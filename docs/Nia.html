@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIA Platform - Documentação v2.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --code-bg: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .logo {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.75rem;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .logo p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            padding: 0 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-left-color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-left-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Content */
+        .content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            max-width: 1200px;
+        }
+
+        .header {
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .subtitle {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .badge-primary { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+
+        section {
+            margin-bottom: 4rem;
+        }
+
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        section h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary);
+        }
+
+        section h4 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #a5b4fc;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(99, 102, 241, 0.1);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .pipeline {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pipeline-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .pipeline-step .number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .pipeline-step .content {
+            flex: 1;
+        }
+
+        .pipeline-step h4 {
+            margin: 0 0 0.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h1>🧠 NIA</h1>
+                <p>Multi-Agent AI Platform</p>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Início</div>
+                <a href="#visao-geral" class="nav-link active">Visão Geral</a>
+                <a href="#arquitetura" class="nav-link">Arquitetura</a>
+                <a href="#tecnologias" class="nav-link">Tecnologias</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Sistema AI</div>
+                <a href="#multi-agent" class="nav-link">Multi-Agent</a>
+                <a href="#pipeline" class="nav-link">Pipeline</a>
+                <a href="#agents" class="nav-link">Agentes</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Desenvolvimento</div>
+                <a href="#banco" class="nav-link">Banco de Dados</a>
+                <a href="#frontend" class="nav-link">Frontend</a>
+                <a href="#api" class="nav-link">API</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Features</div>
+                <a href="#gamificacao" class="nav-link">Gamificação</a>
+                <a href="#autenticacao" class="nav-link">Autenticação</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Projeto</div>
+                <a href="#roadmap" class="nav-link">Roadmap</a>
+                <a href="#executar" class="nav-link">Como Executar</a>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <main class="content">
+            <!-- Header -->
+            <div class="header">
+                <h1>📘 NIA Platform</h1>
+                <p class="subtitle">Sistema Educacional com Multi-Agent AI System</p>
+                <div>
+                    <span class="badge badge-primary">Versão 2.0</span>
+                    <span class="badge badge-success">Novembro 2025</span>
+                    <span class="badge badge-warning">Em Desenvolvimento</span>
+                </div>
+            </div>
+
+            <!-- Visão Geral -->
+            <section id="visao-geral">
+                <h2>🎯 Visão Geral</h2>
+                <p>A <strong>NIA</strong> é uma plataforma educacional inteligente que utiliza um <strong>sistema multi-agente de IA</strong> para gerar cursos completos, criar módulos automaticamente, elaborar quizzes e analisar o progresso de alunos de forma gamificada.</p>
+
+                <div class="grid">
+                    <div class="stat-card">
+                        <div class="icon">🤖</div>
+                        <div class="label">Agentes AI</div>
+                        <div class="value">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">⚡</div>
+                        <div class="label">APIs Gratuitas</div>
+                        <div class="value">100%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">🎯</div>
+                        <div class="label">Taxa de Qualidade</div>
+                        <div class="value">95%+</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">⏱️</div>
+                        <div class="label">Tempo Geração</div>
+                        <div class="value">~5 min</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Arquitetura -->
+            <section id="arquitetura">
+                <h2>🏗️ Arquitetura Geral</h2>
+                
+                <div class="card">
+                    <pre><code>┌─────────────────────────────────────────┐
+│       FRONTEND (Next.js) - :4000        │
+│  React 18 • TypeScript • TailwindCSS    │
+└─────────────────────────────────────────┘
+                  ↕ HTTP/REST
+┌─────────────────────────────────────────┐
+│      BACKEND (FastAPI) - :8000          │
+│  Python 3.11 • Multi-Agent System       │
+└─────────────────────────────────────────┘
+                  ↕ SQL
+┌─────────────────────────────────────────┐
+│    DATABASE (PostgreSQL 15) - :5432     │
+└─────────────────────────────────────────┘
+                  ↕ API Calls
+┌─────────────────────────────────────────┐
+│         SERVIÇOS DE IA (Gratuitos)      │
+│  Gemini • Llama 3.3 • Llama 3.1 • Local │
+└─────────────────────────────────────────┘</code></pre>
+                </div>
+            </section>
+
+            <!-- Tecnologias -->
+            <section id="tecnologias">
+                <h2>🚀 Tecnologias Utilizadas</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h4>Frontend</h4>
+                        <ul>
+                            <li>Next.js 14</li>
+                            <li>React 18</li>
+                            <li>TypeScript</li>
+                            <li>TailwindCSS</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h4>Backend</h4>
+                        <ul>
+                            <li>FastAPI</li>
+                            <li>Python 3.11</li>
+                            <li>SQLAlchemy</li>
+                            <li>Multi-Agent System</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h4>Banco de Dados</h4>
+                        <ul>
+                            <li>PostgreSQL 15</li>
+                            <li>Volume persistente</li>
+                            <li>Docker managed</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h4>Inteligência Artificial</h4>
+                        <ul>
+                            <li>Gemini Pro</li>
+                            <li>Llama 3.3-70B (Groq)</li>
+                            <li>Llama 3.1-8B (Groq)</li>
+                            <li>Llama 3 Local (Ollama)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Multi-Agent -->
+            <section id="multi-agent">
+                <h2>🤖 Arquitetura Multi-Agent</h2>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Agente</th>
+                                <th>IA</th>
+                                <th>Função</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Orchestrator</strong></td>
+                                <td>Gemini Pro</td>
+                                <td>Coordena todo o pipeline</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Specialist</strong></td>
+                                <td>Llama 3.3-70B</td>
+                                <td>Gera conteúdo especializado</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Reviewer</strong></td>
+                                <td>Llama 3.1-8B</td>
+                                <td>Valida qualidade técnica</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Quiz Master</strong></td>
+                                <td>Gemini Pro</td>
+                                <td>Cria avaliações</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tutor</strong></td>
+                                <td>Llama 3 Local</td>
+                                <td>Análise personalizada</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Pipeline -->
+            <section id="pipeline">
+                <h2>🔄 Pipeline de Criação</h2>
+                
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="number">1</div>
+                        <div class="content">
+                            <h4>Pedido do Usuário</h4>
+                            <p>"Criar curso de Python Avançado"</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">2</div>
+                        <div class="content">
+                            <h4>Orchestrator Valida</h4>
+                            <p>Analisa requisitos e cria agents especializados</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">3</div>
+                        <div class="content">
+                            <h4>Specialist Gera Conteúdo</h4>
+                            <p>Cria estrutura + módulos + exemplos</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">4</div>
+                        <div class="content">
+                            <h4>Reviewer Valida</h4>
+                            <p>Nota 0-10. Se < 7, regenera</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">5</div>
+                        <div class="content">
+                            <h4>Quiz Master Cria Prova</h4>
+                            <p>8 questões, mix de dificuldades</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">6</div>
+                        <div class="content">
+                            <h4>Salva no Banco</h4>
+                            <p>Course + Modules + Quiz</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agents Detalhado -->
+            <section id="agents">
+                <h2>🎭 Agentes Especializados</h2>
+
+                <div class="card">
+                    <h3>1️⃣ Orchestrator Agent</h3>
+                    <p><strong>IA:</strong> Gemini Pro</p>
+                    <p><strong>Função:</strong> Coordenador geral que recebe o pedido, cria outros agents e valida o resultado final.</p>
+                </div>
+
+                <div class="card">
+                    <h3>2️⃣ Specialist Agent</h3>
+                    <p><strong>IA:</strong> Llama 3.3-70B (Groq)</p>
+                    <p><strong>Função:</strong> Expert no tema escolhido. Gera estrutura do curso, módulos detalhados, exemplos práticos e exercícios.</p>
+                    <p><strong>Características:</strong></p>
+                    <ul>
+                        <li>Personalidade de expert com 15+ anos de experiência</li>
+                        <li>Adapta ao nível do aluno</li>
+                        <li>Exemplos com código real</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>3️⃣ Reviewer Agent</h3>
+                    <p><strong>IA:</strong> Llama 3.1-8B (Groq)</p>
+                    <p><strong>Função:</strong> Valida qualidade técnica e pedagógica do conteúdo gerado.</p>
+                    <p><strong>Avalia:</strong></p>
+                    <ul>
+                        <li>Precisão técnica</li>
+                        <li>Clareza didática</li>
+                        <li>Exemplos funcionais</li>
+                        <li>Gaps de conteúdo</li>
+                    </ul>
+                    <p><strong>Critério:</strong> Nota mínima 7/10 para aprovar</p>
+                </div>
+
+                <div class="card">
+                    <h3>4️⃣ Quiz Master Agent</h3>
+                    <p><strong>IA:</strong> Gemini Pro</p>
+                    <p><strong>Função:</strong> Cria avaliações alinhadas ao conteúdo do módulo.</p>
+                    <p><strong>Características:</strong></p>
+                    <ul>
+                        <li>8 questões por módulo</li>
+                        <li>Mix: 30% fácil, 50% médio, 20% difícil</li>
+                        <li>Feedback educativo</li>
+                        <li>Total: 100 pontos</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>5️⃣ Tutor Agent</h3>
+                    <p><strong>IA:</strong> Llama 3 Local (Ollama)</p>
+                    <p><strong>Função:</strong> Análise personalizada do desempenho do aluno.</p>
+                    <p><strong>Por que local?</strong> Privacidade total dos dados do aluno</p>
+                    <p><strong>Analisa:</strong></p>
+                    <ul>
+                        <li>Padrões de erro</li>
+                        <li>Pontos fortes/fracos</li>
+                        <li>Recomendações personalizadas</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Banco de Dados -->
+            <section id="banco">
+                <h2>🗄️ Banco de Dados</h2>
+
+                <h3>Tabela: courses</h3>
+                <div class="card">
+                    <pre><code>id, title, description, level, duration_hours,
+prerequisites (JSON), learning_outcomes (JSON),
+structure (JSON), status, created_at</code></pre>
+                </div>
+
+                <h3>Tabela: modules</h3>
+                <div class="card">
+                    <pre><code>id, course_id, module_index, title, content,
+examples (JSON), exercises (JSON), resources (JSON),
+quiz (JSON), review_score, reviewed_by</code></pre>
+                </div>
+
+                <h3>Tabela: progress</h3>
+                <div class="card">
+                    <pre><code>id, user_id, course_id, module_id, status,
+quiz_score, quiz_passed, quiz_answers (JSON),
+tutor_analysis (JSON), points_earned, badges (JSON)</code></pre>
+                </div>
+            </section>
+
+            <!-- Frontend -->
+            <section id="frontend">
+                <h2>🎨 Frontend</h2>
+
+                <h3>Estrutura de Páginas</h3>
+                <div class="card">
+                    <pre><code>/app
+  /courses                # Lista de cursos
+    /create              # Criar novo curso
+    /[id]                # Detalhes do curso
+      /modules/[id]      # Conteúdo do módulo
+        /quiz            # Quiz do módulo
+  /dashboard             # Dashboard do aluno
+  /profile               # Perfil
+  /leaderboard           # Ranking</code></pre>
+                </div>
+
+                <h3>Componentes Principais</h3>
+                <ul>
+                    <li><strong>CourseCard</strong> - Card de curso</li>
+                    <li><strong>CourseGenerator</strong> - Form de criação com IA</li>
+                    <li><strong>ModuleContent</strong> - Renderiza conteúdo</li>
+                    <li><strong>CodeExample</strong> - Syntax highlight</li>
+                    <li><strong>QuizQuestion</strong> - Questão individual</li>
+                    <li><strong>TutorFeedback</strong> - Feedback personalizado</li>
+                </ul>
+            </section>
+
+            <!-- API -->
+            <section id="api">
+                <h2>🔌 API Endpoints</h2>
+
+                <h3>Cursos</h3>
+                <div class="card">
+                    <pre><code>POST   /api/courses/generate
+GET    /api/courses
+GET    /api/courses/{id}
+PUT    /api/courses/{id}
+DELETE /api/courses/{id}</code></pre>
+                </div>
+
+                <h3>Exemplo: Gerar Curso</h3>
+                <div class="card">
+                    <pre><code>POST /api/courses/generate
+
+{
+  "topic": "Python Avançado",
+  "level": "intermediate",
+  "duration_hours": 40
+}
+
+Response:
+{
+  "status": "success",
+  "course_id": 42,
+  "generation_time": 287
+}</code></pre>
+                </div>
+
+                <h3>Exemplo: Submeter Quiz</h3>
+                <div class="card">
+                    <pre><code>POST /api/quiz/submit
+
+{
+  "user_id": "user_123",
+  "module_id": 5,
+  "answers": [
+    {"question_id": 1, "answer": "B"},
+    {"question_id": 2, "answer": "C"}
+  ]
+}
+
+Response:
+{
+  "score": 75,
+  "passed": true,
+  "tutor_analysis": {...}
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Gamificação -->
+            <section id="gamificacao">
+                <h2>🎮 Sistema de Gamificação</h2>
+
+                <h3>Pontuação</h3>
+                <div class="grid">
+                    <div class="stat-card">
+                        <div class="icon">✅</div>
+                        <div class="label">Completar Módulo</div>
+                        <div class="value">50 pts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">🎯</div>
+                        <div class="label">Passar Quiz (70%+)</div>
+                        <div class="value">100 pts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">⭐</div>
+                        <div class="label">Quiz Perfeito</div>
+                        <div class="value">200 pts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">🔥</div>
+                        <div class="label">Streak 7 dias</div>
+                        <div class="value">300 pts</div>
+                    </div>
+                </div>
+
+                <h3>Badges</h3>
+                <ul>
+                    <li>🎓 <strong>First Steps</strong> - Completou primeiro módulo</li>
+                    <li>🏆 <strong>Quiz Master</strong> - 10 quizzes com 100%</li>
+                    <li>💪 <strong>Dedicated</strong> - Estudou 7 dias seguidos</li>
+                    <li>⚡ <strong>Speedrunner</strong> - Completou curso em < 50% do tempo</li>
+                    <li>🎯 <strong>Perfectionist</strong> - 3 cursos com 100% aproveitamento</li>
+                </ul>
+
+                <h3>Níveis</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nível</th>
+                                <th>Pontos</th>
+                                <th>Título</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>0-500</td><td>Iniciante</td></tr>
+                            <tr><td>2</td><td>501-1500</td><td>Aprendiz</td></tr>
+                            <tr><td>3</td><td>1501-3000</td><td>Praticante</td></tr>
+                            <tr><td>4</td><td>3001-5000</td><td>Profissional</td></tr>
+                            <tr><td>5</td><td>5001+</td><td>Expert</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Autenticação -->
+            <section id="autenticacao">
+                <h2>🔐 Autenticação (Fase Futura)</h2>
+
+                <h3>OAuth Providers</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>🔵 Google OAuth</h4>
+                        <p>Login via conta Google usando NextAuth.js</p>
+                    </div>
+                    <div class="card">
+                        <h4>🔷 LinkedIn OAuth</h4>
+                        <p>Login profissional via LinkedIn</p>
+                    </div>
+                </div>
+
+                <h3>Fluxo de Autenticação</h3>
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="number">1</div>
+                        <div class="content">
+                            <p>Usuário clica "Login com Google"</p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="number">2</div>
+                        <div class="content">
+                            <p>NextAuth redireciona para Google OAuth</p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="number">3</div>
+                        <div class="content">
+                            <p>Google retorna com token</p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="number">4</div>
+                        <div class="content">
+                            <p>Backend valida token e cria/atualiza usuário</p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="number">5</div>
+                        <div class="content">
+                            <p>Retorna JWT token</p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="number">6</div>
+                        <div class="content">
+                            <p>Frontend salva token e redireciona para dashboard</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Roadmap -->
+            <section id="roadmap">
+                <h2>📈 Roadmap de Desenvolvimento</h2>
+
+                <h3>✅ Fase 1 - MVP (Atual)</h3>
+                <div class="card">
+                    <ul>
+                        <li>✅ Docker configurado</li>
+                        <li>✅ Backend FastAPI funcionando</li>
+                        <li>✅ Frontend Next.js funcionando</li>
+                        <li>✅ Banco PostgreSQL</li>
+                        <li>🔄 Sistema Multi-Agent</li>
+                        <li>🔄 CRUD de cursos</li>
+                        <li>🔄 Geração de módulos</li>
+                    </ul>
+                </div>
+
+                <h3>🎯 Fase 2 - Core Features</h3>
+                <div class="card">
+                    <ul>
+                        <li>Sistema de Quiz completo</li>
+                        <li>Tutor Agent (análise personalizada)</li>
+                        <li>Dashboard do aluno</li>
+                        <li>Progresso visual</li>
+                        <li>Gamificação básica</li>
+                    </ul>
+                </div>
+
+                <h3>🚀 Fase 3 - Social & Auth</h3>
+                <div class="card">
+                    <ul>
+                        <li>Login Google/LinkedIn</li>
+                        <li>Perfil de usuário</li>
+                        <li>Leaderboard</li>
+                        <li>Certificados digitais</li>
+                        <li>Compartilhamento social</li>
+                    </ul>
+                </div>
+
+                <h3>⚡ Fase 4 - Advanced Features</h3>
+                <div class="card">
+                    <ul>
+                        <li>Recomendações de cursos por IA</li>
+                        <li>Chat com Tutor Agent em tempo real</li>
+                        <li>Modo offline</li>
+                        <li>Mobile app (React Native)</li>
+                        <li>Integração com Notion/Obsidian</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Como Executar -->
+            <section id="executar">
+                <h2>🛠️ Como Executar</h2>
+
+                <h3>Pré-requisitos</h3>
+                <div class="card">
+                    <pre><code># Docker & Docker Compose
+https://docs.docker.com/get-docker/
+
+# Ollama (opcional, para Tutor Agent local)
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3</code></pre>
+                </div>
+
+                <h3>1. Configurar Variáveis de Ambiente</h3>
+                
+                <h4>Backend: <code>backend/.env</code></h4>
+                <div class="card">
+                    <pre><code>DATABASE_URL=postgresql://niauser:niapass@db:5432/niadb
+
+# APIs de IA (Gratuitas)
+GEMINI_API_KEY=sua_chave_aqui
+GROQ_API_KEY=sua_chave_aqui
+
+# Ollama (Local)
+OLLAMA_BASE_URL=http://host.docker.internal:11434</code></pre>
+                </div>
+
+                <h4>Frontend: <code>frontend/.env.local</code></h4>
+                <div class="card">
+                    <pre><code>NEXT_PUBLIC_API_URL=http://localhost:8000</code></pre>
+                </div>
+
+                <h3>2. Obter Chaves de API Gratuitas</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Serviço</th>
+                                <th>Link</th>
+                                <th>Limite</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Google Gemini</td>
+                                <td><a href="https://ai.google.dev" target="_blank">ai.google.dev</a></td>
+                                <td>60 req/min</td>
+                            </tr>
+                            <tr>
+                                <td>Groq</td>
+                                <td><a href="https://console.groq.com" target="_blank">console.groq.com</a></td>
+                                <td>Generoso</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>3. Executar</h3>
+                <div class="card">
+                    <pre><code># Clonar repositório
+git clone https://github.com/seu-usuario/nia-platform.git
+cd nia-platform
+
+# Subir todos os serviços
+docker-compose up --build
+
+# Ou em modo detached
+docker-compose up -d --build</code></pre>
+                </div>
+
+                <h3>4. Acessar</h3>
+                <div class="grid">
+                    <div class="stat-card">
+                        <div class="icon">🎨</div>
+                        <div class="label">Frontend</div>
+                        <div class="value"><a href="http://localhost:4000" target="_blank">:4000</a></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">⚙️</div>
+                        <div class="label">Backend</div>
+                        <div class="value"><a href="http://localhost:8000" target="_blank">:8000</a></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">📚</div>
+                        <div class="label">API Docs</div>
+                        <div class="value"><a href="http://localhost:8000/docs" target="_blank">:8000/docs</a></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">🗄️</div>
+                        <div class="label">Database</div>
+                        <div class="value">:5432</div>
+                    </div>
+                </div>
+
+                <h3>5. Comandos Úteis</h3>
+                <div class="card">
+                    <pre><code># Ver logs
+docker-compose logs -f
+
+# Parar tudo
+docker-compose down
+
+# Reconstruir apenas um serviço
+docker-compose build frontend
+docker-compose up frontend
+
+# Limpar tudo (cuidado!)
+docker-compose down -v
+docker system prune -a</code></pre>
+                </div>
+            </section>
+
+            <!-- Contribuição -->
+            <section id="contribuicao">
+                <h2>🤝 Como Contribuir</h2>
+                
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="number">1</div>
+                        <div class="content">
+                            <h4>Fork o Repositório</h4>
+                            <p>Crie sua cópia do projeto</p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="number">2</div>
+                        <div class="content">
+                            <h4>Crie uma Branch</h4>
+                            <p><code>git checkout -b feature/minha-feature</code></p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="number">3</div>
+                        <div class="content">
+                            <h4>Commit suas Mudanças</h4>
+                            <p><code>git commit -m "feat: adiciona nova feature"</code></p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="number">4</div>
+                        <div class="content">
+                            <h4>Push para o GitHub</h4>
+                            <p><code>git push origin feature/minha-feature</code></p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="number">5</div>
+                        <div class="content">
+                            <h4>Abra um Pull Request</h4>
+                            <p>Descreva suas mudanças detalhadamente</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Guidelines</h3>
+                <ul>
+                    <li>Siga o padrão de código do projeto</li>
+                    <li>Escreva testes para novas features</li>
+                    <li>Atualize a documentação</li>
+                    <li>Use commits semânticos (feat, fix, docs, style, refactor, test, chore)</li>
+                </ul>
+            </section>
+
+            <!-- Footer -->
+            <section style="text-align: center; padding: 3rem 0; border-top: 1px solid var(--border); margin-top: 4rem;">
+                <h3>📝 Licença MIT</h3>
+                <p>Uso livre para fins comerciais e educacionais</p>
+                
+                <div style="margin-top: 2rem;">
+                    <span class="badge badge-primary">v2.0</span>
+                    <span class="badge badge-success">Multi-Agent System</span>
+                    <span class="badge badge-warning">Open Source</span>
+                </div>
+
+                <p style="margin-top: 2rem; color: var(--text-muted);">
+                    Desenvolvido com 💜 usando FastAPI, Next.js e IA
+                </p>
+
+                <div style="margin-top: 2rem;">
+                    <a href="https://github.com/seu-usuario/nia-platform" target="_blank" style="color: var(--primary); text-decoration: none; margin: 0 1rem;">
+                        GitHub
+                    </a>
+                    <a href="https://docs.nia-platform.com" target="_blank" style="color: var(--primary); text-decoration: none; margin: 0 1rem;">
+                        Documentação
+                    </a>
+                    <a href="mailto:contato@nia-platform.com" style="color: var(--primary); text-decoration: none; margin: 0 1rem;">
+                        Contato
+                    </a>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    
+                    // Update active link
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight current section on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

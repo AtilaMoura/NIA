@@ -1,0 +1,790 @@
+{
+  "description": "Este curso é projetado para iniciantes absolutos no mundo do desenvolvimento web, focando nos fundamentos essenciais do HTML. Ao final, você terá uma compreensão sólida de como estruturar conteúdo na web, utilizando as tags e conceitos mais importantes do HTML5. Prepare-se para dar os primeiros passos na criação de suas próprias páginas web!",
+  "estimated_hours": 10,
+  "modules": [
+    {
+      "content": "Bem-vindo ao mundo do HTML! HTML, que significa Linguagem de Marcação de Hipertexto (HyperText Markup Language), é a espinha dorsal de toda página web. Ele não é uma linguagem de programação, mas sim uma linguagem de marcação usada para estruturar o conteúdo que você vê nos navegadores.\n\n### O que é HTML?\nImagine o HTML como o esqueleto de uma página web. Ele define a estrutura e o significado do conteúdo, como títulos, parágrafos, imagens, links e muito mais.\n\n### Como o HTML Funciona?\nOs navegadores (como Chrome, Firefox, Safari) leem arquivos HTML e interpretam as 'tags' para exibir o conteúdo da maneira correta. Um arquivo HTML é texto simples com uma extensão '.html' ou '.htm'.\n\n### Anatomia de um Elemento HTML\nUm elemento HTML é composto por uma tag de abertura, conteúdo e uma tag de fechamento. Por exemplo:\nhtml\n<p>Este é um parágrafo.</p>\n\n*   `<p>`: Tag de abertura que indica o início de um parágrafo.\n*   `Este é um parágrafo.`: O conteúdo do parágrafo.\n*   `</p>`: Tag de fechamento que indica o fim do parágrafo.\n\nAlgumas tags são 'self-closing' ou 'vazias', ou seja, não contêm conteúdo nem tag de fechamento. Exemplo:\nhtml\n<img src=\"imagem.jpg\" alt=\"Descrição da imagem\">\n\n\n### Atributos HTML\nAtributos fornecem informações adicionais sobre um elemento HTML. Eles são sempre definidos na tag de abertura e geralmente vêm em pares nome/valor. Exemplo:\nhtml\n<a href=\"https://www.google.com\">Ir para o Google</a>\n\n*   `href`: Nome do atributo (neste caso, define o destino do link).\n*   `\"https://www.google.com\"`: Valor do atributo.\n\n### Estrutura Básica de um Documento HTML\nTodo documento HTML segue uma estrutura padrão. Vamos quebrá-la:\n\nhtml\n<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Minha Primeira Página</title>\n</head>\n<body>\n    <h1>Olá, Mundo!</h1>\n    <p>Esta é a minha primeira página HTML.</p>\n</body>\n</html>\n\n\n#### Explicação da Estrutura:\n*   `<!DOCTYPE html>`: Declaração que define o tipo de documento. Essencial para que os navegadores saibam que estão lidando com HTML5.\n*   `<html lang=\"pt-BR\">`: O elemento raiz de toda página HTML. O atributo `lang=\"pt-BR\"` indica o idioma do conteúdo (português do Brasil), o que é bom para acessibilidade e SEO.\n*   `<head>`: Esta seção contém metadados sobre a página, que não são exibidos diretamente no navegador, mas são importantes para ele e para os motores de busca. Inclui:\n    *   `<meta charset=\"UTF-8\">`: Define a codificação de caracteres do documento como UTF-8, garantindo que caracteres especiais (acentos, cedilhas) sejam exibidos corretamente.\n    *   `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">`: Configura a viewport, essencial para tornar a página responsiva e visualizável em diferentes dispositivos.\n    *   `<title>Minha Primeira Página</title>`: Define o título da página, que aparece na aba do navegador ou na janela.\n*   `<body>`: Esta é a parte visível da página web. Todo o conteúdo que o usuário vê (textos, imagens, links, etc.) deve estar aqui.",
+      "estimated_minutes": 90,
+      "exercises": [
+        {
+          "question": "O que significa a sigla HTML e qual sua principal função no desenvolvimento web?",
+          "solution": "HTML significa HyperText Markup Language (Linguagem de Marcação de Hipertexto). Sua principal função é estruturar o conteúdo de uma página web, definindo como os diferentes elementos (títulos, parágrafos, imagens, links, etc.) são organizados e interpretados pelos navegadores."
+        },
+        {
+          "question": "Crie um pequeno trecho de código HTML que inclua:\n*   Uma declaração `<!DOCTYPE html>`.\n*   Um elemento `<html>` com o atributo `lang=\"en\"`.\n*   Um elemento `<head>` contendo um `<title>` com o texto 'Página de Teste'.\n*   Um elemento `<body>` contendo um `<h1>` com o texto 'Bem-vindo!' e um `<p>` com o texto 'Este é um teste.'",
+          "solution": "html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <title>Página de Teste</title>\n</head>\n<body>\n    <h1>Bem-vindo!</h1>\n    <p>Este é um teste.</p>\n</body>\n</html>\n"
+        },
+        {
+          "question": "Explique a diferença entre uma tag de abertura, uma tag de fechamento e o conteúdo em um elemento HTML. Dê um exemplo.",
+          "solution": "Uma tag de abertura (<tag>) marca o início de um elemento. Uma tag de fechamento (</tag>) marca o fim de um elemento. O conteúdo é o que está entre as tags de abertura e fechamento. Exemplo: Em `<p>Olá mundo!</p>`, `<p>` é a tag de abertura, `</p>` é a tag de fechamento e `Olá mundo!` é o conteúdo."
+        },
+        {
+          "question": "Qual a importância do atributo `charset=\"UTF-8\"` na tag `<meta>` dentro do `<head>`?",
+          "solution": "O atributo `charset=\"UTF-8\"` é crucial porque define a codificação de caracteres do documento como UTF-8. Isso garante que todos os caracteres, incluindo acentos, cedilhas e outros caracteres especiais de diferentes idiomas, sejam exibidos corretamente no navegador, evitando problemas de texto ilegível."
+        },
+        {
+          "question": "Identifique e explique dois elementos dentro da seção `<head>` de um documento HTML e por que eles são importantes.",
+          "solution": "1.  **`<title>`**: Define o título da página, que aparece na aba do navegador ou na janela do aplicativo. É importante para a usabilidade e para o SEO, pois é o que o usuário vê ao navegar entre abas ou nos resultados de busca.\n2.  **`<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">`**: Configura a viewport da página, informando ao navegador como dimensionar e escalar a página para corresponder à largura do dispositivo. Isso é fundamental para garantir que a página seja responsiva e tenha uma boa aparência em celulares, tablets e desktops."
+        }
+      ],
+      "images": [
+        {
+          "description": "Diagrama mostrando a estrutura de um elemento HTML comum com tags de abertura, conteúdo e fechamento.",
+          "url": "https://www.hostinger.com.br/tutoriais/wp-content/uploads/sites/12/2022/02/estrutura-de-um-elemento-html.webp"
+        },
+        {
+          "description": "Representação visual da estrutura básica de um documento HTML, destacando as seções head e body.",
+          "url": "https://www.digitalocean.com/community/assets/tutorials/html-basics-head-body-and-doctype/structure-d014bc083cf43702a832c3f15d29bdca5a706da62a8ab8ed83445cdb2d86a603.png"
+        }
+      ],
+      "order": 1,
+      "quiz": {
+        "essay": [
+          {
+            "question": "Explique o papel dos atributos em elementos HTML, fornecendo um exemplo prático usando a tag `<a>`."
+          },
+          {
+            "question": "Descreva a importância da meta tag `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">` para o desenvolvimento web moderno."
+          }
+        ],
+        "multiple_choice": [
+          {
+            "correct": 2,
+            "explanation_correct": "A função principal do HTML é estruturar e organizar o conteúdo de uma página web, definindo títulos, parágrafos, imagens, links, etc.",
+            "explanation_incorrect": [
+              "Estilizar a aparência é função do CSS.",
+              "Adicionar interatividade e lógica é normalmente função do JavaScript.",
+              "O HTML não gerencia bancos de dados diretamente."
+            ],
+            "options": [
+              "Estilizar a aparência dos elementos.",
+              "Adicionar interatividade e lógica à página.",
+              "Estruturar e organizar o conteúdo.",
+              "Gerenciar bancos de dados."
+            ],
+            "question": "Qual a principal função do HTML em uma página web?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "A tag `<img>` é um exemplo de tag self-closing (ou vazia) porque não possui conteúdo e não necessita de uma tag de fechamento separada.",
+            "explanation_incorrect": [
+              "`<p>` é um parágrafo e contém conteúdo.",
+              "`<a>` é para links e contém conteúdo.",
+              "`<div>` é uma divisão genérica e contém conteúdo."
+            ],
+            "options": [
+              "`<p></p>`",
+              "`<a></a>`",
+              "`<img>`",
+              "`<div></div>`"
+            ],
+            "question": "Qual das seguintes tags é um exemplo de tag self-closing (vazia)?"
+          },
+          {
+            "correct": 1,
+            "explanation_correct": "A tag `<head>` contém metadados sobre o documento, como o título da página, links para folhas de estilo, scripts e informações que não são exibidas diretamente, mas são importantes para o navegador e motores de busca.",
+            "explanation_incorrect": [
+              "O conteúdo visível é colocado na tag `<body>`.",
+              "Criar cabeçalhos para seções é feito com tags como `<h1>` a `<h6>` no `<body>`.",
+              "A conexão a servidores geralmente é feita por scripts no lado do servidor ou por requisições JavaScript no cliente."
+            ],
+            "options": [
+              "Conter todo o conteúdo visível da página.",
+              "Definir o título da página e incluir metadados.",
+              "Criar cabeçalhos para seções de texto.",
+              "Conectar a página a um servidor."
+            ],
+            "question": "Qual a finalidade da tag `<head>` em um documento HTML?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "O atributo `lang=\"pt-BR\"` é usado para indicar o idioma principal do conteúdo do documento (neste caso, português do Brasil), o que é importante para acessibilidade, SEO e renderização correta de texto.",
+            "explanation_incorrect": [
+              "Não indica uma versão beta.",
+              "O tamanho da fonte é definido por CSS.",
+              "A largura para dispositivos móveis é controlada pela meta tag viewport."
+            ],
+            "options": [
+              "Que o documento é uma versão beta.",
+              "O tamanho padrão da fonte para o documento.",
+              "O idioma principal do conteúdo da página.",
+              "A largura da página para dispositivos móveis."
+            ],
+            "question": "O que o atributo `lang=\"pt-BR\"` no elemento `<html>` indica?"
+          },
+          {
+            "correct": 1,
+            "explanation_correct": "A declaração correta para um documento HTML5 é `<!DOCTYPE html>`. É essencial para que o navegador interprete a página corretamente.",
+            "explanation_incorrect": [
+              "`<DOCTYPE html>` está incorreto por falta do ponto de exclamação.",
+              "`<HTML!DOCTYPE>` está sintaticamente incorreto.",
+              "`<!DOCTYPE HTML5>` era uma sintaxe anterior que não é usada para HTML5."
+            ],
+            "options": [
+              "`<DOCTYPE html>`",
+              "`<!DOCTYPE html>`",
+              "`<HTML!DOCTYPE>`",
+              "`<!DOCTYPE HTML5>`"
+            ],
+            "question": "Qual das seguintes opções é a declaração correta para um documento HTML5?"
+          }
+        ]
+      },
+      "title": "Introdução ao HTML e Estrutura Básica"
+    },
+    {
+      "content": "No módulo anterior, vimos a estrutura básica de uma página HTML. Agora, vamos mergulhar nas tags que usamos para dar significado ao texto e organizar o conteúdo. HTML oferece uma gama de tags para formatar e estruturar texto, bem como para incorporar conteúdo 'inline', ou seja, que flui dentro da linha do texto.\n\n### Títulos (Headings): `<h1>` a `<h6>`\nOs títulos são fundamentais para organizar o conteúdo e proporcionar uma hierarquia visual. Eles variam de `<h1>` (o mais importante) a `<h6>` (o menos importante). Devem ser usados semanticamente, ou seja, `<h1>` para o título principal da página, `<h2>` para subtítulos importantes e assim por diante.\n\nhtml\n<h1>Título Principal da Página</h1>\n<h2>Seção Importante</h2>\n<h3>Subseção do Tópico</h3>\n<h4>Detalhes Específicos</h4>\n<h5>Informações Adicionais</h5>\n<h6>Notas de Rodapé Pequenas</h6>\n\n\n### Parágrafos: `<p>`\nA tag `<p>` é usada para agrupar blocos de texto como parágrafos. É uma das tags mais comuns e básicas do HTML para conteúdo textual.\n\nhtml\n<p>Este é o primeiro parágrafo do meu documento HTML. Ele contém algumas informações introdutórias.</p>\n<p>E aqui temos o segundo parágrafo, que continua o tema abordado anteriormente, com mais detalhes e exemplos.</p>\n\n\n### Formatação de Texto (Ênfase e Importância)\nHTML oferece tags para indicar significado e ênfase específicos no texto, em vez de apenas estilizar.\n\n*   **`<strong>`**: Indica que o texto tem grande importância ou urgência. Por padrão, navegadores o exibem em negrito.\n*   **`<em>`**: Usado para dar ênfase, normalmente exibido em itálico.\n*   **`<b>`**: Apenas formata o texto em negrito sem adicionar importância semântica. (Prefira `<strong>` para importância).\n*   **`<i>`**: Apenas formata o texto em itálico sem adicionar ênfase semântica. (Prefira `<em>` para ênfase).\n\nhtml\n<p>Este é um texto <strong>muito importante</strong> que você precisa ler. Ele contém uma palavra <em>enfatizada</em>.</p>\n<p>Você pode usar <b>negrito</b> e <i>itálico</i> apenas para fins estéticos, mas o ideal é usar as tags semânticas.</p>\n\n\n### Quebras de Linha e Linhas Horizontais\n*   **`<br>` (Break Rule)**: Insere uma quebra de linha. Como uma tag vazia, não tem conteúdo nem tag de fechamento.\n*   **`<hr>` (Horizontal Rule)**: Cria uma linha horizontal, geralmente para separar blocos de conteúdo tematicamente. Também é uma tag vazia.\n\nhtml\n<p>Primeira linha de texto.<br>Segunda linha de texto após uma quebra.\n</p>\n<hr>\n<p>Conteúdo abaixo da linha horizontal.</p>\n\n\n### Links (Hyperlinks): `<a>`\nA tag `<a>` (âncora) é o coração da web, permitindo a navegação entre páginas. O atributo `href` (hypertext reference) é obrigatório e define o destino do link.\n\nhtml\n<p>Visite o <a href=\"https://www.google.com\">Google</a> para pesquisar.</p>\n<p>Acesse <a href=\"pagina2.html\">nossa segunda página</a> (link interno).</p>\n\n\n#### Atributos Comuns para Links:\n*   **`href`**: O URL de destino do link.\n*   **`target`**: Define onde o link será aberto. Valores comuns:\n    *   `_self` (padrão): Abre na mesma aba/janela.\n    *   `_blank`: Abre em uma nova aba/janela.\n*   **`title`**: Fornece informações adicionais sobre o link, que aparecem como um tooltip ao passar o mouse.\n\nhtml\n<a href=\"https://www.openai.com\" target=\"_blank\" title=\"Visitar o site da OpenAI em uma nova aba\">OpenAI</a>\n\n\n### Listas\nListas são essenciais para organizar informações de forma clara.\n\n*   **Listas Não Ordenadas (`<ul>` - Unordered List)**: Usam marcadores (pontos, círculos) para itens que não têm uma ordem específica.\n    *   `<li>` (List Item): Os itens da lista.\n\n    html\n    <p>Minhas frutas favoritas:</p>\n    <ul>\n        <li>Maçã</li>\n        <li>Banana</li>\n        <li>Laranja</li>\n    </ul>\n    \n\n*   **Listas Ordenadas (`<ol>` - Ordered List)**: Usam números ou letras para itens que têm uma ordem sequencial.\n    *   `<li>` (List Item): Os itens da lista.\n\n    html\n    <p>Passos para fazer um café:</p>\n    <ol>\n        <li>Ferver a água</li>\n        <li>Adicionar pó de café</li>\n        <li>Adoçar a gosto</li>\n    </ol>\n    \n\n### Tabelas: `<table>`\nTabelas são usadas para exibir dados tabulares, organizados em linhas e colunas.\n\n*   **`<table>`**: O elemento contêiner da tabela.\n*   **`<thead>`**: Grupo de cabeçalho da tabela.\n*   **`<tbody>`**: Grupo de corpo da tabela.\n*   **`<tr>` (Table Row)**: Uma linha da tabela.\n*   **`<th>` (Table Header)**: Uma célula de cabeçalho (geralmente em negrito e centralizada por padrão).\n*   **`<td>` (Table Data)**: Uma célula de dados comum.\n\nhtml\n<table>\n    <thead>\n        <tr>\n            <th>Nome</th>\n            <th>Idade</th>\n            <th>Cidade</th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td>João</td>\n            <td>30</td>\n            <td>São Paulo</td>\n        </tr>\n        <tr>\n            <td>Maria</td>\n            <td>25</td>\n            <td>Rio de Janeiro</td>\n        </tr>\n    </tbody>\n</table>\n",
+      "estimated_minutes": 120,
+      "exercises": [
+        {
+          "question": "Crie um trecho HTML que inclua:\n*   Um título principal (`<h1>`) para uma receita de bolo.\n*   Um subtítulo (`<h2>`) para os ingredientes.\n*   Uma lista não ordenada (`<ul>`) com pelo menos três ingredientes.\n*   Um parágrafo (`<p>`) com o texto 'Aprenda a fazer um bolo delicioso!' onde a palavra 'delicioso' esteja em negrito (`<strong>`).",
+          "solution": "html\n<h1>Receita de Bolo de Chocolate</h1>\n<h2>Ingredientes</h2>\n<ul>\n    <li>2 xícaras de farinha de trigo</li>\n    <li>1 xícara de açúcar</li>\n    <li>4 ovos</li>\n    <li>1/2 xícara de chocolate em pó</li>\n</ul>\n<p>Aprenda a fazer um bolo <strong>delicioso</strong>!</p>\n"
+        },
+        {
+          "question": "Crie uma lista ordenada (`<ol>`) com os passos para escovar os dentes e insira uma quebra de linha (`<br>`) após cada item da lista. Adicione um parágrafo de introdução antes da lista.",
+          "solution": "html\n<p>Siga estes passos para uma higiene bucal completa:</p>\n<ol>\n    <li>Aplique pasta de dente na escova.<br></li>\n    <li>Escove todos os dentes cuidadosamente.<br></li>\n    <li>Enxágue a boca com água.<br></li>\n    <li>Use fio dental.</li>\n</ol>\n"
+        },
+        {
+          "question": "Crie um link (`<a>`) que leve para 'https://www.wikipedia.org' e abra em uma nova aba (`_blank`). O texto do link deve ser 'Visitar Wikipedia' e deve ter um 'title' explicando que o link abre em uma nova janela.",
+          "solution": "html\n<a href=\"https://www.wikipedia.org\" target=\"_blank\" title=\"Este link abrirá o site da Wikipedia em uma nova aba.\">Visitar Wikipedia</a>\n"
+        },
+        {
+          "question": "Monte uma tabela HTML simples que exiba os dados de dois produtos:\n\n| Produto | Preço | Estoque |\n|---|---|---|\n| Camiseta | R$ 50.00 | 100 |\n| Calça | R$ 120.00 | 50 |\n",
+          "solution": "html\n<table>\n    <thead>\n        <tr>\n            <th>Produto</th>\n            <th>Preço</th>\n            <th>Estoque</th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr>\n            <td>Camiseta</td>\n            <td>R$ 50.00</td>\n            <td>100</td>\n        </tr>\n        <tr>\n            <td>Calça</td>\n            <td>R$ 120.00</td>\n            <td>50</td>\n        </tr>\n    </tbody>\n</table>\n"
+        },
+        {
+          "question": "Qual a diferença semântica entre as tags `<strong>` e `<b>`? Quando você usaria cada uma?",
+          "solution": "A tag `<strong>` é usada para indicar que o texto tem grande importância, urgência ou relevância semântica. Já a tag `<b>` aplica negrito ao texto apenas por razões estéticas, sem adicionar qualquer significado semântico adicional. Deve-se preferir `<strong>` para destacar informações cruciais e `<b>` para situações onde o negrito é apenas uma formatação visual sem importância inerente ao conteúdo."
+        }
+      ],
+      "images": [
+        {
+          "description": "Exemplo visual da hierarquia de títulos HTML de h1 a h6.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements/headings-hierarchy.png"
+        },
+        {
+          "description": "Estrutura básica de uma lista não ordenada (ul) com itens de lista (li).",
+          "url": "https://www.w3schools.com/tags/pic_ul.gif"
+        },
+        {
+          "description": "Estrutura de uma tabela HTML com thead, tbody, tr, th e td.",
+          "url": "https://static-s.w3schools.com/images/lamp.gif"
+        }
+      ],
+      "order": 2,
+      "quiz": {
+        "essay": [
+          {
+            "question": "Compare as tags `<em>` e `<i>` em termos de semântica e uso. Quando você decidiria usar uma em vez da outra?"
+          },
+          {
+            "question": "Descreva como as tags de título (`<h1>` a `<h6>`) devem ser usadas para garantir uma boa estrutura e acessibilidade em uma página web."
+          }
+        ],
+        "multiple_choice": [
+          {
+            "correct": 2,
+            "explanation_correct": "A tag `<h1>` é usada para o título principal e mais importante da página, estabelecendo a hierarquia semântica do conteúdo.",
+            "explanation_incorrect": [
+              "`<h2>` é para subtítulos de primeiro nível.",
+              "`<p>` é para parágrafos de texto.",
+              "`<h6>` é para o título de menor importância."
+            ],
+            "options": [
+              "`<h2>`",
+              "`<p>`",
+              "`<h1>`",
+              "`<h6>`"
+            ],
+            "question": "Qual tag HTML é usada para o título mais importante de uma página?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "O atributo `href` (hypertext reference) é essencial para definir o URL de destino de um link `<a>`.",
+            "explanation_incorrect": [
+              "`src` é usado para especificar a fonte de uma imagem ou vídeo.",
+              "`alt` é para texto alternativo em imagens.",
+              "`title` fornece informações extras, mas não o destino do link."
+            ],
+            "options": [
+              "`src`",
+              "`alt`",
+              "`href`",
+              "`title`"
+            ],
+            "question": "Qual atributo é essencial para definir o destino de um link (`<a>`)?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "A tag `<ul>` (unordered list) é usada para criar uma lista de itens que não têm uma ordem específica, sendo cada item representado por `<li>`.",
+            "explanation_incorrect": [
+              "`<ol>` cria uma lista ordenada.",
+              "`<li>` define um item da lista, mas não a lista em si.",
+              "`<dl>` é para listas de definição."
+            ],
+            "options": [
+              "`<ol>`",
+              "`<li>`",
+              "`<ul>`",
+              "`<dl>`"
+            ],
+            "question": "Qual tag cria uma lista não ordenada de itens?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "A tag `<br>` é uma tag vazia que insere uma quebra de linha, fazendo com que o conteúdo seguinte comece em uma nova linha.",
+            "explanation_incorrect": [
+              "Criar uma linha horizontal é função de `<hr>`.",
+              "Para espaços em branco, usa-se CSS ou entidades HTML como `&nbsp;`.",
+              "Formatar em negrito é feito com `<strong>` ou `<b>`."
+            ],
+            "options": [
+              "Para criar uma linha horizontal.",
+              "Para inserir um espaço em branco extra.",
+              "Para pular para a próxima linha (quebra de linha).",
+              "Para formatar texto em negrito."
+            ],
+            "question": "Para que serve a tag `<br>` em HTML?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "A tag `<th>` (Table Header) é usada para definir uma célula de cabeçalho em uma tabela, que geralmente é exibida em negrito e centralizada por padrão.",
+            "explanation_incorrect": [
+              "`<td>` é para células de dados comuns.",
+              "`<tr>` define uma linha da tabela.",
+              "`<thead>` é para agrupar as linhas de cabeçalho, não uma célula individual."
+            ],
+            "options": [
+              "`<td>`",
+              "`<tr>`",
+              "`<th>`",
+              "`<thead>`"
+            ],
+            "question": "Em uma tabela HTML, qual tag é usada para definir uma célula de cabeçalho da tabela?"
+          }
+        ]
+      },
+      "title": "Tags Essenciais de Texto e Conteúdo Inline"
+    },
+    {
+      "content": "A web não seria tão rica e interativa sem a capacidade de incorporar imagens, áudios e vídeos. Neste módulo, vamos aprender como adicionar esses elementos multimídia às suas páginas HTML.\n\n### Imagens: `<img>`\nA tag `<img>` é usada para incorporar uma imagem em um documento HTML. É uma tag vazia (sem tag de fechamento) e requer alguns atributos essenciais.\n\nhtml\n<img src=\"caminho/para/minha-imagem.jpg\" alt=\"Descrição da imagem\">\n\n\n#### Atributos Essenciais para `<img>`:\n*   **`src` (source)**: O caminho para o arquivo da imagem. Pode ser um caminho relativo (dentro do seu projeto) ou absoluto (um URL na internet).\n*   **`alt` (alternative text)**: Texto alternativo para a imagem. É crucial para acessibilidade (leitores de tela para pessoas com deficiência visual) e também é exibido se a imagem não puder ser carregada. Além disso, é importante para SEO (Search Engine Optimization).\n\n#### Atributos Opcionais para `<img>` (para controle básico de tamanho):\n*   **`width`**: Define a largura da imagem em pixels.\n*   **`height`**: Define a altura da imagem em pixels.\n\n**Importante**: É uma boa prática definir a largura e altura em CSS para um controle mais flexível e responsivo, mas para ajustes rápidos ou para evitar *layout shifts* enquanto a imagem carrega, pode ser útil no HTML.\n\nhtml\n<img src=\"https://via.placeholder.com/150\" alt=\"Um quadrado cinza de 150x150 pixels\" width=\"150\" height=\"150\">\n\n\n### Figuras e Legendas: `<figure>` e `<figcaption>`\nPara associar legendas a imagens (ou outros conteúdos como gráficos, vídeos), usamos as tags `<figure>` e `<figcaption>`. Isso adiciona semântica e melhora a acessibilidade.\n\nhtml\n<figure>\n    <img src=\"https://www.w3schools.com/tags/img_girl.jpg\" alt=\"Garota com jaqueta\">\n    <figcaption>Uma garota usando uma jaqueta em um cenário urbano.</figcaption>\n</figure>\n\n\n### Áudio: `<audio>`\nA tag `<audio>` permite incorporar arquivos de áudio diretamente na página.\n\nhtml\n<audio controls>\n    <source src=\"audio/exemplo.mp3\" type=\"audio/mpeg\">\n    <source src=\"audio/exemplo.ogg\" type=\"audio/ogg\">\n    Seu navegador não suporta o elemento de áudio.\n</audio>\n\n\n#### Atributos Comuns para `<audio>`:\n*   **`controls`**: Adiciona os controles de áudio padrão do navegador (play/pause, volume, barra de progresso).\n*   **`autoplay`**: Tenta iniciar a reprodução automaticamente (muitas vezes bloqueado por navegadores para evitar interrupções ao usuário).\n*   **`loop`**: Faz o áudio tocar em loop contínuo.\n*   **`muted`**: Inicia o áudio mudo.\n*   **`<source>`**: Dentro do `<audio>` (e `<video>`), esta tag permite especificar múltiplos arquivos de áudio/vídeo em diferentes formatos. O navegador tentará carregar o primeiro formato que suporta. O atributo `type` ajuda o navegador a identificar o formato.\n\n### Vídeo: `<video>`\nA tag `<video>` é semelhante à tag `<audio>` e permite incorporar vídeos.\n\nhtml\n<video width=\"320\" height=\"240\" controls>\n    <source src=\"video/exemplo.mp4\" type=\"video/mp4\">\n    <source src=\"video/exemplo.webm\" type=\"video/webm\">\n    Seu navegador não suporta o elemento de vídeo.\n</video>\n\n\n#### Atributos Comuns para `<video>`:\nOs atributos `controls`, `autoplay`, `loop`, `muted` funcionam de forma idêntica ao `<audio>`.\n*   **`width` / `height`**: Define as dimensões do player de vídeo.\n*   **`poster`**: Especifica uma imagem para ser exibida enquanto o vídeo não está disponível ou até o usuário clicar em 'play'.\n\nhtml\n<video width=\"640\" height=\"360\" controls poster=\"imagens/video-capa.jpg\">\n    <source src=\"video/meu-video.mp4\" type=\"video/mp4\">\n    Seu navegador não suporta este vídeo.\n</video>\n\n\n### Incorporando Conteúdo Externo: `<iframe>`\nA tag `<iframe>` (inline frame) é usada para incorporar outro documento HTML dentro do documento atual (como um vídeo do YouTube, um mapa do Google, ou outra página web).\n\n**Cuidado**: O uso excessivo ou incorreto de `<iframe>` pode ter implicações de segurança e desempenho. Use com moderação e apenas com fontes confiáveis.\n\nhtml\n<iframe src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" width=\"560\" height=\"315\" title=\"Vídeo do YouTube - Rick Astley\" frameborder=\"0\" allowfullscreen></iframe>\n\n<iframe src=\"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3679.525656515814!2d-43.17641218498064!3d-22.90684788498058!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9bde559103e3b3%3A0xf6392576b5534f3!2sCristo%20Redentor!5e0!3m2!1spt-BR!2sbr!4v1678901234567!5m2!1spt-BR!2sbr\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>\n\n\n#### Atributos Comuns para `<iframe>`:\n*   **`src`**: O URL do documento a ser incorporado.\n*   **`width` / `height`**: Largura e altura do iframe.\n*   **`frameborder`**: (Obsoleto em HTML5, use CSS para bordas) Define se uma borda será exibida ao redor do iframe. O valor '0' remove a borda.\n*   **`allowfullscreen`**: Permite que o conteúdo incorporado possa ser exibido em tela cheia (muito comum em vídeos do YouTube).\n*   **`title`**: Essencial para acessibilidade, descreve o conteúdo do iframe.\n\nCom esses elementos, suas páginas web se tornarão muito mais dinâmicas e ricas em conteúdo! Lembre-se sempre da acessibilidade: forneça texto alternativo para imagens e títulos descritivos para iframes.",
+      "estimated_minutes": 90,
+      "exercises": [
+        {
+          "question": "Crie um trecho HTML que incorpore uma imagem. Use um URL de uma imagem online (placeholder) para o `src`. Certifique-se de incluir um `alt` text descritivo e defina a largura para 200 pixels.",
+          "solution": "html\n<img src=\"https://via.placeholder.com/200x150\" alt=\"Uma imagem de placeholder cinza de 200 por 150 pixels\" width=\"200\">\n"
+        },
+        {
+          "question": "Explique a importância do atributo `alt` na tag `<img>`.",
+          "solution": "O atributo `alt` (texto alternativo) na tag `<img>` é crucial por várias razões:\n1. **Acessibilidade:** Leitores de tela para pessoas com deficiência visual leem o texto `alt`, descrevendo o conteúdo da imagem.\n2. **Erro de Carregamento:** Se a imagem não puder ser carregada (por URL incorreto, problema de rede, etc.), o texto `alt` é exibido em seu lugar.\n3. **SEO:** Motores de busca usam o texto `alt` para entender o conteúdo da imagem, o que pode ajudar na otimização para mecanismos de busca."
+        },
+        {
+          "question": "Crie um elemento `<audio>` com controles de reprodução (`controls`) e que inicie mudo (`muted`). Inclua uma mensagem para navegadores que não suportam a tag de áudio.",
+          "solution": "html\n<audio controls muted>\n    <source src=\"audio/minha-musica.mp3\" type=\"audio/mpeg\">\n    Seu navegador não suporta este áudio. :(\n</audio>\n"
+        },
+        {
+          "question": "Implemente um `<figure>` que contenha uma imagem. A imagem deve ter um `alt` text e o `figcaption` deve descrever a imagem. Use um URL de imagem placeholder.",
+          "solution": "html\n<figure>\n    <img src=\"https://via.placeholder.com/300x200?text=Minha+Imagem\" alt=\"Um quadrado de placeholder com o texto 'Minha Imagem'\">\n    <figcaption>Esta é uma imagem placeholder genérica com dimensões de 300x200 pixels.</figcaption>\n</figure>\n"
+        },
+        {
+          "question": "Como você incorporaria um vídeo do YouTube em sua página HTML usando a tag `<iframe>`? Quais atributos você consideraria essenciais para isso?",
+          "solution": "Para incorporar um vídeo do YouTube, você usaria a tag `<iframe>` com o atributo `src` apontando para o URL de incorporação do vídeo (geralmente encontrado na opção 'Compartilhar' > 'Incorporar' no YouTube). Atributos essenciais:\n*   `src`: O URL do vídeo a ser incorporado (ex: `https://www.youtube.com/embed/VIDEO_ID`).\n*   `width` e `height`: Para definir as dimensões do player.\n*   `title`: Para acessibilidade, descrevendo o conteúdo do vídeo.\n*   `allowfullscreen`: Para permitir que o vídeo seja reproduzido em tela cheia.\n*   `frameborder=\"0\"`: (Embora obsoleto, muitas vezes usado para remover a borda padrão do iframe).\n\nExemplo:\nhtml\n<iframe src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" width=\"560\" height=\"315\" title=\"Vídeo Musical - Never Gonna Give You Up\" frameborder=\"0\" allowfullscreen></iframe>\n"
+        }
+      ],
+      "images": [
+        {
+          "description": "Exemplo de uma imagem com a tag img e seus atributos src e alt.",
+          "url": "https://www.w3schools.com/html/img_html.gif"
+        },
+        {
+          "description": "Estrutura de um elemento de áudio com múltiplos sources para compatibilidade de navegadores.",
+          "url": "https://www.w3schools.com/html/pic_audiocontrols.gif"
+        },
+        {
+          "description": "Exemplo de um vídeo incorporado com a tag video e seus atributos.",
+          "url": "https://www.w3schools.com/html/pic_videocontrols.gif"
+        }
+      ],
+      "order": 3,
+      "quiz": {
+        "essay": [
+          {
+            "question": "Explique a importância de especificar múltiplas tags `<source>` dentro de um elemento `<video>` ou `<audio>`, e como o atributo `type` auxilia nisso."
+          },
+          {
+            "question": "Discuta as considerações de segurança e desempenho ao usar a tag `<iframe>` para incorporar conteúdo de terceiros em sua página web."
+          }
+        ],
+        "multiple_choice": [
+          {
+            "correct": 3,
+            "explanation_correct": "O atributo `src` (source) é o mais importante e obrigatório, pois define o caminho ou URL da imagem que será exibida.",
+            "explanation_incorrect": [
+              "`width` e `height` são opcionais e podem ser controlados via CSS.",
+              "`alt` é altamente recomendado e importante para acessibilidade, mas uma imagem pode ser semanticamente decorativa e não requerer foco de leitores de tela para descrição neste caso ele é uma string vazia `alt=\"\"` e não 'obrigatório' neste sentido estrito de exibição."
+            ],
+            "options": [
+              "`width`",
+              "`alt`",
+              "`height`",
+              "`src`"
+            ],
+            "question": "Qual é o atributo mais importante e obrigatório para a tag `<img>`?"
+          },
+          {
+            "correct": 1,
+            "explanation_correct": "O atributo `alt` fornece um texto alternativo que é exibido se a imagem não puder ser carregada ou é lido por leitores de tela para descrever a imagem a usuários com deficiência visual.",
+            "explanation_incorrect": [
+              "A largura é definida por `width`.",
+              "O título que aparece ao passar o mouse é definido pelo atributo `title` (cuidado, diferente do `alt`).",
+              "O formato da imagem é inferido pelo `src` URI ou tipo de cabeçalho."
+            ],
+            "options": [
+              "Para definir a largura da imagem.",
+              "Para fornecer um texto alternativo caso a imagem não carregue ou para leitores de tela.",
+              "Para adicionar um título à imagem que aparece ao passar o mouse.",
+              "Para especificar o formato da imagem (ex: .jpg, .png)."
+            ],
+            "question": "Para que serve o atributo `alt` da tag `<img>`?"
+          },
+          {
+            "correct": 3,
+            "explanation_correct": "O atributo `controls` é usado para adicionar os controles de reprodução padrão do navegador aos elementos `<audio>` e `<video>`.",
+            "explanation_incorrect": [
+              "Não existem tags `<play>`, `<audio-controls>` ou `<video-player>` em HTML padrão para essa finalidade."
+            ],
+            "options": [
+              "`<play>`",
+              "`<audio-controls>`",
+              "`<video-player>`",
+              "`controls` (como um atributo)"
+            ],
+            "question": "Qual tag é usada para adicionar controles de reprodução a um elemento de áudio ou vídeo no HTML?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "A combinação das tags `<figure>` e `<figcaption>` é a maneira semântica correta de agrupar uma imagem (ou outro conteúdo) com sua legenda.",
+            "explanation_incorrect": [
+              "As outras opções não oferecem a semântica de figura e legenda."
+            ],
+            "options": [
+              "`<p><img src=\"a.jpg\" alt=\"a\"> Uma legenda.</p>`",
+              "`<div><img src=\"a.jpg\" alt=\"a\"><p>Uma legenda.</p></div>`",
+              "`<figure><img src=\"a.jpg\" alt=\"a\"><figcaption>Uma legenda.</figcaption></figure>`",
+              "`<img src=\"a.jpg\" alt=\"a\" caption=\"Uma legenda.\">`"
+            ],
+            "question": "Qual das seguintes construções é a maneira semântica correta de associar uma legenda a uma imagem?"
+          },
+          {
+            "correct": 3,
+            "explanation_correct": "A tag `<iframe>` é utilizada para incorporar outro documento HTML dentro do documento atual, sendo comumente usada para vídeos do YouTube, mapas e outros conteúdos externos.",
+            "explanation_incorrect": [
+              "`<embed>` é mais genérico para objetos externos, mas `<iframe>` é o padrão para HTML documents.",
+              "`<link>` é para vincular recursos externos como CSS ou favicons.",
+              "`<frame>` é uma tag obsoleta relacionada a framesets."
+            ],
+            "options": [
+              "`<embed>`",
+              "`<link>`",
+              "`<frame>`",
+              "`<iframe>`"
+            ],
+            "question": "Qual tag HTML é usada para incorporar outro documento HTML (como um vídeo do YouTube ou um mapa do Google) diretamente na sua página?"
+          }
+        ]
+      },
+      "title": "Imagens e Mídias"
+    },
+    {
+      "content": "Com as bases de texto e multimídia estabelecidas, é hora de organizar o layout da sua página de maneira mais significativa e acessível. O HTML5 introduziu várias tags semânticas que ajudam a descrever a função das diferentes partes de uma página, tornando-a mais compreensível tanto para seres humanos quanto para máquinas (navegadores, leitores de tela, motores de busca).\n\n### Elementos Semânticos no HTML5\nElementos semânticos descrevem claramente o seu significado para o navegador e o desenvolvedor. Eles não afetam diretamente a aparência (isso fica para o CSS), mas adicionam significado estrutural.\n\n*   **`<header>`**: Representa o conteúdo introdutório de uma seção ou de toda a página. Geralmente contém o logotipo, título do site, navegação principal.\n*   **`<nav>`**: Contém links de navegação, seja para a página atual, outras páginas do site ou outros sites.\n*   **`<main>`**: Representa o conteúdo dominante do `<body>`. Deve haver apenas um elemento `<main>` por documento e ele não deve ser descendente de `<article>`, `<aside>`, `<footer>` ou `<nav>`.\n*   **`<article>`**: Representa um conteúdo autônomo e independente, que pode ser distribuído independentemente do resto da página. Exemplos: um post de blog, um artigo de jornal, um comentário de usuário.\n*   **`<section>`**: Representa uma seção genérica de conteúdo agrupado, tipicamente com um cabeçalho. Não é um contêiner genérico, e sim um agrupamento temático de conteúdo. Se o agrupamento fizer sentido ser listado no contorno de um documento, é uma `section`.\n*   **`<aside>`**: Representa conteúdo que é tangencialmente relacionado ao conteúdo principal, mas poderia ser considerado separado. Exemplos: sidebars, blocos de publicidade, grupos de links relacionados.\n*   **`<footer>`**: Representa o rodapé da seção ou do documento pai mais próximo. Geralmente contém informações sobre o autor, direitos autorais, links relacionados, etc.\n\n### Exemplo de Layout com Tags Semânticas\nhtml\n<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Meu Blog Semântico</title>\n</head>\n<body>\n    <header>\n        <h1>Nome do Meu Blog</h1>\n        <nav>\n            <ul>\n                <li><a href=\"/\">Início</a></li>\n                <li><a href=\"/sobre\">Sobre</a></li>\n                <li><a href=\"/contato\">Contato</a></li>\n            </ul>\n        </nav>\n    </header>\n\n    <main>\n        <article>\n            <h2>Título do Artigo 1</h2>\n            <p>Este é o conteúdo do primeiro artigo do blog. É sobre...</p>\n            <section>\n                <h3>Subseção do Artigo</h3>\n                <p>Detalhes importantes da subseção.</p>\n            </section>\n            <footer>\n                <p>Publicado por João em 15 de janeiro de 2024</p>\n            </footer>\n        </article>\n\n        <article>\n            <h2>Título do Artigo 2</h2>\n            <p>Este é o conteúdo do segundo artigo. Ele discute...</p>\n        </article>\n    </main>\n\n    <aside>\n        <h3>Categorias</h3>\n        <ul>\n            <li><a href=\"/categoria/tecnologia\">Tecnologia</a></li>\n            <li><a href=\"/categoria/lifestyle\">Lifestyle</a></li>\n        </ul>\n        <h3>Anúncio</h3>\n        <p>Compre nossos produtos!</p>\n    </aside>\n\n    <footer>\n        <p>&copy; 2024 Meu Blog. Todos os direitos reservados.</p>\n    </footer>\n</body>\n</html>\n\n\n### `<div>` e `<span>`: Elementos Não Semânticos (Genéricos)\nNem tudo precisa de uma tag semântica específica. Para agrupamentos genéricos de conteúdo onde não há um significado semântico específico a ser transmitido, usamos:\n\n*   **`<div>` (Division)**: Um elemento de bloco genérico usado para agrupar outros elementos HTML. É frequentemente usado para fins de estilização com CSS ou para manipulação com JavaScript. Pense nele como uma 'caixa' sem significado próprio, que você pode estilizar.\n*   **`<span>` (Span)**: Um elemento inline genérico usado para agrupar pequenos trechos de texto ou outros elementos inline. Também é frequentemente usado para propósitos de estilização com CSS ou manipulação com JavaScript.\n\nhtml\n<div class=\"container\">\n    <p>Este é um <span class=\"highlight\">texto importante</span> dentro de um parágrafo que está dentro de uma div.</p>\n    <div class=\"outro-bloco\">\n        <p>Outro parágrafo em um bloco diferente.</p>\n    </div>\n</div>\n\n\n### Quando usar Div vs. Elementos Semânticos?\nUse tags semânticas sempre que o conteúdo que você está agrupando tiver um significado estrutural claro (é um cabeçalho, navegação, rodapé, artigo, etc.). Use `<div>` e `<span>` quando não houver um elemento semântico adequado e você precisar de um 'gancho' para estilização ou script. O objetivo é usar a tag mais apropriada e significativa possível.",
+      "estimated_minutes": 90,
+      "exercises": [
+        {
+          "question": "Crie a estrutura básica de um `<header>` para uma página web. Ele deve conter um `<h1>` com o nome do site ('Meu Site Fantástico') e um `<nav>` com uma lista não ordenada (`<ul>`) de três links (Início, Produtos, Contato).",
+          "solution": "html\n<header>\n    <h1>Meu Site Fantástico</h1>\n    <nav>\n        <ul>\n            <li><a href=\"/\">Início</a></li>\n            <li><a href=\"/produtos\">Produtos</a></li>\n            <li><a href=\"/contato\">Contato</a></li>\n        </ul>\n    </nav>\n</header>\n"
+        },
+        {
+          "question": "Diferencie `<div>` de `<article>` em termos de semântica e uso. Dê um exemplo de quando cada um seria apropriado.",
+          "solution": "`<div>` é um elemento genérico de bloco, sem significado semântico próprio, usado principalmente para agrupar elementos para fins de estilo ou script. **Exemplo:** `div` para agrupar um conjunto de cards em uma grid.\n\n`<article>` é um elemento semântico que representa um conteúdo autônomo e independente, que pode ser distribuído independentemente. **Exemplo:** `<article>` para um post de blog completo, um item de notícia ou um comentário de usuário."
+        },
+        {
+          "question": "Desenvolva a estrutura de um `<article>` que simule um post de blog. O artigo deve ter um `<h2>` (título do post), um `<p>` com o conteúdo do post e um `<footer>` dentro do `<article>` com a informação do autor e data (`<p>`).",
+          "solution": "html\n<article>\n    <h2>A Importância da Semântica em HTML</h2>\n    <p>A semântica em HTML não é apenas sobre estilização, mas sobre dar significado claro ao conteúdo para navegadores, motores de busca e tecnologias de assistência. Usar as tags corretas melhora a acessibilidade e o SEO.</p>\n    <footer>\n        <p>Escrito por Ana Clara em 10 de Março de 2024</p>\n    </footer>\n</article>\n"
+        },
+        {
+          "question": "Para que serve a tag `<aside>`? Dê um exemplo de conteúdo que seria apropriado para essa tag.",
+          "solution": "A tag `<aside>` é usada para conteúdo que é tangencialmente relacionado ao conteúdo principal da página, mas que pode ser considerado separado. Geralmente, aparece como uma barra lateral ou um bloco de informações secundárias. **Exemplo:** Uma lista de 'posts relacionados', um bloco de 'publicidade', uma biografia do autor (se não estiver dentro de um `article` específico), ou um glossário de termos importantes usados na página."
+        },
+        {
+          "question": "Utilizando as tags `<div>` e `<span>`, crie um parágrafo que diga 'Este é um texto com [palavra destacada] e [outra palavra destacada]'. As palavras destacadas devem estar dentro de `<span>` e o parágrafo inteiro deve estar dentro de uma `<div>` genérica.",
+          "solution": "html\n<div class=\"conteudo-principal\">\n    <p>Este é um texto com <span class=\"destaque\">uma palavra destacada</span> e <span class=\"outro-destaque\">outra palavra importante</span>.</p>\n</div>\n"
+        }
+      ],
+      "images": [
+        {
+          "description": "Diagrama mostrando a estrutura de layout comum de uma página web com elementos semânticos como header, nav, main, aside e footer.",
+          "url": "https://www.html.am/html5/images/html5-layout.jpg"
+        },
+        {
+          "description": "Comparação visual entre um bloco (div) e elementos inline (span) em um texto.",
+          "url": "https://www.w3schools.com/css/img_blockinline.gif"
+        }
+      ],
+      "order": 4,
+      "quiz": {
+        "essay": [
+          {
+            "question": "Explique a importância dos elementos semânticos do HTML5 para acessibilidade e SEO, e como eles diferem do uso exclusivo de `<div>`s."
+          },
+          {
+            "question": "Descreva um cenário real onde o uso das tags `<header>`, `<nav>`, `<main>` e `<footer>` seria ideal para estruturar uma página web, e justifique a escolha de cada tag."
+          }
+        ],
+        "multiple_choice": [
+          {
+            "correct": 2,
+            "explanation_correct": "A tag `<main>` representa o conteúdo dominante ou principal do `<body>` do documento. Geralmente, só deve haver um `<main>` por página.",
+            "explanation_incorrect": [
+              "`<header>` é para conteúdo introdutório.",
+              "`<section>` é para seções temáticas de conteúdo.",
+              "`<div>` é um contêiner genérico, não semântico."
+            ],
+            "options": [
+              "`<header>`",
+              "`<section>`",
+              "`<main>`",
+              "`<div>`"
+            ],
+            "question": "Qual tag HTML5 é usada para indicar o conteúdo dominante e exclusivo de um documento?"
+          },
+          {
+            "correct": 1,
+            "explanation_correct": "A tag `<nav>` é semanticamente projetada para conter links de navegação, seja para a página atual ou outras partes do site.",
+            "explanation_incorrect": [
+              "`<footer>` é para rodapés.",
+              "`<aside>` é para conteúdo tangencial.",
+              "`<section>` é para agrupamento temático de conteúdo."
+            ],
+            "options": [
+              "`<footer>`",
+              "`<nav>`",
+              "`<aside>`",
+              "`<section>`"
+            ],
+            "question": "Qual tag é mais semanticamente apropriada para agrupar links de navegação principais do site?"
+          },
+          {
+            "correct": 1,
+            "explanation_correct": "A principal diferença é que `<div>` é um elemento genérico, não semântico, usado para agrupar elementos sem um significado específico. Já `<section>` é um elemento semântico que agrupa conteúdo tematicamente relacionado, geralmente com um cabeçalho associado.",
+            "explanation_incorrect": [
+              "Ambos são elementos de bloco.",
+              "Nenhuma das opções de uso está semanticamente correta."
+            ],
+            "options": [
+              "`<div>` é para conteúdo principal, `<section>` para sidebars.",
+              "`<div>` é um contêiner genérico; `<section>` agrupa conteúdo tematicamente relacionado com um cabeçalho.",
+              "`<div>` é para texto, `<section>` para imagens.",
+              "`<div>` é inline, `<section>` é em bloco."
+            ],
+            "question": "Qual a principal diferença entre `<div>` e `<section>`?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "A tag `<article>` é especificamente para conteúdo independente e autônomo, como posts de blog, artigos de notícias ou comentários de usuários.",
+            "explanation_incorrect": [
+              "`<main>` é para o conteúdo dominante da página.",
+              "`<section>` agrupa conteúdo relacionado, mas não necessariamente autônomo.",
+              "`<div>` é genérico e não semântico."
+            ],
+            "options": [
+              "`<main>`",
+              "`<section>`",
+              "`<article>`",
+              "`<div>`"
+            ],
+            "question": "Qual tag seria ideal para um post de blog ou um item de notícia que pode ser distribuído independentemente do restante da página?"
+          },
+          {
+            "correct": 1,
+            "explanation_correct": "O `<footer>` representa o rodapé da seção ou do documento HTML pai mais próximo. Isso significa que você pode ter um `<footer>` para a página inteira e também `<footer>`s menores dentro de `<article>`s ou `<section>`s.",
+            "explanation_incorrect": [
+              "Pode haver vários `<footer>`s em uma página, não apenas um no final do `<body>`.",
+              "Não deve ser usado dentro de `<nav>`.",
+              "Anúncios isolados são mais apropriados para `<aside>` ou uma `<div>`."
+            ],
+            "options": [
+              "Apenas no final do `<body>` da página.",
+              "Como um rodapé para a seção ou documento HTML pai mais próximo.",
+              "Dentro de `<nav>` para links adicionais.",
+              "Para exibir anúncios isolados."
+            ],
+            "question": "Onde o elemento `<footer>` deve ser usado?"
+          }
+        ]
+      },
+      "title": "Estrutura Semântica Avançada e Divisões"
+    },
+    {
+      "content": "Formulários são componentes essenciais em quase todas as páginas web, permitindo que os usuários interajam com o site, enviem dados, façam login, registrem-se, pesquisem e muito mais. Neste módulo, exploraremos as tags e atributos fundamentais para a criação de formulários HTML.\n\n### A Tag `<form>`\nA tag `<form>` é o contêiner para todos os elementos de entrada do formulário. Ela define como e onde os dados do formulário serão enviados.\n\nhtml\n<form action=\"/submit_form.php\" method=\"post\">\n    <!-- Elementos de entrada virão aqui -->\n</form>\n\n\n#### Atributos Essenciais da Tag `<form>`:\n*   **`action`**: Define o URL para onde os dados do formulário serão enviados quando ele for submetido. Geralmente é um script no lado do servidor (como PHP, Node.js, Python).\n*   **`method`**: Define o método HTTP a ser usado para enviar os dados.\n    *   **`get`**: Os dados do formulário são anexados ao URL como pares nome/valor (query string). Adequado para buscar informações (buscas, filtros) e dados não sensíveis, pois ficam visíveis na URL. Limitação de tamanho de dados.\n    *   **`post`**: Os dados do formulário são enviados no corpo da requisição HTTP. Adequado para enviar grandes quantidades de dados e dados sensíveis (senhas, informações pessoais), pois não ficam visíveis na URL.\n*   **`target`**: Semelhante ao `<a>`, define onde a resposta do servidor será exibida (`_self`, `_blank`, etc.).\n*   **`enctype`**: Especifica como o conteúdo do formulário deve ser codificado ao ser enviado. Usado principalmente com `method=\"post\"` quando há upload de arquivos (`multipart/form-data`).\n\n### Elementos de Entrada Populares: `<input>`\nA tag `<input>` é a tag mais versátil para formulários, usada para coletar diferentes tipos de dados do usuário. O atributo `type` define o tipo de controle de entrada.\n\nhtml\n<input type=\"text\" name=\"nomeUsuario\" placeholder=\"Digite seu nome\">\n\n\n#### Atributos Comuns para `<input>`:\n*   **`type`**: Define o tipo do campo (text, password, email, number, checkbox, radio, submit, etc.).\n*   **`name`**: O nome do campo, usado para identificar o valor do campo quando os dados são enviados ao servidor.\n*   **`value`**: O valor inicial predefinido para o campo.\n*   **`placeholder`**: Um texto de dica que aparece no campo quando está vazio e desaparece ao digitar.\n*   **`required`**: Um atributo booleano (sem valor) que torna o campo obrigatório para envio do formulário.\n*   **`readonly`**: O campo pode ser lido, mas não editado.\n*   **`disabled`**: O campo não pode ser acessado, nem editado, nem os dados são enviados.\n*   **`id`**: Um identificador único para o elemento (útil para CSS, JavaScript e associação com `<label>`).\n\n#### Tipos de Input Essenciais:\n*   **`text`**: Para texto de linha única (padrão se `type` não for especificado).\n    html\n    <label for=\"nome\">Nome:</label>\n    <input type=\"text\" id=\"nome\" name=\"nome\" required>\n    \n*   **`password`**: Para senhas, os caracteres são mascarados.\n    html\n    <label for=\"senha\">Senha:</label>\n    <input type=\"password\" id=\"senha\" name=\"senha\" required>\n    \n*   **`email`**: Para endereços de e-mail. Faz uma validação básica de formato.\n    html\n    <label for=\"email\">E-mail:</label>\n    <input type=\"email\" id=\"email\" name=\"email\">\n    \n*   **`number`**: Para números. Pode incluir `min`, `max`, `step` (incremento).\n    html\n    <label for=\"idade\">Idade:</label>\n    <input type=\"number\" id=\"idade\" name=\"idade\" min=\"0\" max=\"120\">\n    \n*   **`checkbox`**: Para selecionar zero ou mais opções.\n    html\n    <input type=\"checkbox\" id=\"noticias\" name=\"receberNoticias\" value=\"sim\">\n    <label for=\"noticias\">Quero receber notícias</label>\n    \n*   **`radio`**: Para selecionar apenas uma opção de um grupo. Use o mesmo `name` para agrupar.\n    html\n    <input type=\"radio\" id=\"masculino\" name=\"sexo\" value=\"m\">\n    <label for=\"masculino\">Masculino</label>\n    <input type=\"radio\" id=\"feminino\" name=\"sexo\" value=\"f\">\n    <label for=\"feminino\">Feminino</label>\n    \n*   **`submit`**: Um botão para enviar os dados do formulário.\n    html\n    <input type=\"submit\" value=\"Enviar Formulário\">\n    \n*   **`file`**: Para upload de arquivos.\n    html\n    <input type=\"file\" id=\"foto\" name=\"fotoPerfil\" accept=\"image/*\">\n    \n\n### Rótulos: `<label>`\nA tag `<label>` é usada para associar um rótulo de texto a um elemento de entrada. Isso melhora a acessibilidade, pois ao clicar no rótulo, o campo de entrada correspondente recebe o foco. Use o atributo `for` na `<label>` e o `id` correspondente no `<input>`.\n\nhtml\n<label for=\"username\">Nome de Usuário:</label>\n<input type=\"text\" id=\"username\" name=\"username\">\n\n\n### Outros Elementos de Formulário Úteis\n*   **`<textarea>`**: Para entradas de texto de várias linhas. Atributos: `rows` (número de linhas visíveis), `cols` (número de colunas visíveis).\n    html\n    <label for=\"mensagem\">Sua Mensagem:</label>\n    <textarea id=\"mensagem\" name=\"mensagem\" rows=\"5\" cols=\"30\"></textarea>\n    \n*   **`<select>` e `<option>`**: Para criar menus suspensos (dropdowns).\n    *   `<select>`: O contêiner para as opções.\n    *   `<option>`: Cada opção dentro do menu.\n\n    html\n    <label for=\"cidade\">Escolha sua cidade:</label>\n    <select id=\"cidade\" name=\"cidade\">\n        <option value=\"sp\">São Paulo</option>\n        <option value=\"rj\">Rio de Janeiro</option>\n        <option value=\"mg\" selected>Belo Horizonte</option> <!-- 'selected' pré-seleciona -->\n    </select>\n    \n*   **`<button>`**: Um botão genérico. Pode ser de três tipos: `submit` (envia o formulário), `reset` (limpa o formulário), `button` (botão genérico, sem comportamento padrão). Prefira `type=\"submit\"` para botões de envio.\n    html\n    <button type=\"submit\">Salvar Dados</button>\n    <button type=\"reset\">Limpar</button>\n    <button type=\"button\">Clique-me!</button>\n    \n\n### Agrupando Elementos de Formulário: `<fieldset>` e `<legend>`\nPara agrupar elementos relacionados em um formulário, use `<fieldset>`. A tag `<legend>` fornece uma legenda para o grupo.\n\nhtml\n<fieldset>\n    <legend>Informações Pessoais</legend>\n    <label for=\"primeiroNome\">Primeiro Nome:</label>\n    <input type=\"text\" id=\"primeiroNome\" name=\"primeiroNome\">\n    <br>\n    <label for=\"ultimoNome\">Último Nome:</label>\n    <input type=\"text\" id=\"ultimoNome\" name=\"ultimoNome\">\n</fieldset>\n\n\nCriar formulários eficazes é uma habilidade fundamental. Lembre-se sempre de usar `id` e `for` para associar labels aos inputs e de fornecer nomes significativos (`name`) para todos os campos, garantindo que os dados possam ser processados corretamente pelo servidor.",
+      "estimated_minutes": 120,
+      "exercises": [
+        {
+          "question": "Crie um formulário simples que tenha:\n*   Um campo de texto para 'Nome Completo'.\n*   Um campo de e-mail para 'E-mail'.\n*   Um botão de envio com o texto 'Registrar'.\nUse as tags `<label>` e associe-as corretamente aos campos. O formulário deve enviar os dados via método POST para '/cadastro'.",
+          "solution": "html\n<form action=\"/cadastro\" method=\"post\">\n    <label for=\"nomeCompleto\">Nome Completo:</label><br>\n    <input type=\"text\" id=\"nomeCompleto\" name=\"nomeCompleto\" required><br><br>\n    \n    <label for=\"emailUsuario\">E-mail:</label><br>\n    <input type=\"email\" id=\"emailUsuario\" name=\"emailUsuario\" required><br><br>\n    \n    <button type=\"submit\">Registrar</button>\n</form>\n"
+        },
+        {
+          "question": "Explique a diferença entre os métodos HTTP `GET` e `POST` quando usados no atributo `method` da tag `<form>`. Quando você usaria cada um?",
+          "solution": "1.  **`GET`**: Os dados do formulário são anexados ao URL como uma string de consulta (ex: `pagina.php?campo1=valor1&campo2=valor2`).\n    *   **Uso:** Adequado para buscar informações, como pesquisas, filtros, ou dados não sensíveis, pois os dados ficam visíveis na URL. Possui limitação no volume de dados.\n2.  **`POST`**: Os dados do formulário são enviados no corpo da requisição HTTP, não sendo visíveis na URL.\n    *   **Uso:** Ideal para enviar grandes quantidades de dados, dados sensíveis (senhas, informações pessoais), ou dados que modificam o estado do servidor (cadastro, atualização). É mais seguro e não tem limite prático de dados.\n\nVocê usaria `GET` para uma 'busca' em um site e `POST` para um 'formulário de login' ou 'envio de um novo artigo'."
+        },
+        {
+          "question": "Crie um grupo de campos de rádio (`radio buttons`) para escolher uma opção de cor (Vermelho, Verde, Azul). Apenas uma opção pode ser selecionada. Use `<label>` para cada opção e agrupe todos eles em um `<fieldset>` com a legenda 'Escolha uma cor'.",
+          "solution": "html\n<fieldset>\n    <legend>Escolha uma cor</legend>\n    \n    <input type=\"radio\" id=\"corVermelho\" name=\"cor\" value=\"vermelho\">\n    <label for=\"corVermelho\">Vermelho</label><br>\n\n    <input type=\"radio\" id=\"corVerde\" name=\"cor\" value=\"verde\">\n    <label for=\"corVerde\">Verde</label><br>\n\n    <input type=\"radio\" id=\"corAzul\" name=\"cor\" value=\"azul\">\n    <label for=\"corAzul\">Azul</label>\n</fieldset>\n"
+        },
+        {
+          "question": "Considere um campo de texto `<input type=\"text\">`. Explique o propósito dos atributos `name`, `placeholder` e `required` neste campo.",
+          "solution": "*   **`name`**: É o nome do campo de entrada. Ele é crucial porque identifica o campo no momento em que os dados do formulário são enviados ao servidor. O servidor usará este nome para acessar o valor digitado pelo usuário.\n*   **`placeholder`**: Fornece uma dica ou um exemplo breve do tipo de dado esperado no campo de entrada. Este texto aparece dentro do campo quando ele está vazio e desaparece assim que o usuário começa a digitar.\n*   **`required`**: É um atributo booleano que indica que o campo deve ser preenchido antes que o formulário possa ser submetido. Se o campo for deixado em branco, o navegador alertará o usuário antes do envio."
+        },
+        {
+          "question": "Crie um menu suspenso (`<select>`) para a seleção de estados brasileiros (SP, RJ, MG). Defina 'MG' como a opção pré-selecionada. Associe um rótulo a este campo.",
+          "solution": "html\n<label for=\"estado\">Selecione seu Estado:</label>\n<select id=\"estado\" name=\"estado\">\n    <option value=\"sp\">São Paulo</option>\n    <option value=\"rj\">Rio de Janeiro</option>\n    <option value=\"mg\" selected>Minas Gerais</option>\n</select>\n"
+        }
+      ],
+      "images": [
+        {
+          "description": "Exemplo de como um formulário HTML é exibido em um navegador, com campos de texto e botões.",
+          "url": "https://www.w3schools.com/html/html_form_elements.asp"
+        },
+        {
+          "description": "Esquema mostrando a relação entre a tag label e o input através dos atributos for e id.",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label/label_for_example.png"
+        },
+        {
+          "description": "Visualização de um campo de seleção (dropdown) com a tag select e opções.",
+          "url": "https://www.w3schools.com/tags/tryhtml_select_selected.gif"
+        }
+      ],
+      "order": 5,
+      "quiz": {
+        "essay": [
+          {
+            "question": "Descreva o propósito da tag `<fieldset>` e `<legend>` em formulários HTML. Como elas contribuem para a usabilidade e acessibilidade?"
+          },
+          {
+            "question": "Crie um formulário HTML completo para um cadastro de usuário, incluindo os seguintes campos:\n*   Nome de usuário (texto, obrigatório).\n*   Senha (password, obrigatório).\n*   Confirmação de Senha (password, obrigatório).\n*   Um checkbox para 'Aceito os Termos de Serviço' (obrigatório).\n*   Um botão de envio.\nCertifique-se de usar `<label>`s associados e um `action` e `method` apropriados. Não se preocupe com a funcionalidade de backend, apenas a estrutura HTML."
+          }
+        ],
+        "multiple_choice": [
+          {
+            "correct": 2,
+            "explanation_correct": "O atributo `action` da tag `<form>` especifica o URL do script no lado do servidor que processará os dados do formulário quando ele for submetido.",
+            "explanation_incorrect": [
+              "`url` e `destination` não são atributos válidos para essa finalidade na tag `<form>`.",
+              "`href` é usado para links (`<a>`)."
+            ],
+            "options": [
+              "`url`",
+              "`destination`",
+              "`action`",
+              "`href`"
+            ],
+            "question": "Qual atributo da tag `<form>` define o URL para onde os dados do formulário serão enviados?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "O `type=\"radio\"` é usado para criar botões de rádio, onde o usuário pode selecionar apenas uma opção de um grupo mutuamente exclusivo.",
+            "explanation_incorrect": [
+              "`checkbox` permite selecionar múltiplas opções.",
+              "`text` é para entrada de texto livre.",
+              "`select` cria um menu suspenso, não um grupo de botões de rádio."
+            ],
+            "options": [
+              "`checkbox`",
+              "`text`",
+              "`radio`",
+              "`select`"
+            ],
+            "question": "Qual `type` de `<input>` é adequado para permitir que o usuário selecione apenas uma opção de um grupo?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "O atributo `for` na tag `<label>` deve corresponder ao `id` do elemento de formulário ao qual ele está associado, melhorando a acessibilidade e a usabilidade.",
+            "explanation_incorrect": [
+              "O estilo é definido com CSS.",
+              "O valor padrão é `value` em `<input>`.",
+              "Tornar o campo obrigatório é função de `required`."
+            ],
+            "options": [
+              "Para definir o estilo do rótulo.",
+              "Para especificar o valor padrão do campo associado.",
+              "Para associar o rótulo a um elemento de entrada usando seu `id`.",
+              "Para tornar o campo de entrada obrigatório."
+            ],
+            "question": "Para que serve o atributo `for` na tag `<label>`?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "A tag `<textarea>` é usada especificamente para criar um campo de entrada de texto que permite múltiplas linhas de texto.",
+            "explanation_incorrect": [
+              "Não existe `input type=\"textarea\"`.",
+              "`<multiline>` e `<p type=\"input\">` não são tags HTML válidas para essa finalidade."
+            ],
+            "options": [
+              "`<input type=\"textarea\">`",
+              "`<multiline>`",
+              "`<textarea>`",
+              "`<p type=\"input\">`"
+            ],
+            "question": "Qual tag é usada para entradas de texto de várias linhas em um formulário?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "A principal vantagem do método `POST` é que os dados são enviados no corpo da requisição HTTP, tornando-os menos visíveis e mais seguros para dados sensíveis. Além disso, não há uma limitação prática no volume de dados, diferente do `GET`.",
+            "explanation_incorrect": [
+              "Os dados são visíveis na URL com o método `GET`.",
+              "O `GET` tem uma limitação na quantidade de dados.",
+              "A velocidade de processamento depende mais do servidor e da complexidade da requisição do que do método HTTP em si."
+            ],
+            "options": [
+              "Os dados são visíveis na URL para fácil compartilhamento.",
+              "Há uma limitação menor na quantidade de dados que podem ser enviados.",
+              "É mais adequado para dados sensíveis e grandes volumes de dados, pois não ficam visíveis na URL.",
+              "Ele é mais rápido para processar no servidor."
+            ],
+            "question": "Qual é a principal vantagem de usar o método `POST` em vez de `GET` para enviar dados de formulário?"
+          }
+        ]
+      },
+      "title": "Formulários HTML: Coletando Dados do Usuário"
+    },
+    {
+      "content": "Ter uma página web bem estruturada e rica em conteúdo é um ótimo começo, mas para que ela seja encontrada e utilizada por todos, precisamos abordar SEO (Search Engine Optimization) e Acessibilidade. Essas práticas garantem que seu site seja compreensível pelos motores de busca e utilizável por pessoas com diferentes habilidades.\n\n### SEO Básico no HTML\nSEO é o processo de otimizar seu site para obter um bom ranqueamento nos resultados dos motores de busca (como Google, Bing). O HTML desempenha um papel fundamental no SEO 'on-page'.\n\n1.  **Tag `<title>`**: O título da página (dentro do `<head>`) é um dos fatores de SEO mais importantes. Deve ser único para cada página, descritivo e conter palavras-chave relevantes.\n    html\n    <title>Melhores Receitas de Bolo de Chocolate - Aprenda Rápido</title>\n    \n\n2.  **Meta Description (`<meta name=\"description\">`)**: Uma breve descrição do conteúdo da página, também dentro do `<head>`. Embora não seja um fator de ranqueamento direto, ela influencia a taxa de cliques (CTR) nos resultados de busca, já que aparece abaixo do título.\n    html\n    <meta name=\"description\" content=\"Descubra as mais deliciosas receitas de bolo de chocolate, com passos simples e resultados garantidos. Ideal para iniciantes!\">\n    \n\n3.  **Tags de Cabeçalho (`<h1>` a `<h6>`)**: Use os títulos de forma hierárquica e inclua palavras-chave relevantes. O `<h1>` deve ser usado apenas uma vez por página para o título principal.\n    html\n    <h1>Guia Completo para Programadores Iniciantes</h1>\n    <h2>O que é HTML?</h2>\n    <h3>Primeiros Passos com HTML5</h3>\n    \n\n4.  **Atributo `alt` em Imagens (`<img>`)**: Como vimos, o `alt` text descreve a imagem não apenas para acessibilidade, mas também para motores de busca, que não podem 'ver' imagens. Use descrições concisas e relevantes.\n    html\n    <img src=\"bolo.jpg\" alt=\"Bolo de chocolate com cobertura e morangos frescos\">\n    \n\n5.  **Links (internos e externos)**: Links internos (para outras páginas do seu site) e externos (para outros sites relevantes) ajudam os motores de busca a entender a estrutura do seu site e a relevância do seu conteúdo. O texto do link (`<a>`) também é importante.\n    html\n    <p>Saiba mais sobre <a href=\"/sobre-nos\">nossa história</a>.</p>\n    <p>Para informações adicionais, consulte a <a href=\"https://www.wikipedia.org/\" target=\"_blank\">Wikipedia</a>.</p>\n    \n\n6.  **Semântica HTML5**: Usar tags como `<article>`, `<section>`, `<nav>`, `<footer>` etc., ajuda os motores de busca a entender a estrutura e o conteúdo da sua página de forma mais eficaz.\n\n### Acessibilidade no HTML\nAcessibilidade web significa tornar seu site utilizável por todas as pessoas, incluindo aquelas com deficiência (visuais, auditivas, motoras, cognitivas).\n\n1.  **Estrutura Semântica Correta**: O uso apropriado das tags HTML (ex: `<h1>` para títulos, `<p>` para parágrafos, `<nav>` para navegação) é a base da acessibilidade. Leitores de tela usam essa estrutura para apresentar o conteúdo de forma lógica aos usuários.\n\n2.  **Atributo `alt` em Imagens**: Essencial para usuários com deficiência visual, que dependem de leitores de tela para 'ouvir' o conteúdo da imagem.\n\n3.  **Rótulos (`<label>`) para Formulários**: Associar um `<label>` a cada campo de formulário (`<input>`, `<textarea>`, `<select>`) com o atributo `for` ligado ao `id` do campo. Isso permite que usuários de leitores de tela saibam o propósito de cada campo, e também torna o campo clicável ao clicar no rótulo.\n    html\n    <label for=\"nomeUsuario\">Nome de Usuário:</label>\n    <input type=\"text\" id=\"nomeUsuario\" name=\"username\">\n    \n\n4.  **Controles de Áudio e Vídeo**: Inclua o atributo `controls` nos elementos `<audio>` e `<video>` para que os usuários possam gerenciar a reprodução. Forneça transcrições ou legendas para vídeos e áudios para pessoas com deficiência auditiva.\n    html\n    <video controls src=\"meu-video.mp4\"></video>\n    <a href=\"transcricao-video.txt\">Ver transcrição</a>\n    \n\n5.  **Idioma do Documento (`lang` atributo)**: Especifique o idioma principal do documento na tag `<html>` (`<html lang=\"pt-BR\">`). Isso ajuda os leitores de tela a usar a pronúncia correta.\n\n6.  **Ordem de Foco (Controle por Teclado)**: A navegação por teclado (`Tab`, `Shift + Tab`) deve seguir uma ordem lógica. Geralmente, se o HTML estiver semanticamente bem estruturado, a ordem de foco é natural. Certifique-se de que todos os elementos interativos (links, botões, campos de formulário) sejam acessíveis via teclado.\n\n7.  **Contraste de Cores**: Embora seja mais uma preocupação do CSS, é bom ter em mente que as cores do texto e do fundo devem ter contraste suficiente para serem lidas por pessoas com baixa visão.\n\n### Ferramentas de Auditoria\nExistem ferramentas (como Lighthouse no Chrome DevTools, WAVE tool) que podem ajudar a identificar problemas de SEO e acessibilidade em suas páginas web. Use-as regularmente durante o desenvolvimento.",
+      "estimated_minutes": 90,
+      "exercises": [
+        {
+          "question": "Você está criando uma página sobre 'Dicas de Viagem para a Europa'. Escreva o código HTML completo para a seção `<head>` dessa página, incluindo:\n*   Um `<title>` otimizado para SEO.\n*   Uma `<meta name=\"description\">` relevante.\n*   A definição de `charset` e `viewport`.",
+          "solution": "html\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Dicas de Viagem Essenciais para a Europa - Guia Completo</title>\n    <meta name=\"description\" content=\"Planeje sua próxima aventura europeia com nossas dicas de viagem de especialistas: como economizar, melhores destinos e o que levar na mala.\">\n</head>\n"
+        },
+        {
+          "question": "Explique por que o uso semântico das tags HTML (como `<h1>` para o título principal, `<p>` para parágrafos, etc.) é fundamental tanto para SEO quanto para Acessibilidade.",
+          "solution": "O uso semântico das tags HTML é fundamental para ambos porque:\n*   **SEO:** Motores de busca usam a estrutura semântica para entender o conteúdo e a hierarquia da página, o que ajuda no ranqueamento. Por exemplo, um `<h1>` indica o tópico principal da página, dando mais peso a esse texto.\n*   **Acessibilidade:** Leitores de tela e outras tecnologias assistivas dependem da semântica para interpretar e apresentar o conteúdo de forma lógica aos usuários com deficiência. Um `<h1>` será anunciado como 'Título 1', permitindo que o usuário navegue pela estrutura da página de forma eficiente."
+        },
+        {
+          "question": "Crie um trecho HTML para um campo de formulário de 'Comentários'. Este campo deve ser um `<textarea>` e deve:\n*   Ter 5 linhas visíveis e 30 colunas visíveis.\n*   Ser obrigatório (`required`).\n*   Ter um `id` e um `<label>` associado para acessibilidade.",
+          "solution": "html\n<label for=\"caixaComentarios\">Seus Comentários:</label><br>\n<textarea id=\"caixaComentarios\" name=\"comentarios\" rows=\"5\" cols=\"30\" required></textarea>\n"
+        },
+        {
+          "question": "Você tem um site com três seções principais: 'Início', 'Serviços' e 'Contato'.\n1.  Como você usaria as tags de cabeçalho (`<h1>` a `<h6>`) para estruturar semanticamente a página 'Serviços', supondo que 'Serviços' seja o título principal, e dentro dela você tenha 'Desenvolvimento Web' e 'Consultoria' como subtítulos?\n2.  Como você usaria a tag `<nav>` para os links de navegação para essas três seções no cabeçalho do site?",
+          "solution": "1.  **Estrutura de Cabeçalhos na Página 'Serviços':**\n    html\n    <!-- Dentro do <body> da página de Serviços -->\n    <h1>Nossos Serviços</h1>\n    \n    <section>\n        <h2>Desenvolvimento Web</h2>\n        <p>Criamos sites e aplicações modernas...</p>\n    </section>\n\n    <section>\n        <h2>Consultoria</h2>\n        <h3>Marketing Digital</h3>\n        <p>Oferecemos consultoria em estratégias de marketing...</p>\n        <h3>Otimização de SEO</h3>\n        <p>Ajudamos a melhorar o ranqueamento do seu site...</p>\n    </section>\n    \n2.  **Tag `<nav>` para navegação principal:**\n    html\n    <!-- Dentro do <header> do site -->\n    <nav>\n        <ul>\n            <li><a href=\"/\">Início</a></li>\n            <li><a href=\"/servicos\">Serviços</a></li>\n            <li><a href=\"/contato\">Contato</a></li>\n        </ul>\n    </nav>\n    "
+        },
+        {
+          "question": "Qual a importância do atributo `lang` na tag `<html>` (`<html lang=\"pt-BR\">`) para acessibilidade?",
+          "solution": "O atributo `lang` na tag `<html>` é fundamental para a acessibilidade porque ele informa aos navegadores e tecnologias assistivas (como leitores de tela) qual é o idioma principal do conteúdo da página. Isso permite que os leitores de tela usem a pronúncia e entonação corretas para aquele idioma, melhorando significativamente a experiência do usuário com deficiência visual. Além disso, pode auxiliar na renderização de caracteres específicos de um idioma e na tradução automática."
+        }
+      ],
+      "images": [
+        {
+          "description": "Exemplo do snippet de um resultado de busca do Google, mostrando o título e a meta description.",
+          "url": "https://www.reliablesoft.net/wp-content/uploads/2020/07/google-search-result.png"
+        },
+        {
+          "description": "Ícones representando diferentes tipos de deficiência e como a web deve ser acessível a todos.",
+          "url": "https://uxdesign.cc/how-to-design-for-accessibility-8bc437b7ca1e-e2840ac2c040"
+        }
+      ],
+      "order": 6,
+      "quiz": {
+        "essay": [
+          {
+            "question": "Discuta como a estrutura hierárquica das tags de título (`<h1>` a `<h6>`) em HTML impacta a experiência do usuário e a otimização para motores de busca."
+          },
+          {
+            "question": "Quais são as principais considerações de acessibilidade que um desenvolvedor deve ter ao incorporar áudios e vídeos em uma página HTML e como o HTML ajuda a abordá-las?"
+          }
+        ],
+        "multiple_choice": [
+          {
+            "correct": 2,
+            "explanation_correct": "A tag `<title>` é crucial para SEO, pois define o título da página que aparece nos resultados de busca e nas abas do navegador, sendo um forte indicador de conteúdo para motores de busca.",
+            "explanation_incorrect": [
+              "`<meta name=\"keywords\">` é amplamente ignorado pelos motores de busca atualmente.",
+              "`<p>` é para parágrafos de texto, não um fator principal de ranqueamento direto.",
+              "`<span>` é um elemento inline genérico, sem significado SEO direto."
+            ],
+            "options": [
+              "`<meta name=\"keywords\">`",
+              "`<p>`",
+              "`<title>`",
+              "`<span>`"
+            ],
+            "question": "Qual elemento HTML é considerado um dos fatores de SEO mais importantes para o ranqueamento de uma página?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "Associar `<label>` a cada campo de formulário com `for` e `id` é essencial para acessibilidade, permitindo que leitores de tela identifiquem os campos e que usuários cliquem no rótulo para focar o campo.",
+            "explanation_incorrect": [
+              "Limitar inputs a `type=\"text\"` não é boa prática; use os tipos mais apropriados.",
+              "Os `id`s são importantes e devem ser únicos para a associação de labels e para scripts.",
+              "Usar apenas botões de `submit` limitaria a interatividade do formulário."
+            ],
+            "options": [
+              "Definir todas as inputs apenas com `type=\"text\"`.",
+              "Não usar `id` para os inputs para evitar conflitos.",
+              "Associar `<label>` a cada campo de formulário usando os atributos `for` e `id`.",
+              "Usar apenas botões de `submit`."
+            ],
+            "question": "Qual das seguintes práticas é essencial para a acessibilidade de formulários HTML?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "O atributo `alt` é fundamental para acessibilidade, descrevendo a imagem para leitores de tela, e também para SEO, pois ajuda os motores de busca a entender o conteúdo visual.",
+            "explanation_incorrect": [
+              "O estilo é definido com CSS, e o `alt` não muda a cor.",
+              "O caminho do arquivo é especificado com `src`.",
+              "O redimensionamento é feito com `width` e `height` (HTML) ou CSS."
+            ],
+            "options": [
+              "Apenas para mudar a cor da imagem.",
+              "Para especificar o caminho do arquivo da imagem.",
+              "Para acessibilidade (leitores de tela) e SEO (motores de busca).",
+              "Para redimensionar a imagem no navegador."
+            ],
+            "question": "O atributo `alt` na tag `<img>` contribui principalmente para:"
+          },
+          {
+            "correct": 1,
+            "explanation_correct": "Usar apenas um `<h1>` por página é uma boa prática para manter a hierarquia semântica correta, indicando claramente qual é o título principal e tópico central do documento, o que beneficia tanto a acessibilidade quanto o SEO.",
+            "explanation_incorrect": [
+              "Não tem relação direta com tempo de carregamento.",
+              "Navegadores renderizam múltiplos `<h1>`s, mas não é semanticamente correto.",
+              "Não há problema de segurança direto."
+            ],
+            "options": [
+              "Para economizar tempo de carregamento da página.",
+              "Para manter a hierarquia semântica e indicar o tópico principal do documento.",
+              "Porque os navegadores não renderizam mais de um `<h1>`.",
+              "Para evitar problemas de segurança."
+            ],
+            "question": "Por que é importante usar apenas um `<h1>` por página HTML?"
+          },
+          {
+            "correct": 2,
+            "explanation_correct": "Preencher a `meta description` com palavras-chave sem sentido (keyword stuffing) é uma má prática de SEO que pode ser penalizada por motores de busca e não agrega valor ao usuário.",
+            "explanation_incorrect": [
+              "Definir `charset` e `lang` são boas práticas de acessibilidade e renderização.",
+              "Fornecer `title` para links é uma boa prática para usabilidade e acessibilidade."
+            ],
+            "options": [
+              "Usar um `<meta charset=\"UTF-8\">` no `<head>`.",
+              "Definir o atributo `lang` na tag `<html>`.",
+              "Preencher a `<meta name=\"description\">` com palavras-chave repetidas e sem sentido.",
+              "Fornecer um atributo `title` descritivo para links."
+            ],
+            "question": "Qual das seguintes ações *NÃO* é uma boa prática de SEO ou acessibilidade relacionada ao HTML?"
+          }
+        ]
+      },
+      "title": "Configurações de SEO Básico e Acessibilidade"
+    }
+  ],
+  "title": "HTML para Iniciantes: Fundamentos Essenciais para a Web"
+}
