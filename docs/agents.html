@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent System - NIA Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --code-bg: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .logo {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.75rem;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .logo p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-left-color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-left-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            max-width: 1200px;
+        }
+
+        .header {
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .subtitle {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+        }
+
+        section {
+            margin-bottom: 4rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary);
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+
+        .agent-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .agent-icon {
+            font-size: 3rem;
+            margin-right: 1rem;
+        }
+
+        .agent-title h3 {
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .agent-subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .badge-primary { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #a5b4fc;
+        }
+
+        .pipeline {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pipeline-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .pipeline-step .number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(99, 102, 241, 0.1);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h1>🧠 NIA</h1>
+                <p>Multi-Agent System</p>
+            </div>
+
+            <a href="index.html" class="nav-link">← Voltar para Docs</a>
+            <a href="#overview" class="nav-link active">Visão Geral</a>
+            <a href="#pipeline" class="nav-link">Pipeline</a>
+            <a href="#orchestrator" class="nav-link">Orchestrator</a>
+            <a href="#specialist" class="nav-link">Specialist</a>
+            <a href="#reviewer" class="nav-link">Reviewer</a>
+            <a href="#quizmaster" class="nav-link">Quiz Master</a>
+            <a href="#tutor" class="nav-link">Tutor</a>
+            <a href="#implementation" class="nav-link">Implementação</a>
+        </nav>
+
+        <!-- Content -->
+        <main class="content">
+            <!-- Header -->
+            <div class="header">
+                <h1>🤖 Multi-Agent System</h1>
+                <p class="subtitle">Sistema colaborativo de 5 agentes de IA especializados</p>
+                <div>
+                    <span class="badge badge-primary">Gemini Pro</span>
+                    <span class="badge badge-success">Llama 3.3-70B</span>
+                    <span class="badge badge-warning">Llama 3.1-8B</span>
+                </div>
+            </div>
+
+            <!-- Overview -->
+            <section id="overview">
+                <h2>🎯 Visão Geral</h2>
+                <p>O sistema Multi-Agent da NIA utiliza 5 agentes de IA especializados que trabalham em conjunto para criar cursos de alta qualidade:</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>IA</th>
+                            <th>Função</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🎭 <strong>Orchestrator</strong></td>
+                            <td>Gemini Pro</td>
+                            <td>Coordena todo o pipeline</td>
+                        </tr>
+                        <tr>
+                            <td>🎓 <strong>Specialist</strong></td>
+                            <td>Llama 3.3-70B</td>
+                            <td>Gera conteúdo especializado</td>
+                        </tr>
+                        <tr>
+                            <td>✅ <strong>Reviewer</strong></td>
+                            <td>Llama 3.1-8B</td>
+                            <td>Valida qualidade técnica</td>
+                        </tr>
+                        <tr>
+                            <td>📝 <strong>Quiz Master</strong></td>
+                            <td>Gemini Pro</td>
+                            <td>Cria avaliações</td>
+                        </tr>
+                        <tr>
+                            <td>👨‍🏫 <strong>Tutor</strong></td>
+                            <td>Llama 3 Local</td>
+                            <td>Análise personalizada</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card">
+                    <h4>Por que Multi-Agent?</h4>
+                    <ul>
+                        <li>✅ <strong>Qualidade superior</strong> - Múltiplas validações</li>
+                        <li>✅ <strong>Especialização</strong> - Cada agent tem um papel</li>
+                        <li>✅ <strong>Redundância</strong> - Se uma IA falhar, outras continuam</li>
+                        <li>✅ <strong>100% Gratuito</strong> - Todas as APIs são grátis</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Pipeline -->
+            <section id="pipeline">
+                <h2>🔄 Pipeline de Geração</h2>
+                
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="number">1</div>
+                        <div class="content">
+                            <h4>Usuário Solicita</h4>
+                            <p>"Criar curso de Python Avançado, 40h, intermediário"</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">2</div>
+                        <div class="content">
+                            <h4>Orchestrator Valida</h4>
+                            <p>Analisa requisitos e cria Specialist Agent personalizado</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">3</div>
+                        <div class="content">
+                            <h4>Specialist Gera</h4>
+                            <p>Cria estrutura do curso + 2 módulos completos</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">4</div>
+                        <div class="content">
+                            <h4>Reviewer Valida</h4>
+                            <p>Avalia qualidade (0-10). Se < 7, regenera</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">5</div>
+                        <div class="content">
+                            <h4>Quiz Master Cria</h4>
+                            <p>Gera 8 questões por módulo</p>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-step">
+                        <div class="number">6</div>
+                        <div class="content">
+                            <h4>Salva no Banco</h4>
+                            <p>Course + Modules + Quiz</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>⏱️ Tempo de Geração</h4>
+                    <ul>
+                        <li>Estrutura do curso: ~30 segundos</li>
+                        <li>Cada módulo (geração + revisão + quiz): ~2-3 minutos</li>
+                        <li><strong>Total (2 módulos): ~5-7 minutos</strong></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Orchestrator Agent -->
+            <section id="orchestrator">
+                <h2>🎭 Orchestrator Agent</h2>
+                
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-icon">🎭</div>
+                        <div class="agent-title">
+                            <h3>Orchestrator Agent</h3>
+                            <div class="agent-subtitle">Coordenador Geral</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="badge badge-primary">Gemini Pro</span>
+                        <span class="badge badge-success">Coordenação</span>
+                    </div>
+
+                    <h4>Responsabilidades</h4>
+                    <ul>
+                        <li>Receber e validar o pedido do usuário</li>
+                        <li>Criar Specialist Agent personalizado para o tema</li>
+                        <li>Coordenar a execução sequencial de todos os agents</li>
+                        <li>Garantir qualidade final do curso</li>
+                    </ul>
+
+                    <h4>Código</h4>
+                    <pre><code>class OrchestratorAgent:
+    async def create_course(self, topic, level, duration):
+        # 1. Criar Specialist
+        specialist = SpecialistAgent(topic, level)
+        
+        # 2. Gerar estrutura
+        structure = await specialist.generate_structure()
+        
+        # 3. Gerar módulos com validação
+        for module in structure.modules[:2]:
+            content = await specialist.generate_module()
+            review = await reviewer.review(content)
+            
+            if review.score < 7:
+                content = await specialist.regenerate()
+        
+        return course</code></pre>
+                </div>
+            </section>
+
+            <!-- Specialist Agent -->
+            <section id="specialist">
+                <h2>🎓 Specialist Agent</h2>
+                
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-icon">🎓</div>
+                        <div class="agent-title">
+                            <h3>Specialist Agent</h3>
+                            <div class="agent-subtitle">Expert no Tema</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="badge badge-success">Llama 3.3-70B</span>
+                        <span class="badge badge-warning">Groq API</span>
+                    </div>
+
+                    <h4>Características</h4>
+                    <ul>
+                        <li>🎯 Personalidade de expert com 15+ anos de experiência</li>
+                        <li>📚 Mantém consistência pedagógica do início ao fim</li>
+                        <li>🎨 Adapta ao nível do aluno (básico/intermediário/avançado)</li>
+                        <li>💻 Gera exemplos práticos com código real</li>
+                    </ul>
+
+                    <h4>Tarefas</h4>
+                    <ol>
+                        <li>Criar estrutura completa do curso</li>
+                        <li>Definir módulos e progressão lógica</li>
+                        <li>Gerar conteúdo detalhado de cada módulo</li>
+                        <li>Incluir 3+ exemplos práticos por módulo</li>
+                        <li>Criar exercícios progressivos</li>
+                    </ol>
+
+                    <h4>System Prompt</h4>
+                    <pre><code>Você é um ESPECIALISTA RENOMADO em {topic}.
+
+Suas credenciais:
+- 15+ anos de experiência prática
+- Autor de livros sobre o tema
+- Palestrante internacional
+- Mentor de centenas de profissionais
+
+Seu estilo de ensino:
+- Didático e progressivo
+- Usa exemplos reais do mercado
+- Explica conceitos complexos de forma simples
+- Sempre conecta teoria com prática
+
+Nível dos alunos: {level}</code></pre>
+                </div>
+            </section>
+
+            <!-- Reviewer Agent -->
+            <section id="reviewer">
+                <h2>✅ Reviewer Agent</h2>
+                
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-icon">✅</div>
+                        <div class="agent-title">
+                            <h3>Reviewer Agent</h3>
+                            <div class="agent-subtitle">Quality Assurance</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="badge badge-warning">Llama 3.1-8B</span>
+                        <span class="badge badge-primary">Validação</span>
+                    </div>
+
+                    <h4>O que Avalia</h4>
+                    <ul>
+                        <li>✅ Precisão técnica</li>
+                        <li>✅ Clareza didática</li>
+                        <li>✅ Exemplos funcionais</li>
+                        <li>✅ Progressão lógica</li>
+                        <li>✅ Gaps de conteúdo</li>
+                    </ul>
+
+                    <h4>Critérios de Aprovação</h4>
+                    <div class="card">
+                        <ul>
+                            <li><strong>Nota ≥ 7.0:</strong> Aprovado</li>
+                            <li><strong>Nota < 7.0:</strong> Regenerar conteúdo</li>
+                        </ul>
+                    </div>
+
+                    <h4>Output de Revisão</h4>
+                    <pre><code>{
+  "score": 8.5,
+  "strengths": [
+    "Exemplos práticos excelentes",
+    "Progressão didática clara"
+  ],
+  "problems": ["Falta exemplo de erro comum"],
+  "missing_topics": ["Type hints não abordado"],
+  "improvements": [
+    "Adicionar seção sobre debugging",
+    "Incluir mais exercícios práticos"
+  ],
+  "recommendation": "approved"
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Quiz Master Agent -->
+            <section id="quizmaster">
+                <h2>📝 Quiz Master Agent</h2>
+                
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-icon">📝</div>
+                        <div class="agent-title">
+                            <h3>Quiz Master Agent</h3>
+                            <div class="agent-subtitle">Criador de Avaliações</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="badge badge-primary">Gemini Pro</span>
+                        <span class="badge badge-success">Avaliação</span>
+                    </div>
+
+                    <h4>Características</h4>
+                    <ul>
+                        <li>🎯 Questões que testam COMPREENSÃO, não memorização</li>
+                        <li>📊 Mix de dificuldades: 30% fácil, 50% médio, 20% difícil</li>
+                        <li>💡 Feedback educativo em cada resposta</li>
+                        <li>🔍 Questões contextualizadas e práticas</li>
+                    </ul>
+
+                    <h4>Estrutura do Quiz</h4>
+                    <ul>
+                        <li><strong>8 questões</strong> por módulo</li>
+                        <li><strong>100 pontos</strong> total</li>
+                        <li><strong>70 pontos</strong> para passar</li>
+                        <li><strong>Tipos:</strong> múltipla escolha, código, análise</li>
+                    </ul>
+
+                    <h4>Exemplo de Questão</h4>
+                    <pre><code>{
+  "id": 1,
+  "question": "Qual a principal vantagem de decorators?",
+  "type": "multiple_choice",
+  "options": {
+    "A": "Aumentar performance",
+    "B": "Modificar comportamento sem alterar código",
+    "C": "Reduzir memória"
+  },
+  "correct_answer": "B",
+  "explanation": "Decorators permitem adicionar...",
+  "difficulty": "medium",
+  "points": 15
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Tutor Agent -->
+            <section id="tutor">
+                <h2>👨‍🏫 Tutor Agent</h2>
+                
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-icon">👨‍🏫</div>
+                        <div class="agent-title">
+                            <h3>Tutor Agent</h3>
+                            <div class="agent-subtitle">Análise Personalizada</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="badge badge-warning">Llama 3 Local</span>
+                        <span class="badge badge-primary">Ollama</span>
+                    </div>
+
+                    <h4>Por que Local?</h4>
+                    <ul>
+                        <li>🔒 <strong>Privacidade total</strong> - Dados do aluno não saem do servidor</li>
+                        <li>💰 <strong>Zero custo</strong> - Não usa APIs externas</li>
+                        <li>⚡ <strong>Baixa latência</strong> - Resposta imediata</li>
+                        <li>🎯 <strong>Controle total</strong> - Você gerencia o modelo</li>
+                    </ul>
+
+                    <h4>O que Analisa</h4>
+                    <ul>
+                        <li>Respostas corretas/incorretas</li>
+                        <li>Padrões de erro</li>
+                        <li>Pontos fortes e fracos</li>
+                        <li>Tempo de conclusão</li>
+                        <li>Áreas de dificuldade</li>
+                    </ul>
+
+                    <h4>Output da Análise</h4>
+                    <pre><code>{
+  "score_percentage": 75,
+  "strengths": ["Domina conceitos básicos"],
+  "weaknesses": ["Dificuldade com operadores"],
+  "recommendations": [
+    "Revisar seção 2.3 sobre operadores",
+    "Praticar exercícios 5-7",
+    "Assistir vídeo complementar"
+  ],
+  "next_steps": "Revisar antes de avançar",
+  "estimated_review_time": "2 horas",
+  "ready_for_next_module": false
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Implementation -->
+            <section id="implementation">
+                <h2>💻 Implementação</h2>
+
+                <h3>1. Base Agent Class</h3>
+                <pre><code>from abc import ABC, abstractmethod
+
+class BaseAgent(ABC):
+    def __init__(self, name, role, model):
+        self.name = name
+        self.role = role
+        self.model = model
+        self.memory = []
+        self.context = {}
+    
+    def add_to_memory(self, interaction):
+        self.memory.append(interaction)
+    
+    @abstractmethod
+    async def execute(self, task):
+        pass</code></pre>
+
+                <h3>2. Specialist Agent Implementation</h3>
+                <pre><code>from app.services.llama_service import LlamaService
+
+class SpecialistAgent(BaseAgent):
+    def __init__(self, topic, level):
+        super().__init__(
+            name=f"{topic} Expert",
+            role="specialist",
+            model="llama-3.3-70b"
+        )
+        self.llama = LlamaService(model_size="70b")
+    
+    async def generate_module_content(self, module_info):
+        prompt = f"""
+        Você é um ESPECIALISTA em {self.topic}.
+        Crie conteúdo completo para: {module_info['title']}
+        
+        Inclua:
+        1. Teoria detalhada
+        2. 3+ exemplos práticos
+        3. Exercícios
+        4. Recursos adicionais
+        """
+        
+        content = await self.llama.generate(prompt)
+        self.add_to_memory({"action": "generate", "result": content})
+        return content</code></pre>
+
+                <h3>3. Configuração das APIs</h3>
+                <pre><code># backend/app/config/ai_config.py
+
+AI_PROVIDERS = {
+    "gemini": {
+        "api_key": os.getenv("GEMINI_API_KEY"),
+        "model": "gemini-pro",
+        "role": "orchestrator"
+    },
+    "llama_70b": {
+        "api_key": os.getenv("GROQ_API_KEY"),
+        "model": "llama-3.3-70b-versatile",
+        "role": "specialist"
+    },
+    "llama_8b": {
+        "api_key": os.getenv("GROQ_API_KEY"),
+        "model": "llama-3.1-8b-instant",
+        "role": "reviewer"
+    },
+    "llama_local": {
+        "base_url": "http://localhost:11434",
+        "model": "llama3",
+        "role": "tutor"
+    }
+}</code></pre>
+            </section>
+
+            <!-- Footer -->
+            <div style="text-align: center; padding: 3rem 0; border-top: 1px solid var(--border); margin-top: 4rem;">
+                <p style="color: var(--text-muted);">
+                    <a href="index.html" style="color: var(--primary); text-decoration: none;">← Voltar para Documentação Principal</a>
+                </p>
+                <p style="margin-top: 1rem; color: var(--text-muted);">
+                    NIA Platform © 2025 | Multi-Agent System v2.0
+                </p>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        const sections = document.querySelectorAll('section[id]');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
