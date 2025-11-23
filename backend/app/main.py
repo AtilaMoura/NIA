@@ -1,20 +1,28 @@
 from fastapi import FastAPI
-from app.database import Base, engine
-from app.models.models import Course, Module, Progress
+from app.database import engine
+from app.models import models
+from app.routers import users, courses, modules, progress
 
-app = FastAPI(
-    title="NIA API",
-    description="Backend da plataforma NIA",
-    version="1.0.0"
-)
+def create_app():
+    app = FastAPI(
+        title="NIA API",
+        description="Backend da plataforma NIA",
+        version="1.0.0",
+    )
 
-# Criar tabelas automaticamente
-@app.on_event("startup")
-def startup_event():
-    print("🔄 Criando tabelas no banco...")
-    Base.metadata.create_all(bind=engine)
-    print("✅ Tabelas criadas com sucesso!")
+    # Importante para o SQLAlchemy registrar models
+    models.Base.metadata.create_all(bind=engine)
 
-@app.get("/")
-def root():
-    return {"status": "online", "message": "NIA API funcionando!"}
+    # Registrar rotas
+    app.include_router(users.router)
+    app.include_router(courses.router)
+    app.include_router(modules.router)
+    app.include_router(progress.router)
+
+    @app.get("/")
+    def root():
+        return {"status": "online", "message": "NIA API funcionando!"}
+
+    return app
+
+app = create_app()
