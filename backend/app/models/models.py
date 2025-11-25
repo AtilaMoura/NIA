@@ -23,6 +23,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
     name = Column(String(255))
+    password_hash = Column(String(255))
     avatar_url = Column(Text)
 
     # OAuth
@@ -190,7 +191,7 @@ class Progress(Base):
 
     # Identificação
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(String(255), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
     course_id = Column(Integer, ForeignKey('courses.id', ondelete='CASCADE'), nullable=False)
     module_id = Column(Integer, ForeignKey('modules.id', ondelete='CASCADE'), nullable=False)
 

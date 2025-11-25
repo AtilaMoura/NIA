@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from app.database import engine
 from app.models import models
 from app.routers import users, courses, modules, progress
+from app.routers import auth
+from app.routers import test_ai
 
 def create_app():
     app = FastAPI(
@@ -14,10 +16,12 @@ def create_app():
     models.Base.metadata.create_all(bind=engine)
 
     # Registrar rotas
+    app.include_router(auth.router)
     app.include_router(users.router)
     app.include_router(courses.router)
     app.include_router(modules.router)
     app.include_router(progress.router)
+    app.include_router(test_ai.router)
 
     @app.get("/")
     def root():
