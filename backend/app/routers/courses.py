@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.models import Course
 
+from app.schemas.courses import CourseGenerateRequest, CourseGenerateResponse
+from app.agents.orchestrator import Orchestrator
+
 router = APIRouter(prefix="/courses", tags=["Courses"])
 
 # Criar curso
@@ -48,3 +51,31 @@ def delete_course(course_id: int, db: Session = Depends(get_db)):
     db.delete(course)
     db.commit()
     return {"status": "deleted"}
+
+@router.post("/generate", response_model=CourseGenerateResponse)
+async def generate_course(
+    data: CourseGenerateRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Gera um curso completo usando IA (Gemini + Llama + outros).
+    """
+
+    try:
+        orchestrator = Orchestrator()
+        course = await orchestrator.generate_course(
+            topic=data.topic,
+            goal=data.goal,
+            level=data.level,
+            num_modules=data.num_modules,
+            quizzes=data.quizzes
+        )
+
+        return CourseGenerateResponse(
+            topic=course["topic"],
+            summary=course["content"],
+            modules=course["modules"]
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar curso: {str(e)}")
