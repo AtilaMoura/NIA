@@ -1,11 +1,11 @@
 # backend/app/routers/courses.py
-
+import traceback
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 
 # ✅ IMPORTAR OS MODELS
-from app.models.models import Course, Module, Progress  # ← ADICIONE Module!
+from app.models.models import Course, Module, Progress, Lesson  # ← ADICIONE Module!
 
 from app.schemas.courses import (
     CourseGenerateRequest, 
@@ -71,43 +71,34 @@ async def generate_course_structure(
     db: Session = Depends(get_db),
 ):
     """
-    FASE 1: Gera APENAS a estrutura do curso (30 seg)
-    
-    - Título e descrição do curso
-    - Módulos (só título/descrição, SEM conteúdo)
-    - Aulas (só título)
-    - Salva tudo no banco
-    
-    Exemplo:
-    POST /courses/generate-structure
-    {
-      "topic": "Python para Iniciantes",
-      "goal": "Aprender programação do zero",
-      "level": "beginner"
-    }
+    FASE 1: Gera APENAS a estrutura do curso (títulos de módulos e lições)
+    e salva as entidades Course, Module e Lesson no banco de dados.
     """
     try:
         print("🔹 Iniciando geração da estrutura...")
         
+        # Inicializa o Orchestrator (Agente que interage com o LLM)
         orchestrator = Orchestrator()
         
-        # ✅ Gera APENAS estrutura (rápido)
+        # 1. ✅ Gera ESTRUTURA (Course -> Modules -> Lessons) via LLM
+        # A estrutura retornada é um dicionário Python (dict)
         structure = await orchestrator.generate_course_structure(
             topic=data.topic,
             goal=data.goal,
             level=data.level
         )
         
+        modules_data = structure.get('modules', [])
         print(f"✅ Estrutura gerada: {structure.get('title')}")
-        print(f"   Módulos: {len(structure.get('modules', []))}")
+        print(f"   Módulos: {len(modules_data)}")
         
-        # ✅ Salva CURSO no banco
+        # 2. ✅ Salva ENTIDADE COURSE no banco
         course = Course(
             title=structure.get("title", data.topic),
             description=structure.get("description", ""),
             level=data.level,
-            duration_hours=len(structure.get("modules", [])) * 3,  # Estimativa
-            modules_count=len(structure.get("modules", [])),
+            duration_hours=len(modules_data) * 3,  # Estimativa
+            modules_count=len(modules_data),
             structure=structure,  # JSON completo
             status="draft",
             prerequisites=[],
@@ -115,55 +106,94 @@ async def generate_course_structure(
             generated_by={"orchestrator": "gemini", "timestamp": str(datetime.now())}
         )
         db.add(course)
-        db.commit()
-        db.refresh(course)
+        db.flush()  # Garante que o course.id seja gerado antes de salvar os módulos/lições
         
         print(f"✅ Curso salvo no banco com ID: {course.id}")
         
-        # ✅ Salva MÓDULOS no banco (SEM conteúdo)
-        for mod_data in structure.get("modules", []):
+        # Lista para armazenar o número total de lições
+        total_lessons_saved = 0
+        
+        # 3. ✅ Itera e Salva MÓDULOS e LIÇÕES no banco
+        for mod_index, mod_data in enumerate(modules_data, start=1):
+            lessons_data = mod_data.get("lessons", [])
+            lesson_count = len(lessons_data)
+            total_lessons_saved += lesson_count
+            
+            # 3.1. Salva o MÓDULO (com o contador de lições)
             module = Module(
                 course_id=course.id,
-                module_index=mod_data.get("index", 0),
-                title=mod_data.get("title", "Módulo"),
+                module_index=mod_data.get("index", mod_index), # Usa o index do LLM ou o índice de iteração
+                title=mod_data.get("title", f"Módulo {mod_index}"),
                 description=mod_data.get("description", ""),
-                content="",  # ✅ VAZIO! Será gerado sob demanda
+                
+                # NOVOS CAMPOS: 
+                content_generated=False,
+                exam_generated=False,
+                lessons_count=lesson_count, # ✅ ATUALIZADO
+                
                 duration_hours=3,
                 examples=[],
                 exercises=[],
                 resources={},
-                quiz={},  # ✅ Será gerado depois
-                is_published=False,  # ✅ Não publicado ainda
+                quiz={},
+                is_published=False,
                 generated_by="pending"
             )
             db.add(module)
-        
+            db.flush() # Garante que o module.id seja gerado antes de salvar as lições
+            
+            # 3.2. Salva as LIÇÕES associadas a este módulo
+            for lesson_index, lesson_item in enumerate(lessons_data, start=1):
+                lesson = Lesson(
+                    module_id=module.id,
+                    lesson_index=lesson_index,
+                    title=lesson_item.get("title", f"Lição {lesson_index}"),
+                    
+                    # O conteúdo e o status de aprovação serão preenchidos na FASE 2
+                    content="",
+                    is_approved=False,
+                    estimated_read_time_minutes=15, # Placeholder
+                )
+                db.add(lesson)
+
+        # 4. ✅ COMMIT FINAL
         db.commit()
         
-        print(f"✅ {len(structure.get('modules', []))} módulos salvos no banco")
+        print(f"✅ Estrutura completa salva. Módulos: {len(modules_data)}, Lições: {total_lessons_saved}")
         
+        # 5. ✅ Retorno
+        db.refresh(course) # Atualiza o objeto course para garantir consistência
         return CourseStructureResponse(
             id=course.id,
             topic=data.topic,
             title=course.title,
             description=course.description,
-            modules=structure.get("modules", []),
+            modules=structure.get("modules", []), # Retorna a estrutura JSON original
             total_modules=course.modules_count,
             created_at=course.created_at
         )
     
     except Exception as e:
-        import traceback
+        # A instrução traceback.print_exc() é importante para ver a pilha de erros completa no console.
         traceback.print_exc()
+        db.rollback() # ✅ O rollback é CRUCIAL em caso de erro para não ter dados parciais
         raise HTTPException(
             status_code=500, 
             detail=f"Erro ao gerar estrutura: {str(e)}"
         )
 
 
-# ============================================
+# ====================================================================
 # GERAÇÃO COM IA - FASE 2: CONTEÚDO DO MÓDULO
-# ============================================
+# ====================================================================
+
+def is_lesson_complete(lesson: Lesson):
+    return (
+        lesson.content is not None and
+        lesson.is_approved is True and
+        lesson.generated_by is not None and
+        lesson.estimated_read_time_minutes is not None
+    )
 
 @router.post("/generate-module/{course_id}/{module_index}")
 async def generate_module_content(
@@ -172,88 +202,91 @@ async def generate_module_content(
     db: Session = Depends(get_db),
 ):
     """
-    FASE 2: Gera CONTEÚDO COMPLETO de 1 módulo (3-5 min)
-    
-    Chamado quando:
-    - Aluno clica "Começar Módulo X"
-    - Aluno passou no quiz anterior (70%+)
-    
-    Exemplo:
-    POST /courses/generate-module/1/1
+    FASE 2: Gera o conteúdo detalhado para todas as lições de um módulo
+    e atualiza a tabela Module.
     """
+    print(f"🔹 Iniciando FASE 2: Geração de conteúdo para Módulo {module_index} do Curso {course_id}")
     try:
-        # ✅ Busca módulo no banco
+        # 1. Encontra o Módulo e o Curso
         module = db.query(Module).filter(
             Module.course_id == course_id,
             Module.module_index == module_index
         ).first()
         
         if not module:
-            raise HTTPException(404, "Módulo não encontrado")
+            raise HTTPException(status_code=404, detail="Módulo não encontrado")
         
-        # ✅ Se já foi gerado, retorna
-        if module.is_published and module.content:
+        # ADICIONADO: Buscar o objeto Course pai para fornecer contexto global ao Orchestrator
+        course = db.query(Course).filter(Course.id == course_id).first()
+        if not course:
+            # Isso só deve acontecer se houver um problema de integridade referencial no DB
+            raise HTTPException(status_code=500, detail="Curso pai não encontrado para o módulo.")
+        
+        # 2. Verifica se o conteúdo já foi gerado
+        if module.content_generated:
             return {
-                "message": "Módulo já foi gerado anteriormente",
+                "message": "Módulo já teve o conteúdo gerado anteriormente",
                 "module_id": module.id,
                 "title": module.title,
-                "is_published": True
+                "content_generated": True
             }
         
-        print(f"🔹 Gerando conteúdo do módulo: {module.title}")
+        # 3. Busca a lista de Lições (o Specialist Agent precisará disso)
+        lessons = db.query(Lesson).filter(Lesson.module_id == module.id).order_by(Lesson.lesson_index).all()
         
-        orchestrator = Orchestrator()
+        if not lessons:
+             raise HTTPException(status_code=404, detail="Nenhuma lição encontrada para este módulo.")
         
-        # ✅ Gera conteúdo COMPLETO (demora mais)
-        print("   1/3 Gerando conteúdo...")
-        content = await orchestrator.specialist.run(f"""
-        Crie um conteúdo COMPLETO e DETALHADO para o módulo:
+        # 3. Encontrar a próxima lesson incompleta
+        next_lesson = next((l for l in lessons if not is_lesson_complete(l)), None)
+
+        if not next_lesson:
+            return {
+                "message": "Todas as lições já estão completas",
+                "module_id": module.id
+            }
         
-        Título: {module.title}
-        Descrição: {module.description}
+        # 4. Inicializa o Orchestrator
+        orchestrator = Orchestrator()#model = "llama")
         
-        Inclua:
-        - Introdução clara
-        - Explicações detalhadas
-        - 3+ exemplos práticos com código
-        - Exercícios
-        """)
+        # 5. Gera o conteúdo chamando o Orchestrator com todo o contexto
+        # O Orchestrator será responsável por limpar o contexto, chamar os agentes e salvar o Lesson.content
         
-        print("   2/3 Revisando qualidade...")
-        reviewed = await orchestrator.reviewer.run(f"""
-        Revise e melhore este conteúdo:
-        {content[:2000]}
+        print("⚙️ Enviando Curso, Módulo e Lições para o Orchestrator...")
+        print(f"Curso = {course}")
+        print(f"Módulo = {module}")
+        print(f"Lições = {lessons}")
         
-        Deixe mais claro e didático.
-        """)
+        result = await orchestrator.generate_module_structure(
+            course= course.title,
+            module= module.title,
+            lessons= next_lesson.title
+        )
+        return (result)
+        print(f"Conteudo = {result}")
         
-        print("   3/3 Criando quiz...")
-        quiz_text = await orchestrator.quiz.generate_quiz(reviewed[:1000])
-        
-        # ✅ Atualiza módulo no banco
-        module.content = reviewed
-        module.quiz = {"text": quiz_text}  # Simplificado por enquanto
-        module.is_published = True
-        module.generated_by = "specialist_agent"
-        module.ai_model_used = "gemini-1.5-flash"
-        module.review_score = 8.5
-        
+        # 6. Atualiza o Módulo com status de geração e metadados
+        module.content_generated = False # Marca a conclusão da geração
+        #module.ai_model_used = result.get('model_used', 'N/A')
+        #module.review_score = result.get('review_score', 0)
+        #
         db.commit()
         db.refresh(module)
         
-        print(f"✅ Módulo {module.title} gerado e salvo!")
-        
         return {
-            "message": "Módulo gerado com sucesso",
-            "module_id": module.id,
-            "title": module.title,
-            "content_length": len(module.content),
-            "quiz_generated": True
+
+            #"message": "Módulo e Lições gerados com sucesso",
+            #"module_id": module.id,
+            #"title": module.title,
+            #"content": result.content
+            #"content_generated": module.content_generated,
+            #"lessons_processed": len(lessons),
+            #"model_used": module.ai_model_used
         }
     
     except Exception as e:
-        import traceback
         traceback.print_exc()
+        db.rollback()
         raise HTTPException(
             status_code=500,
             detail=f"Erro ao gerar módulo: {str(e)}"

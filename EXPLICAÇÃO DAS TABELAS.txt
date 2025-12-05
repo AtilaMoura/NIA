@@ -1,0 +1,665 @@
+📚 EXPLICAÇÃO DAS TABELAS
+1. Tabela courses (Cursos)
+pythonclass Course(Base):
+    __tablename__ = "courses"
+O QUE ARMAZENA:
+
+Informações gerais do curso (título, descrição, nível)
+Estrutura JSON completa (todos os módulos e títulos das aulas)
+Status do curso (draft, published, archived)
+
+EXEMPLO DE REGISTRO:
+json{
+  "id": 1,
+  "title": "Python para Iniciantes",
+  "description": "Aprenda Python do zero",
+  "level": "beginner",
+  "structure": {
+    "modules": [
+      {
+        "index": 1,
+        "title": "Fundamentos de Python",
+        "lessons": [
+          {"title": "O que é Python?"},
+          {"title": "Instalando Python"},
+          {"title": "Seu Primeiro Programa"}
+        ]
+      }
+    ]
+  }
+}
+QUANDO É CRIADA:
+
+Quando você chama POST /courses/generate-structure
+O SpecialistAgent gera a estrutura completa do curso
+
+
+2. Tabela modules (Módulos)
+pythonclass Module(Base):
+    __tablename__ = "modules"
+O QUE ARMAZENA:
+
+Cada módulo do curso (ex: "Módulo 1: Fundamentos")
+Metadata do módulo (título, descrição, duração)
+Status de geração (aulas foram criadas? quiz foi criado?)
+
+CAMPOS IMPORTANTES:
+
+content_generated: Boolean - As aulas deste módulo já foram geradas?
+exam_generated: Boolean - A prova deste módulo já foi criada?
+lessons_count: Integer - Quantas aulas este módulo tem
+
+EXEMPLO DE REGISTRO:
+json{
+  "id": 1,
+  "course_id": 1,
+  "module_index": 1,
+  "title": "Fundamentos de Python",
+  "description": "Aprenda os conceitos básicos",
+  "content_generated": true,  // ✅ Aulas já foram geradas
+  "exam_generated": true,      // ✅ Quiz já foi criado
+  "lessons_count": 3
+}
+QUANDO É CRIADA:
+
+Quando você chama POST /courses/generate-structure
+Cria um registro para cada módulo da estrutura
+MAS: as aulas NÃO são geradas ainda! (campo content_generated = false)
+
+
+3. Tabela lessons (Aulas) - NOVA!
+pythonclass Lesson(Base):
+    __tablename__ = "lessons"
+O QUE ARMAZENA:
+
+O conteúdo completo de cada aula em Markdown
+Informações de quem gerou e revisou
+Status de aprovação
+
+CAMPOS IMPORTANTES:
+
+content: Text - O conteúdo completo da aula (800-1200 palavras)
+generated_by: String - Nome do agent que gerou ("specialist_agent")
+reviewed_by: String - Nome do agent que revisou ("reviewer_agent")
+review_feedback: JSONB - Feedback da revisão
+is_approved: Boolean - Passou na revisão?
+estimated_read_time_minutes: Integer - Tempo estimado de leitura
+
+EXEMPLO DE REGISTRO:
+json{
+  "id": 1,
+  "module_id": 1,
+  "lesson_index": 1,
+  "title": "O que é Python?",
+  "content": "# Introdução\n\nPython é uma linguagem...",
+  "generated_by": "specialist_agent",
+  "reviewed_by": "reviewer_agent",
+  "review_feedback": {"score": 8.5, "suggestions": []},
+  "is_approved": true,
+  "estimated_read_time_minutes": 5
+}
+QUANDO É CRIADA:
+
+Quando você chama POST /courses/modules/{module_id}/generate-lessons
+Uma linha para cada aula do módulo
+CONTEÚDO COMPLETO é gerado pelo SpecialistAgent
+
+
+4. Tabela progress (Progresso do Aluno)
+pythonclass Progress(Base):
+    __tablename__ = "progress"
+O QUE ARMAZENA:
+
+Progresso do aluno em cada módulo
+Resultado do quiz
+Tempo de estudo
+
+CAMPOS IMPORTANTES:
+
+user_id: Integer - ID do aluno
+course_id: Integer - ID do curso
+module_id: Integer - ID do módulo atual
+current_lesson_index: Integer - Qual aula está estudando
+quiz_score: Integer - Nota do quiz (0-100)
+quiz_passed: Boolean - Passou com 70%+?
+can_advance: Boolean - Pode avançar para próximo módulo?
+
+EXEMPLO DE REGISTRO:
+json{
+  "id": 1,
+  "user_id": 5,
+  "course_id": 1,
+  "module_id": 1,
+  "current_lesson_index": 3,  // Está na aula 3
+  "quiz_score": 85,            // Tirou 85%
+  "quiz_passed": true,         // ✅ Passou!
+  "can_advance": true,         // ✅ Pode ir para módulo 2
+  "status": "completed"
+}
+QUANDO É CRIADA:
+
+Quando o aluno se matricula no curso
+Atualizada conforme ele estuda e faz quizzes
+
+
+5. Tabela lesson_completions (Conclusão de Aulas) - NOVA!
+pythonclass LessonCompletion(Base):
+    __tablename__ = "lesson_completions"
+O QUE ARMAZENA:
+
+Rastreamento de cada aula que o aluno completou
+Tempo gasto em cada aula
+
+CAMPOS IMPORTANTES:
+
+user_id: Integer - ID do aluno
+lesson_id: Integer - ID da aula
+completed: Boolean - Completou?
+time_spent_minutes: Integer - Tempo gasto
+
+EXEMPLO DE REGISTRO:
+json{
+  "id": 1,
+  "user_id": 5,
+  "lesson_id": 1,
+  "completed": true,
+  "time_spent_minutes": 7,
+  "completed_at": "2025-11-29T10:30:00Z"
+}
+```
+
+**QUANDO É CRIADA:**
+- Quando o aluno termina de ler uma aula
+- Usado para calcular progresso no módulo
+
+---
+
+## 🔄 **FLUXO COMPLETO PASSO A PASSO**
+
+### **FASE 1: Gerar Estrutura do Curso (30 segundos)**
+```
+1. Usuário faz request:
+   POST /courses/generate-structure
+   {
+     "topic": "Python para Iniciantes",
+     "goal": "Aprender programação",
+     "level": "beginner"
+   }
+
+2. Backend chama: Orchestrator.generate_course_structure()
+   
+3. SpecialistAgent gera estrutura JSON:
+   {
+     "title": "Python para Iniciantes",
+     "modules": [
+       {
+         "index": 1,
+         "title": "Fundamentos",
+         "lessons": [
+           {"title": "O que é Python?"},
+           {"title": "Instalando Python"},
+           {"title": "Primeiro Programa"}
+         ]
+       },
+       {
+         "index": 2,
+         "title": "Variáveis e Tipos",
+         "lessons": [...]
+       }
+     ]
+   }
+
+4. Backend salva no banco:
+   
+   ┌─────────────────────────────────┐
+   │ TABELA: courses                 │
+   ├─────────────────────────────────┤
+   │ id: 1                           │
+   │ title: "Python para Iniciantes" │
+   │ structure: {JSON completo}      │
+   └─────────────────────────────────┘
+   
+   ┌─────────────────────────────────┐
+   │ TABELA: modules                 │
+   ├─────────────────────────────────┤
+   │ id: 1                           │
+   │ course_id: 1                    │
+   │ module_index: 1                 │
+   │ title: "Fundamentos"            │
+   │ content_generated: FALSE ❌     │
+   │ exam_generated: FALSE ❌        │
+   └─────────────────────────────────┘
+   
+   ┌─────────────────────────────────┐
+   │ TABELA: modules                 │
+   ├─────────────────────────────────┤
+   │ id: 2                           │
+   │ course_id: 1                    │
+   │ module_index: 2                 │
+   │ title: "Variáveis e Tipos"      │
+   │ content_generated: FALSE ❌     │
+   │ exam_generated: FALSE ❌        │
+   └─────────────────────────────────┘
+
+5. IMPORTANTE: Neste momento, NENHUMA aula foi gerada!
+   A tabela "lessons" está VAZIA!
+```
+
+---
+
+### **FASE 2: Aluno se Matricula**
+```
+1. Aluno se matricula no curso
+   POST /courses/1/enroll
+   {
+     "user_id": 5
+   }
+
+2. Backend cria registro de progresso:
+   
+   ┌─────────────────────────────────┐
+   │ TABELA: progress                │
+   ├─────────────────────────────────┤
+   │ id: 1                           │
+   │ user_id: 5                      │
+   │ course_id: 1                    │
+   │ module_id: 1  (começa no 1º)   │
+   │ current_lesson_index: 1         │
+   │ quiz_passed: FALSE              │
+   │ can_advance: FALSE              │
+   │ status: "in_progress"           │
+   └─────────────────────────────────┘
+
+3. Agora o aluno está matriculado e pronto para começar!
+```
+
+---
+
+### **FASE 3: Gerar Aulas do Módulo 1 (2-3 minutos)**
+```
+1. Aluno acessa o Módulo 1
+   Backend detecta: content_generated = FALSE
+   
+2. Backend automaticamente chama:
+   POST /courses/modules/1/generate-lessons
+
+3. Orchestrator inicia processo:
+   
+   ┌──────────────────────────────────────────────┐
+   │ AGENT 1: SpecialistAgent                    │
+   │ - Gera conteúdo da Aula 1                   │
+   │ - Gera conteúdo da Aula 2                   │
+   │ - Gera conteúdo da Aula 3                   │
+   └──────────────────────────────────────────────┘
+          ↓
+   ┌──────────────────────────────────────────────┐
+   │ AGENT 2: ReviewerAgent                      │
+   │ - Revisa conteúdo da Aula 1                 │
+   │ - Revisa conteúdo da Aula 2                 │
+   │ - Revisa conteúdo da Aula 3                 │
+   │ - Dá feedback e score                       │
+   └──────────────────────────────────────────────┘
+          ↓
+   ┌──────────────────────────────────────────────┐
+   │ AGENT 3: QuizAgent                          │
+   │ - Gera 10 questões baseadas nas 3 aulas    │
+   └──────────────────────────────────────────────┘
+
+4. Backend salva tudo no banco:
+   
+   ┌─────────────────────────────────────────┐
+   │ TABELA: lessons                         │
+   ├─────────────────────────────────────────┤
+   │ id: 1                                   │
+   │ module_id: 1                            │
+   │ lesson_index: 1                         │
+   │ title: "O que é Python?"                │
+   │ content: "# Introdução\n\nPython é..." │
+   │   (800-1200 palavras em Markdown)       │
+   │ generated_by: "specialist_agent"        │
+   │ reviewed_by: "reviewer_agent"           │
+   │ review_feedback: {score: 8.5}           │
+   │ is_approved: TRUE ✅                    │
+   └─────────────────────────────────────────┘
+   
+   ┌─────────────────────────────────────────┐
+   │ TABELA: lessons                         │
+   ├─────────────────────────────────────────┤
+   │ id: 2                                   │
+   │ module_id: 1                            │
+   │ lesson_index: 2                         │
+   │ title: "Instalando Python"              │
+   │ content: "# Introdução\n\nNesta aula..." │
+   │ generated_by: "specialist_agent"        │
+   │ reviewed_by: "reviewer_agent"           │
+   │ is_approved: TRUE ✅                    │
+   └─────────────────────────────────────────┘
+   
+   ┌─────────────────────────────────────────┐
+   │ TABELA: lessons                         │
+   ├─────────────────────────────────────────┤
+   │ id: 3                                   │
+   │ module_id: 1                            │
+   │ lesson_index: 3                         │
+   │ title: "Primeiro Programa"              │
+   │ content: "# Introdução\n\nAgora vamos..." │
+   │ generated_by: "specialist_agent"        │
+   │ reviewed_by: "reviewer_agent"           │
+   │ is_approved: TRUE ✅                    │
+   └─────────────────────────────────────────┘
+
+5. Atualiza módulo:
+   
+   ┌─────────────────────────────────┐
+   │ TABELA: modules                 │
+   ├─────────────────────────────────┤
+   │ id: 1                           │
+   │ content_generated: TRUE ✅      │
+   │ exam_generated: TRUE ✅         │
+   │ lessons_count: 3                │
+   │ quiz: {questões geradas}        │
+   └─────────────────────────────────┘
+```
+
+---
+
+### **FASE 4: Aluno Estuda as Aulas**
+```
+1. Aluno acessa Aula 1:
+   GET /courses/lessons/1
+   
+   Retorna:
+   {
+     "id": 1,
+     "title": "O que é Python?",
+     "content": "# Introdução\n\nPython é...",
+     "read_time_minutes": 5
+   }
+
+2. Aluno termina de ler:
+   POST /courses/lessons/1/complete
+   
+   Backend cria:
+   ┌─────────────────────────────────┐
+   │ TABELA: lesson_completions      │
+   ├─────────────────────────────────┤
+   │ user_id: 5                      │
+   │ lesson_id: 1                    │
+   │ completed: TRUE ✅              │
+   │ time_spent_minutes: 7           │
+   └─────────────────────────────────┘
+
+3. Aluno estuda Aula 2 e 3 (mesmo processo)
+
+4. Atualiza progresso:
+   ┌─────────────────────────────────┐
+   │ TABELA: progress                │
+   ├─────────────────────────────────┤
+   │ user_id: 5                      │
+   │ module_id: 1                    │
+   │ current_lesson_index: 3         │
+   │ completion_percentage: 100%     │
+   └─────────────────────────────────┘
+```
+
+---
+
+### **FASE 5: Aluno Faz o Quiz**
+```
+1. Aluno acessa quiz:
+   GET /courses/modules/1/quiz
+   
+   Retorna 10 questões geradas pelo QuizAgent
+
+2. Aluno responde e submete:
+   POST /courses/modules/1/submit-quiz
+   {
+     "answers": [
+       {"question_id": 1, "answer": "B"},
+       {"question_id": 2, "answer": "A"},
+       ...
+     ]
+   }
+
+3. Backend calcula score:
+   - Compara respostas com gabarito
+   - Calcula porcentagem: 8/10 = 80%
+
+4. Backend atualiza progresso:
+   
+   SE score >= 70%:
+   ┌─────────────────────────────────┐
+   │ TABELA: progress                │
+   ├─────────────────────────────────┤
+   │ quiz_score: 80                  │
+   │ quiz_passed: TRUE ✅            │
+   │ can_advance: TRUE ✅            │
+   │ module_id: 2  (libera próximo!) │
+   └─────────────────────────────────┘
+   
+   SE score < 70%:
+   ┌─────────────────────────────────┐
+   │ TABELA: progress                │
+   ├─────────────────────────────────┤
+   │ quiz_score: 65                  │
+   │ quiz_passed: FALSE ❌           │
+   │ can_advance: FALSE ❌           │
+   │ status: "needs_review"          │
+   └─────────────────────────────────┘
+   
+   ┌──────────────────────────────────────────────┐
+   │ ProgressAgent é acionado!                   │
+   │ - Analisa erros do aluno                    │
+   │ - Cria material de revisão personalizado    │
+   │ - Sugere aulas específicas para revisar     │
+   └──────────────────────────────────────────────┘
+```
+
+---
+
+### **FASE 6: Avançar para Módulo 2**
+```
+1. Aluno passou no quiz (score >= 70%)
+
+2. Backend detecta: progress.can_advance = TRUE
+
+3. Backend chama:
+   POST /courses/modules/2/generate-lessons
+   
+   (Mesmo processo da Fase 3)
+
+4. Gera aulas do Módulo 2 sob demanda:
+   - SpecialistAgent gera conteúdo
+   - ReviewerAgent revisa
+   - QuizAgent cria prova
+
+5. Aluno agora pode estudar Módulo 2!
+```
+
+---
+
+## 🤖 **RESUMO DOS AGENTS**
+
+### **1. SpecialistAgent** 
+**FUNÇÃO:** Criar conteúdo educacional
+**QUANDO USA:** 
+- Fase 1: Gerar estrutura do curso
+- Fase 3: Gerar conteúdo das aulas
+
+**EXEMPLO DE PROMPT:**
+```
+Crie uma aula sobre "O que é Python?"
+- 800-1200 palavras
+- Linguagem clara para iniciantes
+- Inclua exemplos práticos
+- Use Markdown
+```
+
+---
+
+### **2. ReviewerAgent**
+**FUNÇÃO:** Revisar e melhorar conteúdo
+**QUANDO USA:**
+- Fase 3: Depois que SpecialistAgent gera cada aula
+
+**EXEMPLO DE PROMPT:**
+```
+Revise este conteúdo:
+[conteúdo da aula]
+
+Melhore:
+- Clareza
+- Didática
+- Organização
+- Corrige erros
+
+Retorne versão melhorada
+```
+
+---
+
+### **3. QuizAgent**
+**FUNÇÃO:** Criar questões de avaliação
+**QUANDO USA:**
+- Fase 3: Depois de todas as aulas serem revisadas
+
+**EXEMPLO DE PROMPT:**
+```
+Gere 10 questões sobre:
+[conteúdo das 3 aulas]
+
+Cada questão:
+- 1 pergunta
+- 4 alternativas
+- 1 correta
+```
+
+---
+
+### **4. ProgressAgent** (FUTURO)
+**FUNÇÃO:** Acompanhar e ajudar aluno
+**QUANDO USA:**
+- Quando aluno tira < 70% no quiz
+- Cria material de revisão personalizado
+
+**EXEMPLO DE PROMPT:**
+```
+Aluno errou questões 2, 5, 7
+Conteúdo relacionado: [aulas X, Y]
+
+Crie:
+- Resumo dos conceitos que ele errou
+- Exercícios de reforço
+- Dicas de estudo
+```
+
+---
+
+## 📊 **DIAGRAMA VISUAL DO FLUXO**
+```
+FASE 1: ESTRUTURA
+┌─────────────┐
+│   Usuário   │
+└──────┬──────┘
+       │ POST /generate-structure
+       ▼
+┌─────────────────┐
+│ SpecialistAgent │ → Gera JSON com módulos e títulos
+└────────┬────────┘
+         │
+         ▼
+   ┌─────────┐
+   │Database │
+   │ courses │ ✅
+   │ modules │ ✅ (sem conteúdo)
+   └─────────┘
+
+═══════════════════════════════════════════════
+
+FASE 2: GERAR AULAS (SOB DEMANDA)
+┌──────────┐
+│  Aluno   │
+│ acessa   │
+│ módulo 1 │
+└────┬─────┘
+     │ POST /modules/1/generate-lessons
+     ▼
+┌────────────────────┐
+│ SpecialistAgent    │ → Gera aula 1
+└──────┬─────────────┘
+       │
+       ▼
+┌────────────────────┐
+│ ReviewerAgent      │ → Revisa aula 1
+└──────┬─────────────┘
+       │
+       ▼
+┌────────────────────┐
+│ SpecialistAgent    │ → Gera aula 2
+└──────┬─────────────┘
+       │
+       ▼
+┌────────────────────┐
+│ ReviewerAgent      │ → Revisa aula 2
+└──────┬─────────────┘
+       │
+       ▼
+┌────────────────────┐
+│ SpecialistAgent    │ → Gera aula 3
+└──────┬─────────────┘
+       │
+       ▼
+┌────────────────────┐
+│ ReviewerAgent      │ → Revisa aula 3
+└──────┬─────────────┘
+       │
+       ▼
+┌────────────────────┐
+│ QuizAgent          │ → Gera quiz com 10 questões
+└──────┬─────────────┘
+       │
+       ▼
+   ┌─────────┐
+   │Database │
+   │ lessons │ ✅ (3 aulas salvas)
+   │ modules │ ✅ (content_generated = TRUE)
+   └─────────┘
+
+═══════════════════════════════════════════════
+
+FASE 3: ALUNO ESTUDA
+┌──────────┐
+│  Aluno   │
+│ estuda   │
+│ 3 aulas  │
+└────┬─────┘
+     │
+     ▼
+┌──────────────┐
+│ Faz Quiz     │
+└────┬─────────┘
+     │
+     ├─ Score >= 70% ──→ Libera Módulo 2
+     │                   Gera aulas do Módulo 2
+     │
+     └─ Score < 70% ───→ ProgressAgent cria revisão
+                         Aluno refaz quiz
+```
+
+---
+
+## ✅ **CHECKLIST DE IMPLEMENTAÇÃO**
+```
+✅ 1. Criar tabela `lessons`
+✅ 2. Criar tabela `lesson_completions`
+✅ 3. Atualizar tabela `modules` (adicionar campos)
+✅ 4. Atualizar tabela `progress` (adicionar campos)
+✅ 5. SpecialistAgent gera estrutura (já funciona)
+✅ 6. SpecialistAgent gera conteúdo das aulas (novo método)
+✅ 7. ReviewerAgent revisa aulas
+✅ 8. QuizAgent gera quiz
+✅ 9. Endpoint: POST /modules/{id}/generate-lessons
+✅ 10. Endpoint: GET /modules/{id}/lessons
+✅ 11. Endpoint: GET /lessons/{id}
+✅ 12. Endpoint: POST /modules/{id}/submit-quiz
+✅ 13. Lógica de 70% para avançar

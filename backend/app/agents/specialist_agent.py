@@ -70,30 +70,77 @@ class SpecialistAgent(BaseAgent):
             # Fallback para services sem generate_json
             text = await self.run(prompt)
             return self._extract_json(text)
-    
-    def _extract_json(self, text: str) -> dict:
+
+    async def generate_lesson_content(self, prompt: str, course: str) -> dict:
+      """
+      Gera o conteúdo COMPLETO de uma aula (Lesson) em JSON compatível com o banco.
+      """
+      final_prompt_old = f"""
+        You are the SpecialistAgent {course}.
+
+        Your task is to generate the full content of a lesson based on the following instructions:
+
+        ---------------------
+        {prompt}
+        ---------------------
+
+        ⚠️ OUTPUT RULES — FOLLOW STRICTLY:
+        1. Return ONLY a valid JSON object. Do NOT add text before or after the JSON.
+        2. The lesson MUST be written entirely in Brazilian Portuguese.
+        3. "content" must contain a COMPLETE Markdown lesson — detailed, structured, and not short.
+        4. The JSON must contain EXACTLY these fields:
+
+        {{
+          "title": "...",
+          "content": "...",
+          "estimated_read_time_minutes": 0,
+          "generated_by": "SpecialistAgent"
+        }}
+
+        5. "estimated_read_time_minutes" must be based on length (~200 palavras = 1 minuto).
+        6. Do NOT add any extra fields under ANY circumstance.
+        7. Do NOT wrap the JSON in code blocks.
+        8. Ensure the JSON produced is valid, properly escaped, and without Markdown fences.
         """
-        Extrai JSON de uma string
-        """
-        try:
-            # Remove markdown
-            text = re.sub(r'```json\n?', '', text)
-            text = re.sub(r'```\n?', '', text)
-            
-            # Tenta parsear direto
-            return json.loads(text.strip())
-        except:
-            # Tenta encontrar JSON no meio do texto
-            match = re.search(r'\{.*\}', text, re.DOTALL)
-            if match:
-                try:
-                    return json.loads(match.group())
-                except:
-                    pass
-        
-        # Fallback: retorna estrutura mínima
-        return {
-            "title": "Erro ao gerar",
-            "description": text[:200],
-            "modules": []
-        }
+      
+      final_prompt = f"""
+      You are the SpecialistAgent.
+
+      Your task is to generate the complete lesson content based on the instructions below.
+
+      ---------------------
+      {prompt}
+      ---------------------
+
+      ⚠️ OUTPUT RULES — FOLLOW THEM STRICTLY:
+
+      1. Return ONLY a Markdown lesson (no JSON, no code blocks, no backticks).
+      2. The lesson MUST be written entirely in Brazilian Portuguese.
+      3. The lesson MUST be complete, detailed, well-structured, and written for humans — not summarized.
+      4. The Markdown must include:
+        - Título da lição
+        - Seções e subseções organizadas
+        - Exemplos, explicações e conclusões
+      5. At the very end of the output, add this line:
+        estimated_read_time_minutes: X
+        Where X is the estimated reading time based on text length 
+        (approximately 200 words = 1 minute).
+      6. Do NOT include any other metadata, JSON, keys, wrappers or comments.
+      7. Do NOT wrap anything in ``` or any Markdown code delimiters.
+
+      Your output must be ONLY the Markdown lesson followed by the time estimate.
+      """
+
+      
+
+
+
+      if hasattr(self.service, 'generate_json'):
+          try:
+              return await self.run(final_prompt)
+          except Exception:
+              text = await self.run(final_prompt)
+              return self._extract_json(text)
+      text = await self.run(final_prompt)
+      return self._extract_json(text)
+  

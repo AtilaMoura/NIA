@@ -1,6 +1,6 @@
 """
 Models do banco de dados usando SQLAlchemy.
-Define as tabelas: users, courses, modules, progress.
+Define as tabelas: users, courses, modules, lessons, lesson_completions, progress.
 """
 
 from sqlalchemy import (
@@ -13,7 +13,7 @@ from sqlalchemy.sql import func
 from app.database import Base
 
 # ============================================================
-# 1. MODEL: USER
+# 1. MODEL: USER (INALTERADO)
 # ============================================================
 
 class User(Base):
@@ -48,6 +48,7 @@ class User(Base):
 
     # Relacionamentos
     progress = relationship("Progress", back_populates="user")
+    # lesson_completions é definido pelo backref em LessonCompletion
 
     # Constraints
     __table_args__ = (
@@ -59,7 +60,7 @@ class User(Base):
 
 
 # ============================================================
-# 2. MODEL: COURSE
+# 2. MODEL: COURSE (INALTERADO)
 # ============================================================
 
 class Course(Base):
@@ -123,7 +124,7 @@ class Course(Base):
 
 
 # ============================================================
-# 3. MODEL: MODULE
+# 3. MODEL: MODULE (ATUALIZADO!)
 # ============================================================
 
 class Module(Base):
@@ -139,16 +140,18 @@ class Module(Base):
     description = Column(Text)
     duration_hours = Column(Integer, nullable=False)
 
-    # Conteúdo
-    content = Column(Text, nullable=False)
+    # Status de Geração (NOVOS CAMPOS)
+    content_generated = Column(Boolean, default=False) # As aulas deste módulo já foram geradas? [cite: 3]
+    exam_generated = Column(Boolean, default=False)    # A prova deste módulo já foi criada? [cite: 4]
+    lessons_count = Column(Integer, default=0)         # Quantas aulas este módulo tem [cite: 5]
+
+    # Conteúdo (Removido do Module para Lesson, mas mantido o Quiz para gabarito/metadados)
+    quiz = Column(JSONB, nullable=True) # Mantido, mas agora armazena gabarito/metadados do quiz do módulo.
 
     # Recursos
     examples = Column(JSONB, default=[])
     exercises = Column(JSONB, default=[])
     resources = Column(JSONB, default={})
-
-    # Quiz
-    quiz = Column(JSONB, nullable=False)
 
     # Revisão IA
     review_score = Column(DECIMAL(3, 1))
@@ -170,6 +173,7 @@ class Module(Base):
     # Relacionamentos
     course = relationship("Course", back_populates="modules")
     progress = relationship("Progress", back_populates="module")
+    lessons = relationship("Lesson", back_populates="module", cascade="all, delete-orphan") # Relacionamento com nova tabela Lesson
 
     # Constraints
     __table_args__ = (
@@ -182,12 +186,50 @@ class Module(Base):
         return f"<Module(id={self.id}, title='{self.title}', course_id={self.course_id})>"
 
 
+# ------------------------------------------------------------
+# 3.1. MODEL: LESSON (NOVA!)
+# ------------------------------------------------------------
+
+class Lesson(Base):
+    __tablename__ = "lessons"
+
+    # Identificação
+    id = Column(Integer, primary_key=True, index=True)
+    module_id = Column(Integer, ForeignKey('modules.id', ondelete='CASCADE'), nullable=False, index=True)
+    lesson_index = Column(Integer, nullable=False)
+    title = Column(String(255), nullable=False)
+
+    # Conteúdo e Metadados
+    content = Column(Text) # O conteúdo completo da aula em Markdown [cite: 6]
+    generated_by = Column(String(100)) # Nome do agent que gerou [cite: 6]
+    reviewed_by = Column(String(100))  # Nome do agent que revisou [cite: 6]
+    review_feedback = Column(JSONB)    # Feedback da revisão [cite: 6]
+    is_approved = Column(Boolean, default=False) # Passou na revisão? [cite: 6]
+    estimated_read_time_minutes = Column(Integer) # Tempo estimado de leitura [cite: 7]
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relacionamentos
+    module = relationship("Module", back_populates="lessons")
+    completions = relationship("LessonCompletion", back_populates="lesson", cascade="all, delete-orphan") # NOVO
+
+    # Constraints
+    __table_args__ = (
+        CheckConstraint('lesson_index > 0', name='valid_lesson_index'),
+    )
+
+    def __repr__(self):
+        return f"<Lesson(id={self.id}, title='{self.title}', module_id={self.module_id})>"
+
+
 # ============================================================
-# 4. MODEL: PROGRESS
+# 4. MODEL: PROGRESS (ATUALIZADO!)
 # ============================================================
 
 class Progress(Base):
-    __tablename__ = "progress"
+    __tablename__ = "progress" 
 
     # Identificação
     id = Column(Integer, primary_key=True, index=True)
@@ -197,6 +239,10 @@ class Progress(Base):
 
     # Status
     status = Column(String(50), default='not_started')
+
+    # NOVOS CAMPOS DE PROGRESSO
+    current_lesson_index = Column(Integer, default=1) # Qual aula está estudando [cite: 8]
+    can_advance = Column(Boolean, default=False)      # Pode avançar para próximo módulo? [cite: 10]
 
     # Tempo e datas
     started_at = Column(DateTime(timezone=True))
@@ -234,7 +280,41 @@ class Progress(Base):
         CheckConstraint("status IN ('not_started', 'in_progress', 'completed', 'failed')", name='valid_status'),
         CheckConstraint('quiz_score >= 0 AND quiz_score <= 100', name='valid_quiz_score'),
         CheckConstraint('quiz_attempts >= 0', name='valid_quiz_attempts'),
+        CheckConstraint('current_lesson_index >= 1', name='valid_current_lesson_index'), # NOVA
     )
 
     def __repr__(self):
         return f"<Progress(id={self.id}, user_id='{self.user_id}', status='{self.status}')>"
+
+
+# ------------------------------------------------------------
+# 5. MODEL: LESSON_COMPLETION (NOVA!)
+# ------------------------------------------------------------
+
+class LessonCompletion(Base):
+    __tablename__ = "lesson_completions"
+
+    # Identificação
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True) # ID do aluno
+    lesson_id = Column(Integer, ForeignKey('lessons.id', ondelete='CASCADE'), nullable=False, index=True) # ID da aula
+
+    # Status
+    completed = Column(Boolean, default=False) # Completou?
+    time_spent_minutes = Column(Integer, default=0) # Tempo gasto
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    completed_at = Column(DateTime(timezone=True))
+
+    # Relacionamentos
+    user = relationship("User", backref="lesson_completions")
+    lesson = relationship("Lesson", back_populates="completions")
+
+    # Constraints
+    __table_args__ = (
+        CheckConstraint('time_spent_minutes >= 0', name='valid_time_spent'),
+    )
+
+    def __repr__(self):
+        return f"<LessonCompletion(id={self.id}, user_id={self.user_id}, lesson_id={self.lesson_id})>"
