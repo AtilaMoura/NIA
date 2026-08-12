@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from app.database import engine
 from app.models import models
-from app.routers import users, courses, modules, progress
+from app.routers import users, courses, modules, progress, lessons, pipeline
 from app.routers import auth
 from app.routers import test_ai
 
@@ -21,6 +21,8 @@ def create_app():
     app.include_router(courses.router)
     app.include_router(modules.router)
     app.include_router(progress.router)
+    app.include_router(lessons.router)
+    app.include_router(pipeline.router)
     app.include_router(test_ai.router)
 
     @app.get("/")

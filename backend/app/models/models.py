@@ -40,6 +40,7 @@ class User(Base):
     # Preferências
     preferred_topics = Column(JSONB, default=[])
     learning_style = Column(String(50))  # visual, practical, theoretical
+    preferred_theme = Column(String(50), default='vidro-fume')  # id do tema em docs/schema/temas.json
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -113,7 +114,7 @@ class Course(Base):
 
     # Constraints
     __table_args__ = (
-        CheckConstraint("level IN ('basic', 'intermediate', 'advanced')", name='valid_level'),
+        CheckConstraint("level IN ('básico', 'intermediário', 'avançado', 'especialista')", name='valid_level'),
         CheckConstraint("status IN ('draft', 'published', 'archived')", name='valid_status'),
         CheckConstraint('duration_hours > 0', name='valid_duration'),
         CheckConstraint('ai_quality_score >= 0 AND ai_quality_score <= 10', name='valid_quality_score'),

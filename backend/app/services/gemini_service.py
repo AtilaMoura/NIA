@@ -78,24 +78,33 @@ class GeminiService:
     async def generate_json(
         self,
         prompt: str,
-        temperature: float = 0.3
+        temperature: float = 0.3,
+        max_tokens: int = 8000
     ) -> dict:
         """
         Gera resposta em formato JSON
-        
+
         Útil para dados estruturados (quizzes, estruturas de curso)
+
+        max_tokens=8000 (era 4000, herdado do default de generate()): achado
+        testando a Fase 7 ponta a ponta — um tópico completo (schema de
+        docs/schema/schema-conteudo-topico.md, gerado em 1 chamada só no modo
+        "comum") passa fácil de 3000-3500 tokens de saída, e com 4000 a resposta
+        as vezes vinha cortada no meio do JSON (erro "Resposta não é JSON válido"
+        que na real era JSON truncado, não markdown sobrando).
         """
-        
+
         # Adiciona instrução para retornar JSON
         full_prompt = f"""{prompt}
 
 IMPORTANTE: Retorne APENAS um JSON válido, sem texto adicional, sem markdown.
 Não use ```json, apenas o JSON puro."""
-        
+
         # Gera o texto
         response = await self.generate(
             prompt=full_prompt,
-            temperature=temperature
+            temperature=temperature,
+            max_tokens=max_tokens
         )
         
         # Remove possíveis markdown

@@ -13,9 +13,9 @@ frontend/.turbo/
 frontend/build/
 
 # Backend (Python)
-backend/__pycache__/
-backend/*.py[cod]
-backend/*$py.class
+backend/**/__pycache__/
+backend/**/*.py[cod]
+backend/**/*$py.class
 backend/*.so
 backend/.Python
 backend/venv/
@@ -27,6 +27,9 @@ backend/.mypy_cache/
 backend/.coverage
 backend/htmlcov/
 backend/*.egg-info/
+
+# Renders de teste manual do renderizador (backend/_render_*.html)
+backend/_render_*.html
 
 # Database
 pgdata/

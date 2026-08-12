@@ -86,22 +86,29 @@ class GroqService:
     async def generate_json(
         self,
         prompt: str,
-        system_prompt: Optional[str] = None
+        system_prompt: Optional[str] = None,
+        max_tokens: int = 8000
     ) -> dict:
         """
         Gera resposta em formato JSON
-        
+
         Útil para quando queremos dados estruturados
+
+        max_tokens=8000 (era 4000, herdado do default de generate()): mesmo
+        achado do GeminiService — um tópico completo em modo "comum" (1 chamada
+        só) passa perto de 3000-3500 tokens de saída, e 4000 deixava pouca
+        margem, arriscando truncar o JSON no meio.
         """
-        
+
         # Adiciona instrução para retornar JSON
         full_prompt = f"{prompt}\n\nRETORNE APENAS JSON VÁLIDO, SEM TEXTO ADICIONAL."
-        
+
         # Gera o texto
         response = await self.generate(
             prompt=full_prompt,
             system_prompt=system_prompt,
-            temperature=0.3  # Menos criativo para JSON
+            temperature=0.3,  # Menos criativo para JSON
+            max_tokens=max_tokens
         )
         
         # Remove possíveis markdown ```json

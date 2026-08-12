@@ -1,0 +1,320 @@
+{
+  "topico_id": "aula1-topico4-geracao-resposta",
+  "titulo": "Geração de resposta",
+  "aula": 1,
+  "numero": 4,
+  "duracao_estimada_min": 13,
+  "roteiro": [
+    "Definição técnica + analogia",
+    "Checkpoint rápido",
+    "Temperatura + Top-k/Top-p",
+    "Efeitos práticos + checkpoint",
+    "Diferença de alucinação + aplicação no Garden Center",
+    "Checkpoint com cenário real",
+    "Resumo",
+    "Avaliação final do tópico"
+  ],
+  "badges_capa": ["⏱ ~13 min", "🔊 áudio com controle de velocidade", "✍️ 3 checkpoints + avaliação final"],
+  "slides": [
+    {
+      "id": "s0",
+      "tipo": "capa",
+      "secao": "Início",
+      "titulo": "Geração de resposta",
+      "subtitulo": "Logits, temperatura e sampling — como o modelo realmente escolhe cada palavra, e por que isso não é a mesma coisa que \"inventar fatos\"",
+      "instrucoes_box": {
+        "label": "📋 Como funciona este estudo",
+        "texto": "Use as setas ← → (teclado) ou os botões embaixo para navegar. Alguns slides são checkpoints — pedem uma resposta antes de liberar o próximo. No fim tem uma avaliação e um resumo pra você trazer de volta pro chat."
+      }
+    },
+    {
+      "id": "s1",
+      "tipo": "conteudo",
+      "secao": "Conteúdo",
+      "titulo_secao": "Definição técnica",
+      "blocos": [
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📘 Definição",
+          "texto": "Antes de escolher a próxima palavra, o modelo calcula um número (logit) pra cada token possível do vocabulário — uma pontuação bruta de \"quão provável\" aquele token parece. Uma função chamada softmax transforma esses números numa distribuição de probabilidade (tudo somando 100%). Escolher qual token vira a resposta, sorteando dentro dessa distribuição, é o processo chamado de sampling."
+        },
+        {
+          "tipo": "diagrama",
+          "id": "diag_logits",
+          "descricao": "Barra horizontal mostrando probabilidades: samambaia 42%, orquídea 26%, cacto 14%, outras opções 17%, cadeira 1% — retomando o exemplo do Tópico 1 pra mostrar de onde essas percentagens vêm tecnicamente.",
+          "svg_raw": "<svg viewBox=\"0 0 340 150\"><text x=\"10\" y=\"14\" font-size=\"10\" fill=\"#9fb3a8\" font-weight=\"700\">Logits → softmax → probabilidades (o sorteio do Tópico 1)</text><rect x=\"10\" y=\"26\" width=\"180\" height=\"16\" fill=\"#c8e06b\"/><text x=\"198\" y=\"38\" font-size=\"9\" fill=\"#f2f6f0\">samambaia — 42%</text><rect x=\"10\" y=\"50\" width=\"112\" height=\"16\" fill=\"#a8c766\"/><text x=\"130\" y=\"62\" font-size=\"9\" fill=\"#f2f6f0\">orquídea — 26%</text><rect x=\"10\" y=\"74\" width=\"70\" height=\"16\" fill=\"#7fa855\"/><text x=\"88\" y=\"86\" font-size=\"9\" fill=\"#f2f6f0\">cacto — 14%</text><rect x=\"10\" y=\"98\" width=\"80\" height=\"16\" fill=\"rgba(255,255,255,.12)\"/><text x=\"98\" y=\"110\" font-size=\"9\" fill=\"#9fb3a8\">outras opções — 17%</text><rect x=\"10\" y=\"122\" width=\"6\" height=\"16\" fill=\"#e0736b\"/><text x=\"24\" y=\"134\" font-size=\"9\" fill=\"#e0736b\">cadeira — 1%</text></svg>"
+        },
+        {
+          "tipo": "paragrafo",
+          "texto": "Essa é a mesma lista de probabilidades que apareceu no Tópico 1 — agora você sabe de onde ela vem tecnicamente."
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "tipo": "conteudo",
+      "secao": "Conteúdo",
+      "titulo_secao": "Uma analogia pra fixar",
+      "blocos": [
+        {
+          "tipo": "box",
+          "variante": "analogy",
+          "label": "🧩 Analogia",
+          "texto": "Pense numa roleta injusta de propósito: cada token do vocabulário tem uma fatia, e o tamanho da fatia é proporcional à probabilidade calculada. \"Samambaia\" tem uma fatia grande (42%), \"cadeira\" tem uma fatia minúscula (1%). Girar a roleta é o sampling: o resultado tende a cair nas fatias grandes, mas fatias pequenas também podem ganhar de vez em quando."
+        },
+        {
+          "tipo": "paragrafo",
+          "texto": "É por isso que perguntar a mesma coisa duas vezes pro modelo às vezes traz respostas com palavras um pouco diferentes — a roleta girou de novo."
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "🌱 Por que isso importa",
+          "texto": "Entender que existe uma \"roleta\" por trás de cada palavra escolhida é o que explica por que dá pra ajustar o quanto o modelo arrisca — é isso que os próximos slides mostram."
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck1",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "id": "ck1_1",
+          "tipo": "mc",
+          "enunciado": "O que é um logit, tecnicamente?",
+          "cenario": null,
+          "opcoes": [
+            "A palavra final escolhida pelo modelo",
+            "Uma pontuação bruta que o modelo calcula pra cada token possível, antes de virar probabilidade",
+            "O nome do tokenizer usado pelo modelo"
+          ],
+          "correta_idx": 1,
+          "explicacao": "Logit é a pontuação bruta; o softmax transforma o conjunto de logits numa distribuição de probabilidade."
+        },
+        {
+          "id": "ck1_2",
+          "tipo": "tf",
+          "enunciado": "\"O sampling sempre escolhe o token com a maior probabilidade, sem exceção.\"",
+          "cenario": null,
+          "correta_bool": false,
+          "explicacao": "Falso — isso seria \"decodificação gulosa\" (greedy), só um jeito possível. O sampling normal sorteia conforme a probabilidade de cada token, então tokens menos prováveis às vezes também ganham."
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "tipo": "conteudo",
+      "secao": "Conteúdo",
+      "titulo_secao": "Temperatura: o controle de quão \"arriscada\" é a roleta",
+      "blocos": [
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📘 Definição",
+          "texto": "Temperatura é um parâmetro que reformata a distribuição de probabilidades antes do sorteio. Temperatura baixa (perto de 0) deixa a roleta quase travada nas fatias maiores — respostas mais previsíveis. Temperatura alta deixa as fatias mais parecidas em tamanho — respostas mais variadas, mas também mais arriscadas."
+        },
+        {
+          "tipo": "diagrama",
+          "id": "diag_temperatura",
+          "descricao": "Comparação lado a lado de duas distribuições: temperatura baixa (uma barra domina, quase travada numa opção) vs. temperatura alta (barras de altura parecida, mais espalhadas).",
+          "svg_raw": "<svg viewBox=\"0 0 340 130\"><text x=\"10\" y=\"14\" font-size=\"10\" fill=\"#7fb4d6\" font-weight=\"700\">Temperatura baixa</text><rect x=\"10\" y=\"24\" width=\"24\" height=\"80\" fill=\"#7fb4d6\"/><rect x=\"42\" y=\"88\" width=\"24\" height=\"16\" fill=\"rgba(127,180,214,.4)\"/><rect x=\"74\" y=\"96\" width=\"24\" height=\"8\" fill=\"rgba(127,180,214,.2)\"/><rect x=\"106\" y=\"100\" width=\"24\" height=\"4\" fill=\"rgba(255,255,255,.08)\"/><text x=\"180\" y=\"14\" font-size=\"10\" fill=\"#e0b168\" font-weight=\"700\">Temperatura alta</text><rect x=\"180\" y=\"52\" width=\"24\" height=\"52\" fill=\"#e0b168\"/><rect x=\"212\" y=\"60\" width=\"24\" height=\"44\" fill=\"rgba(224,177,104,.8)\"/><rect x=\"244\" y=\"66\" width=\"24\" height=\"38\" fill=\"rgba(224,177,104,.55)\"/><rect x=\"276\" y=\"72\" width=\"24\" height=\"32\" fill=\"rgba(224,177,104,.35)\"/><line x1=\"10\" y1=\"108\" x2=\"130\" y2=\"108\" stroke=\"#4a564d\" stroke-width=\"1\"/><line x1=\"180\" y1=\"108\" x2=\"300\" y2=\"108\" stroke=\"#4a564d\" stroke-width=\"1\"/><text x=\"70\" y=\"122\" text-anchor=\"middle\" font-size=\"8\" fill=\"#9fb3a8\">1 opção domina</text><text x=\"240\" y=\"122\" text-anchor=\"middle\" font-size=\"8\" fill=\"#9fb3a8\">opções mais parecidas</text></svg>"
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "tipo": "conteudo",
+      "secao": "Conteúdo",
+      "titulo_secao": "Top-k e Top-p: limitando o menu de opções",
+      "blocos": [
+        { "tipo": "paragrafo", "texto": "Além da temperatura, dá pra restringir quantos tokens entram na roleta antes do sorteio." },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "🌱 Duas formas de restringir",
+          "texto": "Top-k — considera só os k tokens mais prováveis (ex: só os 40 melhores). Top-p (nucleus sampling) — considera o menor grupo de tokens cuja soma de probabilidade já passa de p% (ex: 90%), descartando a \"cauda\" de opções muito improváveis."
+        },
+        { "tipo": "paragrafo", "texto": "Isso evita que, mesmo com temperatura mais alta, o modelo escolha um token completamente bizarro que só tinha 0,001% de chance." }
+      ]
+    },
+    {
+      "id": "s6",
+      "tipo": "conteudo",
+      "secao": "Conteúdo",
+      "titulo_secao": "Efeitos práticos da temperatura",
+      "blocos": [
+        {
+          "tipo": "cols2",
+          "esquerda": { "variante": "app", "label": "✔ Temperatura baixa", "texto": "Respostas consistentes e previsíveis · repete o mesmo tipo de frase · ideal pra fatos, preços, políticas da loja." },
+          "direita": { "variante": "error", "label": "⚠ Temperatura alta", "texto": "Respostas mais variadas e \"criativas\" · maior chance de fugir do tom esperado · maior chance de escolher uma palavra menos precisa." }
+        }
+      ]
+    },
+    {
+      "id": "s7",
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck2",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "id": "ck2",
+          "tipo": "classify",
+          "enunciado": "Classifique: essa resposta do agente pede temperatura baixa, ou temperatura alta?",
+          "cenario": null,
+          "rotulos_opcoes": [
+            { "valor": "baixa", "rotulo": "Baixa" },
+            { "valor": "alta", "rotulo": "Alta" }
+          ],
+          "itens": [
+            { "id": "ck2_1", "texto": "Confirmar se um produto está em estoque hoje", "correta": "baixa" },
+            { "id": "ck2_2", "texto": "Escrever uma legenda criativa pra post de Instagram sobre plantas", "correta": "alta" },
+            { "id": "ck2_3", "texto": "Informar o preço de um produto", "correta": "baixa" },
+            { "id": "ck2_4", "texto": "Sugerir variações de frases pra descrever uma planta no catálogo", "correta": "alta" },
+            { "id": "ck2_5", "texto": "Confirmar a política de troca/devolução da loja", "correta": "baixa" }
+          ],
+          "explicacao": "Fatos que precisam ser sempre iguais (estoque, preço, política) pedem temperatura baixa. Tarefas de variação de estilo/texto criativo combinam com temperatura mais alta."
+        }
+      ]
+    },
+    {
+      "id": "s8",
+      "tipo": "conteudo",
+      "secao": "Conteúdo",
+      "titulo_secao": "Isso não é a mesma coisa que alucinação",
+      "blocos": [
+        { "tipo": "paragrafo", "texto": "Temperatura e sampling controlam como o modelo escolhe as palavras — o estilo, a variedade, a previsibilidade. Isso é diferente de alucinação, que é o modelo afirmar algo falso com confiança (tema do próximo tópico)." },
+        { "tipo": "quote", "texto": "Mesmo com temperatura zero, um modelo sem grounding pode alucinar; e mesmo com temperatura alta, um modelo bem 'aterrado' pode variar o estilo sem inventar fatos." },
+        { "tipo": "box", "variante": "error", "label": "⚠ Risco de confundir os dois", "texto": "Achar que 'baixar a temperatura' resolve o problema de respostas erradas sobre fatos do negócio. Temperatura ajusta estilo; fatos confiáveis dependem de grounding (Tópicos 1 e 3), não de sampling." }
+      ]
+    },
+    {
+      "id": "s9",
+      "tipo": "conteudo",
+      "secao": "Conteúdo",
+      "titulo_secao": "Aplicação no seu Garden Center",
+      "blocos": [
+        { "tipo": "box", "variante": "app", "label": "🌱 Na prática", "texto": "Pra respostas que envolvem fatos do negócio (estoque, preço, política), o ideal é manter a temperatura baixa, priorizando consistência. Pra tarefas criativas dentro do fluxo (gerar variações de texto de marketing, sugestões de combinação de plantas), uma temperatura um pouco mais alta pode ajudar a variar o texto — desde que os fatos continuem vindo de fora via grounding, não do sorteio de tokens." }
+      ]
+    },
+    {
+      "id": "s10",
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck3",
+      "titulo_secao": "Checkpoint rápido — cenário real",
+      "perguntas": [
+        {
+          "id": "ck3",
+          "tipo": "open",
+          "enunciado": "Qual é o risco dessa decisão, e qual conceito deste tópico explica isso?",
+          "cenario": "O time decide deixar a temperatura do agente bem alta \"pra ele ficar mais natural e humano\" em todas as respostas — inclusive quando confirma preço e disponibilidade de produtos.",
+          "placeholder": "Escreva sua resposta e clique em Registrar...",
+          "explicacao": "Temperatura alta aumenta a variação nas palavras escolhidas — inclusive em respostas que deveriam ser sempre iguais e precisas, tipo preço e estoque. Isso não cria automaticamente uma mentira (isso seria falta de grounding), mas aumenta a inconsistência. Pra fatos de negócio, o ideal é temperatura baixa — deixar 'alta em tudo' é misturar uma configuração de estilo com uma necessidade de precisão."
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "tipo": "conteudo",
+      "secao": "Conteúdo",
+      "titulo_secao": "Resumo do Tópico 4",
+      "blocos": [
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "🧠 Resumo",
+          "itens": [
+            "Logit = pontuação bruta por token; softmax transforma em probabilidade; sampling sorteia dentro dela.",
+            "Temperatura controla o quão 'achatada' fica a distribuição — baixa = previsível, alta = variada.",
+            "Top-k/Top-p limitam quantos tokens entram no sorteio, evitando escolhas bizarras.",
+            "Temperatura não é alucinação: controla estilo, não garante (nem impede) fatos corretos — isso depende de grounding."
+          ]
+        },
+        { "tipo": "paragrafo", "texto": "Próximo passo: uma avaliação final um pouco mais exigente, misturando os pontos que mais geram confusão." }
+      ]
+    },
+    {
+      "id": "s12",
+      "tipo": "avaliacao_intro",
+      "secao": "Avaliação Final",
+      "titulo": "Avaliação Final",
+      "subtitulo": "5 questões — algumas juntam mais de um conceito. Duas são abertas.",
+      "instrucoes_box": {
+        "label": "📋 Antes de começar",
+        "texto": "A correção objetiva já aparece na hora. Mas a avaliação final de verdade — com feedback honesto e a decisão de seguir ou reforçar — acontece quando você levar o resumo desta tela pro chat com o Claude."
+      }
+    },
+    {
+      "id": "s13", "tipo": "avaliacao_pergunta", "secao": "Avaliação Final", "gate_id": "ef1",
+      "pergunta": {
+        "id": "ef1", "tipo": "mc",
+        "enunciado": "O que a temperatura controla, no processo de geração de resposta?",
+        "cenario": null,
+        "opcoes": [
+          "Se o modelo vai buscar fatos externos ou não",
+          "Quão 'achatada' ou 'concentrada' fica a distribuição de probabilidade usada no sorteio do próximo token",
+          "Quantos tokens cabem na janela de contexto"
+        ],
+        "correta_idx": 1,
+        "explicacao": "Temperatura reformata a distribuição antes do sorteio — não tem relação com buscar fatos externos nem com o tamanho da janela."
+      }
+    },
+    {
+      "id": "s14", "tipo": "avaliacao_pergunta", "secao": "Avaliação Final", "gate_id": "ef2",
+      "pergunta": {
+        "id": "ef2", "tipo": "mc",
+        "enunciado": "Por que 'decodificação gulosa' (sempre escolher o token mais provável) não é a mesma coisa que sampling normal?",
+        "cenario": null,
+        "opcoes": [
+          "Porque a gulosa é mais lenta",
+          "Porque a gulosa ignora a distribuição e sempre pega o token nº1, enquanto o sampling normal sorteia considerando as probabilidades de vários tokens",
+          "Porque a gulosa não usa logits"
+        ],
+        "correta_idx": 1,
+        "explicacao": "Greedy é determinística (sempre o mesmo resultado pro mesmo contexto); sampling normal introduz variação, mesmo usando os mesmos logits como base."
+      }
+    },
+    {
+      "id": "s15", "tipo": "avaliacao_pergunta", "secao": "Avaliação Final", "gate_id": "ef3",
+      "pergunta": {
+        "id": "ef3", "tipo": "tf",
+        "enunciado": "\"Temperatura alta e alucinação são a mesma coisa: as duas fazem o modelo inventar fatos falsos.\"",
+        "cenario": null,
+        "correta_bool": false,
+        "explicacao": "Falso — temperatura controla estilo/variedade da escolha de palavras; alucinação é afirmar algo falso com confiança, geralmente por falta de grounding. São conceitos relacionados, mas diferentes."
+      }
+    },
+    {
+      "id": "s16", "tipo": "avaliacao_pergunta", "secao": "Avaliação Final", "gate_id": "ef4",
+      "pergunta": {
+        "id": "ef4", "tipo": "open",
+        "enunciado": "Cite uma tarefa do seu agente do Garden Center que pede temperatura baixa, e outra que combina bem com temperatura mais alta — diferentes dos exemplos usados aqui.",
+        "cenario": null,
+        "placeholder": "(a) Temperatura baixa: ...\n(b) Temperatura mais alta: ...",
+        "explicacao": null
+      }
+    },
+    {
+      "id": "s17", "tipo": "avaliacao_pergunta", "secao": "Avaliação Final", "gate_id": "ef5",
+      "pergunta": {
+        "id": "ef5", "tipo": "open",
+        "enunciado": "Como tokens, janela de contexto e temperatura se conectam na hora de configurar uma resposta do agente sobre disponibilidade de um produto?",
+        "cenario": null,
+        "placeholder": "Junte grounding do fato + temperatura baixa pra consistência + tudo isso ainda consumindo tokens dentro da janela...",
+        "explicacao": null
+      }
+    },
+    {
+      "id": "s18",
+      "tipo": "resultado",
+      "secao": "Resultado",
+      "titulo": "Resultado desta sessão",
+      "proximo_topico_label": "Tópico 5 (Alucinação)"
+    }
+  ]
+}
