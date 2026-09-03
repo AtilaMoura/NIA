@@ -1,0 +1,1108 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dons Espirituais: Ferramentas para o Chamado — Tópico 2 (estudo em slides)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&amp;family=Source+Sans+3:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --bg: #faf6ee;
+    --surface: #ffffff;
+    --surface-2: #f3ece0;
+    --border: #e4d8c3;
+    --border-soft: #ede4d0;
+    --text: #2b241c;
+    --text-muted: #6b5f4f;
+    --text-dim: #8a7a62;
+    --accent: #8a5a2b;
+    --accent-soft: rgba(138,90,43,.14);
+    --accent-text-on: #fbf3e0;
+    --bad: #a3402f;
+    --bad-soft: rgba(163,64,47,.12);
+    --blue: #3d5f6e;
+    --amber: #b8763a;
+    --violet: #5a4a72;
+    --radius: 14px;
+    --radius-lg: 20px;
+    --font-display: &#39;Fraunces&#39;, Georgia, &#39;Times New Roman&#39;, serif;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: &#39;Source Sans 3&#39;, -apple-system, &#39;Segoe UI&#39;, &#39;Noto Sans&#39;, Roboto, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    color: var(--text);
+    padding: 13px 16px 11px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .topbar-row { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; gap: 10px; }
+  .topbar-title { font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); font-size: 10.5px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .topbar-count { color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .fullscreen-btn {
+    flex: 0 0 auto; width: 26px; height: 26px; border-radius: var(--radius-lg);
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background .2s ease, transform .15s ease;
+  }
+  .fullscreen-btn:hover { background: var(--surface-2); }
+  .fullscreen-btn:active { transform: scale(.92); }
+  .progress-track { height: 2px; background: var(--border-soft); margin-top: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+  .section-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--text-dim); margin-top: 8px; font-weight: 600; }
+
+  .slides { height: 100%; padding-top: 72px; padding-bottom: 82px; overflow: hidden; background: var(--bg); }
+  .slide { display: none; height: 100%; overflow-y: auto; padding: 26px 20px 32px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .slide::-webkit-scrollbar { width: 7px; }
+  .slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+  .slide::-webkit-scrollbar-track { background: transparent; }
+  .slide.active { display: block; animation: slideIn .4s cubic-bezier(.16,1,.3,1) both; position: relative; z-index: 1; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .slide.active { animation: none; } }
+  .slide-inner { max-width: 640px; margin: 0 auto; }
+
+  h1.title { font-family: var(--font-display); font-size: 24px; color: var(--text); margin: 0 0 8px 0; font-weight: 600; line-height: 1.28; letter-spacing: -.3px; }
+  h2.sub { font-size: 14px; color: var(--text-muted); font-weight: 400; margin: 0 0 20px 0; line-height: 1.55; }
+  h3.section-h { font-family: var(--font-display); font-size: 15px; color: var(--text); margin: 22px 0 11px 0; font-weight: 600; display: flex; align-items: center; gap: 9px; letter-spacing: .2px; }
+  h3.section-h::before { content: ""; width: 3px; height: 15px; background: var(--accent); flex-shrink: 0; }
+  p { margin: 8px 0; font-size: 15px; line-height: 1.65; color: var(--text); }
+  strong { color: var(--accent); font-weight: 600; }
+  code { font-family: 'SF Mono', 'Courier New', monospace; background: var(--surface-2); padding: 2px 6px; border-radius: 3px; color: var(--accent); font-size: 13px; }
+
+  .box { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 15px 16px; margin: 12px 0; font-size: 14.5px; line-height: 1.6; }
+  .box-label { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 7px; }
+  .box-def { border-left: 2px solid var(--blue); } .box-def .box-label { color: var(--blue); }
+  .box-analogy { border-left: 2px solid var(--amber); } .box-analogy .box-label { color: var(--amber); }
+  .box-app { border-left: 2px solid var(--accent); } .box-app .box-label { color: var(--accent); }
+  .box-error { border-left: 2px solid var(--bad); } .box-error .box-label { color: var(--bad); }
+  .box-summary { border-left: 2px solid var(--violet); } .box-summary .box-label { color: var(--violet); }
+  .box-instr { border-left: 2px solid var(--blue); font-size: 13.5px; } .box-instr .box-label { color: var(--blue); }
+  .capa-imagem { width: 100%; max-height: 320px; object-fit: cover; border-radius: var(--radius-lg); border: 1px solid var(--border-soft); margin: 14px 0 18px; display: block; }
+
+  .quote-block { font-family: var(--font-display); font-style: italic; font-size: 16px; color: var(--text-muted); border-left: 2px solid var(--border); padding: 4px 0 4px 14px; margin: 18px 0; font-weight: 300; }
+
+  .cols2 { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cols2 > div { flex: 1; min-width: 240px; }
+
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .badge { font-size: 10.5px; background: var(--surface-2); border: 1px solid var(--border-soft); color: var(--text-muted); padding: 6px 11px; border-radius: 20px; font-weight: 500; }
+
+  .roadmap { display: flex; flex-direction: column; gap: 8px; margin: 18px 0; }
+  .roadmap-item { display: flex; align-items: center; gap: 11px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 11px 13px; font-size: 13.5px; color: var(--text-muted); transition: border-color .15s ease; }
+  .roadmap-item:hover { border-color: var(--border); }
+  .roadmap-num { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--accent); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+
+  .type-cards { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 14px 0; }
+  @media (min-width: 480px) { .type-cards { grid-template-columns: 1fr 1fr; } }
+  .type-card { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); padding: 13px 14px; transition: border-color .15s ease; }
+  .type-card:hover { border-color: var(--border); }
+  .type-card-icon { font-size: 20px; margin-bottom: 6px; display: block; }
+  .type-card-name { font-weight: 600; font-size: 13.5px; color: var(--text); margin-bottom: 4px; }
+  .type-card-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+
+  .timeline { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+  .tl-item { position: relative; padding: 4px 0 22px 32px; }
+  .tl-item::before { content: ""; position: absolute; left: 8px; top: 20px; bottom: -2px; width: 1px; background: var(--border); }
+  .tl-item:last-child::before { display: none; }
+  .tl-dot { position: absolute; left: 0; top: 2px; width: 17px; height: 17px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--bg); font-weight: 700; }
+  .tl-title { font-family: var(--font-display); font-weight: 600; font-size: 14.5px; color: var(--text); margin-bottom: 4px; }
+  .tl-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+
+  figure { margin: 14px 0; }
+  .fig-wrap { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); padding: 12px; overflow-x: auto; }
+  svg.diagram { width: 100%; height: auto; display: block; min-width: 300px; }
+  figcaption { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 8px; line-height: 1.55; }
+
+  .question { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); padding: 16px; margin: 14px 0; }
+  .q-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; padding: 4px 10px; border-radius: 20px; background: var(--surface-2); color: var(--text-muted); }
+  .q-text { font-size: 15px; font-weight: 500; color: var(--text); margin: 6px 0 11px 0; line-height: 1.55; }
+  .q-scenario { background: var(--surface-2); border-left: 2px solid var(--amber); padding: 11px 13px; font-size: 14px; font-style: italic; color: var(--text-muted); margin-bottom: 11px; border-radius: var(--radius); }
+
+  .confidence { display: flex; gap: 6px; align-items: center; font-size: 11.5px; color: var(--text-dim); margin-bottom: 11px; flex-wrap: wrap; }
+  .confidence button { font-size: 10.5px; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all .15s ease; }
+  .confidence button:hover { border-color: var(--accent); color: var(--text); }
+  .confidence button.active { background: var(--accent); color: var(--accent-text-on); border-color: var(--accent); font-weight: 700; }
+  .confidence button:active { transform: scale(.94); }
+
+  .opt-btn { display: block; width: 100%; text-align: left; padding: 12px 13px; margin: 6px 0; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--surface-2); font-size: 14px; cursor: pointer; color: var(--text); transition: border-color .15s ease, transform .12s ease; font-family: inherit; }
+  .opt-btn:hover { border-color: var(--accent); transform: translateX(2px); }
+  .opt-btn.correct { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; color: var(--accent); }
+  .opt-btn.incorrect { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+  .opt-btn:disabled { cursor: default; transform: none; }
+
+  .tf-row { display: flex; gap: 8px; margin: 8px 0; }
+  .tf-btn { flex: 1; padding: 12px; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--surface-2); font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text); transition: border-color .15s ease; font-family: inherit; }
+  .tf-btn:hover:not(:disabled) { border-color: var(--accent); }
+  .tf-btn.correct { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .tf-btn.incorrect { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+  .tf-btn:disabled { cursor: default; }
+
+  textarea { width: 100%; min-height: 70px; border-radius: var(--radius); border: 1px solid var(--border); padding: 11px; font-size: 14px; font-family: inherit; resize: vertical; margin: 6px 0; background: var(--surface-2); color: var(--text); transition: border-color .15s ease; }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  textarea::placeholder { color: var(--text-dim); }
+
+  .classify-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-soft); flex-wrap: wrap; }
+  .classify-item:last-child { border-bottom: none; }
+  .classify-label { font-size: 13.5px; flex: 1; min-width: 150px; color: var(--text); }
+  .classify-btns { display: flex; gap: 6px; }
+  .classify-btns button { font-size: 10.5px; padding: 7px 10px; border-radius: var(--radius); border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: border-color .15s ease; font-family: inherit; }
+  .classify-btns button:hover:not(:disabled) { border-color: var(--accent); }
+  .classify-btns button.correct { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .classify-btns button.incorrect { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+
+  .reveal-btn, .register-btn { margin-top: 8px; font-size: 13px; padding: 10px 16px; border-radius: var(--radius); border: none; background: var(--accent); color: var(--accent-text-on); cursor: pointer; font-weight: 700; transition: transform .12s ease, box-shadow .2s ease; animation: breathe 3s ease-in-out infinite; font-family: inherit; }
+  .reveal-btn:hover, .register-btn:hover { transform: translateY(-1px); }
+  .register-btn.done { background: var(--text-dim); color: var(--bg); animation: none; }
+  @keyframes breathe { 0%, 100% { box-shadow: 0 0 0 0 var(--accent-soft); } 50% { box-shadow: 0 0 0 5px transparent; } }
+  @media (prefers-reduced-motion: reduce) { .reveal-btn, .register-btn { animation: none; } }
+
+  .explanation { display: none; margin-top: 10px; background: var(--accent-soft); border-left: 2px solid var(--accent); padding: 11px 13px; font-size: 13.5px; color: var(--text); border-radius: var(--radius); }
+  .explanation.show { display: block; animation: slideIn .3s ease both; }
+
+  .gate-hint { font-size: 12px; color: var(--amber); margin-top: 8px; display: none; }
+  .gate-hint.show { display: block; }
+
+  .navbar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border-top: 1px solid var(--border-soft);
+    padding: 11px 16px; display: flex; align-items: center; gap: 7px;
+  }
+  .nav-btn { flex: 1; padding: 12px; border-radius: var(--radius); border: none; font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: .3px; transition: transform .12s ease, filter .15s ease; font-family: inherit; }
+  .nav-btn:active { transform: scale(.97); }
+  .nav-prev { background: var(--surface-2); color: var(--text); border: 1px solid var(--border-soft); flex: 0 0 60px; }
+  .nav-prev:hover:not(:disabled) { border-color: var(--border); }
+  .nav-next { background: var(--accent); color: var(--accent-text-on); flex: 1; }
+  .nav-next:hover:not(:disabled) { filter: brightness(1.08); }
+  .nav-next:disabled { background: var(--surface-2); color: var(--text-dim); cursor: not-allowed; }
+  .nav-audio { flex: 0 0 42px; background: var(--surface-2); border: 1px solid var(--border-soft); color: var(--text); border-radius: var(--radius); font-size: 14px; cursor: pointer; transition: border-color .15s ease; }
+  .nav-audio:hover { border-color: var(--accent); }
+  .nav-audio.speaking { background: var(--accent); color: var(--accent-text-on); border-color: var(--accent); }
+  .nav-speed { flex: 0 0 46px; background: var(--surface-2); border: 1px solid var(--border-soft); color: var(--text); border-radius: var(--radius); font-size: 10.5px; font-weight: 700; cursor: pointer; transition: border-color .15s ease; font-family: inherit; }
+  .nav-speed:hover { border-color: var(--accent); }
+  .nav-speed:active { transform: scale(.94); }
+
+  .summary-box textarea { min-height: 220px; font-family: 'SF Mono', 'Courier New', monospace; font-size: 11.5px; }
+  .copy-btn { background: var(--accent); color: var(--accent-text-on); border: none; padding: 11px 18px; border-radius: var(--radius); font-weight: 700; cursor: pointer; font-size: 13px; margin-top: 6px; transition: transform .12s ease; font-family: inherit; }
+  .copy-btn:hover { transform: translateY(-1px); }
+  .copy-btn.copied { background: var(--text-dim); }
+  .stat-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border-soft); font-size: 14px; color: var(--text-muted); }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-val { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+  svg { width: 100%; height: auto; display: block; }
+
+  @media (min-width: 720px) {
+    .slide { padding-left: clamp(20px, 5vw, 64px); padding-right: clamp(20px, 5vw, 64px); }
+    .slide-inner { max-width: 860px; }
+    h1.title { font-size: 29px; }
+    h2.sub { font-size: 15.5px; }
+    p, .q-text { font-size: 16px; }
+    .box { padding: 18px 20px; }
+  }
+  @media (min-width: 1150px) {
+    .slide-inner { max-width: 1040px; }
+    h1.title { font-size: 34px; }
+    h3.section-h { font-size: 17px; }
+    p, .q-text { font-size: 16.5px; line-height: 1.7; }
+    .box { padding: 20px 24px; font-size: 15.5px; }
+    .question { padding: 22px; }
+    .roadmap-item, .badge { font-size: 14.5px; }
+  }
+  @media (min-width: 1550px) {
+    .slide-inner { max-width: 1220px; }
+    h1.title { font-size: 38px; }
+  }
+
+  body.is-fullscreen .slide-inner { max-width: 1280px; }
+  body.is-fullscreen h1.title { font-size: 40px; }
+  body.is-fullscreen h3.section-h { font-size: 18px; }
+  body.is-fullscreen .q-text, body.is-fullscreen p { font-size: 17.5px; }
+  body.is-fullscreen .box { padding: 22px 26px; font-size: 16px; }
+
+  h1.title{border-bottom:2px solid var(--border);padding-bottom:10px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="topbar-title">📖 Tópico 2 · Dons Espirituais: Ferramentas para o Chamado</span>
+    <span class="topbar-right">
+      <span class="topbar-count" id="slideCount">1/19</span>
+      <button class="fullscreen-btn" id="fullscreenBtn" title="Tela cheia">⛶</button>
+    </span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="section-label" id="sectionLabel">Conteúdo</div>
+</div>
+
+<div class="slides" id="slides">
+  <div class="slide active" data-section="Início">
+    <div class="slide-inner">
+
+        <h1 class="title">Dons Espirituais: Ferramentas para o Chamado</h1>
+        <h2 class="sub">Compreendendo e Aplicando Romanos 12:6-8 no Serviço Cristão</h2>
+        <img class="capa-imagem" src="http://localhost:8100/static/course-images/curso8/topico2-maos-dadas-ia.png" alt="Várias mãos diferentes se estendendo em direção ao centro, palmas abertas, luz quente">
+        <h3 class="section-h">Roteiro deste tópico</h3>
+        <div class="roadmap">
+          <div class="roadmap-item"><span class="roadmap-num">1</span> Introdução aos dons espirituais e sua importância para o serviço cristão.</div>
+          <div class="roadmap-item"><span class="roadmap-num">2</span> Exploração de Romanos 12:6-8 como base para entender a diversidade e o propósito dos dons.</div>
+          <div class="roadmap-item"><span class="roadmap-num">3</span> Análise dos dons específicos e a maneira correta de exercê-los.</div>
+          <div class="roadmap-item"><span class="roadmap-num">4</span> Conexão direta entre dons e o chamado do obreiro.</div>
+          <div class="roadmap-item"><span class="roadmap-num">5</span> Orientações para identificação e desenvolvimento pessoal dos dons.</div>
+          <div class="roadmap-item"><span class="roadmap-num">6</span> Reflexão pessoal antes de seguir.</div>
+          <div class="roadmap-item"><span class="roadmap-num">7</span> Resumo consolidado do tópico.</div>
+          <div class="roadmap-item"><span class="roadmap-num">8</span> Conclusão sobre a unidade do corpo de Cristo e a valorização de cada dom.</div>
+        </div>
+        <div class="badge-row">
+<span class="badge">⏱ ~14 min</span>
+<span class="badge">🔊 áudio com controle de velocidade</span>
+<span class="badge">✍️ 3 checkpoints + avaliação final</span>
+        </div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Dons Espirituais">
+    <div class="slide-inner">
+
+<h3 class="section-h">O que são Dons Espirituais? Definição e Analogia do Corpo</h3>    <p>No curso de Formação Geral do Novo Obreiro Cristão, já exploramos o conceito do Sacerdócio de Todos os Crentes, que nos lembra que cada crente tem acesso direto a Deus e é chamado a servir. Dentro dessa perspectiva de serviço, os dons espirituais emergem como capacitações divinas essenciais. Eles não são meras habilidades humanas aprimoradas, mas sim presentes da graça de Deus, concedidos para equipar os crentes para o serviço eficaz na igreja e no mundo.</p>
+    <div class="box box-def">
+<div class="box-label">💡 Definição</div>    Dons espirituais podem ser entendidos como capacitações sobrenaturais concedidas pelo Espírito Santo a cada crente, com o propósito de edificar a igreja, glorificar a Deus e cumprir a missão de Cristo no mundo. Eles são ferramentas divinas para o serviço, manifestando a graça de Deus de maneiras diversas através de seu povo.
+  </div>
+    <div class="box box-def">
+<div class="box-label">📖 O texto</div>    Em Romanos 12, o apóstolo Paulo aborda a vida prática do cristão, incluindo a maneira como os crentes devem se relacionar e servir uns aos outros. Ele escreve sobre os dons espirituais, afirmando: &#39;De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria&#39; (Rm 12:6-8). Esta passagem é fundamental para a compreensão da diversidade e propósito dos dons.
+  </div>
+    <p>A leitura de Romanos 12:6-8 deixa claro que os dons são &#39;diferentes&#39; e são concedidos &#39;segundo a graça que nos foi dada&#39;. Isso sublinha que a origem dos dons é divina (graça) e que eles se manifestam de múltiplas formas. A lista apresentada por Paulo — profecia, ministério, ensino, exortação, repartir, presidir e usar de misericórdia — não é necessariamente exaustiva, mas serve para ilustrar a vasta gama de maneiras pelas quais os crentes são capacitados a servir.</p>
+    <div class="box box-analogy">
+<div class="box-label">🧩 A Analogia do Corpo</div>    Para ilustrar a importância da diversidade e da interdependência dos dons, a Bíblia frequentemente utiliza a analogia do corpo humano. Assim como um corpo físico possui muitos membros (olhos, mãos, pés) com funções distintas, mas que trabalham em harmonia para o bem do todo, a igreja é vista como o &#39;corpo de Cristo&#39;. Cada crente é um membro desse corpo e possui um dom espiritual específico, ou um conjunto de dons, que contribui para a saúde e o funcionamento eficaz da comunidade. Embora Romanos 12:6-8 se concentre na lista de dons, o contexto mais amplo da carta de Paulo (e de outras epístolas, como 1 Coríntios 12) desenvolve essa metáfora, mostrando que a diversidade não é uma fraqueza, mas uma força que promove a unidade e a edificação mútua.
+  </div>
+    <p>A diversidade funcional é um pilar da compreensão dos dons espirituais. Ninguém possui todos os dons, e nenhum dom é superior a outro em termos de importância para o corpo. O que Paulo enfatiza em Romanos 12:6-8 é que cada dom deve ser exercido com a atitude correta e com dedicação: a profecia com fé, o ministério com serviço, o ensino com dedicação, a exortação com encorajamento, a repartição com liberalidade, a presidência com zelo e a misericórdia com alegria. Essa diversidade assegura que todas as necessidades da comunidade possam ser atendidas e que o corpo de Cristo possa crescer de forma saudável e equilibrada.</p>
+    <div class="box box-summary">
+<div class="box-label">Sumário</div>    <ul style="margin:4px 0; padding-left:20px;">
+<li>Dons espirituais são capacitações divinas, concedidas pela graça do Espírito Santo, e não são habilidades meramente humanas.</li>
+<li>O propósito principal dos dons é o serviço, a edificação da igreja e a glória de Deus.</li>
+<li>A Bíblia, como em Romanos 12:6-8, apresenta uma diversidade de dons, cada um com sua função específica.</li>
+<li>A analogia do corpo de Cristo ilustra que, assim como os membros de um corpo, os crentes com seus diferentes dons são interdependentes e essenciais para o funcionamento saudável da igreja.</li>
+<li>A diversidade funcional dos dons promove a unidade e permite que todas as necessidades da comunidade sejam atendidas.</li>
+    </ul>
+  </div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Dons Espirituais">
+    <div class="slide-inner">
+
+<h3 class="section-h">A Base Bíblica dos Dons: Romanos 12:6-8</h3>    <p>Após compreendermos que os dons espirituais são capacitações divinas concedidas para o serviço mútuo no corpo de Cristo, conforme a analogia da diversidade funcional, é fundamental examinar as Escrituras para aprofundar nosso entendimento. A carta de Paulo aos Romanos oferece uma base sólida para essa compreensão, especialmente no capítulo 12, onde o apóstolo detalha a origem e a aplicação desses dons na vida da comunidade de fé.</p>
+    <div class="box box-def">
+<div class="box-label">📖 O Texto Bíblico: Romanos 12:6-8</div>    Em Romanos 12:6-8, Paulo escreve sobre a diversidade dos dons e a maneira como devem ser exercidos: &#39;De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria.&#39; (Rm 12:6-8).
+  </div>
+    <p>Este trecho de Romanos 12 estabelece princípios cruciais para a compreensão dos dons espirituais. Ele não apenas lista alguns exemplos de dons, mas também enfatiza a fonte de sua concessão e a atitude com que devem ser exercidos. Dois pontos centrais emergem imediatamente da leitura do texto: a graça de Deus como origem e a medida da fé como guia para seu uso.</p>
+    <div class="cols2">
+      <div class="box box-def">
+<div class="box-label">🎁 Dons pela Graça</div>    O texto bíblico afirma que temos &#39;diferentes dons segundo a graça que nos foi dada&#39; (Rm 12:6). Isso sublinha que os dons não são méritos pessoais ou resultados de esforço humano, mas sim presentes imerecidos de Deus. A palavra &#39;graça&#39; (charis, no grego) aqui reforça a ideia de que a capacitação para o serviço é um favor divino, um dom gratuito que visa edificar a comunidade, e não glorificar o indivíduo. É a soberania de Deus que distribui esses dons conforme Sua vontade, e não por qualquer mérito humano.
+  </div>
+      <div class="box box-def">
+<div class="box-label">⚖️ Uso Conforme a Fé</div>    A passagem também instrui que, se é &#39;profecia, seja ela segundo a medida da fé&#39; (Rm 12:6). Embora essa instrução seja dada especificamente para a profecia, o princípio é frequentemente interpretado como aplicável a todos os dons. A &#39;medida da fé&#39; pode ser entendida como a confiança e dependência em Deus ao exercer o dom, ou como a proporção da fé que Deus concedeu para o exercício específico daquele dom. Em qualquer leitura, o foco está em não exceder a capacitação divina e em agir com integridade e dependência do Espírito Santo, e não da própria capacidade ou presunção humana.
+  </div>
+    </div>
+    <p>Além de estabelecer a graça como fonte e a fé como medida, Romanos 12:7-8 prossegue listando exemplos práticos de dons e a atitude esperada em seu exercício. Paulo menciona &#39;ministério&#39; (serviço geral), &#39;ensinar&#39; (dedicação), &#39;exortar&#39; (ânimo e encorajamento), &#39;repartir&#39; (liberalidade), &#39;presidir&#39; (zelo e diligência) e &#39;usar de misericórdia&#39; (alegria). Cada instrução não apenas identifica um dom, mas também prescreve a maneira correta de exercê-lo, focando na qualidade do serviço e na motivação do coração. Isso demonstra que os dons não são apenas habilidades, mas também envolvem uma postura de serviço e um caráter moldado por Cristo, que se manifesta na forma como são utilizados.</p>
+    <div class="box box-summary">
+<div class="box-label">🎯 Pontos Chave de Romanos 12:6-8</div>    <ul style="margin:4px 0; padding-left:20px;">
+<li>Os dons espirituais são concedidos pela &#39;graça que nos foi dada&#39; (Rm 12:6), enfatizando sua origem divina e imerecida.</li>
+<li>O exercício dos dons deve ser &#39;segundo a medida da fé&#39; (Rm 12:6), indicando a necessidade de dependência de Deus e integridade no uso.</li>
+<li>A passagem ilustra a diversidade dos dons (profecia, ministério, ensino, exortação, repartir, presidir, misericórdia) e a atitude esperada em cada um (dedicação, liberalidade, zelo, alegria), mostrando que o caráter é intrínseco ao serviço.</li>
+    </ul>
+  </div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Checkpoint" data-gate="ck1">
+    <div class="slide-inner">
+
+        <h3 class="section-h">Checkpoint rápido</h3>
+<div class="question" data-qid="ck1_1">
+    <div class="q-meta">
+      <span class="q-type">Múltipla escolha</span>
+    </div>
+    <div class="q-text">Segundo Romanos 12:6, a concessão dos dons espirituais depende de:</div>
+    <div class="confidence" data-confidence="ck1_1">Confiança:
+    <button data-c="baixa">Baixa</button><button data-c="media">Média</button><button data-c="alta">Alta</button>
+  </div>
+
+    <div class="opts gate-item" data-correct="0" data-qid="ck1_1">
+      <button class="opt-btn" data-i="0">Graça que nos foi dada</button>
+      <button class="opt-btn" data-i="1">Nível de estudo bíblico</button>
+      <button class="opt-btn" data-i="2">Tempo de igreja</button>
+      <button class="opt-btn" data-i="3">Carisma pessoal</button>
+    </div>
+
+<div class="explanation" data-exp="ck1_1">Romanos 12:6 afirma que os dons são dados &#39;segundo a graça que nos foi dada&#39;, indicando que a origem é a graça divina.</div>  </div>        <div class="gate-hint" data-gate-hint="ck1">👆 Responda antes de continuar.</div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Dons Espirituais">
+    <div class="slide-inner">
+
+<h3 class="section-h">Dons Específicos e o Modo de Exercê-los (Rm 12:6-8)</h3>    <p>Após entendermos que os dons espirituais são capacitações divinas concedidas pela graça de Deus para o serviço, e que Romanos 12:6-8 serve como base para essa compreensão, agora nos aprofundaremos nos dons específicos listados nessa passagem. O apóstolo Paulo não apenas os enumera, mas também enfatiza a maneira e a atitude com que cada um deve ser exercido, revelando que o &#39;como&#39; é tão crucial quanto o &#39;o quê&#39; no serviço cristão.</p>
+    <div class="box box-def">
+<div class="box-label">📖 O texto</div>    Em Romanos 12:6-8, Paulo escreve: &#39;De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria.&#39; (Rm 12:6-8)
+  </div>
+    <p>Esta lista, embora não exaustiva, apresenta uma variedade de dons que abrangem tanto a comunicação da verdade divina quanto o serviço prático e a liderança na comunidade de fé. Mais do que a mera posse de um dom, Paulo destaca a importância da *maneira* como ele é aplicado.</p>
+    <div class="type-cards">
+      <div class="type-card">
+        <span class="type-card-icon">💬</span>
+        <div class="type-card-name">Profecia</div>
+        <div class="type-card-desc">O texto instrui: &#39;se é profecia, seja ela segundo a medida da fé&#39;. Isso sugere que a comunicação de uma mensagem inspirada por Deus deve ser feita com fidelidade à revelação recebida e em conformidade com a fé cristã, sem exceder os limites da verdade bíblica. É uma questão de discernimento e responsabilidade.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">🤝</span>
+        <div class="type-card-name">Ministério (Serviço)</div>
+        <div class="type-card-desc">Para o &#39;ministério&#39;, a instrução é &#39;seja em ministrar&#39;. A palavra grega &#39;diakonia&#39; (ministério/serviço) aqui implica uma dedicação prática e ativa em atender às necessidades dos outros. É um chamado para servir com diligência e foco na ação.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">📚</span>
+        <div class="type-card-name">Ensino</div>
+        <div class="type-card-desc">Quem tem o dom de &#39;ensinar&#39;, deve ter &#39;dedicação ao ensino&#39;. Isso implica um compromisso sério com a clareza, a precisão e a profundidade na transmissão do conhecimento bíblico, buscando edificar e instruir a comunidade de forma consistente.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">🗣️</span>
+        <div class="type-card-name">Exortação</div>
+        <div class="type-card-desc">O que &#39;exorta, use esse dom em exortar&#39;. A exortação envolve encorajar, consolar, admoestar e desafiar os irmãos na fé. Deve ser feita com o propósito de edificar e fortalecer, muitas vezes em momentos de dificuldade ou para estimular o crescimento espiritual.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">💰</span>
+        <div class="type-card-name">Repartir (Contribuição)</div>
+        <div class="type-card-desc">O que &#39;reparte, faça-o com liberalidade&#39;. Este dom se manifesta na capacidade de compartilhar recursos financeiros ou materiais com generosidade e sem reservas, visando suprir as necessidades de outros e apoiar a obra de Deus. A liberalidade é a chave.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">👑</span>
+        <div class="type-card-name">Presidir (Liderança)</div>
+        <div class="type-card-desc">O que &#39;preside, com zelo&#39;. O dom de liderança envolve a capacidade de organizar, guiar e cuidar do rebanho de Deus. O &#39;zelo&#39; aqui indica diligência, seriedade e um senso de responsabilidade para com aqueles que estão sob sua supervisão, buscando o bem-estar e o progresso da comunidade.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">❤️</span>
+        <div class="type-card-name">Misericórdia</div>
+        <div class="type-card-desc">O que &#39;usa de misericórdia, com alegria&#39;. Este dom se manifesta na compaixão e na ação prática para aliviar o sofrimento alheio. A instrução de fazê-lo &#39;com alegria&#39; ressalta que a misericórdia não deve ser um fardo, mas uma expressão genuína de amor e empatia, realizada com um coração disposto e grato.</div>
+      </div>
+    </div>
+    <div class="box box-instr">
+<div class="box-label">⚠️ Esta lista não é a única</div>    Romanos 12:6-8 não é a única passagem que fala de dons — 1 Coríntios 12:8-10 e Efésios 4:11 citam outros, como cura, línguas, discernimento de espíritos e apostolado. Tradições cristãs diferem sobre como esses dons operam hoje (algumas defendem que continuam ativos como no Novo Testamento, outras que cessaram com os apóstolos). Este curso não assume nenhuma dessas posições — o que importa aqui é o princípio comum às três listas: os dons vêm da graça de Deus e servem ao corpo, qualquer que seja a lista.
+  </div>
+    <p>Percebe-se que, para cada dom, Paulo adiciona uma qualificação que não se refere à *natureza* do dom em si, mas à *atitude* e *propósito* com que ele é exercido. Isso sublinha que os dons não são para autoexaltação, mas para o serviço abnegado e eficaz ao corpo de Cristo.</p>
+    <div class="box box-app">
+<div class="box-label">💡 Aplicação Prática</div>    A ênfase de Paulo na &#39;maneira&#39; de exercer os dons nos lembra que a motivação e o coração são fundamentais. Um dom, por mais poderoso que seja, pode perder seu impacto ou até se tornar prejudicial se não for exercido com a atitude correta – seja fé, dedicação, liberalidade, zelo ou alegria. O serviço cristão é tanto sobre o que fazemos quanto sobre o espírito com que o fazemos.
+  </div>
+    <div class="quote-block">&#34;Servindo uns aos outros conforme o dom que cada um recebeu, como bons despenseiros da multiforme graça de Deus.&#34; — 1 Pedro 4:10 (Almeida)</div>
+      <figure>
+    <div class="fig-wrap"><svg class="diagram" viewBox="0 0 360 460">
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a5a1a"/>
+    </marker>
+  </defs>
+
+  <rect x="90" y="8" width="180" height="42" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+  <text x="180" y="26" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Reconhecer o dom</text>
+  <text x="180" y="40" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Rm 12:6</text>
+
+  <line x1="180" y1="50" x2="180" y2="66" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+
+  <rect x="60" y="66" width="240" height="42" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+  <text x="180" y="84" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Buscar oportunidade de servir</text>
+  <text x="180" y="98" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">1Pe 4:10</text>
+
+  <line x1="180" y1="108" x2="180" y2="124" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+
+  <rect x="60" y="124" width="240" height="42" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+  <text x="180" y="142" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Exercer com a atitude certa</text>
+  <text x="180" y="156" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Rm 12:6-8</text>
+
+  <line x1="180" y1="166" x2="180" y2="184" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+
+  <polygon points="180,184 262,232 180,280 98,232" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+  <text x="180" y="228" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Isso edifica</text>
+  <text x="180" y="242" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">o corpo de Cristo?</text>
+
+  <line x1="98" y1="232" x2="30" y2="290" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+  <text x="52" y="270" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#8a5a1a" text-anchor="middle">Não</text>
+  <line x1="262" y1="232" x2="330" y2="290" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+  <text x="308" y="270" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#8a5a1a" text-anchor="middle">Sim</text>
+
+  <rect x="10" y="296" width="170" height="50" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+  <text x="95" y="316" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Buscar orientação</text>
+  <text x="95" y="330" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">e ajustar</text>
+  <text x="95" y="342" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Tg 1:5</text>
+
+  <rect x="180" y="296" width="170" height="50" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+  <text x="265" y="316" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Continuar com</text>
+  <text x="265" y="330" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">perseverança</text>
+  <text x="265" y="342" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Gl 6:9</text>
+
+  <line x1="95" y1="346" x2="160" y2="392" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+  <line x1="265" y1="346" x2="200" y2="392" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+
+  <rect x="80" y="398" width="200" height="50" fill="#f3e6d3" stroke="#8a5a1a" stroke-width="1.5" rx="8"/>
+  <text x="180" y="418" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Crescimento do corpo</text>
+  <text x="180" y="432" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">de Cristo</text>
+  <text x="180" y="444" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Ef 4:16</text>
+</svg></div>
+    <figcaption>O uso responsável de um dom não é ponto final — é um ciclo: reconhecer, servir, exercer com a atitude certa, e reavaliar se está edificando o corpo.</figcaption>
+  </figure>
+
+    <p>Em última análise, a instrução de Paulo em Romanos 12:6-8 reforça a ideia do sacerdócio de todos os crentes, onde cada membro do corpo de Cristo é capacitado e chamado a servir. O uso consciente e intencional dos dons, com a atitude correta, contribui para a edificação mútua e para o testemunho eficaz da igreja no mundo.</p>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Dons Espirituais">
+    <div class="slide-inner">
+
+<h3 class="section-h">Dons Espirituais como Ferramentas para o Chamado do Obreiro</h3>    <p>Os dons espirituais, conforme já explorado, são capacitações divinas concedidas pela graça de Deus para o serviço no corpo de Cristo. Neste assunto, aprofundaremos como essas ferramentas divinas são intrínsecas ao chamado individual do obreiro, equipando-o de forma única para cumprir sua vocação no Reino.</p>
+    <div class="box box-def">
+<div class="box-label">📖 A Base da Capacitação</div>    A Escritura é clara sobre a origem e a diversidade dos dons. Em Romanos 12:6, lemos: &#39;De modo que, tendo diferentes dons segundo a graça que nos foi dada...&#39; (Rm 12:6). Este versículo estabelece que os dons são uma concessão graciosa de Deus, não mérito humano, e que são variados. Essa diversidade é fundamental para a compreensão de como cada obreiro é singularmente capacitado para o seu chamado específico.
+  </div>
+    <p>Compreender os dons espirituais como ferramentas é crucial para o novo obreiro. Eles não são meros talentos naturais aprimorados, mas sim habilidades sobrenaturais que Deus concede para propósitos específicos. Assim como o &#39;sacerdócio de todos os crentes&#39; implica que cada crente tem acesso direto a Deus e um papel no Seu serviço, os dons espirituais são a capacitação divina para que cada um possa exercer esse papel de forma eficaz, alinhado ao seu chamado particular.</p>
+    <div class="box box-app">
+<div class="box-label">🛠️ Dons em Ação</div>    A passagem de Romanos 12:6-8 não apenas lista dons, mas também orienta sobre a atitude em seu uso. Por exemplo, se o dom é &#39;ensinar, haja dedicação ao ensino&#39; (Rm 12:7). Para um obreiro com um chamado para a educação cristã, o dom de ensino é a ferramenta primária que o capacita a comunicar verdades bíblicas com clareza e impacto. Da mesma forma, &#39;o que reparte, faça-o com liberalidade&#39; (Rm 12:8) mostra como o dom de contribuição equipa alguém para apoiar financeiramente a obra, e &#39;o que preside, com zelo&#39; (Rm 12:8) revela a capacitação para liderar com diligência e propósito. Cada dom é uma habilidade específica que equipa o obreiro para uma área particular de serviço.
+  </div>
+    <p>Embora os dons sejam manifestações individuais, seu propósito final é sempre o fortalecimento e a edificação do corpo de Cristo. O chamado do obreiro, capacitado por dons espirituais, não é para glória própria, mas para servir aos outros, promovendo a unidade e o crescimento da igreja. É através do uso interconectado e abnegado desses dons que a igreja cumpre sua missão no mundo.</p>
+    <div class="box box-app">
+<div class="box-label">💡 Identificando Seu Equipamento</div>    A identificação e o desenvolvimento dos dons espirituais são passos importantes para o obreiro que busca cumprir seu chamado. Embora o texto bíblico não forneça um método passo a passo para isso, uma leitura interpretativa sugere que a oração, o estudo da Palavra, a experimentação em diferentes áreas de serviço e o feedback da comunidade cristã podem ser meios pelos quais um obreiro pode discernir as capacitações que Deus lhe concedeu. Reconhecer e cultivar esses dons permite que o obreiro sirva com maior eficácia e alegria, alinhado ao propósito divino para sua vida.
+  </div>
+    <p>Em suma, os dons espirituais são mais do que habilidades; são as ferramentas divinas que capacitam o obreiro para o seu chamado específico. Eles transformam a vocação em serviço efetivo, permitindo que cada crente contribua de forma única para a missão da igreja. Compreender, buscar e exercitar esses dons é fundamental para todo novo obreiro que deseja servir a Deus com excelência e fidelidade.</p>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Checkpoint" data-gate="ck2">
+    <div class="slide-inner">
+
+        <h3 class="section-h">Checkpoint rápido</h3>
+<div class="question" data-qid="ck2_1">
+    <div class="q-meta">
+      <span class="q-type">Verdadeiro / Falso</span>
+    </div>
+    <div class="q-text">Os dons espirituais são talentos naturais aprimorados pelo esforço próprio do crente.</div>
+    <div class="confidence" data-confidence="ck2_1">Confiança:
+    <button data-c="baixa">Baixa</button><button data-c="media">Média</button><button data-c="alta">Alta</button>
+  </div>
+
+    <div class="tf-row gate-item" data-correct-tf="falso" data-qid="ck2_1">
+      <button class="tf-btn" data-v="verdadeiro">Verdadeiro</button>
+      <button class="tf-btn" data-v="falso">Falso</button>
+    </div>
+
+<div class="explanation" data-exp="ck2_1">Os dons são capacitações sobrenaturais concedidas pelo Espírito Santo, não resultado de esforço humano.</div>  </div>        <div class="gate-hint" data-gate-hint="ck2">👆 Responda antes de continuar.</div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Dons Espirituais">
+    <div class="slide-inner">
+
+<h3 class="section-h">Identificando e Desenvolvendo Seus Dons Espirituais</h3>    <p>Os dons espirituais são capacitações divinas concedidas pela graça de Deus (Rm 12:6) para o serviço e a edificação do corpo de Cristo. Compreender o que são e sua base bíblica é o primeiro passo. Agora, aprofundaremos na jornada prática de como um obreiro cristão pode reconhecer esses dons em sua própria vida e, uma vez identificados, como cultivá-los para um serviço mais eficaz no Reino.</p>
+    <div class="box box-def">
+<div class="box-label">🔍 O que significa?</div>    Identificar um dom espiritual significa reconhecer uma capacitação específica que Deus concedeu para o serviço. Desenvolver um dom, por sua vez, é o processo de cultivar, aprimorar e usar essa capacitação de forma cada vez mais eficaz e alinhada à vontade divina, para a glória de Deus e o benefício da comunidade.
+  </div>
+    <div class="type-cards">
+      <div class="type-card">
+        <span class="type-card-icon">🙏</span>
+        <div class="type-card-name">1. Oração e Busca</div>
+        <div class="type-card-desc">Comece buscando a Deus em oração, pedindo discernimento e clareza. O Espírito Santo, que distribui os dons, é quem pode revelá-los.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">📖</span>
+        <div class="type-card-name">2. Estudo da Palavra</div>
+        <div class="type-card-desc">Familiarize-se com as passagens bíblicas que listam e descrevem os dons (como Romanos 12, 1 Coríntios 12 e Efésios 4). Isso ajuda a entender as características de cada dom.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">🪞</span>
+        <div class="type-card-name">3. Autoavaliação e Reflexão</div>
+        <div class="type-card-desc">Reflita sobre suas paixões, habilidades naturais, áreas onde você se sente mais realizado ao servir e onde percebe que seu esforço gera resultados positivos para os outros.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">👥</span>
+        <div class="type-card-name">4. Confirmação da Comunidade</div>
+        <div class="type-card-desc">Busque feedback de líderes e irmãos na fé. Muitas vezes, outros podem identificar dons em você que você mesmo ainda não percebeu, observando sua eficácia no serviço.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">🧭</span>
+        <div class="type-card-name">5. Experimentação e Serviço</div>
+        <div class="type-card-desc">Engaje-se em diferentes áreas de serviço na igreja e na comunidade. A prática é um dos meios mais eficazes para descobrir e confirmar um dom, pois ele se manifesta no uso.</div>
+      </div>
+    </div>
+    <div class="box box-app">
+<div class="box-label">💡 Um Processo Contínuo</div>    A identificação dos dons espirituais raramente é um evento único e definitivo. É um processo dinâmico que envolve discernimento, confirmação e prática ao longo da jornada cristã. É possível descobrir novos dons ou ver outros se aprofundarem e se manifestarem de novas formas com o tempo.
+  </div>
+    <p>Uma vez que um dom é identificado, o próximo passo é cultivá-lo. O desenvolvimento não é apenas aprimorar uma habilidade humana, mas aprender a usar a capacitação divina de forma mais eficaz, madura e alinhada à vontade de Deus, para que o serviço seja frutífero e glorifique a Ele.</p>
+    <div class="type-cards">
+      <div class="type-card">
+        <span class="type-card-icon">🔁</span>
+        <div class="type-card-name">1. Prática Contínua</div>
+        <div class="type-card-desc">O uso regular do dom fortalece e aprimora sua manifestação. Assim como um músculo, um dom se desenvolve com o exercício constante.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">📚</span>
+        <div class="type-card-name">2. Aprendizado e Aprimoramento</div>
+        <div class="type-card-desc">Busque conhecimento, treinamento e mentoria. Aprenda com aqueles que já exercem o mesmo dom com maturidade e eficácia. Estude a Palavra para entender mais profundamente a natureza e o propósito do seu dom.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">🙌</span>
+        <div class="type-card-name">3. Dependência de Deus</div>
+        <div class="type-card-desc">Reconheça que o dom é uma capacitação divina e que seu poder e eficácia vêm de Deus, não da sua própria capacidade. Mantenha uma vida de oração e submissão ao Espírito Santo.</div>
+      </div>
+      <div class="type-card">
+        <span class="type-card-icon">🤲</span>
+        <div class="type-card-name">4. Serviço Fiel e Humilde</div>
+        <div class="type-card-desc">Use o dom para edificar o corpo de Cristo e glorificar a Deus, sem buscar reconhecimento pessoal. A humildade e a fidelidade no serviço são cruciais para o desenvolvimento saudável de qualquer dom.</div>
+      </div>
+    </div>
+    <div class="box box-def">
+<div class="box-label">📖 O Modo de Exercer (Rm 12:6-8)</div>    O texto de Romanos 12:6-8 não apenas lista dons, mas também instrui sobre a *maneira* de exercê-los, o que é fundamental para o seu desenvolvimento. Paulo escreve:
+
+&#39;De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria.&#39; (Rm 12:6-8)
+
+Essa passagem sugere que o desenvolvimento de um dom não é apenas sobre aprimorar a técnica ou a habilidade, mas sobre cultivar a atitude e o propósito corretos — fé, dedicação, liberalidade, zelo e alegria — que maximizam sua eficácia e refletem o caráter de Cristo no serviço.
+  </div>
+    <p>Identificar e desenvolver os dons espirituais é uma parte essencial da jornada do obreiro cristão. Ao buscar ativamente o discernimento e cultivar fielmente as capacitações divinas, o crente se torna um instrumento mais eficaz nas mãos de Deus, contribuindo para a edificação da igreja e a expansão do Reino com propósito e poder.</p>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Checkpoint" data-gate="ck3">
+    <div class="slide-inner">
+
+        <h3 class="section-h">Checkpoint rápido</h3>
+<div class="question" data-qid="ck3_1">
+    <div class="q-meta">
+      <span class="q-type">Aplicação aberta</span>
+    </div>
+    <div class="q-text">Descreva brevemente duas maneiras pelas quais um obreiro pode buscar identificar e desenvolver seus dons espirituais.</div>
+    <div class="confidence" data-confidence="ck3_1">Confiança:
+    <button data-c="baixa">Baixa</button><button data-c="media">Média</button><button data-c="alta">Alta</button>
+  </div>
+
+    <textarea data-open="ck3_1" placeholder="Sua resposta aqui..."></textarea>
+    <button class="register-btn gate-item" data-qid="ck3_1" data-register="ck3_1">Registrar resposta</button>
+
+  </div>        <div class="gate-hint" data-gate-hint="ck3">👆 Responda antes de continuar.</div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Dons Espirituais">
+    <div class="slide-inner">
+
+<h3 class="section-h">A Unidade do Corpo e a Valorização de Cada Dom</h3>    <p>Após explorar a natureza dos dons espirituais e sua base bíblica em Romanos 12:6-8, bem como a maneira de exercê-los, é fundamental compreender que a diversidade dessas capacitações divinas visa a unidade do corpo de Cristo. A manifestação de diferentes dons não é um convite à comparação ou à divisão, mas um chamado à interdependência e à valorização mútua de cada membro e sua contribuição.</p>
+    <figure class="fig-wrap" style="padding:0; overflow:hidden;">
+      <img src="http://localhost:8100/static/course-images/curso8/topico2-dons-corpo-servindo-ia.png" alt="Crentes servindo ao mesmo tempo com dons diferentes numa sala de igreja: louvor, ensino, som, acolhimento e oração" style="width:100%; display:block; border-radius: var(--radius-lg);">
+<figcaption style="font-size:12px; color:var(--text-muted); padding:8px 12px;">Dons diferentes, o mesmo Espírito, o mesmo corpo trabalhando junto (1Co 12:4-6).</figcaption>    </figure>
+    <div class="quote-block">&#34;Ora, há diversidade de dons, mas o Espírito é o mesmo. E há diversidade de ministérios, mas o Senhor é o mesmo. E há diversidade de operações, mas é o mesmo Deus que opera tudo em todos.&#34; — 1 Coríntios 12:4-6 (Almeida)</div>
+    <div class="box box-def">
+<div class="box-label">📖 A Diversidade dos Dons</div>    Em Romanos 12:6, o apóstolo Paulo inicia a lista de dons afirmando: &#39;De modo que, tendo diferentes dons segundo a graça que nos foi dada...&#39; (Rm 12:6). Este versículo estabelece que a variedade de dons não é acidental, mas uma concessão intencional da graça de Deus. A palavra &#39;diferentes&#39; (do grego &#39;diaphorous&#39;) sublinha que a diversidade é uma característica inerente ao plano divino para o corpo de Cristo, onde cada dom, com sua particularidade, é essencial.
+  </div>
+    <p>A analogia do corpo de Cristo, já abordada em aulas anteriores, é central para entender a interdependência dos dons. Assim como um corpo físico necessita de todos os seus membros para funcionar plenamente – olhos, ouvidos, mãos e pés, cada um com sua função específica – o corpo espiritual de Cristo depende da operação conjunta e harmoniosa de todos os dons. Nenhum dom é autossuficiente, e a ausência ou desvalorização de um afeta o funcionamento do todo.</p>
+    <p>A valorização de cada dom implica evitar comparações e a criação de hierarquias dentro da igreja. O texto bíblico de Romanos 12:6-8, ao listar dons variados sem atribuir maior ou menor importância a nenhum deles, sugere que todos são igualmente necessários para o propósito de Deus. A interpretação comum entre estudiosos é que a comparação de dons pode levar à inveja, ao orgulho ou ao desânimo, minando a unidade e a eficácia do corpo. O foco deve estar no serviço mútuo, e não na proeminência individual.</p>
+    <div class="box box-app">
+<div class="box-label">💡 Valorizando Cada Contribuição</div>    Cada dom espiritual, seja ele de profecia, ministério, ensino, exortação, repartição, presidência ou misericórdia (Rm 12:6-8), possui um valor intrínseco e uma função vital no corpo de Cristo. A verdadeira força da igreja reside na capacidade de reconhecer, encorajar e integrar todas essas manifestações da graça divina. Valorizar cada dom significa entender que a contribuição de um membro, por mais discreta que pareça, é tão essencial quanto a de outro que atua de forma mais visível, promovendo assim um ambiente de respeito e edificação mútua.
+  </div>
+    <p>A unidade do corpo de Cristo é fortalecida quando os membros cooperam ativamente, usando seus dons de forma complementar. Em vez de operar isoladamente, o obreiro cristão é chamado a discernir como seu dom se encaixa e apoia os dons dos outros, trabalhando em conjunto para o avanço do Reino. Essa cooperação mútua reflete o amor e a harmonia que devem caracterizar a comunidade de fé, conforme o propósito de Deus para a igreja.</p>
+    <div class="box box-summary">
+<div class="box-label">Sumário</div>    <ul style="margin:4px 0; padding-left:20px;">
+<li>Os dons espirituais são diversos por design divino, conforme Romanos 12:6.</li>
+<li>A diversidade dos dons promove a interdependência e a unidade no corpo de Cristo.</li>
+<li>É crucial evitar comparações e hierarquias entre os dons, pois todos são valiosos.</li>
+<li>A valorização de cada dom leva à cooperação mútua e à edificação da igreja.</li>
+    </ul>
+  </div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="reflexao">
+    <div class="slide-inner">
+
+<h3 class="section-h">Pra Refletir Antes do Próximo Tópico</h3>    <div class="box box-summary">
+<div class="box-label">🕊️ Reflexão</div>    <ul style="margin:4px 0; padding-left:20px;">
+<li>Antes deste tópico, você já sabia identificar qual dom Deus te deu, ou essa é a primeira vez que parou pra pensar nisso? O que mais chamou sua atenção na lista de Romanos 12:6-8?</li>
+<li>O texto liga cada dom a uma atitude (fé, dedicação, liberalidade, zelo, alegria) — não só à ação em si. Lembre de alguém exercendo um dom sem essa atitude certa (por obrigação, por orgulho, por comparação com outro). O que isso mudou no resultado?</li>
+<li>Conectando com o Tópico 1: se cada crente já é sacerdote (1Pe 2:9) e cada um recebeu ao menos um dom (1Pe 4:10), o que isso muda em como você vê alguém na sua igreja que nunca ocupou nenhuma função formal?</li>
+    </ul>
+  </div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="resumo">
+    <div class="slide-inner">
+
+<h3 class="section-h">Resumo do Tópico 2</h3>    <div class="box box-summary">
+<div class="box-label">🧠 Resumo</div>    <ul style="margin:4px 0; padding-left:20px;">
+<li>Dons espirituais (Rm 12:6-8) são capacitações concedidas pela graça de Deus — não méritos, não talentos naturais aprimorados pelo esforço.</li>
+<li>A lista de Paulo (profecia, ministério, ensino, exortação, repartir, presidir, misericórdia) não é exaustiva: 1 Coríntios 12:4-6 confirma — mesmo Espírito, diversidade de dons.</li>
+<li>Cada dom vem com uma atitude prescrita no texto (fé, dedicação, liberalidade, zelo, alegria) — o &#34;como&#34; importa tanto quanto o &#34;quê&#34;.</li>
+<li>Listas paralelas em 1 Coríntios 12 e Efésios 4 incluem outros dons (cura, línguas, apostolado) — tradições cristãs interpretam isso de formas diferentes; este curso não assume nenhuma posição específica.</li>
+<li>Identificar um dom é processo contínuo: oração, estudo da Palavra, autoavaliação, confirmação da comunidade, prática.</li>
+<li>Os dons existem pra edificar o corpo — unidade, não comparação nem hierarquia. Nenhum dom vale mais que outro.</li>
+<li>Conecta com o Tópico 1: todo crente já é sacerdote por Cristo (1Pe 2:9), e todo crente recebeu ao menos um dom pra exercer esse sacerdócio (1Pe 4:10) — servir não espera função formal.</li>
+    </ul>
+  </div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Avaliação Final">
+    <div class="slide-inner">
+
+        <h1 class="title">Avaliação Final</h1>
+        <h2 class="sub">5 questões — algumas juntam mais de um conceito. Duas são abertas.</h2>
+        <div class="box box-instr">
+          <div class="box-label">📋 Antes de começar</div>
+          A correção objetiva já aparece na hora. Mas a avaliação final de verdade — com feedback honesto e a decisão de seguir ou reforçar — acontece quando você levar o resumo desta tela pro chat com o Claude.
+        </div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Avaliação Final" data-gate="ef1">
+    <div class="slide-inner">
+
+        <div class="question" data-qid="ef1_1">
+    <div class="q-meta">
+      <span class="q-type">Múltipla escolha</span>
+    </div>
+    <div class="q-text">Qual a principal analogia bíblica usada para descrever a interconexão e diversidade dos dons espirituais?</div>
+    <div class="confidence" data-confidence="ef1_1">Confiança:
+    <button data-c="baixa">Baixa</button><button data-c="media">Média</button><button data-c="alta">Alta</button>
+  </div>
+
+    <div class="opts gate-item" data-correct="0" data-qid="ef1_1">
+      <button class="opt-btn" data-i="0">O corpo humano</button>
+      <button class="opt-btn" data-i="1">A família</button>
+      <button class="opt-btn" data-i="2">A igreja como templo</button>
+      <button class="opt-btn" data-i="3">O jardim</button>
+    </div>
+
+<div class="explanation" data-exp="ef1_1">A Bíblia compara a comunidade cristã a um corpo, onde cada membro tem funções diferentes, porém interdependentes (1 Coríntios 12).</div>  </div>
+        <div class="gate-hint" data-gate-hint="ef1">👆 Responda antes de continuar.</div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Avaliação Final" data-gate="ef2">
+    <div class="slide-inner">
+
+        <div class="question" data-qid="ef2_1">
+    <div class="q-meta">
+      <span class="q-type">Múltipla escolha</span>
+    </div>
+    <div class="q-text">Segundo Romanos 12:6-8, qual a atitude correta ao exercer o dom de repartir/contribuir?</div>
+    <div class="confidence" data-confidence="ef2_1">Confiança:
+    <button data-c="baixa">Baixa</button><button data-c="media">Média</button><button data-c="alta">Alta</button>
+  </div>
+
+    <div class="opts gate-item" data-correct="0" data-qid="ef2_1">
+      <button class="opt-btn" data-i="0">Com liberalidade</button>
+      <button class="opt-btn" data-i="1">Com reserva</button>
+      <button class="opt-btn" data-i="2">Com orgulho</button>
+      <button class="opt-btn" data-i="3">Com indiferença</button>
+    </div>
+
+<div class="explanation" data-exp="ef2_1">O texto instrui a repartir &#39;com liberalidade&#39;, indicando generosidade e desprendimento.</div>  </div>
+        <div class="gate-hint" data-gate-hint="ef2">👆 Responda antes de continuar.</div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Avaliação Final" data-gate="ef3">
+    <div class="slide-inner">
+
+        <div class="question" data-qid="ef3_1">
+    <div class="q-meta">
+      <span class="q-type">Verdadeiro / Falso</span>
+    </div>
+    <div class="q-text">Os dons espirituais são concedidos com base no mérito e no esforço pessoal do crente, não na graça de Deus.</div>
+    <div class="confidence" data-confidence="ef3_1">Confiança:
+    <button data-c="baixa">Baixa</button><button data-c="media">Média</button><button data-c="alta">Alta</button>
+  </div>
+
+    <div class="tf-row gate-item" data-correct-tf="falso" data-qid="ef3_1">
+      <button class="tf-btn" data-v="verdadeiro">Verdadeiro</button>
+      <button class="tf-btn" data-v="falso">Falso</button>
+    </div>
+
+<div class="explanation" data-exp="ef3_1">Os dons são dádivas da graça de Deus, não resultado de mérito ou esforço humano.</div>  </div>
+        <div class="gate-hint" data-gate-hint="ef3">👆 Responda antes de continuar.</div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Avaliação Final" data-gate="ef4">
+    <div class="slide-inner">
+
+        <div class="question" data-qid="ef4_1">
+    <div class="q-meta">
+      <span class="q-type">Aplicação aberta</span>
+    </div>
+    <div class="q-text">Explique como os dons espirituais se relacionam com o chamado específico de um obreiro.</div>
+    <div class="confidence" data-confidence="ef4_1">Confiança:
+    <button data-c="baixa">Baixa</button><button data-c="media">Média</button><button data-c="alta">Alta</button>
+  </div>
+
+    <textarea data-open="ef4_1" placeholder="Sua resposta aqui..."></textarea>
+    <button class="register-btn gate-item" data-qid="ef4_1" data-register="ef4_1">Registrar resposta</button>
+
+  </div>
+        <div class="gate-hint" data-gate-hint="ef4">👆 Responda antes de continuar.</div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Avaliação Final" data-gate="ef5">
+    <div class="slide-inner">
+
+        <div class="question" data-qid="ef5_1">
+    <div class="q-meta">
+      <span class="q-type">Aplicação aberta</span>
+    </div>
+    <div class="q-text">Conectando com o Tópico 1 (Sacerdócio de Todos os Crentes): qual o perigo de comparar os próprios dons com os de outros membros do corpo, e como isso fere a unidade que o sacerdócio universal já estabelece?</div>
+    <div class="confidence" data-confidence="ef5_1">Confiança:
+    <button data-c="baixa">Baixa</button><button data-c="media">Média</button><button data-c="alta">Alta</button>
+  </div>
+
+    <textarea data-open="ef5_1" placeholder="Sua resposta aqui..."></textarea>
+    <button class="register-btn gate-item" data-qid="ef5_1" data-register="ef5_1">Registrar resposta</button>
+
+  </div>
+        <div class="gate-hint" data-gate-hint="ef5">👆 Responda antes de continuar.</div>
+
+
+    </div>
+  </div>
+  <div class="slide" data-section="Resultado">
+    <div class="slide-inner">
+
+        <h1 class="title">Resultado desta sessão</h1>
+        <div class="box box-summary" id="statsBox">
+          <div class="box-label">📊 Pontuação objetiva</div>
+          <div class="stat-row"><span>Acertos automáticos</span><span class="stat-val" id="statScore">0 / 0</span></div>
+          <div class="stat-row"><span>Respostas com alta confiança e erro</span><span class="stat-val" id="statFlags">0</span></div>
+          <div class="stat-row"><span>Questões abertas registradas</span><span class="stat-val" id="statOpen">0 / 3</span></div>
+        </div>
+        <div class="box box-instr">
+          <div class="box-label">➡ Próximo passo</div>
+          A correção automática não avalia as respostas abertas nem decide se você já domina o tópico — isso fica pra uma leitura de verdade, feita por mim no chat. Copie o resumo abaixo e cole na conversa com o Claude Code.
+        </div>
+        <div class="box summary-box">
+          <div class="box-label">📄 Resumo para colar no chat</div>
+          <textarea id="summaryText" readonly></textarea>
+          <button class="copy-btn" id="copyBtn">Copiar resumo</button>
+        </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="navbar">
+  <button class="nav-btn nav-prev" id="prevBtn">◀</button>
+  <button class="nav-audio" id="audioBtn" title="Ouvir este slide">🔊</button>
+  <button class="nav-speed" id="speedBtn" title="Velocidade da leitura">1x</button>
+  <button class="nav-btn nav-next" id="nextBtn">Próximo ▶</button>
+</div>
+
+<script>
+const TOPICO_ID = "curso8-modulo1-aula1-topico2";
+const TOPICO_TITULO = "Dons Espirituais: Ferramentas para o Chamado";
+const TOPICO_NUMERO = 2;
+const PROXIMO_TOPICO_LABEL = "T\u00f3pico 3: Voca\u00e7\u00e3o e Of\u00edcios";
+const QUESTION_ORDER = [{"id": "ck1_1", "label": "Checkpoint — Segundo Romanos 12:6, a concessão dos dons espiritua...", "tipo": "mc"}, {"id": "ck2_1", "label": "Checkpoint — Os dons espirituais são talentos naturais aprimorado...", "tipo": "tf"}, {"id": "ck3_1", "label": "Checkpoint — Descreva brevemente duas maneiras pelas quais um obr...", "tipo": "open"}, {"id": "ef1_1", "label": "Avaliação Final — Qual a principal analogia bíblica usada para descrev...", "tipo": "mc"}, {"id": "ef2_1", "label": "Avaliação Final — Segundo Romanos 12:6-8, qual a atitude correta ao ex...", "tipo": "mc"}, {"id": "ef3_1", "label": "Avaliação Final — Os dons espirituais são concedidos com base no mérit...", "tipo": "tf"}, {"id": "ef4_1", "label": "Avaliação Final — Explique como os dons espirituais se relacionam com...", "tipo": "open"}, {"id": "ef5_1", "label": "Avaliação Final — Conectando com o Tópico 1 (Sacerdócio de Todos os Cr...", "tipo": "open"}];
+const OPEN_TOTAL = 3;
+
+const state = {};
+function ensureQ(qid) {
+  if (!state[qid]) state[qid] = { confidence: null, correct: null, text: null };
+  return state[qid];
+}
+
+document.querySelectorAll('.confidence').forEach(function (box) {
+  const qid = box.dataset.confidence;
+  box.querySelectorAll('button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      box.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      ensureQ(qid).confidence = btn.dataset.c;
+    });
+  });
+});
+
+document.querySelectorAll('.opts').forEach(function (optsEl) {
+  const qid = optsEl.dataset.qid;
+  const correctIdx = parseInt(optsEl.dataset.correct, 10);
+  const question = optsEl.closest('.question');
+  const exp = question.querySelector('.explanation');
+  const buttons = optsEl.querySelectorAll('.opt-btn');
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (optsEl.dataset.answered) return;
+      optsEl.dataset.answered = '1';
+      const chosenIdx = parseInt(btn.dataset.i, 10);
+      buttons.forEach(function (b) { b.disabled = true; });
+      buttons[correctIdx].classList.add('correct');
+      const isCorrect = chosenIdx === correctIdx;
+      if (!isCorrect) btn.classList.add('incorrect');
+      ensureQ(qid).correct = isCorrect;
+      if (exp) exp.classList.add('show');
+      checkGate(optsEl.closest('.slide'));
+      updateStatsLive();
+    });
+  });
+});
+
+document.querySelectorAll('.tf-row').forEach(function (row) {
+  const qid = row.dataset.qid;
+  const correctVal = row.dataset.correctTf;
+  const question = row.closest('.question');
+  const exp = question.querySelector('.explanation');
+  const buttons = row.querySelectorAll('.tf-btn');
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (row.dataset.answered) return;
+      row.dataset.answered = '1';
+      buttons.forEach(function (b) { b.disabled = true; });
+      const correctBtn = row.querySelector('[data-v="' + correctVal + '"]');
+      correctBtn.classList.add('correct');
+      const isCorrect = btn.dataset.v === correctVal;
+      if (!isCorrect) btn.classList.add('incorrect');
+      ensureQ(qid).correct = isCorrect;
+      if (exp) exp.classList.add('show');
+      checkGate(row.closest('.slide'));
+      updateStatsLive();
+    });
+  });
+});
+
+document.querySelectorAll('[data-gate-group]').forEach(function (group) {
+  const groupId = group.dataset.gateGroup;
+  group.querySelectorAll('.classify-item').forEach(function (item) {
+    const qid = item.dataset.qid;
+    const correctVal = item.dataset.correct;
+    const buttons = item.querySelectorAll('.classify-btns button');
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (item.dataset.answered) return;
+        item.dataset.answered = '1';
+        buttons.forEach(function (b) { b.disabled = true; });
+        const correctBtn = item.querySelector('[data-v="' + correctVal + '"]');
+        if (correctBtn) correctBtn.classList.add('correct');
+        const isCorrect = btn.dataset.v === correctVal;
+        if (!isCorrect) btn.classList.add('incorrect');
+        ensureQ(qid).correct = isCorrect;
+        const allAnswered = group.querySelectorAll('.classify-item:not([data-answered])').length === 0;
+        if (allAnswered) {
+          const exp = document.querySelector('[data-exp="' + groupId + '"]');
+          if (exp) exp.classList.add('show');
+        }
+        checkGate(item.closest('.slide'));
+        updateStatsLive();
+      });
+    });
+  });
+});
+
+document.querySelectorAll('.reveal-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const target = document.querySelector('[data-exp="' + btn.dataset.target + '"]');
+    if (target) target.classList.add('show');
+  });
+});
+
+document.querySelectorAll('.register-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const qid = btn.dataset.register;
+    const textarea = document.querySelector('textarea[data-open="' + qid + '"]');
+    const text = textarea.value.trim();
+    if (!text) { textarea.focus(); return; }
+    ensureQ(qid).text = text;
+    btn.textContent = 'Registrado ✔ (clique de novo se editar)';
+    btn.classList.add('done');
+    btn.dataset.answered = '1';
+    checkGate(btn.closest('.slide'));
+    updateStatsLive();
+  });
+});
+document.querySelectorAll('textarea[data-open]').forEach(function (ta) {
+  ta.addEventListener('input', function () {
+    const qid = ta.dataset.open;
+    const btn = document.querySelector('.register-btn[data-register="' + qid + '"]');
+    if (btn && btn.dataset.answered) {
+      btn.dataset.answered = '';
+      btn.textContent = 'Registrar resposta';
+      btn.classList.remove('done');
+      checkGate(ta.closest('.slide'));
+    }
+  });
+});
+
+const slides = Array.from(document.querySelectorAll('.slide'));
+let current = 0;
+
+function checkGate(slideEl) {
+  if (!slideEl || !slideEl.dataset.gate) return;
+  const items = slideEl.querySelectorAll('.gate-item');
+  const allAnswered = Array.from(items).every(function (it) { return it.dataset.answered; });
+  const hint = slideEl.querySelector('[data-gate-hint]');
+  if (slideEl.classList.contains('active')) {
+    document.getElementById('nextBtn').disabled = !allAnswered;
+    if (hint) hint.classList.toggle('show', !allAnswered);
+  }
+  slideEl.dataset.unlocked = allAnswered ? '1' : '';
+}
+
+function showSlide(idx) {
+  stopSpeech();
+  slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+  current = idx;
+  const slideEl = slides[idx];
+  document.getElementById('slideCount').textContent = (idx + 1) + '/' + slides.length;
+  document.getElementById('progressFill').style.width = ((idx + 1) / slides.length * 100) + '%';
+  document.getElementById('sectionLabel').textContent = slideEl.dataset.section || '';
+  document.getElementById('prevBtn').disabled = idx === 0;
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = idx === slides.length - 1 ? 'Fim' : 'Próximo ▶';
+  if (slideEl.dataset.gate) { checkGate(slideEl); } else { nextBtn.disabled = false; }
+  if (idx === slides.length - 1) buildSummary();
+}
+
+document.getElementById('prevBtn').addEventListener('click', function () { if (current > 0) showSlide(current - 1); });
+document.getElementById('nextBtn').addEventListener('click', function () { if (current < slides.length - 1) showSlide(current + 1); });
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
+  if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
+});
+
+const speedLevels = [0.65, 0.8, 1.0, 1.2, 1.4];
+const speedLabels = ['0.65x', '0.8x', '1x', '1.2x', '1.4x'];
+let speedIdx = 2;
+(function loadSavedSpeed() {
+  const saved = parseInt(localStorage.getItem('gcTtsSpeedIdx'), 10);
+  if (!isNaN(saved) && saved >= 0 && saved < speedLevels.length) speedIdx = saved;
+})();
+const speedBtn = document.getElementById('speedBtn');
+function updateSpeedLabel() { speedBtn.textContent = speedLabels[speedIdx]; }
+updateSpeedLabel();
+speedBtn.addEventListener('click', function () {
+  const wasSpeaking = speaking;
+  speedIdx = (speedIdx + 1) % speedLevels.length;
+  localStorage.setItem('gcTtsSpeedIdx', String(speedIdx));
+  updateSpeedLabel();
+  if (wasSpeaking) { stopSpeech(); speakCurrentSlide(); }
+});
+
+let speaking = false;
+function stopSpeech() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  speaking = false;
+  document.getElementById('audioBtn').classList.remove('speaking');
+}
+function speakCurrentSlide() {
+  if (!('speechSynthesis' in window)) { alert('Seu navegador não suporta leitura em voz alta.'); return; }
+  const slideEl = slides[current];
+  const text = slideEl.querySelector('.slide-inner').innerText;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'pt-BR';
+  utter.rate = speedLevels[speedIdx];
+  utter.onend = function () { stopSpeech(); };
+  window.speechSynthesis.speak(utter);
+  speaking = true;
+  document.getElementById('audioBtn').classList.add('speaking');
+}
+document.getElementById('audioBtn').addEventListener('click', function () { if (speaking) { stopSpeech(); return; } speakCurrentSlide(); });
+
+function updateStatsLive() { if (current === slides.length - 1) buildSummary(); }
+
+function buildSummary() {
+  let correctCount = 0, objectiveTotal = 0, flags = [], openCount = 0;
+  const lines = ['=== RESUMO — Tópico ' + TOPICO_NUMERO + ': ' + TOPICO_TITULO + ' ==='];
+
+  QUESTION_ORDER.forEach(function (q) {
+    const st = state[q.id];
+    if (!st) { lines.push(q.label + ': (não respondido)'); return; }
+    if (st.correct !== null) {
+      objectiveTotal++;
+      if (st.correct) correctCount++;
+      if (st.correct === false && st.confidence === 'alta') flags.push(q.label);
+      lines.push(q.label + ': ' + (st.correct ? 'ACERTOU' : 'ERROU') + ' (confiança: ' + (st.confidence || 'não marcada') + ')');
+    } else if (st.text) {
+      openCount++;
+      lines.push(q.label + ' (confiança: ' + (st.confidence || 'não marcada') + '):\n  "' + st.text + '"');
+    }
+  });
+
+  lines.push('');
+  lines.push('Pontuação objetiva: ' + correctCount + '/' + objectiveTotal);
+  lines.push('Sinalizações (alta confiança + errou): ' + (flags.length ? flags.join(', ') : 'nenhuma'));
+  lines.push('Questões abertas registradas: ' + openCount + '/' + OPEN_TOTAL);
+  lines.push('');
+  lines.push('Peço avaliação honesta como especialista: devo seguir para ' + PROXIMO_TOPICO_LABEL + ' ou preciso de reforço antes?');
+
+  document.getElementById('statScore').textContent = correctCount + ' / ' + objectiveTotal;
+  document.getElementById('statFlags').textContent = flags.length;
+  document.getElementById('statOpen').textContent = openCount + ' / ' + OPEN_TOTAL;
+  document.getElementById('summaryText').value = lines.join('\n');
+}
+
+document.getElementById('copyBtn') && document.getElementById('copyBtn').addEventListener('click', function () {
+  const ta = document.getElementById('summaryText');
+  ta.select();
+  navigator.clipboard.writeText(ta.value).then(function () {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copiado! ✔';
+    btn.classList.add('copied');
+    setTimeout(function () { btn.textContent = 'Copiar resumo'; btn.classList.remove('copied'); }, 2000);
+  });
+});
+
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+function syncFullscreenUI() {
+  const on = !!document.fullscreenElement;
+  document.body.classList.toggle('is-fullscreen', on);
+  fullscreenBtn.textContent = on ? '✕' : '⛶';
+  fullscreenBtn.title = on ? 'Sair da tela cheia' : 'Tela cheia';
+}
+fullscreenBtn.addEventListener('click', function () {
+  if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(function () {}); }
+  else { document.exitFullscreen().catch(function () {}); }
+});
+document.addEventListener('fullscreenchange', syncFullscreenUI);
+
+showSlide(0);
+</script>
+
+</body>
+</html>

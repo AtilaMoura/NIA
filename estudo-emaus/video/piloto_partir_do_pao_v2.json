@@ -1,0 +1,40 @@
+{
+  "titulo": "O Caminho de Emaús",
+  "subtitulo": "Parte 3 · O partir do pão — Lucas 24:28-35",
+  "voz": "Achernar",
+  "estilo": "Narre em português do Brasil, com tom calmo, reverente e íntimo, num ritmo pausado de audiolivro devocional. Faça pausas naturais entre as frases.",
+  "formato": "9:16",
+  "movimento": true,
+  "segmentos": [
+    {
+      "imagem": "05-fica-connosco.png",
+      "mov": "in",
+      "narracao": "Ao chegarem perto de Emaús, Jesus fez como quem ia seguir adiante. Mas os dois insistiram: fica connosco, porque é tarde, e o dia já declinou. E ele entrou para ficar com eles.",
+      "legenda": "“Fica connosco, porque é tarde.”\nLucas 24:29"
+    },
+    {
+      "imagem": "06-partir-do-pao.png",
+      "mov": "left", "luz": "quente",
+      "narracao": "À mesa, o convidado agiu como anfitrião. Tomou o pão, abençoou, partiu, e deu a eles.",
+      "legenda": "Tomou o pão, abençoou,\npartiu, e deu a eles."
+    },
+    {
+      "imagem": "06-partir-do-pao.png",
+      "mov": "in", "luz": "quente",
+      "narracao": "Naquele instante, os olhos deles se abriram, e o reconheceram. E ele desapareceu da frente deles.",
+      "legenda": "“Abriram-se-lhes os olhos,\ne o reconheceram.” — v.31"
+    },
+    {
+      "imagem": "06-partir-do-pao.png",
+      "mov": "right", "luz": "quente",
+      "narracao": "O que abriu os olhos deles? O texto não diz. Talvez as mãos feridas que lhe estendiam o pão. Algum gesto familiar que disse, num relâmpago: este é o Cristo.",
+      "legenda": "O que abriu os olhos deles?\nO texto não diz."
+    },
+    {
+      "imagem": "07-cadeira-vazia.png",
+      "mov": "out", "luz": "quente",
+      "narracao": "Ele parte o pão e desaparece. E não faz falta. O reconhecimento não depende de vê-lo à mesa. Depende de olhos abertos.",
+      "legenda": "Não depende de vê-lo.\nDepende de olhos abertos."
+    }
+  ]
+}

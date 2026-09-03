@@ -1,0 +1,67 @@
+{
+  "titulo": "Fundamentos de LLM para Agente de Vendas via WhatsApp em Garden Center",
+  "descricao": "Este curso cobre os fundamentos de LLM aplicados a um agente de vendas via WhatsApp para um Garden Center, ensinando como desenhar um agente de vendas confiável.",
+  "nivel": "básico",
+  "modulos": [
+    {
+      "titulo": "Introdução ao LLM e ao Agente de Vendas",
+      "descricao": "Conhecendo os conceitos básicos do LLM e sua aplicação em um agente de vendas.",
+      "licoes": [
+        {
+          "titulo": "O que é LLM?",
+          "foco": "Definir o que é LLM e sua importância"
+        },
+        {
+          "titulo": "Introdução ao Agente de Vendas",
+          "foco": "Entender o papel do agente de vendas em um Garden Center"
+        }
+      ]
+    },
+    {
+      "titulo": "Desenvolvimento do Agente de Vendas",
+      "descricao": "Desenvolvendo o agente de vendas com LLM.",
+      "licoes": [
+        {
+          "titulo": "Arquitetura do Agente de Vendas",
+          "foco": "Descrever a arquitetura do agente de vendas"
+        },
+        {
+          "titulo": "Treinamento do Modelo de LLM",
+          "foco": "Treinar o modelo de LLM para o agente de vendas"
+        },
+        {
+          "titulo": "Integração com o WhatsApp",
+          "foco": "Integrar o agente de vendas com o WhatsApp"
+        }
+      ]
+    },
+    {
+      "titulo": "Implementação e Testes",
+      "descricao": "Implementando e testando o agente de vendas.",
+      "licoes": [
+        {
+          "titulo": "Implementação do Agente de Vendas",
+          "foco": "Implementar o agente de vendas em um ambiente de produção"
+        },
+        {
+          "titulo": "Testes e Depuração",
+          "foco": "Realizar testes e depuração do agente de vendas"
+        }
+      ]
+    },
+    {
+      "titulo": "Manutenção e Melhoria",
+      "descricao": "Manutenção e melhoria contínua do agente de vendas.",
+      "licoes": [
+        {
+          "titulo": "Monitoramento e Análise de Desempenho",
+          "foco": "Monitorar e analisar o desempenho do agente de vendas"
+        },
+        {
+          "titulo": "Melhoria Contínua do Agente de Vendas",
+          "foco": "Melhorar continuamente o agente de vendas com base em feedback e análise de desempenho"
+        }
+      ]
+    }
+  ]
+}

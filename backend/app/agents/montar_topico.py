@@ -111,7 +111,7 @@ def montar_topico(conteudo: dict, perguntas: dict, proximo_topico_label: str) ->
         f"✍️ {total_checkpoints} checkpoints + avaliação final",
     ]
 
-    return {
+    resultado = {
         "topico_id": conteudo["topico_id"],
         "titulo": conteudo["titulo"],
         "aula": conteudo["aula"],
@@ -121,6 +121,12 @@ def montar_topico(conteudo: dict, perguntas: dict, proximo_topico_label: str) ->
         "badges_capa": badges_capa,
         "slides": slides,
     }
+    # Achado real (2026-08-26, Tópico 2 do curso de obreiro): imagem_capa sumia
+    # ao passar pelo montar_topico() de verdade — só funcionava antes porque o
+    # Tópico 1 tinha sido montado à mão, sem passar por essa função.
+    if conteudo.get("imagem_capa"):
+        resultado["imagem_capa"] = conteudo["imagem_capa"]
+    return resultado
 
 
 def _sem_chave(d: dict, *chaves: str) -> dict:

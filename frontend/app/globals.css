@@ -24,3 +24,158 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ===== Sistema de humor de cor do NIA (aluno + admin) =====
+   Fonte de verdade: protótipos aprovados (Artifacts) de 2026-08-12.
+   Ver memória "nia-visual-padroes". Aplicado via [data-mood]/[data-theme]
+   na raiz — não confundir com o tema de LICAO (Vidro Fumê etc., sistema separado). */
+:root {
+  --nia-radius-sm: 6px;
+  --nia-radius-md: 12px;
+  --nia-radius-lg: 20px;
+  --nia-radius-pill: 999px;
+
+  --nia-font-display: "Century Gothic", "Questrial", Futura, "URW Gothic", "Segoe UI", system-ui, sans-serif;
+  --nia-font-body: Calibri, Candara, "Segoe UI", "Noto Sans", Roboto, system-ui, sans-serif;
+  --nia-font-mono: "Cascadia Code", "Cascadia Mono", Consolas, "SF Mono", Menlo, "Roboto Mono", monospace;
+}
+
+/* Status semântico: fixo por modo, não varia por humor */
+[data-theme="light"] {
+  --nia-bad: #c23b3b;
+  --nia-info: #3a6bbd;
+}
+[data-theme="dark"] {
+  --nia-bad: #e8635f;
+  --nia-info: #6f9de0;
+}
+
+[data-mood="musgo"][data-theme="light"] {
+  --nia-bg: #f3f1e7;
+  --nia-surface: #fbfaf3;
+  --nia-surface2: #f0eee2;
+  --nia-border: #dcd8c6;
+  --nia-ink: #232a1e;
+  --nia-ink-muted: #5e6a54;
+  --nia-accent: #4f7a56;
+  --nia-accent-ink: #f6fbf1;
+  --nia-good: #2e8b74;
+}
+[data-mood="musgo"][data-theme="dark"] {
+  --nia-bg: #11150e;
+  --nia-surface: #1a2016;
+  --nia-surface2: #212819;
+  --nia-border: #2e3826;
+  --nia-ink: #eaefe1;
+  --nia-ink-muted: #9fae92;
+  --nia-accent: #8fc28a;
+  --nia-accent-ink: #12190f;
+  --nia-good: #57c29b;
+}
+
+[data-mood="ambar"][data-theme="light"] {
+  --nia-bg: #f6f1e6;
+  --nia-surface: #fcf8ee;
+  --nia-surface2: #f0e9d4;
+  --nia-border: #e1d3ac;
+  --nia-ink: #2b2213;
+  --nia-ink-muted: #6b5c3d;
+  --nia-accent: #a9782b;
+  --nia-accent-ink: #fff8e9;
+  --nia-good: #3e8f5a;
+}
+[data-mood="ambar"][data-theme="dark"] {
+  --nia-bg: #17130a;
+  --nia-surface: #211b0f;
+  --nia-surface2: #292112;
+  --nia-border: #3b301a;
+  --nia-ink: #f3e9d2;
+  --nia-ink-muted: #b39f76;
+  --nia-accent: #e0a94b;
+  --nia-accent-ink: #1d1508;
+  --nia-good: #5fc98a;
+}
+
+[data-mood="mare"][data-theme="light"] {
+  --nia-bg: #eff3f3;
+  --nia-surface: #fafcfc;
+  --nia-surface2: #e6ecec;
+  --nia-border: #cfdbdb;
+  --nia-ink: #16242a;
+  --nia-ink-muted: #52696e;
+  --nia-accent: #1e7a8c;
+  --nia-accent-ink: #f1fbfc;
+  --nia-good: #2f9e6f;
+}
+[data-mood="mare"][data-theme="dark"] {
+  --nia-bg: #0b1517;
+  --nia-surface: #121f22;
+  --nia-surface2: #16262a;
+  --nia-border: #234046;
+  --nia-ink: #e4f1f2;
+  --nia-ink-muted: #8faeb3;
+  --nia-accent: #4fc3d9;
+  --nia-accent-ink: #08191b;
+  --nia-good: #55d19a;
+}
+
+[data-mood="framboesa"][data-theme="light"] {
+  --nia-bg: #f8efef;
+  --nia-surface: #fdf7f7;
+  --nia-surface2: #f1e1e1;
+  --nia-border: #e4c6c6;
+  --nia-ink: #2e1518;
+  --nia-ink-muted: #7a4f53;
+  --nia-accent: #c24762;
+  --nia-accent-ink: #fff2f4;
+  --nia-good: #3e8f5a;
+}
+[data-mood="framboesa"][data-theme="dark"] {
+  --nia-bg: #180c0e;
+  --nia-surface: #241417;
+  --nia-surface2: #2c181c;
+  --nia-border: #43242a;
+  --nia-ink: #f5e3e5;
+  --nia-ink-muted: #c08d93;
+  --nia-accent: #e8748f;
+  --nia-accent-ink: #1d0d10;
+  --nia-good: #5fc98a;
+}
+
+[data-mood="lavanda"][data-theme="light"] {
+  --nia-bg: #f1eff6;
+  --nia-surface: #faf9fc;
+  --nia-surface2: #e7e3f1;
+  --nia-border: #d2cbe6;
+  --nia-ink: #211c33;
+  --nia-ink-muted: #5f5679;
+  --nia-accent: #6e58b0;
+  --nia-accent-ink: #f7f5fd;
+  --nia-good: #2f8f6e;
+}
+[data-mood="lavanda"][data-theme="dark"] {
+  --nia-bg: #120f1c;
+  --nia-surface: #1b1729;
+  --nia-surface2: #221d33;
+  --nia-border: #362e4e;
+  --nia-ink: #e9e5f5;
+  --nia-ink-muted: #a99fc4;
+  --nia-accent: #a78ee8;
+  --nia-accent-ink: #16101f;
+  --nia-good: #63cfa0;
+}
+
+/* ===== Humor por CURSO (independente do [data-mood] da raiz, que é o shell
+   do app) — usado nos "pôsteres" de curso no painel. Provisório: hoje é
+   atribuído por hash determinístico do id do curso (ver humorDoCurso() em
+   _lib/progresso.ts), porque Course.category ainda não existe populado no
+   backend. Sempre os valores claros dos 5 humores — o pôster é sempre vívido,
+   não segue claro/escuro do shell.
+   --m-a2 é a versão quase-preta de cada humor, só pra degradê de legibilidade
+   em cima de foto — não é --m-a escurecido na hora (fica fraco demais, foi
+   bug real: hero saiu com texto ilegível em cima da imagem até essa correção). */
+.nia-mood-musgo { --m-a: #4f7a56; --m-a2: #1b2e1e; --m-ink: #f6fbf1; }
+.nia-mood-ambar { --m-a: #a9782b; --m-a2: #332309; --m-ink: #fff8e9; }
+.nia-mood-mare { --m-a: #1e7a8c; --m-a2: #0d2b32; --m-ink: #f1fbfc; }
+.nia-mood-framboesa { --m-a: #c24762; --m-a2: #3a1219; --m-ink: #fff2f4; }
+.nia-mood-lavanda { --m-a: #6e58b0; --m-a2: #221b3a; --m-ink: #f7f5fd; }

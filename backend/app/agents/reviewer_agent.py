@@ -19,6 +19,7 @@ Saída no formato que Module.review_score / Module.review_feedback já esperam
 import json
 
 from .base_agent import BaseAgent
+from .perfis import PerfilDominio, PERFIL_TECH
 from ..renderer.validate import validar_topico
 
 SCHEMA_REVISAO = """
@@ -36,8 +37,8 @@ Devolva APENAS um JSON válido (sem markdown), neste formato:
 "aprovado" só pode ser true se score >= 7 E não houver nenhum problema "bloqueante".
 
 O QUE VERIFICAR (cada um vira um "problema" se falhar, com o "onde" apontando o local exato):
-1. Fio condutor: o conteúdo contradiz em algum momento que o LLM é só camada de linguagem
-   e que fatos de negócio vêm sempre de tools/grounding? Isso é BLOQUEANTE se acontecer.
+1. Fio condutor: o conteúdo contradiz em algum momento a regra de "fio condutor" desta
+   área (informada abaixo, antes do JSON do tópico)? Isso é BLOQUEANTE se acontecer.
 2. Continuidade: toda referência a "Tópico N" ou a um conceito de tópico anterior está
    CORRETA (bate com o resumo de tópicos anteriores fornecido)? Uma referência errada
    (ex: atribuir tokenização ao tópico errado) é BLOQUEANTE — é o modelo alucinando sobre
@@ -48,8 +49,9 @@ O QUE VERIFICAR (cada um vira um "problema" se falhar, com o "onde" apontando o 
    pergunta do mesmo tópico, mesmo com palavras diferentes (não é duplicata literal —
    checagem de string já cobre isso, aqui é sobre IDEIA repetida)? LEVE se for parcial,
    BLOQUEANTE se for a mesma pergunta disfarçada.
-5. Genérico demais: algum bloco de conteúdo fica no nível de "o agente usa IA pra
-   responder mensagens" sem nomear nenhum mecanismo/tool/decisão concreta? LEVE.
+5. Genérico demais: algum bloco de conteúdo fica no nível de generalidade vaga —
+   sem nomear nenhum elemento concreto do assunto (mecanismo, referência exata, exemplo
+   específico) — quando o "foco" pedia especificidade? LEVE.
 6. Gabarito: alguma pergunta objetiva (mc/tf/classify) tem resposta correta ambígua,
    discutível, ou uma alternativa incorreta que também poderia estar certa? LEVE, a
    menos que a resposta marcada como certa esteja claramente errada (aí é BLOQUEANTE).
@@ -64,6 +66,7 @@ class ReviewerAgent(BaseAgent):
         topico: dict,
         contexto_topicos_anteriores: str = "",
         foco_esperado: str = "",
+        perfil: PerfilDominio = PERFIL_TECH,
     ) -> dict:
         problemas_estruturais = validar_topico(topico)
         if problemas_estruturais:
@@ -80,12 +83,11 @@ class ReviewerAgent(BaseAgent):
 
         topico_resumido = _resumir_para_revisao(topico)
         prompt = f"""
-Você é o revisor pedagógico do tópico abaixo, do curso "LLM aplicado a um agente de
-vendas via WhatsApp para um Garden Center". Já passou pelas checagens estruturais —
-sua parte é julgamento de conteúdo, não formato.
+Você é o revisor pedagógico do tópico abaixo, do {perfil.contexto_curso}. Já passou
+pelas checagens estruturais — sua parte é julgamento de conteúdo, não formato.
 
-FIO CONDUTOR DA ÁREA (nunca pode ser contradito): o LLM é só a camada de linguagem;
-fatos de negócio sempre vêm de tools/grounding, nunca "da memória" do modelo.
+FIO CONDUTOR DA ÁREA (nunca pode ser contradito):
+{perfil.fio_condutor}
 
 TÓPICOS ANTERIORES (pra checar se as referências no conteúdo batem com isso):
 {contexto_topicos_anteriores or "(nenhum — primeiro tópico)"}

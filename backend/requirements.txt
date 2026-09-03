@@ -17,8 +17,12 @@ python-multipart==0.0.6
 # HTTP Client para chamadas de API
 httpx==0.25.2
 
-# IA - Google Gemini
-google-generativeai==0.3.2
+# IA - Google Gemini (migrado 2026-08-26: google-generativeai==0.3.2 está
+# descontinuado — repo virou "deprecated-generative-ai-python" — e dava 504
+# Deadline Exceeded sempre em ~60s com gemini-2.5-flash, independente do
+# tamanho do prompt (ver curso de obreiro/anotação para IA.md). SDK novo
+# unificado, mesma API key.
+google-genai==2.20.0
 
 # IA - Groq (usa API compatível com OpenAI)
 # Já funciona com httpx, não precisa lib específica

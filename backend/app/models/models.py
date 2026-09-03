@@ -5,7 +5,7 @@ Define as tabelas: users, courses, modules, lessons, lesson_completions, progres
 
 from sqlalchemy import (
     Column, Integer, String, Text, Boolean, DECIMAL, DateTime,
-    ForeignKey, CheckConstraint
+    ForeignKey, CheckConstraint, UniqueConstraint
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
@@ -37,10 +37,19 @@ class User(Base):
     streak_days = Column(Integer, default=0)
     last_activity_date = Column(DateTime(timezone=True))
 
+    # Papel de acesso
+    role = Column(String(20), nullable=False, default='aluno')  # 'aluno' ou 'admin'
+
     # Preferências
     preferred_topics = Column(JSONB, default=[])
     learning_style = Column(String(50))  # visual, practical, theoretical
     preferred_theme = Column(String(50), default='vidro-fume')  # id do tema em docs/schema/temas.json
+
+    # Preferências do painel (Fase 4 do front) — eixo diferente de preferred_theme
+    # acima (aquele é o tema do SLIDE da lição; estes são a moldura do app).
+    preferred_mood = Column(String(20), nullable=False, default='musgo')
+    preferred_panel_mode = Column(String(10), nullable=False, default='light')
+    preferred_panel_layout = Column(String(20), nullable=False, default='retomar')
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -54,6 +63,16 @@ class User(Base):
     # Constraints
     __table_args__ = (
         CheckConstraint('level >= 1 AND level <= 100', name='valid_level'),
+        CheckConstraint("role IN ('aluno', 'admin')", name='valid_role'),
+        CheckConstraint(
+            "preferred_mood IN ('musgo', 'ambar', 'mare', 'framboesa', 'lavanda')",
+            name='valid_preferred_mood',
+        ),
+        CheckConstraint("preferred_panel_mode IN ('light', 'dark')", name='valid_preferred_panel_mode'),
+        CheckConstraint(
+            "preferred_panel_layout IN ('retomar', 'biblioteca', 'trilha')",
+            name='valid_preferred_panel_layout',
+        ),
     )
 
     def __repr__(self):
@@ -215,6 +234,7 @@ class Lesson(Base):
     # Relacionamentos
     module = relationship("Module", back_populates="lessons")
     completions = relationship("LessonCompletion", back_populates="lesson", cascade="all, delete-orphan") # NOVO
+    topicos = relationship("Topico", back_populates="lesson", cascade="all, delete-orphan", order_by="Topico.topico_index")
 
     # Constraints
     __table_args__ = (
@@ -223,6 +243,49 @@ class Lesson(Base):
 
     def __repr__(self):
         return f"<Lesson(id={self.id}, title='{self.title}', module_id={self.module_id})>"
+
+
+# ------------------------------------------------------------
+# 3.2. MODEL: TOPICO (NOVA! — 2026-08-26, nível Módulo→Aula→Tópicos)
+# ------------------------------------------------------------
+# Uma Lesson passa a representar a AULA (título, foco); cada Aula pode ter
+# vários Tópicos, cada um com conteúdo/geração/revisão próprios (mesmo
+# schema de slide que Lesson.content já usava quando 1 aula = 1 tópico só).
+# Lesson.content não é apagado nem deixa de funcionar — fica como está pras
+# aulas que não precisam desse nível extra (ex: cursos de tech já existentes).
+
+class Topico(Base):
+    __tablename__ = "topicos"
+
+    # Identificação
+    id = Column(Integer, primary_key=True, index=True)
+    lesson_id = Column(Integer, ForeignKey('lessons.id', ondelete='CASCADE'), nullable=False, index=True)
+    topico_index = Column(Integer, nullable=False)
+    titulo = Column(String(255), nullable=False)
+    referencia_biblica = Column(String(255))  # ex: "Rm 12:6-8" — nulo em domínios não-bíblicos
+
+    # Conteúdo e Metadados (mesmo padrão de Lesson)
+    content = Column(Text)
+    generated_by = Column(String(100))
+    reviewed_by = Column(String(100))
+    review_feedback = Column(JSONB)
+    is_approved = Column(Boolean, default=False)
+    estimated_read_time_minutes = Column(Integer)
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relacionamentos
+    lesson = relationship("Lesson", back_populates="topicos")
+
+    # Constraints
+    __table_args__ = (
+        CheckConstraint('topico_index > 0', name='valid_topico_index'),
+    )
+
+    def __repr__(self):
+        return f"<Topico(id={self.id}, titulo='{self.titulo}', lesson_id={self.lesson_id})>"
 
 
 # ============================================================
@@ -319,3 +382,42 @@ class LessonCompletion(Base):
 
     def __repr__(self):
         return f"<LessonCompletion(id={self.id}, user_id={self.user_id}, lesson_id={self.lesson_id})>"
+
+
+# ------------------------------------------------------------
+# 6. MODEL: TOPICO_PROGRESS (NOVA! — FASE 2 do front Emaús)
+# ------------------------------------------------------------
+# Progresso por TÓPICO. O model Progress existente é por MÓDULO e não serve
+# pra granularidade de tópico que o front de formação bíblica precisa.
+# Só upsert de status — nunca deleta (soft, padrão do projeto).
+
+class TopicoProgress(Base):
+    __tablename__ = "topico_progress"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    status = Column(String(20), nullable=False, default='nao_iniciado')
+
+    iniciado_em = Column(DateTime(timezone=True))    # 1ª vez que virou 'em_andamento'
+    concluido_em = Column(DateTime(timezone=True))   # quando virou 'concluido' (não é limpo depois)
+    time_spent_s = Column(Integer, default=0)        # reservado (FASE 3 popula)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    user = relationship("User", backref="topico_progress")
+    topico = relationship("Topico", backref="progresso")
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('nao_iniciado', 'em_andamento', 'concluido')",
+            name='valid_topico_progress_status',
+        ),
+        CheckConstraint('time_spent_s >= 0', name='valid_topico_time_spent'),
+        UniqueConstraint('user_id', 'topico_id', name='uq_topico_progress_user_topico'),
+    )
+
+    def __repr__(self):
+        return f"<TopicoProgress(id={self.id}, user_id={self.user_id}, topico_id={self.topico_id}, status='{self.status}')>"

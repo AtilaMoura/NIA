@@ -1,0 +1,335 @@
+{
+  "provedor": "GROQ",
+  "topico_id": "curso8-modulo1-aula1-topico2",
+  "titulo": "Dons Espirituais – Chamado do Obreiro",
+  "aula": 1,
+  "numero": 2,
+  "duracao_estimada_min": 15,
+  "roteiro": [
+    "Apresentação do tema e objetivo da aula",
+    "Leitura e contextualização de Romanos 12:6‑8",
+    "Desenvolvimento dos assuntos sequenciais",
+    "Aplicação prática para o obreiro",
+    "Síntese e encaminhamento para a avaliação"
+  ],
+  "slides": [
+    {
+      "tipo": "capa",
+      "secao": "Início",
+      "titulo": "Dons Espirituais – Chamado do Obreiro",
+      "subtitulo": "Entendendo e exercendo os dons segundo Romanos 12:6‑8"
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "dons_espirituais",
+      "titulo_secao": "Definição Técnica de Dons Espirituais e Analogia Cotidiana",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "A Bíblia apresenta os dons espirituais como capacidades específicas concedidas por Deus para o serviço dentro do corpo de Cristo. Cada crente recebe, segundo a graça que lhe foi dada, um ou mais dons que visam edificar a comunidade, promover o testemunho e glorificar a Deus."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto",
+          "texto": "De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria. (Rm 12:6-8)"
+        },
+        {
+          "tipo": "box",
+          "variante": "analogy",
+          "label": "🔧 Analogia Cotidiana",
+          "texto": "Imagine uma equipe de construção. Cada trabalhador tem uma ferramenta diferente: um tem martelo, outro tem serrote, outro tem pincel. O martelo serve para pregar, o serrote para cortar madeira, o pincel para pintar. Da mesma forma, os dons espirituais são como essas ferramentas: cada um tem uma função específica que, quando usada corretamente, contribui para a obra completa que é o Reino de Deus."
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "🛠️ Aplicação Prática",
+          "texto": "Ao reconhecer o dom que Deus lhe concedeu, o crente deve exercê‑lo com diligência e alegria, assim como o trabalhador usa sua ferramenta com competência. O objetivo não é a exaltação pessoal, mas o benefício da comunidade e a manifestação da graça divina."
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "✅ Resumo",
+          "texto": "• Dons são capacidades dadas por graça (Rm 12:6‑8). • Cada dom tem um propósito específico no serviço cristão. • A diversidade de dons forma um corpo unido, como uma equipe com diferentes ferramentas."
+        }
+      ],
+      "checkpoint_apos": {
+        "gate_id": "ck1",
+        "tipo": "mc",
+        "testar": "Qual das opções abaixo melhor descreve a definição bíblica de dons espirituais?"
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "dons_espirituais_romanos_12_6_8",
+      "titulo_secao": "Fundamento Bíblico dos Dons Espirituais (Romanos 12:6‑8)",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Nesta aula vamos observar o texto que serve de base para todo o ensino sobre os dons espirituais no Novo Testamento. Romanos 12:6‑8 apresenta uma lista concisa de dons e, ao lado de cada um, um verbo que indica como o crente deve exercê‑lo."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto",
+          "texto": "De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça‑o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria. (Romanos 12:6‑8)"
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "🔑 Verbos‑chave do texto",
+          "itens": [
+            "seja (profecia)",
+            "seja (ministério)",
+            "haja (ensinar)",
+            "use (exortar)",
+            "faça‑o (repartir)",
+            "com (presidir)",
+            "com (usar de misericórdia)"
+          ]
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "🛠️ Aplicação prática",
+          "texto": "Cada verbo indica a atitude esperada: *seja* implica conformidade com a medida da fé; *haja* sugere empenho ativo; *use* aponta para a intenção deliberada; *faça‑o* enfatiza generosidade; *com* (presidir) e *com* (misericórdia) ressaltam o caráter de zelo e alegria. O crente deve buscar refletir esses verbos ao exercer seu dom."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "instr",
+            "label": "Como identificar seu dom",
+            "texto": "1. Ore pedindo clareza sobre a graça que recebeu.\n2. Observe quais das áreas listadas (profecia, ministério, ensino, exortação, repartir, presidir, misericórdia) desperta maior entusiasmo e capacidade.\n3. Verifique se o verbo associado ao dom corresponde ao seu estilo de servir."
+          },
+          "direita": {
+            "variante": "instr",
+            "label": "Como exercitar o verbo",
+            "texto": "1. *Seja* – alinhe sua prática à medida da fé, evitando exageros ou escassez.\n2. *Haja* – dedique tempo e esforço ao ensino, preparando‑se e estudando.\n3. *Use* – exerça a exortação com intencionalidade, buscando edificar outros.\n4. *Faça‑o* – reparta recursos com liberalidade, sem restrição.\n5. *Com* – presida com zelo, cuidando da ordem; use a misericórdia com alegria, demonstrando compaixão."
+          }
+        },
+        {
+          "tipo": "badges",
+          "itens": [
+            "📖 Texto base: Romanos 12:6‑8",
+            "🔍 Observação: verbos indicam atitude",
+            "🤝 Aplicação: alinhar prática ao verbo"
+          ]
+        }
+      ],
+      "checkpoint_apos": null
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "dons_espirituais",
+      "titulo_secao": "Classificação tradicional dos dons espirituais",
+      "blocos": [
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto",
+          "texto": "De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria. (Romanos 12:6-8)"
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "📑 Categorias principais",
+          "itens": [
+            "Profecia – dom de comunicar mensagem inspirada por Deus.",
+            "Ministério – serviço prático e apoio às necessidades da comunidade.",
+            "Ensino – transmissão de verdades bíblicas com dedicação.",
+            "Exortação – encorajamento e motivação dos irmãos.",
+            "Generosidade – repartir recursos com liberalidade.",
+            "Liderança – presidir com zelo e responsabilidade.",
+            "Misericórdia – exercer compaixão e alegria ao ajudar."
+          ]
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "🔎 Observação prática",
+          "texto": "As categorias acima são apresentadas na própria lista de Romanos 12:6‑8. Elas são usadas por muitas tradições como um esquema de classificação, mas não implicam hierarquia de valor; cada dom tem importância para o corpo de Cristo."
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "⚠️ Atenção",
+          "texto": "Algumas denominações acrescentam outras categorias (por exemplo, “dons de cura” ou “dons de línguas”). Essas adições não constam do texto de Romanos 12:6‑8 e, portanto, são interpretações humanas que variam entre tradições."
+        }
+      ],
+      "checkpoint_apos": null
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "mecanismo_discernimento",
+      "titulo_secao": "Mecanismo de Discernimento do Dom Pessoal",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Descobrir o dom espiritual que Deus concedeu a cada obreiro requer um processo intencional que combina oração pessoal, confirmação comunitária e observação dos frutos produzidos na vida e no ministério."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto",
+          "texto": "De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria. (Rom 12:6-8)"
+        },
+        {
+          "tipo": "box",
+          "variante": "instr",
+          "label": "Passos Práticos de Discernimento",
+          "itens": [
+            "1. Oração: peça a Deus clareza sobre o dom que Ele deseja que você exercite (1 Coríntios 12:11).",
+            "2. Auto‑exame: observe quais atividades lhe trazem alegria, vigor e senso de realização, e onde outros reconhecem seu efeito positivo.",
+            "3. Confirmação da comunidade: compartilhe suas percepções com líderes e irmãos para receber feedback honesto.",
+            "4. Avaliação dos frutos: verifique se o exercício do dom produz crescimento espiritual próprio e edificação da igreja (Gálatas 5:22‑23)."
+          ]
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "analogy",
+            "label": "Analogia do Jardim",
+            "texto": "Assim como um jardineiro observa quais sementes germinam melhor em diferentes áreas do solo, o obreiro deve observar onde seu coração floresce mais ao servir, indicando o tipo de dom que o Espírito está cultivando."
+          },
+          "direita": {
+            "variante": "app",
+            "label": "Aplicação",
+            "texto": "Se ao ensinar a Palavra você sente energia renovada e a congregação responde com entendimento, isso pode ser um sinal de dom de ensino. Se, ao servir, há um prazer inesperado em atender necessidades, pode ser o dom de ministério ou de misericórdia."
+          }
+        },
+        {
+          "tipo": "diagram",
+          "id": "discernimento_fluxo",
+          "descricao": "Oração por direção → auto‑exame das paixões e habilidades → busca de confirmação na comunidade → avalia: há frutos evidentes? → se sim, desenvolve o dom com treinamento; se não, revisita oração e auto‑exame",
+          "svg_raw": null
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "Resumo",
+          "texto": "O discernimento do dom pessoal não é um ato isolado, mas um ciclo contínuo de dependência de Deus, reflexão pessoal e validação comunitária, sempre medido pelos frutos do Espírito."
+        }
+      ],
+      "checkpoint_apos": {
+        "gate_id": "ck2",
+        "tipo": "tf",
+        "testar": "O discernimento do dom inclui apenas a leitura pessoal da Bíblia (verdadeiro/falso)."
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "uso_responsavel_dons",
+      "titulo_secao": "Uso responsável dos dons no ministério local",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Depois de reconhecer o dom que Deus concedeu, o obreiro deve exercê‑lo de forma que glorifique a Cristo, edifique a comunidade e respeite a autoridade estabelecida na igreja local."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto",
+          "texto": "De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria. (Rom 12:6‑8)"
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "Princípio bíblico: humildade",
+          "texto": "A palavra “seja” (imperativo) que acompanha cada dom indica que o exercício deve ser feito de acordo com a medida que Deus concedeu, não por ambição pessoal. A humildade consiste em reconhecer que o dom vem da graça e não do próprio mérito."
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "Princípio bíblico: serviço",
+          "texto": "Os verbos associados a cada dom (exortar, repartir, presidir, usar de misericórdia) apontam para ações concretas de serviço à comunidade. O foco não é o reconhecimento, mas a necessidade da igreja."
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "Princípio bíblico: submissão à liderança",
+          "texto": "Quando o dom envolve “presidir”, o texto liga‑o ao “zelo”. Isso indica que a liderança deve ser exercida com zelo, mas sempre sob a autoridade já reconhecida na igreja local (ex.: presbíteros, pastores)."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "instr",
+            "label": "Passos práticos",
+            "texto": "1. Ore pedindo discernimento sobre como usar o dom.\n2. Compartilhe com seu líder de igreja para confirmação e orientação.\n3. Comece em pequenos serviços, avaliando o fruto (Efésios 4:12‑13)."
+          },
+          "direita": {
+            "variante": "instr",
+            "label": "Alertas comuns",
+            "texto": "• Orgulho: acreditar que o dom torna superior.\n• Isolamento: exercer o dom sem rendição à comunidade.\n• Excesso: usar o dom de forma forçada, sem necessidade."
+          }
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Descoberta",
+              "descricao": "Identificação do dom por meio de oração, feedback da comunidade e observação dos frutos."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "Treinamento",
+              "descricao": "Desenvolvimento de habilidades específicas sob a orientação de líderes experientes."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "Serviço",
+              "descricao": "Aplicação do dom no contexto local, sempre submetido à liderança e à visão da igreja."
+            },
+            {
+              "numero": 4,
+              "cor": "#2c7fb8",
+              "titulo": "Avaliação",
+              "descricao": "Revisão periódica com líderes para garantir que o dom está sendo usado conforme a graça e para ajustes necessários."
+            }
+          ]
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "Resumo",
+          "texto": "O uso responsável dos dons exige: (1) reconhecimento da origem divina, (2) prática humilde e servidora, (3) submissão à autoridade local e (4) avaliação contínua para que o dom contribua para o crescimento do Corpo de Cristo."
+        }
+      ],
+      "checkpoint_apos": {
+        "gate_id": "ck3",
+        "tipo": "open",
+        "testar": "Descreva brevemente como um obreiro pode aplicar seu dom de ensino em um pequeno grupo."
+      }
+    }
+  ],
+  "avaliacao_conceitos": [
+    {
+      "gate_id": "ef1",
+      "tipo": "mc",
+      "testar": "Qual verbo em Romanos 12:6‑8 indica a necessidade de usar o dom com diligência?"
+    },
+    {
+      "gate_id": "ef2",
+      "tipo": "tf",
+      "testar": "Todos os dons espirituais são concedidos apenas para o ministério público (verdadeiro/falso)."
+    },
+    {
+      "gate_id": "ef3",
+      "tipo": "classify",
+      "testar": "Classifique os seguintes dons como ‘serviço’, ‘ensino’ ou ‘liderança’: hospitalidade, profecia, administração."
+    },
+    {
+      "gate_id": "ef4",
+      "tipo": "mc",
+      "testar": "Qual das etapas NÃO faz parte do processo de discernimento do dom apresentado?"
+    },
+    {
+      "gate_id": "ef5",
+      "tipo": "open",
+      "testar": "Relate uma situação prática em que o uso inadequado de um dom pode causar divisão na igreja."
+    }
+  ]
+}

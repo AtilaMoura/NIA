@@ -3,7 +3,8 @@ from app.models.models import User
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.core.security import create_access_token, verify_password, hash_password, ACCESS_TOKEN_EXPIRE_MINUTES
-from app.schemas.auth import UserLogin, UserRegister, Token
+from app.core.auth import get_current_user
+from app.schemas.auth import UserLogin, UserRegister, Token, UserMe
 from app.database import get_db
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -26,6 +27,10 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
 
     access_token = create_access_token({"sub": str(new_user.id)})
     return Token(access_token=access_token)
+
+@router.get("/me", response_model=UserMe)
+def me(current_user: User = Depends(get_current_user)):
+    return current_user
 
 @router.post("/login", response_model=Token)
 def login(data: UserLogin, db: Session = Depends(get_db)):

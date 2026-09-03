@@ -1,0 +1,489 @@
+{
+  "topico_id": "curso8-modulo1-topico3",
+  "titulo": "Vocação e Ofícios na Igreja",
+  "aula": 1,
+  "numero": 3,
+  "duracao_estimada_min": 12,
+  "roteiro": [
+    "Introdução ao tema",
+    "Definição técnica de dom vs. ofício",
+    "Análise de Efésios 4:7-16 como texto central",
+    "Patrimônio bíblico do reconhecimento público (Atos 6)",
+    "Critérios de caráter para ancião/bispo e diácono (1Tm 3; Tito 1)",
+    "Debates interpretativos contemporâneos",
+    "Síntese e aplicação prática"
+  ],
+  "slides": [
+    {
+      "tipo": "capa",
+      "secao": "Início",
+      "titulo": "Vocação e Ofícios na Igreja",
+      "subtitulo": "Distinções entre dom, vocação e ofício; reconhecimento bíblico e critérios de elegibilidade",
+      "instrucoes_box": {
+        "label": "📋 Como funciona este estudo",
+        "texto": "Use as setas ← → ou os botões embaixo para navegar. Alguns slides são checkpoints — pedem uma resposta antes de liberar o próximo."
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "vocacao_oficios",
+      "titulo_secao": "Dom e Ofício: Definição Técnica e Analogia",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "No contexto da vida cristã, é fundamental distinguir entre o dom que Deus concede a cada crente e o ofício que a comunidade reconhece como função formal. Essa distinção evita confusões que podem gerar divisões ou desvalorizar o serviço de quem exerce um cargo específico."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto",
+          "texto": "Em Efésios 4:7-12, lemos que \"Mas a cada um de nós foi dada a graça conforme a medida do dom de Cristo\" e que \"Ele deu uns como apóstolos, e outros como profetas, e outros como evangelistas, e outros como pastores e mestres\". O versículo indica que o dom é uma graça concedida individualmente, enquanto os ofícios (apóstolo, profeta, evangelista, pastor, mestre) são funções específicas destinadas ao aperfeiçoamento do corpo de Cristo."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "Definição de Dom",
+          "texto": "Dom: capacidade ou habilitação sobrenatural dada por Deus a todo crente, independentemente de posição ou tempo de serviço, para contribuir com a edificação do corpo. Não depende de reconhecimento institucional; sua validade está na fonte divina (Efésios 4:7)."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "Definição de Ofício",
+          "texto": "Ofício: cargo ou função formal reconhecida pela comunidade cristã, designada para organizar o serviço e garantir a ordem no ministério (ex.: pastor, diácono, ancião). O ofício requer aprovação da igreja local e está ligado a responsabilidades específicas descritas em passagens como 1 Timóteo 3:1‑13 e Atos 6:1‑6."
+        },
+        {
+          "tipo": "box",
+          "variante": "analogy",
+          "label": "Analogia",
+          "texto": "Imagine o corpo humano: o dom é como um órgão que cada pessoa possui – por exemplo, o coração que bombeia sangue. Todos têm coração, mas nem todos são designados a ser o cérebro que dirige decisões. O ofício seria o cargo de “gerente de recursos humanos” dentro de uma empresa: alguém que, embora tenha habilidades (dom) para várias tarefas, foi oficialmente colocado em uma posição de liderança para coordenar o trabalho dos demais."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "summary",
+            "label": "Resumo – Dom",
+            "texto": "• Dado por Deus a cada crente\n• Não requer aprovação humana\n• Serve ao corpo de forma espontânea\n• Base bíblica: Efésios 4:7; 1 Coríntios 12:28"
+          },
+          "direita": {
+            "variante": "summary",
+            "label": "Resumo – Ofício",
+            "texto": "• Função reconhecida pela comunidade\n• Exige qualificação e aprovação (ex.: 1 Timóteo 3, Atos 6)\n• Responsabilidades definidas\n• Visão de ordem e serviço institucional"
+          }
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "Aplicação prática",
+          "texto": "Ao discernir seu chamado, o cristão deve primeiro reconhecer o dom que o Espírito lhe concedeu (oração, estudo, conselho) e, em seguida, buscar onde a igreja local necessita de um ofício que se alinhe a esse dom. O ofício não anula o dom; ao contrário, o coloca em serviço de forma organizada."
+        }
+      ],
+      "checkpoint_apos": null
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "vocacao_oficios",
+      "titulo_secao": "Dom como recurso e ofício como estrutura",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Os dons são capacitações sobrenaturais que Deus concede a cada crente para que ele possa exercer um serviço dentro da comunidade. O ofício, por sua vez, é a função reconhecida e organizada pela igreja para que esses dons sejam colocados em prática de forma ordenada. Quando o dom opera dentro do ofício, não há competição, mas sim complementação que equipa todo o corpo para o serviço."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto",
+          "texto": "Em Efésios 4:7-12, Paulo escreve: \"Mas a cada um de nós foi dada a graça conforme a medida do dom de Cristo. Por isso foi dito: Subindo ao alto, levou cativo o cativeiro, e deu dons aos homens... E ele deu uns como apóstolos, e outros como profetas, e outros como evangelistas, e outros como pastores e mestres, tendo em vista o aperfeiçoamento dos santos, para a obra do ministério, para edificação do corpo de Cristo\" (Ef 4:7-12). O texto indica que os dons são concedidos por Cristo e que há ofícios específicos (apóstolos, profetas, evangelistas, pastores, mestres) destinados a edificar o corpo."
+        },
+        {
+          "tipo": "box",
+          "variante": "analogy",
+          "label": "🔧 Analogia",
+          "texto": "Imagine uma orquestra: os músicos recebem o dom de tocar seus instrumentos (dom). O maestro, a partitura e a posição de cada músico na orquestra constituem o ofício. Cada instrumento tem seu papel, mas todos contribuem para a mesma sinfonia. Da mesma forma, o dom é a habilidade dada por Deus; o ofício é a estrutura que organiza quem exerce qual dom, garantindo harmonia no serviço da igreja."
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "🛠️ Aplicação prática",
+          "texto": "1. Identifique seu dom pessoal (ex.: ensino, evangelismo, pastoreio) por meio de oração e confirmação da comunidade. 2. Verifique qual ofício está aberto ou necessita de apoio na sua igreja local (ex.: líder de célula, coordenador de ação social). 3. Ofereça seu dom dentro desse ofício, reconhecendo que a estrutura da igreja fornece apoio, supervisão e responsabilidade. 4. Mantenha a comunicação com outros ofícios para que os diferentes dons se complementem, evitando sobreposição ou competição."
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "📌 Resumo",
+          "texto": "• Dom = recurso sobrenatural concedido por Cristo a cada crente. • Ofício = estrutura organizacional reconhecida pela comunidade para aplicar esses recursos. • O funcionamento conjunto promove edificação, unidade e crescimento do corpo de Cristo, conforme Efésios 4:13‑16."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "def",
+            "label": "Dom (recurso)",
+            "texto": "Capacitação dada pelo Espírito, independente de cargo ou título. Pode ser exercido em qualquer contexto, desde a casa até a assembleia."
+          },
+          "direita": {
+            "variante": "def",
+            "label": "Ofício (estrutura)",
+            "texto": "Função formal reconhecida pela igreja que organiza quem exerce quais dons, garantindo ordem, prestação de contas e apoio mútuo."
+          }
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "⚠️ Erro comum",
+          "texto": "Pensar que o dom substitui o ofício ou que o ofício elimina a necessidade do dom. O texto de Efésios deixa claro que os dons são dados *para* os ofícios, não *em vez* deles."
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Descoberta do dom",
+              "descricao": "Por meio de oração, estudo e confirmação da comunidade, o crente reconhece sua capacitação espiritual."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "Alinhamento ao ofício",
+              "descricao": "A liderança da igreja identifica onde o ofício necessita daquele dom e convida o crente a servir."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "Serviço integrado",
+              "descricao": "O dom é exercido dentro da estrutura do ofício, com supervisão, apoio e avaliação contínua."
+            },
+            {
+              "numero": 4,
+              "cor": "#2c7fb8",
+              "titulo": "Crescimento mútuo",
+              "descricao": "A edificação do corpo avança, refletindo a meta de Efésios 4:13‑16 de alcançar a unidade da fé e o pleno conhecimento de Cristo."
+            }
+          ]
+        }
+      ],
+      "checkpoint_apos": {
+        "gate_id": "ck1",
+        "tipo": "mc",
+        "testar": "Qual a relação correta entre dom e ofício? A) São sinônimos B) O dom alimenta o ofício C) O ofício substitui o dom D) Não há relação"
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "vocacao_oficios",
+      "titulo_secao": "Liderança para edificação",
+      "blocos": [
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto",
+          "texto": "Mas a cada um de nós foi dada a graça conforme a medida do dom de Cristo. Por isso foi dito: Subindo ao alto, levou cativo o cativeiro, e deu dons aos homens. Ora, isto - ele subiu - que é, senão que também desceu às partes mais baixas da terra? Aquele que desceu é também o mesmo que subiu muito acima de todos os céus, para cumprir todas as coisas. E ele deu uns como apóstolos, e outros como profetas, e outros como evangelistas, e outros como pastores e mestres, tendo em vista o aperfeiçoamento dos santos, para a obra do ministério, para edificação do corpo de Cristo; até que todos cheguemos à unidade da fé e do pleno conhecimento do Filho de Deus, ao estado de homem feito, à medida da estatura da plenitude de Cristo; para que não mais sejamos meninos, inconstantes, levados ao redor por todo vento de doutrina, pela fraudulência dos homens, pela astúcia tendente à maquinação do erro; antes, seguindo a verdade em amor, cresçamos em tudo naquele que é a cabeça, Cristo, do qual o corpo inteiro bem ajustado, e ligado pelo auxílio de todas as juntas, segundo a justa operação de cada parte, efetua o seu crescimento para edificação de si mesmo em amor. (Efésios 4:7-16)"
+        },
+        {
+          "tipo": "paragrafo",
+          "texto": "O propósito dos ofícios listados por Paulo — apóstolo, profeta, evangelista, pastor e mestre — é equipar o corpo de Cristo para que cada membro cresça em maturidade espiritual, alcançando a unidade da fé e o pleno conhecimento de Cristo."
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "Aplicação prática",
+          "texto": "Cada igreja deve reconhecer esses ofícios como funções de liderança que se complementam. O apóstolo inaugura e estabelece novas comunidades; o profeta aponta a vontade de Deus para a igreja; o evangelista proclama o evangelho a quem ainda não crê; o pastor cuida do rebanho, nutrindo e protegendo; o mestre instrui na doutrina, formando discípulos capazes de ensinar outros."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "summary",
+            "label": "Ofício de Apóstolo",
+            "texto": "Fundador de igrejas, enviado com autoridade para plantar novas comunidades e estabelecer estruturas de liderança."
+          },
+          "direita": {
+            "variante": "summary",
+            "label": "Ofício de Profeta",
+            "texto": "Comunica a direção de Deus ao corpo, corrige desvios e incentiva a vivência da verdade em amor."
+          }
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "summary",
+            "label": "Ofício de Evangelista",
+            "texto": "Especializado em levar a mensagem do evangelho a povos não alcançados, despertando fé e iniciando novos crentes."
+          },
+          "direita": {
+            "variante": "summary",
+            "label": "Ofício de Pastor",
+            "texto": "Cuida do rebanho, alimenta espiritualmente, protege e orienta os membros em sua caminhada diária."
+          }
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "Ofício de Mestre",
+          "texto": "Ensina a doutrina de forma sistemática, formando discípulos que, por sua vez, podem ensinar outros, garantindo a continuidade da fé."
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Chamado",
+              "descricao": "Deus concede a graça segundo a medida do dom de Cristo a cada crente."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "Distribuição dos ofícios",
+              "descricao": "Ele designa alguns como apóstolos, profetas, evangelistas, pastores e mestres."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "Objetivo",
+              "descricao": "Visar ao aperfeiçoamento dos santos, à unidade da fé e ao crescimento em amor."
+            }
+          ]
+        },
+        {
+          "tipo": "badges",
+          "itens": [
+            "Unidade da fé",
+            "Maturidade espiritual",
+            "Crescimento em amor"
+          ]
+        }
+      ],
+      "checkpoint_apos": null
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "vocacao_oficios",
+      "titulo_secao": "Reconhecimento público de ofício: Atos 6:1-6",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Na igreja primitiva, a necessidade de atender às viúvas e distribuir alimentos gerou uma primeira forma de organização prática. Os apóstolos, percebendo que o serviço diário poderia desviar a atenção da pregação, convocaram a comunidade para escolher sete homens que fossem de boa reputação, cheios do Espírito Santo e de sabedoria. Essa escolha coletiva, seguida da imposição de mãos pelos apóstolos, constitui o padrão bíblico de reconhecimento público de um ofício dentro do corpo de Cristo."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto",
+          "texto": "Em Atos 6:1-6, lemos que, diante da murmuração dos helenistas contra os hebreus por causa das viúvas, os doze apóstolos disseram: \"Não é razoável que nós deixemos a palavra de Deus e sirvamos às mesas\" (At 6:3). Eles então instruíram a comunidade a escolher, dentre eles, sete homens de boa reputação, cheios do Espírito Santo e de sabedoria, aos quais seriam confiados esses serviços (At 6:4). Após a escolha, os apóstolos oraram e impuseram as mãos sobre eles, confirmando publicamente o ofício (At 6:6)."
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "Aplicação prática",
+          "texto": "Para reconhecer um ofício hoje, a comunidade deve: 1) identificar a necessidade concreta; 2) convocar a igreja para propor candidatos que atendam aos critérios bíblicos (boa reputação, cheio do Espírito, sabedoria); 3) realizar uma votação ou consenso que reflita a escolha coletiva; 4) validar o chamado por meio da imposição de mãos e oração, sinalizando a aprovação do corpo."
+        },
+        {
+          "tipo": "diagrama",
+          "id": "fluxo_selecao_oficio",
+          "descricao": "Identificar necessidade prática → convocar a comunidade para propor candidatos → decide: há consenso sobre os candidatos? → se sim, realizar votação ou consenso → impôr as mãos e orar sobre os escolhidos → ofício reconhecido publicamente",
+          "svg_raw": null
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "Resumo do padrão bíblico",
+          "texto": "1. Problema concreto surge na comunidade; 2. Liderança (apóstolos ou presbíteros) delega a decisão à igreja; 3. Critérios claros de caráter e capacitação espiritual; 4. Escolha coletiva (voto ou consenso); 5. Imposição de mãos como ato público de validação; 6. Continuidade do serviço sob supervisão da liderança."
+        }
+      ],
+      "checkpoint_apos": {
+        "gate_id": "ck2",
+        "tipo": "tf",
+        "testar": "Em Atos 6, a escolha dos diáconos foi feita pelos apóstolos sem consulta da comunidade."
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "criterios_caracter",
+      "titulo_secao": "Critérios de Caráter para Ancião/Bispo e Diácono",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Os requisitos para quem exerce ofícios de liderança na igreja não se baseiam em habilidades técnicas ou em formação acadêmica, mas na qualidade de vida e no testemunho pessoal. O texto bíblico apresenta uma lista de atributos que revelam a maturidade espiritual e a capacidade de representar Cristo no cotidiano da comunidade."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 1 Timóteo 3:1‑13 (trecho selecionado)",
+          "texto": "Fiel é esta palavra: Se alguém aspira ao episcopado, excelente obra deseja. É necessário, pois, que o bispo seja irrepreensível, marido de uma só mulher, temperante, sóbrio, ordeiro, hospitaleiro, apto para ensinar; não dado ao vinho, não espancador, mas moderado, inimigo de contendas, não ganancioso; que governe bem a sua própria casa, tendo seus filhos em sujeição, com todo o respeito (pois, se alguém não sabe governar a sua própria casa, como cuidará da igreja de Deus?); não neófito, para que não se ensoberbeça e venha a cair na condenação do Diabo. Também é necessário que tenha bom testemunho dos que estão de fora, para que não caia em opróbrio, e no laço do Diabo. Da mesma forma os diáconos sejam sérios, não de língua dobre, não dados a muito vinho, não cobiçosos de torpe ganância, guardando o mistério da fé numa consciência pura. E também estes sejam primeiro provados, depois exercitem o diaconato, se forem irrepreensíveis. Da mesma sorte as mulheres sejam sérias, não maldizentes, temperantes, e fiéis em tudo. Os diáconos sejam maridos de uma só mulher, e governem bem a seus filhos e suas próprias casas. Porque os que servirem bem como diáconos, adquirirão para si um lugar honroso e muita confiança na fé que há em Cristo Jesus."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 Tito 1:5‑9 (trecho selecionado)",
+          "texto": "Por esta causa te deixei em Creta, para que pusesses em boa ordem o que ainda não o está, e que em cada cidade estabelecesses anciãos, como já te mandei; alguém que seja irrepreensível, marido de uma só mulher, tendo filhos crentes que não sejam acusados de dissolução, nem sejam desobedientes. Pois é necessário que o bispo seja irrepreensível, como despenseiro de Deus, não soberbo, nem irascível, nem dado ao vinho, nem espancador, nem cobiçoso de torpe ganância; mas hospitaleiro, amigo do bem, sóbrio, justo, piedoso, temperante; retendo firme a palavra fiel, que é conforme a doutrina, para que seja poderoso, tanto para exortar na sã doutrina como para convencer os contradizentes."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "summary",
+            "label": "Qualidades Comuns (Ancião/Bispo e Diácono)",
+            "texto": "• Irrepreensível (sem escândalo público)\n• Marido de uma só mulher\n• Temperante e sóbrio\n• Hospitaleiro e amigo do bem\n• Governar bem a própria casa\n• Boa reputação entre os que estão fora da igreja"
+          },
+          "direita": {
+            "variante": "summary",
+            "label": "Diferenças Específicas",
+            "texto": "Ancião/Bispo:\n- Aptidão para ensinar\n- Não ser neófito (não recém-convertido)\n- Não ser ganancioso, nem irascível, nem soberbo\n\nDiácono:\n- Ser sério, não de língua dobre\n- Guardar o mistério da fé numa consciência pura\n- Primeiro ser provado antes de exercer o ofício"
+          }
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "Aplicação Prática",
+          "texto": "Ao considerar alguém para o ofício de ancião ou diácono, a comunidade deve observar a vida cotidiana do candidato: como ele administra sua família, como se relaciona com vizinhos e colegas, e se há relatos consistentes de integridade. Não se trata de avaliar competências técnicas, mas de confirmar que o caráter reflete os padrões descritos em 1 Tm 3 e Tito 1."
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Chamado",
+              "descricao": "A pessoa sente o convite do Espírito e a comunidade reconhece um potencial de liderança."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "Avaliação de Caráter",
+              "descricao": "Exame da vida familiar, reputação externa e conduta pessoal conforme os critérios bíblicos."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "Imposição de Mãos",
+              "descricao": "A comunidade, por consenso, impõe as mãos como sinal de reconhecimento e oração por capacitação."
+            }
+          ]
+        },
+        {
+          "tipo": "badges",
+          "itens": [
+            "Irrepreensível",
+            "Temperante",
+            "Hospitaleiro",
+            "Bom Testemunho",
+            "Governar a Casa"
+          ]
+        }
+      ],
+      "checkpoint_apos": {
+        "gate_id": "ck3",
+        "tipo": "classify",
+        "testar": "Classifique cada item como 'caráter' ou 'habilidade': irrepreensível, bom professor, hospitaleiro, sábio em doutrina."
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "continuidade_oficios",
+      "titulo_secao": "Debates interpretativos sobre a continuidade dos ofícios",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Ao longo da história da igreja, cristãos têm discutido se os ofícios de apóstolo, profeta, bispo (presbítero) e diácono permanecem como funções exercidas hoje ou se foram limitados ao período apostólico. Essas discussões variam conforme a tradição, a hermenêutica empregada e a leitura dos textos fundadores."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto de Efésios 4:7-13",
+          "texto": "Em Efésios 4:7-13, Paulo descreve que Cristo concedeu dons aos homens, incluindo apóstolos, profetas, evangelistas, pastores e mestres, com o objetivo de aperfeiçoar os santos para a obra do ministério e a edificação do corpo de Cristo, até que todos alcancem a unidade da fé e o pleno conhecimento do Filho de Deus."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto de 1 Coríntios 12:28",
+          "texto": "Em 1 Coríntios 12:28, Paulo enumera que Deus colocou na igreja, primeiramente, apóstolos, depois profetas, mestres, operadores de milagres, dons de curar, socorros, governos e variedades de línguas."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📖 O texto de Atos 6:1-6",
+          "texto": "Em Atos 6:1-6, diante do crescimento da comunidade e da queixa das viúvas, os apóstolos escolheram sete homens de boa reputação, cheios do Espírito Santo e de sabedoria, para servir às mesas, impondo-lhes as mãos como reconhecimento da comunidade."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "summary",
+            "label": "Visão da continuidade plena",
+            "texto": "Alguns grupos interpretam que o texto de Efésios 4:7-13 indica que os ofícios listados são permanentes, pois a passagem não faz distinção temporal. Eles apontam que a necessidade de “aperfeiçoamento dos santos” permanece, logo os ofícios devem ser exercidos até que a igreja alcance a maturidade plena. Essa leitura costuma ser acompanhada por uma aplicação prática que inclui a ordenação de novos apóstolos e profetas dentro da igreja local."
+          },
+          "direita": {
+            "variante": "summary",
+            "label": "Visão da cessação dos ofícios",
+            "texto": "Outros cristãos entendem que os ofícios de apóstolo e profeta eram específicos ao período fundacional, baseando‑se em passagens como 2 Timóteo 2:2, que fala de transmitir o ensino a “homens fiéis” que possam ensinar outros, sugerindo uma transição para funções de ensino e liderança local. Eles argumentam que a lista de ofícios em Efésios serve como modelo para a estrutura inicial, mas que a missão apostólica (fundar igrejas, receber revelação direta) não se repete após o fechamento do cânon."
+          }
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "Leitura humana – questão de elegibilidade de mulheres",
+          "texto": "A questão de mulheres exercerem ofícios como presbíteras ou diáconas é interpretada de forma diversa. Algumas tradições citam 1 Timóteo 3 e Tito 1, que descrevem requisitos para bispos e diáconos, sem mencionar explicitamente gênero, e concluem que o texto permite a ordenação de mulheres que atendam aos mesmos critérios de caráter. Outras tradições ressaltam a prática histórica da igreja primitiva, onde mulheres como Febe (Romanos 16:1) são reconhecidas como diaconisas, mas argumentam que a ausência de menção direta a mulheres nesses capítulos indica uma restrição implícita. Essa divergência é reconhecida como interpretativa, não como fato consensual."
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Período apostólico",
+              "descricao": "Ofícios de apóstolo e profeta exercidos por aqueles que testemunharam a ressurreição e receberam revelação direta."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "Primeiros séculos",
+              "descricao": "Expansão da igreja e desenvolvimento de funções de bispo e diácono para organização e cuidado pastoral."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "Reforma e pós‑Reforma",
+              "descricao": "Reavaliação dos ofícios à luz da Sola Scriptura; surgimento de posições que limitam o apostolado ao Novo Testamento."
+            },
+            {
+              "numero": 4,
+              "cor": "#2c7fb8",
+              "titulo": "Movimentos contemporâneos",
+              "descricao": "Renovação carismática que reintroduz o ofício de profeta; debates sobre ordenação de mulheres em várias denominações."
+            }
+          ]
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "Aviso de interpretação",
+          "texto": "As posições apresentadas acima são leituras humanas de textos bíblicos. Elas não têm a mesma autoridade que o texto bíblico em si e podem variar entre diferentes tradições cristãs."
+        }
+      ],
+      "checkpoint_apos": null
+    }
+  ],
+  "avaliacao_conceitos": [
+    {
+      "gate_id": "ef1",
+      "tipo": "mc",
+      "testar": "Qual passagem bíblica define o crente como sacerdócio real? (1Pe 2:9)"
+    },
+    {
+      "gate_id": "ef2",
+      "tipo": "tf",
+      "testar": "Os dons espirituais são distribuídos 'como quer' pelo Espírito (1Co 12:11)."
+    },
+    {
+      "gate_id": "ef3",
+      "tipo": "mc",
+      "testar": "Qual é o objetivo principal dos ofícios listados em Efésios 4:12? A) Controle da igreja B) Aperfeiçoamento dos santos C) Acúmulo de poder D) Isolamento dos líderes"
+    },
+    {
+      "gate_id": "ef4",
+      "tipo": "open",
+      "testar": "Descreva brevemente como o processo de escolha dos diáconos em Atos 6 reflete o princípio do reconhecimento público."
+    },
+    {
+      "gate_id": "ef5",
+      "tipo": "classify",
+      "testar": "Classifique as qualificações de 1 Timóteo 3:2-5 como 'caráter' ou 'competência'."
+    }
+  ]
+}

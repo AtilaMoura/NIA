@@ -21,11 +21,13 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.models import Course, Module, Lesson, Progress
+from app.models.models import Course, Module, Lesson, Topico, Progress, User
 from app.agents.pipeline import gerar_estrutura_curso, gerar_e_revisar_topico
 from app.agents.tutor_agent import TutorAgent
+from app.agents.perfis import resolver_perfil
 from app.services.groq_service import GroqService
 from app.services.gemini_service import GeminiService
+from app.services.biblia_service import buscar_todos_textos
 
 router = APIRouter(prefix="/pipeline", tags=["Pipeline"])
 
@@ -117,18 +119,42 @@ async def criar_curso(data: CriarCursoRequest, db: Session = Depends(get_db)):
 class GerarLicaoRequest(BaseModel):
     modo: str = "comum"  # "comum" | "pro"
     modelo: str = "groq"
+    perfil: str = "tech"  # "tech" | "teologia" — ver app/agents/perfis.py
 
 
-def _foco_da_licao(course: Course, module: Module, lesson: Lesson) -> str:
-    """O 'foco' de cada tópico só existe no JSON de estrutura (Course.structure) —
-    não vale a pena criar coluna nova só pra isso (não há Alembic; ALTER TABLE em
-    produção fica pra quando o container for atualizado)."""
+def _licao_data(course: Course, module: Module, lesson: Lesson) -> dict:
+    """Dados brutos da lição no JSON de estrutura (Course.structure) — não vale a
+    pena criar coluna nova só pra isso (não há Alembic; ALTER TABLE em produção fica
+    pra quando o container for atualizado)."""
     try:
         modulos = course.structure.get("modulos", [])
         licoes = modulos[module.module_index - 1].get("licoes", [])
-        return licoes[lesson.lesson_index - 1].get("foco", "")
+        return licoes[lesson.lesson_index - 1]
     except (IndexError, AttributeError, KeyError):
-        return ""
+        return {}
+
+
+def _foco_da_licao(course: Course, module: Module, lesson: Lesson) -> str:
+    return _licao_data(course, module, lesson).get("foco", "")
+
+
+async def _texto_biblico_da_licao(course: Course, module: Module, lesson: Lesson) -> str:
+    """Achado no piloto de Filipenses: pedir citação literal sem fornecer o texto de
+    verdade não funciona (IA erra a citação, Reviewer reprova certo). Generalizado pro
+    curso de obreiro (2026-08-25, ver memória nia-curso-obreiro): em vez de reconhecer
+    só UMA referência de Filipenses no título, varre título + foco + "topicos" da
+    lição inteira em busca de QUALQUER referência bíblica (qualquer livro do NT +
+    alguns do AT — ver biblia_service.extrair_referencias) e busca o texto real
+    (Almeida, domínio público) de cada uma. Sem nenhuma referência reconhecida = ""
+    (a lição é contextual/histórica, sem grounding, e o fio condutor cobre esse caso
+    proibindo citação literal sem base)."""
+    dados = _licao_data(course, module, lesson)
+    texto_busca = " ".join([
+        lesson.title,
+        dados.get("foco", ""),
+        " ".join(dados.get("topicos", [])),
+    ])
+    return await buscar_todos_textos(texto_busca)
 
 
 def _contexto_topicos_anteriores(db: Session, course_id: int, module: Module, lesson: Lesson) -> str:
@@ -184,6 +210,87 @@ def _proximo_topico_label(db: Session, course_id: int, module: Module, lesson: L
     return "conclusão do curso"
 
 
+def _contexto_topicos_anteriores_na_aula(db: Session, lesson_id: int, topico_index_atual: int) -> str:
+    """Mesma ideia de _contexto_topicos_anteriores(), um nível abaixo: continuidade
+    entre Tópicos da MESMA aula (Lesson), não entre lições do curso — criado junto
+    com a tabela Topico (2026-08-26, curso de obreiro, ver PLANO_IMPLEMENTACAO_ESTUDO_IA.md
+    Fase 0b). Só considera tópicos já aprovados, na ordem, antes do atual."""
+    topicos_antes = (
+        db.query(Topico)
+        .filter(
+            Topico.lesson_id == lesson_id,
+            Topico.is_approved == True,  # noqa: E712
+            Topico.topico_index < topico_index_atual,
+        )
+        .order_by(Topico.topico_index)
+        .all()
+    )
+    linhas = [f"- Tópico {t.topico_index}: {t.titulo}" for t in topicos_antes]
+    return "\n".join(linhas)
+
+
+def _proximo_topico_label_na_aula(db: Session, lesson_id: int, topico_index_atual: int) -> str:
+    proximo = (
+        db.query(Topico)
+        .filter(Topico.lesson_id == lesson_id, Topico.topico_index == topico_index_atual + 1)
+        .first()
+    )
+    return proximo.titulo if proximo else "conclusão desta aula"
+
+
+@router.post("/topicos/{topico_id}/gerar")
+async def gerar_topico(topico_id: int, data: GerarLicaoRequest, db: Session = Depends(get_db)):
+    """Mesma coisa que POST /licoes/{id}/gerar (Fase 2 comum/pro + Fase 5), um nível
+    abaixo: gera 1 Topico dentro de uma aula (Lesson), com continuidade calculada
+    entre os tópicos da mesma aula (não entre aulas do curso — ver
+    _contexto_topicos_anteriores_na_aula acima). Texto bíblico vem direto de
+    Topico.referencia_biblica, sem precisar escanear título/foco como Lesson fazia."""
+    topico = db.query(Topico).filter(Topico.id == topico_id).first()
+    if not topico:
+        raise HTTPException(404, "Tópico não encontrado")
+    lesson = db.query(Lesson).filter(Lesson.id == topico.lesson_id).first()
+    module = db.query(Module).filter(Module.id == lesson.module_id).first()
+    course = db.query(Course).filter(Course.id == module.course_id).first()
+
+    if topico.is_approved:
+        return {"message": "Tópico já aprovado anteriormente", "topico_id": topico.id, "aprovado": True}
+
+    try:
+        resultado = await gerar_e_revisar_topico(
+            _service(data.modelo),
+            titulo=topico.titulo,
+            aula=module.module_index,
+            numero=topico.topico_index,
+            topico_id=f"curso{course.id}-modulo{module.module_index}-aula{lesson.lesson_index}-topico{topico.topico_index}",
+            modo=data.modo,
+            nivel=course.level,
+            contexto_topicos_anteriores=_contexto_topicos_anteriores_na_aula(db, lesson.id, topico.topico_index),
+            foco=f"{lesson.title} — {topico.titulo}" + (f" ({topico.referencia_biblica})" if topico.referencia_biblica else ""),
+            proximo_topico_label=_proximo_topico_label_na_aula(db, lesson.id, topico.topico_index),
+            perfil=resolver_perfil(data.perfil),
+            texto_biblico_base=await buscar_todos_textos(topico.referencia_biblica or ""),
+        )
+
+        revisao = resultado["revisao"]
+        topico.content = json.dumps(resultado["topico"], ensure_ascii=False)
+        topico.generated_by = f"ContentAgent+QuizAgent ({data.modo})"
+        topico.reviewed_by = "ReviewerAgent"
+        topico.review_feedback = revisao
+        topico.is_approved = bool(revisao.get("aprovado"))
+        topico.estimated_read_time_minutes = resultado["topico"].get("duracao_estimada_min")
+        db.commit()
+
+        return {
+            "topico_id": topico.id,
+            "aprovado": topico.is_approved,
+            "revisao": revisao,
+        }
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, f"Erro ao gerar/revisar tópico: {str(e)}")
+
+
 @router.post("/licoes/{lesson_id}/gerar")
 async def gerar_licao(lesson_id: int, data: GerarLicaoRequest, db: Session = Depends(get_db)):
     """Gera o conteúdo de 1 tópico (Fase 2, modo comum ou pro) e já roda o Reviewer
@@ -211,6 +318,8 @@ async def gerar_licao(lesson_id: int, data: GerarLicaoRequest, db: Session = Dep
             contexto_topicos_anteriores=_contexto_topicos_anteriores(db, course.id, module, lesson),
             foco=_foco_da_licao(course, module, lesson),
             proximo_topico_label=_proximo_topico_label(db, course.id, module, lesson),
+            perfil=resolver_perfil(data.perfil),
+            texto_biblico_base=await _texto_biblico_da_licao(course, module, lesson),
         )
 
         revisao = resultado["revisao"]
@@ -250,6 +359,65 @@ class AvaliarResumoRequest(BaseModel):
     user_id: int
     resumo_texto: str
     modelo: str = "groq"
+    perfil: str = "tech"  # "tech" | "teologia" — ver app/agents/perfis.py
+
+
+PONTOS_POR_LICAO_DOMINADA = 10
+
+
+def _curso_ficou_completo(db: Session, user_id: int, course_id: int) -> bool:
+    """Um curso não tem status próprio de conclusão — cada Module tem seu
+    próprio Progress (ver _foco_da_licao acima). 'Curso completo' aqui
+    significa: todos os módulos do curso já têm Progress concluído pra esse
+    aluno."""
+    modulos_ids = [m.id for m in db.query(Module).filter(Module.course_id == course_id).all()]
+    if not modulos_ids:
+        return False
+    completos = (
+        db.query(Progress)
+        .filter(Progress.user_id == user_id, Progress.module_id.in_(modulos_ids), Progress.status == "completed")
+        .count()
+    )
+    return completos == len(modulos_ids)
+
+
+def _conceder_gamificacao(db: Session, user: User, course_id: int) -> None:
+    """Chamado só quando o Tutor aprova ('dominado'). Pontos/nível/streak/badges
+    não tinham nenhum código escrevendo neles antes disso — eram campos mortos
+    no schema desde o início do projeto. Catálogo de badges é intencionalmente
+    pequeno e objetivo (não é exaustivo — ver PROMPT_UX_ALUNO.md)."""
+    user.total_points = (user.total_points or 0) + PONTOS_POR_LICAO_DOMINADA
+
+    agora = datetime.now(timezone.utc)
+    if user.last_activity_date is None:
+        user.streak_days = 1
+    else:
+        dias_diff = (agora.date() - user.last_activity_date.date()).days
+        if dias_diff == 1:
+            user.streak_days = (user.streak_days or 0) + 1
+        elif dias_diff > 1:
+            user.streak_days = 1
+        # dias_diff == 0 (mesma data): streak não muda, já conta hoje
+    user.last_activity_date = agora
+    user.level = min(100, max(1, 1 + user.total_points // 100))
+
+    total_dominado = 0
+    for p in db.query(Progress).filter(Progress.user_id == user.id).all():
+        historico = (p.tutor_analysis or {}).get("historico", [])
+        total_dominado += sum(1 for h in historico if h.get("veredito") == "dominado")
+
+    atuais = set(user.badges or [])
+    novas = []
+    if total_dominado >= 1 and "primeira-licao-dominada" not in atuais:
+        novas.append("primeira-licao-dominada")
+    if (user.streak_days or 0) >= 3 and "streak-3-dias" not in atuais:
+        novas.append("streak-3-dias")
+    if (user.streak_days or 0) >= 7 and "streak-7-dias" not in atuais:
+        novas.append("streak-7-dias")
+    if _curso_ficou_completo(db, user.id, course_id) and "primeiro-curso-concluido" not in atuais:
+        novas.append("primeiro-curso-concluido")
+    if novas:
+        user.badges = list(atuais) + novas
 
 
 @router.post("/licoes/{lesson_id}/avaliar")
@@ -290,6 +458,7 @@ async def avaliar_resumo(lesson_id: int, data: AvaliarResumoRequest, db: Session
             data.resumo_texto,
             contexto_topico=f"{lesson.title} (Módulo {module.module_index}, Tópico {lesson.lesson_index})",
             historico_reforcos=historico,
+            perfil=resolver_perfil(data.perfil),
         )
 
         historico_atualizado = (progress.tutor_analysis or {}).get("historico", [])
@@ -312,6 +481,10 @@ async def avaliar_resumo(lesson_id: int, data: AvaliarResumoRequest, db: Session
             if not proxima:
                 progress.status = "completed"
                 progress.completed_at = datetime.now(timezone.utc)
+
+            usuario = db.query(User).filter(User.id == data.user_id).first()
+            if usuario:
+                _conceder_gamificacao(db, usuario, module.course_id)
         else:
             progress.can_advance = False
 

@@ -28,7 +28,7 @@ services:
     environment:
       DATABASE_URL: "postgresql://niauser:niapass@db:5432/niadb"
     ports:
-      - "8000:8000"
+      - "8100:8000"
     volumes:
       - ./backend:/app
       - ./docs:/docs
@@ -39,9 +39,10 @@ services:
     depends_on:
       - backend
     ports:
-      - "4000:3000"
+      - "4100:3000"
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:8000"
+      NEXT_PUBLIC_API_URL: "http://localhost:8100"
+      API_URL_INTERNAL: "http://backend:8000"
     volumes:
       - ./frontend:/app
       - /app/node_modules        # <- ADICIONE ESTA LINHA

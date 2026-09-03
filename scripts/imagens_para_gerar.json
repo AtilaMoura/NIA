@@ -1,0 +1,16 @@
+[
+  {
+    "descricao": "Generate an image. Hand-drawn editorial illustration, warm sepia and amber ink-wash style on an aged parchment-colored paper texture, loose expressive pen-and-ink linework similar to a 19th-century book illustration or woodcut, simplified faces without heavy photographic detail, soft wash shading, no photorealism, no text or logos, no denominational symbols (no crucifix, no statues, no liturgical garments). A small group of ordinary people of different ages stands close together around one person who kneels with head slightly bowed; several of them rest their hands gently on that person's shoulders and head in a gesture of blessing - the moment a congregation publicly recognizes and commissions someone for a role of service. Sober, warm, communal composition, generous negative space, consistent with a refined old book illustration aesthetic.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico3",
+    "arquivo": "reconhecimento-oficio-desenho.png"
+  },
+  {
+    "descricao": "Generate an image. Hand-drawn editorial illustration, warm sepia and amber ink-wash style on an aged parchment-colored paper texture, loose expressive pen-and-ink linework similar to a 19th-century book illustration or woodcut, simplified faces without heavy photographic detail, soft wash shading, no photorealism, no text or logos, no denominational symbols. Inside a simple modest home kitchen, an older person quietly serves a simple meal to two or three seated guests at a small table, unremarkable everyday hospitality, nothing staged, no audience - warm domestic intimacy rendered in the same refined old book illustration aesthetic, generous negative space.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico3",
+    "arquivo": "caracter-nao-talento-desenho.png"
+  }
+]

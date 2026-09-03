@@ -10,7 +10,7 @@ com o conteúdo e não se repetir (ver PLANO_IMPLEMENTACAO_ESTUDO_IA.md, Fase 2)
 """
 
 from ..base_agent import BaseAgent
-from .shared import FIO_CONDUTOR_IA, EXEMPLO_DE_PROFUNDIDADE
+from ..perfis import PerfilDominio, PERFIL_TECH
 
 SCHEMA_CONTEUDO = """
 Devolva APENAS um JSON válido (sem markdown, sem ```), neste formato:
@@ -47,6 +47,10 @@ Bloco (dentro de "blocos"), campo "tipo":
 - "diagrama": {id, descricao (narrando um FLUXO de pelo menos 3 passos com uma decisão,
   ex: "cliente pergunta X → sistema decide Y → resultado Z" — nunca uma frase única
   decorativa), svg_raw: null}
+- "imagem_sugerida": {descricao} — USE RARAMENTE, só quando uma referência visual real
+  (mapa, foto histórica, rota, retrato) ajudaria muito mais que texto/diagrama. A maioria
+  dos slides NÃO deveria ter isso — não force um bloco desses em todo slide nem em toda
+  lição. Não gera imagem nenhuma, só descreve o que seria útil pra alguém buscar depois.
 
 "avaliacao_conceitos": exatamente 5 itens, gate_ids ef1..ef5, cada um com "tipo" (mc, mc,
 tf-ou-classify, open, open — a última open sendo integrativa, testando conexão com tópicos
@@ -74,16 +78,21 @@ class ContentAgent(BaseAgent):
         nivel: str = "básico",
         contexto_topicos_anteriores: str = "",
         foco: str = "",
+        perfil: PerfilDominio = PERFIL_TECH,
+        texto_biblico_base: str = "",
     ) -> dict:
         prompt = f"""
-Você é o especialista de CONTEÚDO (não de perguntas) da área de Fundamentos de LLM
-(Inteligência Artificial), escrevendo os slides de ensino de um tópico pro curso
-"LLM aplicado a um agente de vendas via WhatsApp para um Garden Center" (loja de
-plantas fictícia). Você NÃO escreve nenhuma pergunta — só marca onde e o que testar.
+Você é o especialista de CONTEÚDO (não de perguntas) desta área, escrevendo os slides
+de ensino de um tópico pro {perfil.contexto_curso}. Você NÃO escreve nenhuma pergunta
+— só marca onde e o que testar.
 
-{FIO_CONDUTOR_IA}
+{perfil.fio_condutor}
 
-{EXEMPLO_DE_PROFUNDIDADE}
+{perfil.exemplo_calibracao}
+
+{perfil.exemplo_diagrama}
+
+{"TEXTO BÍBLICO DE REFERÊNCIA (fonte real — toda citação literal TEM que vir exatamente daqui, nunca de memória): " + chr(10) + texto_biblico_base if texto_biblico_base else ""}
 
 NÍVEL DESTE TÓPICO: {nivel}
 
@@ -121,13 +130,15 @@ TÓPICO A GERAR AGORA:
         nivel: str = "básico",
         contexto_topicos_anteriores: str = "",
         foco: str = "",
+        perfil: PerfilDominio = PERFIL_TECH,
     ) -> dict:
         """Decide a lista de assuntos do tópico (só títulos + foco, sem conteúdo ainda)."""
         prompt = f"""
 Você é o especialista que decide EM QUANTOS ASSUNTOS um tópico de estudo se divide —
 sem escrever o conteúdo de nenhum deles ainda (isso vem depois, um assunto de cada vez).
+Isso é pro {perfil.contexto_curso}.
 
-{FIO_CONDUTOR_IA}
+{perfil.fio_condutor}
 
 NÍVEL: {nivel}
 TÓPICOS JÁ COBERTOS NESTA AULA:
@@ -168,16 +179,20 @@ REGRAS:
         assuntos_anteriores: str,
         contexto_topicos_anteriores: str = "",
         precisa_diagrama: bool = False,
+        perfil: PerfilDominio = PERFIL_TECH,
+        texto_biblico_base: str = "",
     ) -> dict:
         """Gera os blocos de conteúdo de UM assunto, vendo o que já foi escrito antes dele
         (nos assuntos anteriores do mesmo tópico) pra manter costura e não repetir."""
         prompt = f"""
 Você é o especialista de CONTEÚDO escrevendo só UM assunto dentro do tópico
-"{topico_titulo}". Não escreva nenhuma pergunta.
+"{topico_titulo}", do {perfil.contexto_curso}. Não escreva nenhuma pergunta.
 
-{FIO_CONDUTOR_IA}
+{perfil.fio_condutor}
 
-{EXEMPLO_DE_PROFUNDIDADE}
+{perfil.exemplo_calibracao}
+
+{"TEXTO BÍBLICO DE REFERÊNCIA (fonte real — toda citação literal TEM que vir exatamente daqui, nunca de memória): " + chr(10) + texto_biblico_base if texto_biblico_base else ""}
 
 TÓPICOS JÁ COBERTOS EM AULAS ANTERIORES:
 {contexto_topicos_anteriores or "(nenhum)"}
@@ -205,7 +220,7 @@ Bloco, campo "tipo":
 - "quote": {{texto}}
 - "diagrama": {{id, descricao (FLUXO de 3+ passos com uma decisão, nunca frase única), svg_raw: null}}
 
-{"OBRIGATÓRIO: inclua um bloco 'diagrama' neste assunto, narrando um fluxo real (não decorativo)." if precisa_diagrama else "Não é obrigatório usar diagrama neste assunto."}
+{("OBRIGATÓRIO: inclua um bloco 'diagrama' neste assunto, narrando um fluxo real (não decorativo), com pelo menos 3 passos ligados por seta (→) e 1 decisão explícita." + chr(10) + chr(10) + perfil.exemplo_diagrama) if precisa_diagrama else "Não é obrigatório usar diagrama neste assunto."}
 
 Todo texto em português do Brasil.
 """
@@ -221,11 +236,13 @@ Todo texto em português do Brasil.
         contexto_topicos_anteriores: str = "",
         foco: str = "",
         pausa_entre_chamadas_s: float = 2.0,
+        perfil: PerfilDominio = PERFIL_TECH,
+        texto_biblico_base: str = "",
     ) -> dict:
         import asyncio
 
         esqueleto = await self.gerar_esqueleto_assuntos(
-            titulo, aula, numero, nivel, contexto_topicos_anteriores, foco
+            titulo, aula, numero, nivel, contexto_topicos_anteriores, foco, perfil=perfil
         )
 
         slides = [{
@@ -249,6 +266,8 @@ Todo texto em português do Brasil.
                 assuntos_anteriores="\n".join(assuntos_ja_escritos_resumo),
                 contexto_topicos_anteriores=contexto_topicos_anteriores,
                 precisa_diagrama=bool(assunto_meta.get("precisa_diagrama")),
+                perfil=perfil,
+                texto_biblico_base=texto_biblico_base,
             )
             slide = {
                 "tipo": "conteudo",

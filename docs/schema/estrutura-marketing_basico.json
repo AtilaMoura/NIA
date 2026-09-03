@@ -1,0 +1,75 @@
+{
+  "titulo": "Marketing Digital para Pequenos Negócios Locais",
+  "descricao": "Aprenda a divulgar seu pequeno negócio local nas redes sociais do zero, entendendo os fundamentos do marketing digital e como aplicá-los para atrair mais clientes.",
+  "nivel": "básico",
+  "modulos": [
+    {
+      "titulo": "Introdução ao Marketing Digital",
+      "descricao": "Conheça os conceitos básicos do marketing digital e sua importância para pequenos negócios locais.",
+      "licoes": [
+        {
+          "titulo": "O que é Marketing Digital",
+          "foco": "Definição e benefícios do marketing digital para pequenos negócios"
+        },
+        {
+          "titulo": "Objetivos do Marketing Digital",
+          "foco": "Entenda como definir objetivos claros para sua estratégia de marketing digital"
+        }
+      ]
+    },
+    {
+      "titulo": "Redes Sociais para Pequenos Negócios",
+      "descricao": "Aprenda a escolher e utilizar as redes sociais certas para o seu negócio.",
+      "licoes": [
+        {
+          "titulo": "Escolhendo as Redes Sociais Certas",
+          "foco": "Análise das principais redes sociais e como escolher as mais adequadas para o seu público-alvo"
+        },
+        {
+          "titulo": "Criando Perfis Profissionais",
+          "foco": "Dicas para criar perfis atraentes e profissionais nas redes sociais"
+        },
+        {
+          "titulo": "Conteúdo para Redes Sociais",
+          "foco": "Aprenda a criar conteúdo atraente e relevante para suas redes sociais"
+        }
+      ]
+    },
+    {
+      "titulo": "Estratégias de Conteúdo para Pequenos Negócios",
+      "descricao": "Desenvolva uma estratégia de conteúdo eficaz para atrair e reter clientes.",
+      "licoes": [
+        {
+          "titulo": "Tipos de Conteúdo para Pequenos Negócios",
+          "foco": "Exploração de diferentes tipos de conteúdo, como textos, imagens e vídeos"
+        },
+        {
+          "titulo": "Calendário de Conteúdo",
+          "foco": "Aprenda a planejar e organizar seu conteúdo com antecedência"
+        },
+        {
+          "titulo": "Medindo o Sucesso do Conteúdo",
+          "foco": "Entenda como monitorar e medir o desempenho do seu conteúdo nas redes sociais"
+        }
+      ]
+    },
+    {
+      "titulo": "Publicidade nas Redes Sociais",
+      "descricao": "Aprenda a usar publicidade nas redes sociais para alcançar mais clientes.",
+      "licoes": [
+        {
+          "titulo": "Introdução à Publicidade nas Redes Sociais",
+          "foco": "Conheça os fundamentos da publicidade nas redes sociais e como ela pode ajudar seu negócio"
+        },
+        {
+          "titulo": "Criando Anúncios Eficazes",
+          "foco": "Dicas para criar anúncios atraentes e direcionados para seu público-alvo"
+        },
+        {
+          "titulo": "Gerenciando Campanhas Publicitárias",
+          "foco": "Aprenda a monitorar e otimizar suas campanhas publicitárias nas redes sociais"
+        }
+      ]
+    }
+  ]
+}

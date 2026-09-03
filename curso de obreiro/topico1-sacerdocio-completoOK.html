@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tópico 1 — Sacerdócio de Todos os Crentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6ee;
+    --surface: #ffffff;
+    --surface-2: #f3ece0;
+    --ink: #2b241c;
+    --ink-muted: #6b5f4f;
+    --border: #e4d8c3;
+    --accent: #8a5a2b;
+    --accent-2: #b8763a;
+    --gold: #b8923e;
+    --verse-bg: #fbf3e0;
+    --verse-border: #c9a24a;
+    --radius: 14px;
+    --radius-lg: 20px;
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Source Sans 3', -apple-system, Segoe UI, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.7;
+    font-size: 17px;
+  }
+
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    height: 340px;
+    margin-bottom: 0;
+    overflow: hidden;
+  }
+  .hero img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.9) brightness(0.75); }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(43,36,28,.15) 0%, rgba(43,36,28,.55) 75%, rgba(43,36,28,.85) 100%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 32px clamp(20px, 6vw, 60px);
+  }
+  .kicker {
+    color: #f0dcae; font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-family: var(--font-display); color: #fff; font-size: clamp(28px, 5vw, 44px); font-weight: 600;
+    margin: 0 0 8px; line-height: 1.15; max-width: 640px;
+  }
+  .hero .subref { color: #e8d9b8; font-size: 15px; font-style: italic; }
+
+  /* ---------- LAYOUT ---------- */
+  main { padding-top: 44px; }
+
+  .lede {
+    font-family: var(--font-display); font-size: 21px; line-height: 1.6; color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .lede em { color: var(--accent); font-style: normal; }
+
+  .meta-row {
+    display: flex; gap: 18px; flex-wrap: wrap; margin: 22px 0 40px;
+    font-size: 13px; color: var(--ink-muted);
+  }
+  .meta-row span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+
+  h2.section-title {
+    font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--ink);
+    margin: 56px 0 6px; padding-top: 4px; display: flex; align-items: baseline; gap: 10px;
+  }
+  h2.section-title .num {
+    font-size: 14px; color: var(--gold); font-weight: 700; font-family: var(--font-body); letter-spacing: .06em;
+  }
+  .section-intro { color: var(--ink-muted); font-size: 15px; margin-bottom: 22px; }
+
+  p { margin: 0 0 18px; }
+  strong { color: var(--ink); }
+
+  /* ---------- VERSE BLOCK ---------- */
+  .verse {
+    background: var(--verse-bg);
+    border-left: 4px solid var(--verse-border);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 20px 24px;
+    margin: 22px 0;
+  }
+  .verse .verse-text {
+    font-family: var(--font-display); font-size: 19px; line-height: 1.65; color: #4a3a1e;
+    font-style: italic;
+  }
+  .verse .verse-ref {
+    margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: .04em;
+    font-style: normal; text-transform: uppercase;
+  }
+
+  /* ---------- CALLOUT / NOTE BOXES ---------- */
+  .box {
+    border-radius: var(--radius); padding: 18px 22px; margin: 22px 0; font-size: 15.5px;
+    border: 1px solid var(--border); background: var(--surface);
+  }
+  .box .box-label {
+    font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em;
+    margin-bottom: 8px; display: block; color: var(--accent-2);
+  }
+  .box.history { background: #f4efe4; border-color: #ddd0b0; }
+  .box.history .box-label { color: #8a6a20; }
+  .box.warning { background: #fbeee4; border-color: #e6c7a8; }
+  .box.warning .box-label { color: #a35a1e; }
+  .box.application { background: #eef3ea; border-color: #cfdcc4; }
+  .box.application .box-label { color: #4f7a3a; }
+
+  blockquote.luther {
+    margin: 22px 0; padding: 20px 24px; background: #2b241c; color: #f0e6cf;
+    border-radius: var(--radius); font-family: var(--font-display); font-size: 17px; line-height: 1.6;
+  }
+  blockquote.luther cite { display: block; margin-top: 12px; font-family: var(--font-body); font-size: 12.5px;
+    color: #c9b98a; font-style: normal; letter-spacing: .04em; text-transform: uppercase; }
+
+  /* ---------- TIMELINE (história) ---------- */
+  .timeline { margin: 26px 0; }
+  .tl-item { position: relative; padding-left: 28px; padding-bottom: 22px; border-left: 2px solid var(--border); margin-left: 6px; }
+  .tl-item:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .tl-item::before {
+    content: ''; position: absolute; left: -7px; top: 2px; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--gold); border: 2px solid var(--bg);
+  }
+  .tl-year { font-weight: 700; font-size: 13px; color: var(--accent); letter-spacing: .04em; text-transform: uppercase; }
+  .tl-title { font-family: var(--font-display); font-size: 17px; font-weight: 600; margin: 3px 0 4px; }
+  .tl-desc { font-size: 15px; color: var(--ink-muted); }
+
+  /* ---------- LIST ---------- */
+  ul.impl { list-style: none; margin: 20px 0; padding: 0; }
+  ul.impl li {
+    display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  ul.impl li:last-child { border-bottom: none; }
+  ul.impl .letter {
+    flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2);
+    color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ---------- IMAGE MID-ARTICLE ---------- */
+  figure.inline-img { margin: 32px -4px; }
+  figure.inline-img img { width: 100%; border-radius: var(--radius-lg); display: block; }
+  figure.inline-img figcaption { font-size: 12.5px; color: var(--ink-muted); margin-top: 8px; text-align: center; font-style: italic; }
+
+  /* ---------- REFLECTION ---------- */
+  .reflect { background: var(--surface); border: 1px dashed var(--gold); border-radius: var(--radius-lg); padding: 24px 26px; margin: 30px 0; }
+  .reflect h3 { font-family: var(--font-display); margin: 0 0 14px; font-size: 19px; color: var(--accent); }
+  .reflect ol { margin: 0; padding-left: 20px; }
+  .reflect li { margin-bottom: 10px; }
+
+  /* ---------- SUMMARY ---------- */
+  .summary-card {
+    background: linear-gradient(135deg, #3a2e1c, #2b241c); color: #f0e6cf; border-radius: var(--radius-lg);
+    padding: 28px 28px; margin: 44px 0 20px;
+  }
+  .summary-card h3 { font-family: var(--font-display); margin: 0 0 14px; font-size: 20px; color: #f0dcae; }
+  .summary-card ul { margin: 0; padding-left: 18px; }
+  .summary-card li { margin-bottom: 8px; font-size: 15px; }
+
+  footer.sources {
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);
+    font-size: 12.5px; color: var(--ink-muted);
+  }
+  footer.sources p { margin: 0 0 6px; }
+
+  @media (max-width: 600px) {
+    .hero { height: 260px; }
+    .verse .verse-text { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <img src="http://localhost:8100/static/course-images/curso8/topico1-sacerdocio-todos-crentes-ia.png" alt="Grupo de crentes comuns reunidos sob a luz de uma janela redonda, cabeças inclinadas em oração">
+  <div class="hero-overlay">
+    <div class="kicker">Módulo 1 · Chamado e Fundamento Bíblico · Tópico 1</div>
+    <h1>Sacerdócio de Todos os Crentes</h1>
+    <div class="subref">"...para que anuncieis as grandezas daquele que vos chamou das trevas para a sua maravilhosa luz." — 1 Pedro 2:9</div>
+  </div>
+</div>
+
+<div class="wrap">
+<main>
+
+  <p class="lede">Antes de aprender <em>o que fazer</em> como obreiro, é preciso entender <em>o que você já é</em>. A Bíblia chama todo crente — não só pastores, não só líderes — de <em>sacerdote</em>. Este tópico existe pra fundamentar, com o texto na mão, por que isso é verdade e o que isso muda na prática.</p>
+
+  <div class="meta-row">
+    <span><span class="dot"></span>Leitura: ~14 min</span>
+    <span><span class="dot"></span>Base: 1 Pedro 2:4-10, Êxodo 19:5-6, Apocalipse 1:5-6</span>
+    <span><span class="dot"></span>Nível: intermediário</span>
+  </div>
+
+  <h2 class="section-title"><span class="num">01</span> O texto central</h2>
+  <p class="section-intro">Tudo começa em uma única frase de Pedro, escrita a cristãos espalhados, muitos deles ex-pagãos sem nenhuma herança religiosa judaica — gente que, aos olhos do mundo, não tinha nenhum direito a título sacerdotal.</p>
+
+  <div class="verse">
+    <div class="verse-text">"Mas vós sois a geração eleita, o sacerdócio real, a nação santa, o povo adquirido, para que anuncieis as grandezas daquele que vos chamou das trevas para a sua maravilhosa luz."</div>
+    <div class="verse-ref">1 Pedro 2:9 (Almeida)</div>
+  </div>
+
+  <p>Repare no sujeito da frase: <strong>"vós"</strong> — não "os apóstolos", não "os presbíteros", não "os mais maduros na fé". Pedro escreve para a igreja inteira, sem distinção de função ou tempo de conversão. Quatro títulos são dados de uma vez: geração eleita, sacerdócio real, nação santa, povo adquirido. Nenhum deles vem com uma condição de "exceto se você não for líder formal".</p>
+
+  <p>E o versículo termina com uma <strong>finalidade</strong>, não com um privilégio pra guardar pra si: "para que anuncieis". O sacerdócio bíblico nunca é status decorativo — é vocação para proclamar.</p>
+
+  <h2 class="section-title"><span class="num">02</span> O contexto imediato: pedras vivas, casa espiritual</h2>
+  <p class="section-intro">1 Pedro 2:9 não aparece isolado. Pedro vinha construindo uma imagem nos versículos anteriores que explica <em>por que</em> ele pode chamar pessoas comuns de sacerdotes.</p>
+
+  <div class="verse">
+    <div class="verse-text">"...chegando-vos para ele, pedra viva, rejeitada, na verdade, pelos homens, mas, para com Deus eleita e preciosa, vós também, quais pedras vivas, sois edificados como casa espiritual para serdes sacerdócio santo, a fim de oferecerdes sacrifícios espirituais, aceitáveis a Deus por Jesus Cristo. Por isso, na Escritura se diz: Eis que ponho em Sião uma principal pedra angular, eleita e preciosa; e quem nela crer não será confundido."</div>
+    <div class="verse-ref">1 Pedro 2:4-6 (Almeida)</div>
+  </div>
+
+  <figure class="inline-img">
+    <img src="http://localhost:8100/static/course-images/curso8/topico1-pedras-vivas.jpg" alt="Parede de pedra natural, texturas e tons terrosos">
+    <figcaption>Cada crente é uma "pedra viva" — parte de uma construção, nunca uma peça isolada.</figcaption>
+  </figure>
+
+  <p>A lógica do texto é: Jesus é a <strong>pedra angular</strong> (a pedra que define o alinhamento de todo o edifício). Quem se aproxima dele — "chegando-vos para ele" — não fica do lado de fora observando; é encaixado na mesma construção, como mais uma pedra viva. E o edifício que essas pedras formam não é um templo de tijolo: é uma <strong>casa espiritual</strong>, cuja função é ser <strong>sacerdócio santo</strong>, oferecendo <strong>sacrifícios espirituais</strong> — não mais animais no altar, mas louvor, intercessão, uma vida entregue (compare com Romanos 12:1).</p>
+
+  <div class="box">
+    <span class="box-label">📖 Ponto de atenção</span>
+    Nenhuma pedra, por mais "viva" que seja, constrói algo sozinha. O texto nunca fala de "pedra viva" no singular isolado — é sempre "pedras vivas", no plural, formando uma casa. O sacerdócio de todos os crentes é uma verdade <em>comunitária</em> antes de ser individual: você não é sacerdote apesar da igreja, você é sacerdote <em>como parte dela</em>.
+  </div>
+
+  <h2 class="section-title"><span class="num">03</span> Raízes no Antigo Testamento</h2>
+  <p class="section-intro">Pedro não inventou esses títulos. Ele está citando — quase palavra por palavra — uma promessa feita a Israel mais de mil anos antes, no Sinai.</p>
+
+  <div class="verse">
+    <div class="verse-text">"Agora, pois, se atentamente ouvirdes a minha voz e guardardes o meu pacto, então sereis a minha possessão peculiar dentre todos os povos, porque minha é toda a terra; e vós sereis para mim reino sacerdotal e nação santa."</div>
+    <div class="verse-ref">Êxodo 19:5-6 (Almeida)</div>
+  </div>
+
+  <p>"Reino sacerdotal e nação santa" — os mesmos elementos que Pedro usa. E o profeta Isaías, séculos depois, ainda dentro do Antigo Testamento, amplia essa promessa:</p>
+
+  <div class="verse">
+    <div class="verse-text">"Mas vós sereis chamados sacerdotes do Senhor, e vos chamarão ministros de nosso Deus; comereis as riquezas das nações, e na sua glória vos gloriareis."</div>
+    <div class="verse-ref">Isaías 61:6 (Almeida)</div>
+  </div>
+
+  <p>No Antigo Testamento, porém, havia uma tribo específica — Levi — separada para o sacerdócio funcional (oferecer sacrifícios, cuidar do templo). A promessa de um "reino sacerdotal" pra <em>toda</em> a nação convivia, na prática, com um sacerdócio exclusivo de poucos. Pedro, ao aplicar essa linguagem à igreja em 1 Pedro 2:9, está anunciando que algo mudou: a promessa que era figura/sombra agora se cumpre sem intermediário exclusivo. É esse o ponto — o Novo Testamento não cria um sacerdócio novo do zero, ele <strong>universaliza</strong> uma promessa que já existia.</p>
+
+  <h2 class="section-title"><span class="num">04</span> "Real": onde realeza e sacerdócio se encontram</h2>
+  <p class="section-intro">No Antigo Testamento, rei e sacerdote eram funções deliberadamente separadas — um rei que tentasse agir como sacerdote era julgado (2 Crônicas 26:16-21, o caso do rei Uzias). "Sacerdócio <strong>real</strong>" em 1 Pedro 2:9 não é força de expressão: é a fusão de dois ofícios que Israel nunca podia unir numa só pessoa, exceto em Cristo.</p>
+
+  <div class="verse">
+    <div class="verse-text">"...e da parte de Jesus Cristo [...] Àquele que nos ama, e pelo seu sangue nos libertou dos nossos pecados, e nos fez reino, sacerdotes para Deus, seu Pai, a ele seja glória e domínio pelos séculos dos séculos. Amém."</div>
+    <div class="verse-ref">Apocalipse 1:5-6 (Almeida)</div>
+  </div>
+
+  <div class="verse">
+    <div class="verse-text">"Digno és de tomar o livro, e de abrir os seus selos; porque foste morto, e com o teu sangue compraste para Deus homens de toda tribo, e língua, e povo e nação; e para o nosso Deus os fizeste reino, e sacerdotes; e eles reinarão sobre a terra."</div>
+    <div class="verse-ref">Apocalipse 5:9-10 (Almeida)</div>
+  </div>
+
+  <p>Repare que em Apocalipse a base não é mérito nem função eclesiástica — é sangue derramado ("pelo seu sangue nos libertou", "com o teu sangue compraste"). O sacerdócio de todos os crentes não é conquistado por tempo de igreja, formação teológica ou cargo. É dado a "homens de toda tribo, e língua, e povo e nação" — a mesma universalidade que Pedro já tinha anunciado.</p>
+
+  <h2 class="section-title"><span class="num">05</span> Um mediador só — não zero mediadores</h2>
+  <div class="box warning">
+    <span class="box-label">⚠️ Erro comum a evitar</span>
+    "Todos são sacerdotes" às vezes é mal-entendido como "ninguém precisa de mediador" ou "minha opinião vale tanto quanto qualquer ensino da igreja". Não é isso que o texto ensina.
+  </div>
+
+  <div class="verse">
+    <div class="verse-text">"Porque há um só Deus, e um só Mediador entre Deus e os homens, Cristo Jesus, homem."</div>
+    <div class="verse-ref">1 Timóteo 2:5 (Almeida)</div>
+  </div>
+
+  <p>O sacerdócio de todos os crentes não elimina a necessidade de mediador — ele afirma que <strong>esse mediador único, Jesus, já deu a cada crente acesso direto a Deus</strong>, sem precisar de um sacerdote humano intermediário adicional. A diferença é sutil e importante: não é "cada um decide por si o que é verdade"; é "cada um, por Cristo, já tem acesso direto ao Pai — sem precisar de mais ninguém além de Jesus para chegar até Ele".</p>
+
+  <h2 class="section-title"><span class="num">06</span> Da igreja primitiva à Reforma: como isso quase se perdeu</h2>
+  <p class="section-intro">Essa verdade bíblica não foi sempre vivida com clareza na história da igreja. Vale conhecer o percurso — não por curiosidade histórica, mas porque o mesmo risco existe hoje.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-year">Séc. I-II</div>
+      <div class="tl-title">O Novo Testamento não descreve um "ofício sacerdotal" na igreja</div>
+      <div class="tl-desc">Nenhum apóstolo é chamado de "sacerdote" num sentido exclusivo. A linguagem sacerdotal (1Pe 2, Ap 1 e 5) é sempre aplicada à igreja toda.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">Séc. II-III</div>
+      <div class="tl-title">A ideia de um clero sacerdotal começa a surgir</div>
+      <div class="tl-desc">Escritores como Tertuliano e Hipólito passam a chamar os ministros cristãos de "sacerdotes" e "sumos sacerdotes" — um vocabulário que o Novo Testamento não usa pra líderes da igreja.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">Idade Média</div>
+      <div class="tl-title">O clero vira uma classe separada dos leigos</div>
+      <div class="tl-desc">Com a eucaristia entendida como repetição do sacrifício de Cristo, e os sacramentos como canal quase exclusivo da graça, o povo comum passa a depender inteiramente do sacerdote pra se relacionar com Deus.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">1520</div>
+      <div class="tl-title">Martinho Lutero redescobre o texto</div>
+      <div class="tl-desc">Estudando as Escrituras em Wittenberg, Lutero volta a 1 Pedro 2:9 e escreve "A Liberdade do Cristão", um dos textos-base da Reforma Protestante.</div>
+    </div>
+  </div>
+
+  <blockquote class="luther">
+    "De posse da primogenitura e de todas as suas honras e dignidade, Cristo divide-a com todos os cristãos para que por meio da fé todos possam ser também reis e sacerdotes com Cristo, tal como diz o apóstolo Pedro em 1 Pe 2:9 [...] Somos sacerdotes; isto é muito mais que ser reis, porque o sacerdócio nos torna dignos de aparecer diante de Deus e rogar pelos outros."
+    <cite>Martinho Lutero — A Liberdade do Cristão, 1520</cite>
+  </blockquote>
+
+  <p>Lutero também respondeu a uma objeção que ainda hoje aparece: se todos são sacerdotes, pra que existem pastores? Sua resposta continua valendo: nem todos podem pregar, administrar e liderar ao mesmo tempo — mas a diferença é de <strong>função</strong>, não de <strong>dignidade diante de Deus</strong>. É a mesma distinção que vamos aprofundar no próximo tópico, sobre dons e vocação.</p>
+
+  <h2 class="section-title"><span class="num">07</span> O que isso muda na prática</h2>
+
+  <ul class="impl">
+    <li><span class="letter">A</span><div><strong>Acesso direto.</strong> Você não precisa de ninguém "mais espiritual" pra orar por você chegar a Deus. Você já tem acesso — por Cristo, agora.</div></li>
+    <li><span class="letter">B</span><div><strong>Sentido comunitário, não individualista.</strong> Ser sacerdote não é "eu e Deus, sozinhos". É orar, interceder e servir <em>uns aos outros</em> — sacerdócio se exerce em comunidade.</div></li>
+    <li><span class="letter">C</span><div><strong>"Leigo" não é sinônimo de "menos importante".</strong> A palavra vem do grego <em>laós</em>, que só significa "povo de Deus". Ter uma função diferente da de um pastor não te torna um cristão de segunda categoria.</div></li>
+    <li><span class="letter">D</span><div><strong>Dons e ministérios continuam distintos.</strong> Todos são sacerdotes, mas nem todos são chamados a pregar ou administrar sacramentos — isso não contradiz o sacerdócio universal, complementa ele (é o assunto do próximo tópico).</div></li>
+    <li><span class="letter">E</span><div><strong>Alerta permanente.</strong> Sempre que uma liderança concentra toda a atividade espiritual em si e não abre espaço pra os membros exercerem seus dons, a igreja volta, na prática, ao mesmo sacerdotalismo medieval que a Reforma rejeitou — mesmo sem usar esse nome.</div></li>
+  </ul>
+
+  <div class="box application">
+    <span class="box-label">🛠️ Pra você, novo obreiro</span>
+    Você está começando a servir sem nunca ter ocupado uma função formal — e é exatamente por isso que este tópico vem primeiro no curso. Antes de aprender uma tarefa (acolher, ensinar, organizar), você precisa saber que já tem lugar garantido nesse "sacerdócio real" nem por mérito, nem por tempo de igreja, mas porque Cristo já te trouxe pra dentro da construção. Servir não é o que te qualifica como sacerdote — é a <em>consequência</em> de já ser um.
+  </div>
+
+  <div class="reflect">
+    <h3>Pra refletir antes do próximo tópico</h3>
+    <ol>
+      <li>Antes de estudar este tópico, você entendia "sacerdócio" como algo reservado a pastores/líderes? O que mudou na sua leitura de 1 Pedro 2:9?</li>
+      <li>O texto liga sacerdócio a uma finalidade — "para que anuncieis". Que "grandezas de Deus" você já viveu o suficiente pra conseguir anunciar a alguém hoje?</li>
+      <li>Pense num momento em que você (ou alguém perto de você) tratou a liderança da igreja como a única "ponte" possível até Deus. Como esse tópico revê essa ideia sem negar o valor da liderança?</li>
+    </ol>
+  </div>
+
+  <div class="summary-card">
+    <h3>Resumo do Tópico 1</h3>
+    <ul>
+      <li><strong>1 Pedro 2:9</strong> chama todo crente — sem distinção de função — de geração eleita, sacerdócio real, nação santa, povo adquirido.</li>
+      <li>O fundamento é <strong>1 Pedro 2:4-8</strong>: cada crente é uma "pedra viva" edificada sobre Cristo, a pedra angular, formando uma casa espiritual.</li>
+      <li>Não é invenção do Novo Testamento — cumpre uma promessa já feita a Israel em <strong>Êxodo 19:5-6</strong> e <strong>Isaías 61:6</strong>.</li>
+      <li>"Real" (realeza + sacerdócio) só se une em Cristo — confirmado em <strong>Apocalipse 1:5-6</strong> e <strong>5:9-10</strong>, com base no sangue de Cristo, não em mérito.</li>
+      <li>Isso <strong>não elimina</strong> Jesus como único Mediador (<strong>1 Timóteo 2:5</strong>) — dá a cada crente acesso direto por meio dele.</li>
+      <li>A igreja quase perdeu essa verdade na Idade Média; foi <strong>Martinho Lutero</strong>, em 1520, quem a resgatou como um dos pilares da Reforma.</li>
+      <li>Na prática: acesso direto, sentido comunitário, dignidade igual entre "leigos" e ministros, dons continuam distintos, e vigilância constante contra o retorno ao sacerdotalismo.</li>
+    </ul>
+  </div>
+
+  <footer class="sources">
+    <p><strong>Textos bíblicos:</strong> tradução Almeida (domínio público), via bible-api.com.</p>
+    <p><strong>Fontes de apoio:</strong> David Guzik, <em>Enduring Word Bible Commentary</em> (1 Pedro 2); artigo "O Sacerdócio Universal dos Fiéis", CPAJ/Mackenzie; Martinho Lutero, <em>A Liberdade do Cristão</em> (1520).</p>
+    <p><strong>Imagens:</strong> Pexels (uso livre, sem direitos autorais) — Sersh Marsh ("Brown and Gray Stone Wall") e cottonbro studio ("Sunrays Passing Through a Round Window").</p>
+  </footer>
+
+</main>
+</div>
+</body>
+</html>

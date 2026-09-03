@@ -12,3 +12,13 @@ class UserRegister(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class UserMe(BaseModel):
+    id: int
+    name: str | None = None
+    email: str
+    role: str
+    preferred_theme: str | None = None
+
+    class Config:
+        from_attributes = True

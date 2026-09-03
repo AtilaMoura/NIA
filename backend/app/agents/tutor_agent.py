@@ -13,7 +13,7 @@ placar/flags antes de mandar pro agente; a IA lê o texto igual leria no chat.
 """
 
 from .base_agent import BaseAgent
-from .specialists.shared import FIO_CONDUTOR_IA
+from .perfis import PerfilDominio, PERFIL_TECH
 
 SCHEMA_AVALIACAO = """
 Devolva APENAS um JSON válido (sem markdown), neste formato:
@@ -59,13 +59,14 @@ class TutorAgent(BaseAgent):
         resumo_texto: str,
         contexto_topico: str = "",
         historico_reforcos: str = "",
+        perfil: PerfilDominio = PERFIL_TECH,
     ) -> dict:
         prompt = f"""
-Você é o tutor pedagógico do curso "LLM aplicado a um agente de vendas via WhatsApp para
-um Garden Center". Um aluno acabou de terminar um tópico e colou o resumo estruturado das
-respostas dele. Avalie como um especialista faria manualmente — sem puxar saco.
+Você é o tutor pedagógico do {perfil.contexto_curso}. Um aluno acabou de terminar um
+tópico e colou o resumo estruturado das respostas dele. Avalie como um especialista
+faria manualmente — sem puxar saco.
 
-{FIO_CONDUTOR_IA}
+{perfil.fio_condutor}
 
 {"CONTEXTO DO TÓPICO (o que era esperado que o aluno dominasse): " + contexto_topico if contexto_topico else ""}
 

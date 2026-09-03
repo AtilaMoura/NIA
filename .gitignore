@@ -74,4 +74,9 @@ coverage/
 *.tmp
 *.temp
 temp/
-tmp/
+tmp/.firecrawl/
+
+# Caches de ferramentas / Python fora do backend
+.firecrawl/
+**/__pycache__/
+estudo-emaus/video/_work/

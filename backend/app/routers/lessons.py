@@ -11,6 +11,14 @@ from app.renderer.render import render_topico, carregar_temas
 router = APIRouter(prefix="/lessons", tags=["Lessons"])
 
 
+# Listar todas as lições (Fase 3 do front usa isso pra montar a grade do aluno,
+# filtrando por module_id/curso do lado do cliente — mesmo padrão sem filtro já
+# usado em list_modules/list_progress)
+@router.get("/")
+def list_lessons(db: Session = Depends(get_db)):
+    return db.query(Lesson).all()
+
+
 # Criar lição (content é o JSON estruturado — ver docs/schema/ — guardado como texto)
 @router.post("/")
 def create_lesson(data: dict, db: Session = Depends(get_db)):

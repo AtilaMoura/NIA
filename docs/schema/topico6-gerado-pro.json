@@ -1,0 +1,440 @@
+{
+  "topico_id": "aula1-topico6-aplicacao-no-agente",
+  "titulo": "Aplicação no Agente",
+  "aula": 1,
+  "numero": 6,
+  "duracao_estimada_min": 60,
+  "roteiro": [
+    "Introdução ao Agente",
+    "Orquestrador e Ferramentas",
+    "Memória de Cliente e Grounding",
+    "Temperatura e Geração de Respostas",
+    "Exemplos Práticos e Casos de Uso"
+  ],
+  "badges_capa": [
+    "⏱ ~60 min",
+    "🔊 áudio com controle de velocidade",
+    "✍️ 3 checkpoints + avaliação final"
+  ],
+  "slides": [
+    {
+      "tipo": "capa",
+      "secao": "Início",
+      "titulo": "Aplicação no Agente",
+      "subtitulo": "Integração do LLM com Ferramentas e Orquestrador",
+      "instrucoes_box": {
+        "label": "📋 Como funciona este estudo",
+        "texto": "Use as setas ← → ou os botões embaixo para navegar. Alguns slides são checkpoints — pedem uma resposta antes de liberar o próximo."
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Aplicação no agente",
+      "titulo_secao": "Integração do LLM com Ferramentas",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "O orquestrador desempenha um papel fundamental na integração do LLM com ferramentas determinísticas para garantir a precisão dos fatos. Ele atua como um intermediário, permitindo que o LLM se concentre em sua função principal de processamento de linguagem natural, enquanto as ferramentas específicas lidam com a verificação e fornecimento de informações precisas."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📚 Definição Técnica do Orquestrador",
+          "texto": "O orquestrador é um componente que integra o LLM com ferramentas determinísticas, como o tool check_stock, para garantir que as respostas fornecidas sejam precisas e baseadas em dados reais. Isso é especialmente importante para evitar alucinações e garantir que o agente forneça informações confiáveis ao usuário."
+        },
+        {
+          "tipo": "box",
+          "variante": "analogy",
+          "label": "📈 Analogia do Orquestrador",
+          "texto": "Imagine um maestro regendo uma orquestra. Assim como o maestro coordena os músicos para criar uma sinfonia harmoniosa, o orquestrador coordena o LLM e as ferramentas determinísticas para criar respostas precisas e coerentes. Cada componente desempenha um papel específico, e o orquestrador garante que todos trabalhem juntos em perfeita harmonia."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "app",
+            "label": "📊 Aplicação Prática",
+            "texto": "O orquestrador é aplicado em cenários onde a precisão dos fatos é crucial, como em sistemas de recomendação de produtos ou em chatbots que fornecem informações sobre estoque e preços."
+          },
+          "direita": {
+            "variante": "error",
+            "label": "🚫 Erro Comum",
+            "texto": "Um erro comum é confiar apenas no LLM para fornecer informações precisas, sem integrá-lo com ferramentas determinísticas. Isso pode levar a alucinações e respostas imprecisas."
+          }
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Ferramentas Obrigatórias para Fatos e Grounding",
+      "titulo_secao": "Conhecendo as Ferramentas Necessárias para Precisão de Dados",
+      "blocos": [
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📚 Definição",
+          "texto": "Ferramentas obrigatórias para fatos e grounding são mecanismos que garantem a precisão dos dados fornecidos pelo modelo de linguagem, evitando alucinações e erros. Isso inclui integração com bancos de dados, APIs e outros sistemas que fornecem informações precisas e atualizadas."
+        },
+        {
+          "tipo": "paragrafo",
+          "texto": "Para manter a precisão dos dados, é fundamental utilizar ferramentas que possam fornecer informações confiáveis e atualizadas. Isso pode incluir a integração com sistemas de gerenciamento de estoque, APIs de preços atuais, ou até mesmo sistemas de gerenciamento de clientes. Essas ferramentas ajudam a evitar que o modelo de linguagem forneça informações incorretas ou desatualizadas."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "app",
+            "label": "📊 Exemplo de Ferramenta",
+            "texto": "Um exemplo de ferramenta obrigatória é o sistema de gerenciamento de estoque, que fornece informações precisas sobre a disponibilidade de produtos."
+          },
+          "direita": {
+            "variante": "app",
+            "label": "📈 Benefícios",
+            "texto": "A utilização dessas ferramentas traz benefícios como a redução de erros, a melhoria da experiência do usuário e a aumento da confiabilidade do modelo de linguagem."
+          }
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Integração com Sistemas de Dados",
+              "descricao": "Integrar o modelo de linguagem com sistemas de dados confiáveis para fornecer informações precisas."
+            },
+            {
+              "numero": 2,
+              "cor": "#1b9e5a",
+              "titulo": "Implementação de Ferramentas de Grounding",
+              "descricao": "Implementar ferramentas de grounding para evitar alucinações e erros no modelo de linguagem."
+            },
+            {
+              "numero": 3,
+              "cor": "#d98e2e",
+              "titulo": "Monitoramento e Manutenção",
+              "descricao": "Monitorar e manter as ferramentas e sistemas de dados para garantir a precisão e confiabilidade do modelo de linguagem."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck1",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "open",
+          "id": "ck1_1",
+          "enunciado": "Descreva a importância da integração do LLM com ferramentas determinísticas para garantir a precisão dos fatos.",
+          "cenario": null,
+          "placeholder": "Resposta",
+          "explicacao": null
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Integração com o LLM",
+      "titulo_secao": "Memória de Cliente e Integração com o LLM",
+      "blocos": [
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📚 Definição",
+          "texto": "A memória de cliente se refere ao histórico de interações e preferências de um cliente, que é fundamental para fornecer respostas personalizadas e relevantes. A integração com o LLM permite que essas informações sejam utilizadas para melhorar a precisão e a personalização das respostas."
+        },
+        {
+          "tipo": "paragrafo",
+          "texto": "Para integrar a memória de cliente com o LLM, é necessário utilizar ferramentas de gerenciamento de dados que possam armazenar e recuperar informações sobre os clientes de forma eficiente. Isso pode incluir a utilização de bancos de dados ou sistemas de gerenciamento de relacionamentos com os clientes."
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "📊 Aplicação",
+          "texto": "Um exemplo de aplicação da integração da memória de cliente com o LLM é a utilização de um sistema de recomendação de produtos personalizados. O LLM pode ser treinado para analisar as preferências e o histórico de compras do cliente e fornecer recomendações de produtos relevantes."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "def",
+            "label": "📝 Benefícios",
+            "texto": "A integração da memória de cliente com o LLM pode trazer vários benefícios, incluindo a melhoria da experiência do cliente, o aumento da satisfação do cliente e a redução dos custos de atendimento ao cliente."
+          },
+          "direita": {
+            "variante": "error",
+            "label": "🚫 Desafios",
+            "texto": "No entanto, a integração da memória de cliente com o LLM também pode apresentar desafios, como a garantia da privacidade e segurança dos dados do cliente, a necessidade de atualizar constantemente as informações do cliente e a possibilidade de alucinações do LLM."
+          }
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Coleta de Dados",
+              "descricao": "Coletar informações sobre os clientes, incluindo histórico de interações e preferências."
+            },
+            {
+              "numero": 2,
+              "cor": "#1b9e5a",
+              "titulo": "Armazenamento de Dados",
+              "descricao": "Armazenar as informações coletadas em um banco de dados ou sistema de gerenciamento de relacionamentos com os clientes."
+            },
+            {
+              "numero": 3,
+              "cor": "#d98e2e",
+              "titulo": "Integração com o LLM",
+              "descricao": "Integrar a memória de cliente com o LLM para fornecer respostas personalizadas e relevantes."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck2",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "open",
+          "id": "ck2_1",
+          "enunciado": "Explique a importância da memória de cliente para fornecer respostas personalizadas e relevantes.",
+          "cenario": null,
+          "placeholder": "Resposta",
+          "explicacao": null
+        },
+        {
+          "tipo": "open",
+          "id": "ck2_2",
+          "enunciado": "Descreva como a integração da memória de cliente com o LLM pode melhorar a experiência do usuário.",
+          "cenario": null,
+          "placeholder": "Resposta",
+          "explicacao": null
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Aplicação no agente",
+      "titulo_secao": "Uso de Temperatura Baixa vs Alta na Geração de Respostas",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "A temperatura é um parâmetro importante na geração de respostas do LLM, pois controla a aleatoriedade das respostas. Uma temperatura baixa resulta em respostas mais confiantes e determinísticas, enquanto uma temperatura alta gera respostas mais variadas e imprevisíveis."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📊 Definição de Temperatura",
+          "texto": "A temperatura é um parâmetro que controla a entropia da distribuição de probabilidade das respostas geradas pelo LLM. Quanto menor a temperatura, mais concentrada é a distribuição de probabilidade, resultando em respostas mais confiantes."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "app",
+            "label": "📈 Temperatura Baixa",
+            "texto": "Uma temperatura baixa é útil quando se deseja obter respostas precisas e confiantes, como em aplicativos de suporte ao cliente ou em sistemas de recomendação."
+          },
+          "direita": {
+            "variante": "app",
+            "label": "📉 Temperatura Alta",
+            "texto": "Uma temperatura alta é útil quando se deseja obter respostas criativas e variadas, como em aplicativos de escrita criativa ou em sistemas de geração de ideias."
+          }
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Definição do Contexto",
+              "descricao": "Definir o contexto em que a geração de respostas será utilizada, considerando fatores como a precisão e a criatividade necessárias."
+            },
+            {
+              "numero": 2,
+              "cor": "#1b9e5a",
+              "titulo": "Escolha da Temperatura",
+              "descricao": "Escolher a temperatura certa com base no contexto definido, considerando a necessidade de precisão e criatividade."
+            },
+            {
+              "numero": 3,
+              "cor": "#d98e2e",
+              "titulo": "Ajuste e Refinamento",
+              "descricao": "Ajustar e refinar a temperatura com base nos resultados obtidos, garantindo que as respostas geradas atendam às necessidades do contexto."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck3",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "open",
+          "id": "ck3_1",
+          "enunciado": "Justifique a escolha de temperatura baixa em um cenário de aplicação que exige precisão e confiabilidade.",
+          "cenario": null,
+          "placeholder": "Resposta",
+          "explicacao": null
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "aplicacao_no_agente",
+      "titulo_secao": "Exemplos Práticos de Aplicação no Agente",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "A aplicação de LLM em agentes pode ser vista em vários contextos, como atendimento ao cliente, suporte técnico e até mesmo em vendas. Nesses casos, o LLM é utilizado para entender as necessidades do usuário e fornecer respostas personalizadas e precisas."
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "📊 Exemplo de Aplicação",
+          "texto": "Um exemplo prático é o uso de LLM em um sistema de atendimento ao cliente para responder a perguntas frequentes sobre produtos e serviços. O LLM pode ser integrado com uma ferramenta de gerenciamento de estoque para fornecer informações precisas sobre a disponibilidade de produtos."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "def",
+            "label": "📚 Desafios",
+            "texto": "Um dos principais desafios na aplicação de LLM em agentes é garantir a precisão dos fatos e evitar alucinações. Isso pode ser alcançado com a integração de ferramentas de grounding e a utilização de dados precisos."
+          },
+          "direita": {
+            "variante": "app",
+            "label": "📈 Soluções",
+            "texto": "Para superar esses desafios, é importante utilizar ferramentas de gerenciamento de dados e integração com sistemas de informação precisos. Além disso, a escolha da temperatura certa na geração de respostas pode ajudar a evitar alucinações e garantir respostas precisas."
+          }
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Integração com Ferramentas",
+              "descricao": "Integrar o LLM com ferramentas de gerenciamento de estoque e dados para garantir a precisão dos fatos."
+            },
+            {
+              "numero": 2,
+              "cor": "#1b9e5a",
+              "titulo": "Treinamento do Modelo",
+              "descricao": "Treinar o LLM com dados precisos e relevantes para o contexto de aplicação."
+            },
+            {
+              "numero": 3,
+              "cor": "#d98e2e",
+              "titulo": "Ajuste da Temperatura",
+              "descricao": "Ajustar a temperatura na geração de respostas para evitar alucinações e garantir respostas precisas."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tipo": "avaliacao_intro",
+      "secao": "Avaliação Final",
+      "titulo": "Avaliação Final",
+      "subtitulo": "5 questões — algumas juntam mais de um conceito. Duas são abertas.",
+      "instrucoes_box": {
+        "label": "📋 Antes de começar",
+        "texto": "A correção objetiva já aparece na hora. Mas a avaliação final de verdade — com feedback honesto e a decisão de seguir ou reforçar — acontece quando você levar o resumo desta tela pro chat com o Claude."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef1",
+      "pergunta": {
+        "tipo": "mc",
+        "id": "ef1_1",
+        "enunciado": "O que é o orquestrador e qual é sua função principal?",
+        "cenario": null,
+        "opcoes": [
+          "Um componente que integra o LLM com ferramentas determinísticas",
+          "Um modelo de linguagem que fornece respostas precisas",
+          "Um sistema de gerenciamento de estoque",
+          "Um sistema de recomendação de produtos"
+        ],
+        "correta_idx": 0,
+        "explicacao": "O orquestrador é um componente que integra o LLM com ferramentas determinísticas para garantir a precisão dos fatos."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef2",
+      "pergunta": {
+        "tipo": "open",
+        "id": "ef2_1",
+        "enunciado": "Descreva a importância do grounding para a precisão dos fatos em um modelo de linguagem.",
+        "cenario": null,
+        "placeholder": "Resposta",
+        "explicacao": null
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef3",
+      "pergunta": {
+        "tipo": "mc",
+        "id": "ef3_1",
+        "enunciado": "Quais são as ferramentas necessárias para a memória de cliente?",
+        "cenario": null,
+        "opcoes": [
+          "Bancos de dados e sistemas de gerenciamento de relacionamentos",
+          "Sistemas de gerenciamento de estoque e APIs de preços",
+          "Modelos de linguagem e ferramentas de grounding",
+          "Todas as opções anteriores"
+        ],
+        "correta_idx": 3,
+        "explicacao": "As ferramentas necessárias para a memória de cliente incluem bancos de dados, sistemas de gerenciamento de relacionamentos, sistemas de gerenciamento de estoque e APIs de preços."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef4",
+      "pergunta": {
+        "tipo": "open",
+        "id": "ef4_1",
+        "enunciado": "Explique como a temperatura afeta a geração de respostas em um modelo de linguagem.",
+        "cenario": null,
+        "placeholder": "Resposta",
+        "explicacao": null
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef5",
+      "pergunta": {
+        "tipo": "mc",
+        "id": "ef5_1",
+        "enunciado": "Quais são os casos de uso do LLM em agentes?",
+        "cenario": null,
+        "opcoes": [
+          "Atendimento ao cliente e suporte técnico",
+          "Vendas e marketing",
+          "Gerenciamento de estoque e logística",
+          "Todas as opções anteriores"
+        ],
+        "correta_idx": 3,
+        "explicacao": "Os casos de uso do LLM em agentes incluem atendimento ao cliente, suporte técnico, vendas, marketing, gerenciamento de estoque e logística."
+      }
+    },
+    {
+      "tipo": "resultado",
+      "secao": "Resultado",
+      "titulo": "Resultado desta sessão",
+      "proximo_topico_label": "a conclusão da Aula 1 — este foi o último tópico dela"
+    }
+  ]
+}

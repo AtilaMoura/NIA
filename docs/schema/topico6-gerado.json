@@ -1,0 +1,283 @@
+{
+  "topico_id": "aula1-topico6-aplicacao-no-agente",
+  "titulo": "Aplicação no Agente",
+  "aula": 1,
+  "numero": 6,
+  "duracao_estimada_min": 15,
+  "roteiro": [
+    "Introdução ao agente de WhatsApp do Garden Center",
+    "Orquestrador e tools obrigatórias pra fatos",
+    "Memória de cliente e quando usar temperatura baixa vs alta",
+    "Juntar tudo: visão de arquitetura do agente",
+    "Mitigação de alucinação e exemplos práticos"
+  ],
+  "badges_capa": [
+    "⏱ ~15 min",
+    "🔊 áudio com controle de velocidade",
+    "✍️ 3 checkpoints + avaliação final"
+  ],
+  "slides": [
+    {
+      "tipo": "capa",
+      "secao": "Início",
+      "titulo": "Aplicação no Agente",
+      "subtitulo": "Desenhando o agente de WhatsApp do Garden Center",
+      "instrucoes_box": {
+        "label": "📚 Introdução",
+        "texto": "Neste tópico, vamos aplicar todos os conceitos aprendidos anteriormente para desenhar o agente de WhatsApp do Garden Center."
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Introdução",
+      "titulo_secao": "O Agente de WhatsApp do Garden Center",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "O agente de WhatsApp do Garden Center é um sistema que utiliza LLM para entender e responder às mensagens dos clientes. Lembra do Tópico 1, onde aprendemos que o LLM é uma camada de linguagem que pode ser treinada para realizar tarefas específicas?"
+        },
+        {
+          "tipo": "box",
+          "variante": "analogy",
+          "label": "🤔 Analogia",
+          "texto": "Imagine que o agente de WhatsApp é como um vendedor que nunca viu a prateleira de hoje, mas pode entender o que os clientes estão pedindo e responder de acordo. Isso é possível graças ao LLM, que pode aprender a representar a linguagem de forma eficaz."
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Orquestrador e Tools",
+      "titulo_secao": "Orquestrador e Tools Obrigatórias",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Para que o agente de WhatsApp funcione corretamente, é necessário um orquestrador que gerencie as interações entre o cliente e o sistema. Além disso, são necessárias tools obrigatórias para fatos, como o estoque e o preço dos produtos. Lembra do Tópico 5, onde aprendemos sobre a importância do grounding para evitar a alucinação?"
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📚 Definição",
+          "texto": "O orquestrador é responsável por gerenciar as interações entre o cliente e o sistema, enquanto as tools obrigatórias para fatos são responsáveis por fornecer informações precisas sobre o estoque e o preço dos produtos."
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck1",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "mc",
+          "id": "ck1_1",
+          "enunciado": "Qual é o papel do orquestrador no agente de WhatsApp do Garden Center?",
+          "cenario": null,
+          "opcoes": [
+            "Gerenciar as interações entre o cliente e o sistema",
+            "Fornecer informações precisas sobre o estoque e o preço dos produtos",
+            "Entender e responder às mensagens dos clientes",
+            "Ajustar a temperatura para fornecer respostas mais consistentes"
+          ],
+          "correta_idx": 0,
+          "explicacao": "O orquestrador é responsável por gerenciar as interações entre o cliente e o sistema."
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Memória de Cliente",
+      "titulo_secao": "Memória de Cliente e Temperatura",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "A memória de cliente é fundamental para que o agente de WhatsApp possa entender as preferências e os históricos de compra dos clientes. Além disso, a temperatura é um parâmetro importante que pode afetar a resposta do sistema. Lembra do Tópico 4, onde aprendemos sobre a geração de resposta e a temperatura?"
+        },
+        {
+          "tipo": "box",
+          "variante": "app",
+          "label": "📊 Aplicação",
+          "texto": "A temperatura pode ser ajustada para que o sistema forneça respostas mais consistentes ou mais variadas, dependendo das necessidades do cliente."
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck2",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "mc",
+          "id": "ck2_1",
+          "enunciado": "Como a memória de cliente afeta a resposta do agente de WhatsApp do Garden Center?",
+          "cenario": null,
+          "opcoes": [
+            "Permite que o sistema forneça respostas mais personalizadas",
+            "Não afeta a resposta do sistema",
+            "Faz com que o sistema forneça respostas mais genéricas",
+            "Impede que o sistema forneça respostas precisas"
+          ],
+          "correta_idx": 0,
+          "explicacao": "A memória de cliente permite que o sistema forneça respostas mais personalizadas."
+        },
+        {
+          "tipo": "mc",
+          "id": "ck2_2",
+          "enunciado": "Qual é o efeito da temperatura na resposta do agente de WhatsApp do Garden Center?",
+          "cenario": null,
+          "opcoes": [
+            "Faz com que o sistema forneça respostas mais consistentes",
+            "Faz com que o sistema forneça respostas mais variadas",
+            "Não afeta a resposta do sistema",
+            "Impede que o sistema forneça respostas precisas"
+          ],
+          "correta_idx": 0,
+          "explicacao": "A temperatura pode fazer com que o sistema forneça respostas mais consistentes."
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Visão de Arquitetura",
+      "titulo_secao": "Visão de Arquitetura do Agente",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "A visão de arquitetura do agente de WhatsApp do Garden Center envolve a integração de todos os componentes, incluindo o orquestrador, as tools obrigatórias para fatos, a memória de cliente e a temperatura. Lembra do Tópico 3, onde aprendemos sobre a tokenização e a janela de contexto?"
+        },
+        {
+          "tipo": "diagrama",
+          "id": "diagrama1",
+          "descricao": "O cliente envia uma mensagem → o orquestrador recebe a mensagem → o sistema verifica o estoque e o preço dos produtos → o sistema responde ao cliente com base na temperatura e na memória de cliente",
+          "svg_raw": null
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck3",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "open",
+          "id": "ck3_1",
+          "enunciado": "Descreva como a visão de arquitetura do agente de WhatsApp do Garden Center integra os componentes de orquestrador, tools obrigatórias para fatos, memória de cliente e temperatura.",
+          "cenario": null,
+          "placeholder": "Descreva a visão de arquitetura...",
+          "explicacao": null
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Mitigação de Alucinação",
+      "titulo_secao": "Mitigação de Alucinação",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "A alucinação é um problema comum em sistemas de LLM, onde o sistema fornece respostas precisas mas sem base real. Lembra do Tópico 5, onde aprendemos sobre a alucinação e como mitigá-la?"
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "🚫 Erro",
+          "texto": "A alucinação pode ser mitigada utilizando tools obrigatórias para fatos e garantindo que o sistema tenha acesso a informações precisas e atualizadas."
+        }
+      ]
+    },
+    {
+      "tipo": "avaliacao_intro",
+      "secao": "Avaliação Final",
+      "titulo": "Avaliação Final",
+      "subtitulo": "5 questões — algumas juntam mais de um conceito. Duas são abertas.",
+      "instrucoes_box": {
+        "label": "📋 Antes de começar",
+        "texto": "A correção objetiva já aparece na hora. Mas a avaliação final de verdade — com feedback honesto e a decisão de seguir ou reforçar — acontece quando você levar o resumo desta tela pro chat com o Claude."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef1",
+      "pergunta": {
+        "tipo": "mc",
+        "id": "ef1_1",
+        "enunciado": "O que é o orquestrador no agente de WhatsApp do Garden Center?",
+        "cenario": null,
+        "opcoes": [
+          "Um sistema que utiliza LLM para entender e responder às mensagens dos clientes",
+          "Um componente que gerencia as interações entre o cliente e o sistema",
+          "Um conjunto de ferramentas que fornecem informações precisas sobre o estoque e o preço dos produtos",
+          "Um parâmetro que afeta a resposta do sistema"
+        ],
+        "correta_idx": 1,
+        "explicacao": "O orquestrador é um componente que gerencia as interações entre o cliente e o sistema."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef2",
+      "pergunta": {
+        "tipo": "mc",
+        "id": "ef2_1",
+        "enunciado": "Quais são as tools obrigatórias para fatos no agente de WhatsApp do Garden Center?",
+        "cenario": null,
+        "opcoes": [
+          "Ferramentas que fornecem informações precisas sobre o estoque e o preço dos produtos",
+          "Ferramentas que permitem que o sistema forneça respostas mais personalizadas",
+          "Ferramentas que ajustam a temperatura para fornecer respostas mais consistentes",
+          "Ferramentas que impedem que o sistema forneça respostas precisas"
+        ],
+        "correta_idx": 0,
+        "explicacao": "As tools obrigatórias para fatos são ferramentas que fornecem informações precisas sobre o estoque e o preço dos produtos."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef3",
+      "pergunta": {
+        "tipo": "tf",
+        "id": "ef3_1",
+        "enunciado": "A temperatura afeta a resposta do agente de WhatsApp do Garden Center.",
+        "cenario": null,
+        "correta_bool": true,
+        "explicacao": "A temperatura pode afetar a resposta do sistema, tornando-a mais consistente ou variada."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef4",
+      "pergunta": {
+        "tipo": "open",
+        "id": "ef4_1",
+        "enunciado": "Descreva a visão de arquitetura do agente de WhatsApp do Garden Center e como ela integra todos os componentes.",
+        "cenario": null,
+        "placeholder": "Descreva a visão de arquitetura...",
+        "explicacao": null
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef5",
+      "pergunta": {
+        "tipo": "open",
+        "id": "ef5_1",
+        "enunciado": "Explique como a alucinação pode ser mitigada no agente de WhatsApp do Garden Center e quais são as consequências de não mitigá-la.",
+        "cenario": null,
+        "placeholder": "Explique como a alucinação pode ser mitigada...",
+        "explicacao": null
+      }
+    },
+    {
+      "tipo": "resultado",
+      "secao": "Resultado",
+      "titulo": "Resultado desta sessão",
+      "proximo_topico_label": "a conclusão da Aula 1 — este foi o último tópico dela"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "titulo": "Fundamentos de LLM aplicado a um agente de vendas via WhatsApp para um Garden Center",
+  "descricao": "Este curso cobre a aplicação de LLMs em um agente de vendas via WhatsApp para um Garden Center, revisando a arquitetura para profissionais experientes que já trabalham com LLMs em produção.",
+  "nivel": "especialista",
+  "modulos": [
+    {
+      "titulo": "Introdução ao LLM em Garden Center",
+      "descricao": "Visão geral da aplicação de LLMs em um agente de vendas via WhatsApp para um Garden Center.",
+      "licoes": [
+        {
+          "titulo": "Revisão de Conceitos Básicos de LLM",
+          "foco": "Revisar os conceitos fundamentais de LLMs e sua aplicação em ambientes de produção."
+        },
+        {
+          "titulo": "Análise de Casos de Uso em Garden Center",
+          "foco": "Analisar casos de uso específicos de LLMs em um Garden Center e como eles se aplicam à venda via WhatsApp."
+        }
+      ]
+    },
+    {
+      "titulo": "Desenvolvimento de Pipeline de Grounding",
+      "descricao": "Desenvolvimento de um pipeline de grounding para a integração de LLMs em um agente de vendas via WhatsApp.",
+      "licoes": [
+        {
+          "titulo": "Arquitetura de Pipeline de Grounding",
+          "foco": "Desenvolver a arquitetura de um pipeline de grounding para LLMs em um agente de vendas via WhatsApp."
+        },
+        {
+          "titulo": "Implementação de Componentes de Pipeline",
+          "foco": "Implementar os componentes necessários para o pipeline de grounding, incluindo processamento de linguagem natural e integração com o WhatsApp."
+        }
+      ]
+    },
+    {
+      "titulo": "Otimização e Manutenção do Pipeline",
+      "descricao": "Otimização e manutenção do pipeline de grounding para garantir o desempenho e a escalabilidade.",
+      "licoes": [
+        {
+          "titulo": "Técnicas de Otimização de Desempenho",
+          "foco": "Aplicar técnicas de otimização de desempenho para melhorar a eficiência do pipeline de grounding."
+        },
+        {
+          "titulo": "Estratégias de Manutenção e Monitoramento",
+          "foco": "Desenvolver estratégias de manutenção e monitoramento para garantir a estabilidade e a escalabilidade do pipeline de grounding."
+        }
+      ]
+    }
+  ]
+}

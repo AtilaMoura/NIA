@@ -19,6 +19,7 @@ from .specialists.ia_agent import ContentAgent
 from .quiz_agent import QuizAgent
 from .montar_topico import montar_topico
 from .reviewer_agent import ReviewerAgent
+from .perfis import PerfilDominio, PERFIL_TECH
 
 
 async def gerar_estrutura_curso(service, assunto: str, nivel: str, objetivo: str = "") -> dict:
@@ -38,6 +39,8 @@ async def gerar_e_revisar_topico(
     foco: str = "",
     proximo_topico_label: str = "(fim do módulo)",
     pausa_entre_chamadas_s: float = 2.0,
+    perfil: PerfilDominio = PERFIL_TECH,
+    texto_biblico_base: str = "",
 ) -> dict:
     """Gera 1 tópico completo (conteúdo + perguntas + montagem) e já revisa.
     Retorna {"topico": dict, "revisao": dict} — "revisao['aprovado']" decide se
@@ -55,12 +58,14 @@ async def gerar_e_revisar_topico(
         conteudo = await content_agent.generate_conteudo_pro(
             titulo=titulo, aula=aula, numero=numero, topico_id=topico_id,
             nivel=nivel, contexto_topicos_anteriores=contexto_topicos_anteriores,
-            foco=foco, pausa_entre_chamadas_s=pausa_entre_chamadas_s,
+            foco=foco, pausa_entre_chamadas_s=pausa_entre_chamadas_s, perfil=perfil,
+            texto_biblico_base=texto_biblico_base,
         )
     else:
         conteudo = await content_agent.generate_conteudo(
             titulo=titulo, aula=aula, numero=numero, nivel=nivel,
             contexto_topicos_anteriores=contexto_topicos_anteriores, foco=foco,
+            perfil=perfil, texto_biblico_base=texto_biblico_base,
         )
 
     # Trava determinística (não confiar na IA pra isso — mesmo motivo que
@@ -75,6 +80,7 @@ async def gerar_e_revisar_topico(
         topico,
         contexto_topicos_anteriores=contexto_topicos_anteriores,
         foco_esperado=foco,
+        perfil=perfil,
     )
 
     return {"topico": topico, "revisao": revisao}

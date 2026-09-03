@@ -63,17 +63,60 @@ IDs de pergunta devem seguir o padrão do gate: ck1 com 1 pergunta -> id "ck1_1"
 """.strip()
 
 
+TRUNCAR_EM = 100  # chars por campo de texto — ver _resumir_blocos_para_quiz
+
+
+def _truncar(texto: str, limite: int = TRUNCAR_EM) -> str:
+    if not isinstance(texto, str) or len(texto) <= limite:
+        return texto
+    return texto[:limite].rstrip() + "…"
+
+
+def _resumir_blocos_para_quiz(blocos: list) -> list:
+    """Corta o texto de cada bloco pro QuizAgent não estourar o teto de
+    tokens/minuto do Groq (achado real, 2026-08-26: um tópico rico — modo
+    pro com prosa longa — mandou 14628 tokens numa chamada só contra um
+    limite de 8000; ReviewerAgent já cortava svg_raw mas o QuizAgent não
+    cortava nada). Mantém o suficiente de cada bloco pra escrever pergunta
+    em cima (a primeira frase geralmente carrega a ideia central), sem
+    mandar o parágrafo inteiro. Não mexe no conteúdo de verdade (isso é
+    só o resumo mandado pra IA escrever pergunta, o slide salvo continua
+    com o texto completo)."""
+    resumidos = []
+    for b in blocos:
+        b = dict(b)
+        tipo = b.get("tipo")
+        if tipo == "diagrama":
+            b.pop("svg_raw", None)
+            if "descricao" in b:
+                b["descricao"] = _truncar(b["descricao"])
+        elif "texto" in b:
+            b["texto"] = _truncar(b["texto"])
+        elif "itens" in b and isinstance(b["itens"], list):
+            b["itens"] = [
+                {**i, "descricao": _truncar(i["descricao"])} if isinstance(i, dict) and "descricao" in i
+                else (_truncar(i) if isinstance(i, str) else i)
+                for i in b["itens"]
+            ]
+        elif tipo == "cols2":
+            for lado in ("esquerda", "direita"):
+                if lado in b and isinstance(b[lado], dict) and "texto" in b[lado]:
+                    b[lado] = {**b[lado], "texto": _truncar(b[lado]["texto"])}
+        resumidos.append(b)
+    return resumidos
+
+
 class QuizAgent(BaseAgent):
     """Gera as perguntas de um tópico a partir do conteúdo já escrito."""
 
-    async def generate_perguntas(self, conteudo: dict) -> dict:
+    async def generate_perguntas(self, conteudo: dict, max_tokens: int = 2800) -> dict:
         conteudo_resumido = {
             "titulo": conteudo.get("titulo"),
             "slides": [
                 {
                     "secao": s.get("secao"),
                     "titulo_secao": s.get("titulo_secao"),
-                    "blocos": s.get("blocos"),
+                    "blocos": _resumir_blocos_para_quiz(s.get("blocos", [])),
                     "checkpoint_apos": s.get("checkpoint_apos"),
                 }
                 for s in conteudo.get("slides", [])
@@ -91,4 +134,12 @@ CONTEÚDO DO TÓPICO:
 
 {SCHEMA_PERGUNTAS}
 """
-        return await self.run_json_com_retry(prompt)
+        # max_tokens baixo por padrão (2800): a resposta esperada aqui é só um
+        # punhado de perguntas (não um tópico inteiro), e no Groq isso deixa mais
+        # espaço de prompt dentro do teto de 8000/min (ver base_agent.py e achado
+        # de 2026-08-26 no histórico do projeto). Esse teto NÃO se aplica ao
+        # Gemini (cuja restrição é 20 requisições/dia, não tokens/requisição) —
+        # em tópicos ricos com vários itens "classify", 2800 tokens de saída
+        # cortam a resposta no meio do JSON; quem chama com GeminiService deve
+        # passar um max_tokens maior (achado gerando o Tópico 3, 2026-09-01).
+        return await self.run_json_com_retry(prompt, max_tokens=max_tokens)

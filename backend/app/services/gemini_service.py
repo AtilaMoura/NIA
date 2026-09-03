@@ -1,44 +1,53 @@
 # backend/app/services/gemini_service.py
 """
-Serviço para comunicação com Google Gemini API
+Serviço para comunicação com Google Gemini API.
+
+Migrado em 2026-08-26 do pacote antigo `google-generativeai` (0.3.2) pro SDK
+novo unificado `google-genai` — o pacote antigo está descontinuado (repo
+renomeado "deprecated-generative-ai-python") e dava `504 Deadline Exceeded`
+sempre em ~60s com gemini-2.5-flash, independente do tamanho do prompt (bug
+conhecido desse SDK antigo com esse modelo — ver
+curso de obreiro/anotação para IA.md pro diagnóstico completo, testado
+isolado, sem retry, 2 vezes seguidas). Interface pública da classe (generate/
+generate_json/validate_content) mantida idêntica — nada no resto do código
+(ia_agent.py, quiz_agent.py, reviewer_agent.py, tutor_agent.py) precisa mudar.
 """
 
-import google.generativeai as genai
 import os
 from typing import Optional
-import json
-import re
+
+from google import genai
+from google.genai import types
+
 
 class GeminiService:
     """
-    Service para chamar a API do Google Gemini
-    
-    Gemini Pro é GRÁTIS e muito bom para:
-    - Análise e validação
-    - Geração de quizzes
-    - Coordenação (Orchestrator)
+    Service para chamar a API do Google Gemini (SDK novo, google-genai).
     """
-    
-    def __init__(self, model_name: str = "gemini-2.5-flash"):
+
+    def __init__(self, model_name: str = "gemini-2.5-flash", timeout_ms: int = 90_000):
         """
         Inicializa o service do Gemini
-        
+
         Args:
-            model_name: Modelo a usar (gemini-pro é o padrão)
+            model_name: Modelo a usar
+            timeout_ms: Timeout por requisição (o SDK antigo travava sem
+                limite nenhum — esse aqui é explícito, mesmo que o SDK novo
+                também tenha bugs conhecidos de timeout não 100% respeitado)
         """
         api_key = os.getenv("GEMINI_API_KEY")
-        
+
         if not api_key:
             raise ValueError("❌ GEMINI_API_KEY não encontrada no .env!")
-        
-        # Configura a API
-        genai.configure(api_key=api_key)
-        
-        # Cria o modelo
-        self.model = genai.GenerativeModel(model_name)
-        
-        print(f"✅ Gemini Service inicializado com modelo: {model_name}")
-    
+
+        self.model_name = model_name
+        self.client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(timeout=timeout_ms),
+        )
+
+        print(f"✅ Gemini Service inicializado com modelo: {model_name} (SDK google-genai, timeout {timeout_ms}ms)")
+
     async def generate(
         self,
         prompt: str,
@@ -47,34 +56,29 @@ class GeminiService:
     ) -> str:
         """
         Gera texto usando Gemini
-        
+
         Args:
             prompt: O prompt/pergunta para a IA
             temperature: Criatividade (0.0 = preciso, 1.0 = criativo)
             max_tokens: Tamanho máximo da resposta
-        
+
         Returns:
             str: Texto gerado pela IA
         """
-        
         try:
-            # Configurações de geração
-            generation_config = {
-                "temperature": temperature,
-                "max_output_tokens": max_tokens,
-            }
-            
-            # Gera o conteúdo (sícrono, mas rápido)
-            response = self.model.generate_content(
-                prompt,
-                generation_config=generation_config
+            response = await self.client.aio.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=temperature,
+                    max_output_tokens=max_tokens,
+                ),
             )
-            
             return response.text
-        
+
         except Exception as e:
             raise Exception(f"❌ Erro ao chamar Gemini: {str(e)}")
-    
+
     async def generate_json(
         self,
         prompt: str,
@@ -86,46 +90,40 @@ class GeminiService:
 
         Útil para dados estruturados (quizzes, estruturas de curso)
 
-        max_tokens=8000 (era 4000, herdado do default de generate()): achado
-        testando a Fase 7 ponta a ponta — um tópico completo (schema de
+        max_tokens=8000: um tópico completo (schema de
         docs/schema/schema-conteudo-topico.md, gerado em 1 chamada só no modo
-        "comum") passa fácil de 3000-3500 tokens de saída, e com 4000 a resposta
-        as vezes vinha cortada no meio do JSON (erro "Resposta não é JSON válido"
-        que na real era JSON truncado, não markdown sobrando).
+        "comum") passa fácil de 3000-3500 tokens de saída.
         """
+        import json
+        import re
 
-        # Adiciona instrução para retornar JSON
         full_prompt = f"""{prompt}
 
 IMPORTANTE: Retorne APENAS um JSON válido, sem texto adicional, sem markdown.
 Não use ```json, apenas o JSON puro."""
 
-        # Gera o texto
         response = await self.generate(
             prompt=full_prompt,
             temperature=temperature,
             max_tokens=max_tokens
         )
-        
-        # Remove possíveis markdown
+
         response = re.sub(r'```json\n?', '', response)
         response = re.sub(r'```\n?', '', response)
         response = response.strip()
-        
-        # Converte para dict
+
         try:
             return json.loads(response)
-        except json.JSONDecodeError as e:
-            # Tenta encontrar JSON no texto
+        except json.JSONDecodeError:
             match = re.search(r'\{.*\}', response, re.DOTALL)
             if match:
                 try:
                     return json.loads(match.group())
-                except:
+                except Exception:
                     pass
-            
+
             raise Exception(f"❌ Resposta não é JSON válido: {response[:200]}...")
-    
+
     async def validate_content(
         self,
         content: str,
@@ -133,17 +131,16 @@ Não use ```json, apenas o JSON puro."""
     ) -> dict:
         """
         Valida conteúdo com base em critérios
-        
+
         Útil para o Reviewer Agent
-        
+
         Args:
             content: Conteúdo a validar
             criteria: Critérios de validação
-        
+
         Returns:
             dict: {"score": 8.5, "feedback": "...", "approved": true}
         """
-        
         prompt = f"""Você é um revisor técnico especializado.
 
 CONTEÚDO A VALIDAR:
@@ -160,7 +157,7 @@ Analise o conteúdo e retorne um JSON com:
   "weaknesses": ["ponto fraco 1"],
   "feedback": "Texto geral sobre a qualidade"
 }}"""
-        
+
         return await self.generate_json(prompt)
 
 
@@ -169,31 +166,21 @@ Analise o conteúdo e retorne um JSON com:
 # ============================================
 if __name__ == "__main__":
     import asyncio
-    
+
     async def test():
         service = GeminiService()
-        
-        # Teste 1: Texto simples
+
         print("\n🧪 Teste 1: Geração de texto")
         response = await service.generate(
             prompt="Explique decorators em Python em 3 linhas"
         )
         print(f"Resposta: {response}\n")
-        
-        # Teste 2: JSON
+
         print("🧪 Teste 2: Geração de JSON")
         quiz = await service.generate_json(
             prompt="""Crie um quiz sobre Python básico com 2 questões.
             Formato: {"questions": [{"question": "...", "options": {...}, "correct": "A"}]}"""
         )
         print(f"Quiz: {quiz}\n")
-        
-        # Teste 3: Validação
-        print("🧪 Teste 3: Validação de conteúdo")
-        validation = await service.validate_content(
-            content="Python é uma linguagem de programação interpretada...",
-            criteria="Clareza, precisão técnica, didática"
-        )
-        print(f"Validação: {validation}")
-    
+
     asyncio.run(test())

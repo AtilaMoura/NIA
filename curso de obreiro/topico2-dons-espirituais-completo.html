@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tópico 2 — Dons Espirituais: Ferramentas para o Chamado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6ee; --surface: #ffffff; --surface-2: #f3ece0;
+    --ink: #2b241c; --ink-muted: #6b5f4f; --border: #e4d8c3;
+    --accent: #8a5a2b; --accent-2: #b8763a; --gold: #b8923e;
+    --verse-bg: #fbf3e0; --verse-border: #c9a24a;
+    --radius: 14px; --radius-lg: 20px;
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Source Sans 3', -apple-system, Segoe UI, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); line-height: 1.7; font-size: 17px; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 20px 80px; }
+  .hero { position: relative; height: 340px; margin-bottom: 0; overflow: hidden; }
+  .hero img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.9) brightness(0.75); }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(43,36,28,.15) 0%, rgba(43,36,28,.55) 75%, rgba(43,36,28,.85) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 32px clamp(20px, 6vw, 60px); }
+  .kicker { color: #f0dcae; font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; }
+  .hero h1 { font-family: var(--font-display); color: #fff; font-size: clamp(28px, 5vw, 44px); font-weight: 600; margin: 0 0 8px; line-height: 1.15; max-width: 640px; }
+  .hero .subref { color: #e8d9b8; font-size: 15px; font-style: italic; }
+  main { padding-top: 44px; }
+  .lede { font-family: var(--font-display); font-size: 21px; line-height: 1.6; color: var(--ink); margin-bottom: 8px; }
+  .meta-row { display: flex; gap: 18px; flex-wrap: wrap; margin: 22px 0 40px; font-size: 13px; color: var(--ink-muted); }
+  .meta-row span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  h2.section-title { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--ink); margin: 56px 0 6px; padding-top: 4px; display: flex; align-items: baseline; gap: 10px; }
+  h2.section-title .num { font-size: 14px; color: var(--gold); font-weight: 700; font-family: var(--font-body); letter-spacing: .06em; }
+  .section-intro { font-family: var(--font-display); font-size: 17px; color: var(--ink-muted); font-style: italic; margin: 0 0 20px; }
+  p { margin: 0 0 18px; }
+  strong { color: var(--ink); }
+  .verse { background: var(--verse-bg); border-left: 4px solid var(--verse-border); border-radius: 0 var(--radius) var(--radius) 0; padding: 20px 24px; margin: 22px 0; }
+  .verse .verse-text { font-family: var(--font-display); font-size: 19px; line-height: 1.65; color: #4a3a1e; font-style: italic; }
+  .verse .verse-ref { margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: .04em; text-transform: uppercase; }
+  .box { border-radius: var(--radius); padding: 18px 22px; margin: 22px 0; font-size: 15.5px; border: 1px solid var(--border); background: var(--surface); }
+  .box .box-label { font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; display: block; color: var(--accent-2); }
+  .box p:last-child { margin-bottom: 0; }
+  .box.warning { background: #fbeee4; border-color: #e6c7a8; }
+  .box.warning .box-label { color: #a35a1e; }
+  .box.application { background: #eef3ea; border-color: #cfdcc4; }
+  .box.application .box-label { color: #4f7a3a; }
+  .cols2 { display: flex; gap: 10px; flex-wrap: wrap; margin: 22px 0; }
+  .cols2 > .box { flex: 1; min-width: 240px; margin: 0; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 22px 0; }
+  @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .card-icon { font-size: 20px; }
+  .card-name { font-family: var(--font-display); font-weight: 600; font-size: 15px; margin: 6px 0 4px; }
+  .card-desc { font-size: 13.5px; color: var(--ink-muted); line-height: 1.55; }
+  .takeaway { margin: 26px 0 8px; padding: 12px 16px; background: var(--surface-2); border-left: 3px solid var(--gold); border-radius: 0 var(--radius) var(--radius) 0; font-size: 14.5px; line-height: 1.55; }
+  .takeaway strong { color: var(--accent); letter-spacing: .02em; }
+  figure.inline-img { margin: 32px -4px; }
+  figure.inline-img img { width: 100%; border-radius: var(--radius-lg); display: block; }
+  figure.inline-img figcaption { font-size: 12.5px; color: var(--ink-muted); margin-top: 8px; text-align: center; font-style: italic; }
+  figure.diagram-fig { margin: 28px 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+  figure.diagram-fig svg { width: 100%; height: auto; display: block; }
+  figure.diagram-fig figcaption { font-size: 12.5px; color: var(--ink-muted); margin-top: 10px; text-align: center; font-style: italic; }
+  .reflect { background: var(--surface); border: 1px dashed var(--gold); border-radius: var(--radius-lg); padding: 24px 26px; margin: 30px 0; }
+  .reflect h3 { font-family: var(--font-display); margin: 0 0 14px; font-size: 19px; color: var(--accent); }
+  .reflect ol { margin: 0; padding-left: 20px; } .reflect li { margin-bottom: 10px; }
+  .summary-card { background: linear-gradient(135deg, #3a2e1c, #2b241c); color: #f0e6cf; border-radius: var(--radius-lg); padding: 28px 28px; margin: 44px 0 20px; }
+  .summary-card h3 { font-family: var(--font-display); margin: 0 0 14px; font-size: 20px; color: #f0dcae; }
+  .summary-card ul { margin: 0; padding-left: 18px; } .summary-card li { margin-bottom: 8px; font-size: 15px; }
+  footer.sources { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--ink-muted); }
+  footer.sources p { margin: 0 0 6px; }
+  @media (max-width: 600px) { .hero { height: 260px; } .verse .verse-text { font-size: 17px; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <img src="http://localhost:8100/static/course-images/curso8/topico2-maos-dadas-ia.png" alt="Várias mãos diferentes se estendendo em direção ao centro, palmas abertas, luz quente">
+  <div class="hero-overlay">
+    <div class="kicker">Módulo 1 · Chamado e Fundamento Bíblico · Tópico 2</div>
+    <h1>Dons Espirituais: Ferramentas para o Chamado</h1>
+    <div class="subref">Compreendendo e aplicando Romanos 12:6-8 no serviço cristão</div>
+  </div>
+</div>
+
+<div class="wrap">
+<main>
+  <p class="lede">Depois de entender que todo crente já é sacerdote (Tópico 1), a pergunta natural é: sacerdote pra fazer o quê? Este tópico responde com Romanos 12:6-8 — a lista de dons que Deus distribui pela graça, o "como" exercer cada um, e como o seu dom dá forma concreta ao seu chamado.</p>
+
+  <div class="meta-row">
+    <span><span class="dot"></span>Leitura: ~16 min</span>
+    <span><span class="dot"></span>Base: Romanos 12:6-8, 1 Coríntios 12, Efésios 4:11-12, 1 Pedro 4:10</span>
+    <span><span class="dot"></span>Nível: intermediário</span>
+  </div>
+
+  <h2 class="section-title"><span class="num">01</span> O que é um dom espiritual</h2>
+  <p class="section-intro">Antes de olhar a lista, é preciso definir o termo — e o principal erro aqui é confundir dom com talento.</p>
+
+  <p>Um <strong>dom espiritual</strong> é uma capacitação concedida por Deus, pela ação do Espírito Santo, para o serviço no corpo de Cristo. A ênfase do Novo Testamento está em três pontos: a <strong>origem</strong> é a graça (não o mérito nem o esforço), o <strong>propósito</strong> é edificar a igreja (não projetar o indivíduo), e a <strong>distribuição</strong> é decisão de Deus, não escolha nossa.</p>
+
+  <div class="verse">
+    <div class="verse-text">"Mas um só e o mesmo Espírito opera todas estas coisas, distribuindo particularmente a cada um como quer."</div>
+    <div class="verse-ref">1 Coríntios 12:11 (Almeida)</div>
+  </div>
+
+  <p>"Como quer" e "a cada um": o dom não é conquistado nem escolhido de catálogo — é distribuído pelo Espírito segundo a vontade dele, e ninguém fica sem. Isso já tira o peso de duas ansiedades comuns do novo obreiro: a de "não ter dom nenhum" e a de "precisar ter um dom específico" pra ser útil.</p>
+
+  <div class="box">
+    <span class="box-label">💡 Dom não é a mesma coisa que talento</span>
+    <p>Um talento natural (voz bonita, facilidade com números, jeito com gente) pode existir em qualquer pessoa, crente ou não, e serve a qualquer finalidade. Um dom espiritual é dado ao crente <em>para o serviço do corpo</em> e só cumpre seu propósito nesse contexto. Na prática os dois costumam andar juntos — Deus frequentemente capacita a pessoa numa área em que ela já tem afinidade —, mas a origem (graça, não genética ou treino) e o alvo (a igreja, não o currículo pessoal) são diferentes.</p>
+  </div>
+
+  <p>A imagem que a Bíblia mais usa pra explicar tudo isso é a do <strong>corpo</strong>: muitos membros, funções distintas, um organismo só. Nenhum membro tem todas as funções, e nenhum é dispensável.</p>
+
+  <div class="verse">
+    <div class="verse-text">"Porque, assim como o corpo é um, e tem muitos membros, e todos os membros do corpo, embora muitos, formam um só corpo, assim também é Cristo."</div>
+    <div class="verse-ref">1 Coríntios 12:12 (Almeida)</div>
+  </div>
+
+  <p class="takeaway"><strong>Em resumo:</strong> dom é capacitação da graça, distribuída pelo Espírito "como quer", para servir o corpo — não é talento natural nem mérito, e todo crente recebeu ao menos um.</p>
+
+  <h2 class="section-title"><span class="num">02</span> A base bíblica: Romanos 12:6-8</h2>
+  <p class="section-intro">Esta é a passagem central do tópico. Ela aparece uma vez aqui, na íntegra — depois vamos voltar a ela por partes.</p>
+
+  <div class="verse">
+    <div class="verse-text">"De modo que, tendo diferentes dons segundo a graça que nos foi dada, se é profecia, seja ela segundo a medida da fé; se é ministério, seja em ministrar; se é ensinar, haja dedicação ao ensino; ou que exorta, use esse dom em exortar; o que reparte, faça-o com liberalidade; o que preside, com zelo; o que usa de misericórdia, com alegria."</div>
+    <div class="verse-ref">Romanos 12:6-8 (Almeida)</div>
+  </div>
+
+  <p>O texto vem logo depois de Paulo pedir que ninguém pense de si "mais alto do que convém" e falar da "medida de fé que Deus repartiu a cada um" (Rm 12:3), e da imagem do corpo com muitos membros em Rm 12:4-5. O contexto, portanto, é <strong>humildade e interdependência</strong> — a lista de dons não é um convite a se comparar, é a explicação de por que cada membro é necessário.</p>
+
+  <p>A palavra traduzida por "diferentes" (do grego <em>diáphoros</em>) marca que a variedade é intencional, parte do projeto — não um acidente que a igreja precise corrigir para ficar "uniforme".</p>
+
+  <div class="cols2">
+    <div class="box">
+      <span class="box-label">🎁 A origem: graça</span>
+      <p>"Segundo a graça que nos foi dada" (Rm 12:6). A palavra grega para dom aqui, <em>chárisma</em>, vem de <em>cháris</em> — graça. O dom é favor imerecido, não recompensa. Isso derruba dois erros opostos: o orgulho de quem acha que mereceu, e o complexo de quem acha que "não tem nada pra oferecer".</p>
+    </div>
+    <div class="box">
+      <span class="box-label">⚖️ A medida: "segundo a medida da fé"</span>
+      <p>Dito sobre a profecia, mas normalmente aplicado a todos os dons. Duas leituras clássicas: (1) exercer o dom na proporção da fé que Deus concedeu a cada um (ligando a Rm 12:3), sem forçar além do que se recebeu; (2) exercê-lo em conformidade com o conteúdo já revelado da fé, sem contradizer a Escritura. As duas apontam pro mesmo lugar: dependência de Deus, não presunção.</p>
+    </div>
+  </div>
+
+  <div class="box">
+    <span class="box-label">📖 A lista não é exaustiva</span>
+    <p>Paulo dá sete exemplos aqui, mas <strong>1 Coríntios 12:8-10</strong> e <strong>Efésios 4:11</strong> citam outros (cura, línguas, discernimento de espíritos, apostolado, evangelismo, pastoreio). Tradições cristãs divergem sobre como alguns desses dons operam hoje — algumas entendem que continuam ativos como no Novo Testamento, outras que cessaram com os apóstolos. <strong>Este curso não assume nenhuma dessas posições.</strong> O princípio comum às três listas é o que interessa aqui: os dons vêm da graça de Deus e servem ao corpo.</p>
+  </div>
+
+  <p class="takeaway"><strong>Em resumo:</strong> em Rm 12:6-8 a origem do dom é a graça (<em>chárisma</em>), a régua do uso é "a medida da fé" (dependência, não presunção), e a lista é ilustrativa — não fechada.</p>
+
+  <h2 class="section-title"><span class="num">03</span> Os sete dons e o modo de exercê-los</h2>
+  <p class="section-intro">Para cada dom, Paulo acrescenta uma atitude. O "como" é parte da instrução, não um detalhe.</p>
+
+  <div class="cards">
+    <div class="card">
+      <span class="card-icon">💬</span>
+      <div class="card-name">Profecia — "segundo a medida da fé"</div>
+      <div class="card-desc">Comunicar uma mensagem da parte de Deus com fidelidade à revelação recebida e em conformidade com a fé cristã, sem exceder os limites do que a Escritura ensina. Discernimento e responsabilidade.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🤝</span>
+      <div class="card-name">Ministério — "seja em ministrar"</div>
+      <div class="card-desc">Do grego <em>diakonia</em>, serviço prático. Dedicação ativa em atender necessidades concretas dos outros, com diligência e foco na ação, não no reconhecimento.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">📚</span>
+      <div class="card-name">Ensino — "haja dedicação ao ensino"</div>
+      <div class="card-desc">Compromisso com clareza, precisão e profundidade ao transmitir a Palavra. Preparo sério e constante, para instruir e edificar a comunidade.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🗣️</span>
+      <div class="card-name">Exortação — "use esse dom em exortar"</div>
+      <div class="card-desc">Encorajar, consolar, admoestar e desafiar os irmãos, sempre com o propósito de fortalecer — frequentemente em momentos de dificuldade ou desânimo.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">💰</span>
+      <div class="card-name">Repartir — "com liberalidade"</div>
+      <div class="card-desc">Compartilhar recursos financeiros ou materiais com generosidade e sem segundas intenções, para suprir necessidades e sustentar a obra. A palavra também carrega a ideia de simplicidade, sem ostentação.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">👑</span>
+      <div class="card-name">Presidir — "com zelo"</div>
+      <div class="card-desc">Organizar, guiar e cuidar. O termo grego também é usado para quem "cuida de" alguém; o "zelo" indica diligência e senso de responsabilidade pelos que estão sob sua liderança.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">❤️</span>
+      <div class="card-name">Misericórdia — "com alegria"</div>
+      <div class="card-desc">Compaixão que vira ação para aliviar o sofrimento alheio. O "com alegria" deixa claro que não é para ser feito como fardo, mas como expressão genuína de amor.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🎯</span>
+      <div class="card-name">O padrão por trás dos sete</div>
+      <div class="card-desc">Em todos, a qualificação não descreve a <em>natureza</em> do dom, e sim a <em>atitude</em> de quem o exerce: fé, dedicação, liberalidade, zelo, alegria. Um dom exercido com a motivação errada perde o efeito ou fere.</div>
+    </div>
+  </div>
+
+  <p>Note ainda um agrupamento útil: alguns dons são de <strong>palavra</strong> (profecia, ensino, exortação) e outros de <strong>ação e cuidado</strong> (ministério, repartir, presidir, misericórdia). A igreja precisa dos dois blocos funcionando — uma comunidade só de "palavra" fica sem cuidado prático, e uma só de "ação" fica sem direção e ensino.</p>
+
+  <div class="box application">
+    <span class="box-label">💡 Aplicação</span>
+    <p>O serviço cristão é tanto sobre <em>o que</em> se faz quanto sobre <em>o espírito com que</em> se faz. Vale checar: quando você serve, é por fé e alegria, ou por obrigação, medo de decepcionar, ou comparação com outra pessoa? A atitude aparece no resultado.</p>
+  </div>
+
+  <div class="verse">
+    <div class="verse-text">"Servindo uns aos outros conforme o dom que cada um recebeu, como bons despenseiros da multiforme graça de Deus."</div>
+    <div class="verse-ref">1 Pedro 4:10 (Almeida)</div>
+  </div>
+
+  <p>Pedro confirma o princípio de Paulo: <strong>cada</strong> um recebeu, e o dom é para servir <strong>uns aos outros</strong>. A palavra "despenseiros" (administradores de uma casa) diz que o dom é algo que Deus confiou à sua guarda para distribuir — não uma posse para acumular.</p>
+
+  <figure class="diagram-fig"><svg class="diagram" viewBox="0 0 360 460" role="img" aria-label="Ciclo do uso responsável de um dom: reconhecer, servir, exercer com a atitude certa, e reavaliar se está edificando o corpo">
+    <defs>
+      <marker id="seta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#8a5a1a"/>
+      </marker>
+    </defs>
+
+    <rect x="90" y="8" width="180" height="42" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+    <text x="180" y="26" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Reconhecer o dom</text>
+    <text x="180" y="40" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Rm 12:6</text>
+
+    <line x1="180" y1="50" x2="180" y2="66" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+
+    <rect x="60" y="66" width="240" height="42" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+    <text x="180" y="84" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Buscar oportunidade de servir</text>
+    <text x="180" y="98" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">1Pe 4:10</text>
+
+    <line x1="180" y1="108" x2="180" y2="124" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+
+    <rect x="60" y="124" width="240" height="42" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+    <text x="180" y="142" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Exercer com a atitude certa</text>
+    <text x="180" y="156" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Rm 12:6-8</text>
+
+    <line x1="180" y1="166" x2="180" y2="184" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+
+    <polygon points="180,184 262,232 180,280 98,232" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5"/>
+    <text x="180" y="228" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Isso edifica</text>
+    <text x="180" y="242" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">o corpo de Cristo?</text>
+
+    <line x1="98" y1="232" x2="30" y2="290" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+    <text x="52" y="270" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#8a5a1a" text-anchor="middle">Não</text>
+    <line x1="262" y1="232" x2="330" y2="290" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+    <text x="308" y="270" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#8a5a1a" text-anchor="middle">Sim</text>
+
+    <rect x="10" y="296" width="170" height="50" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+    <text x="95" y="316" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Buscar orientação</text>
+    <text x="95" y="330" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">e ajustar</text>
+    <text x="95" y="342" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Tg 1:5</text>
+
+    <rect x="180" y="296" width="170" height="50" fill="#fffbf1" stroke="#d8c58e" stroke-width="1.5" rx="8"/>
+    <text x="265" y="316" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Continuar com</text>
+    <text x="265" y="330" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">perseverança</text>
+    <text x="265" y="342" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Gl 6:9</text>
+
+    <line x1="95" y1="346" x2="160" y2="392" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+    <line x1="265" y1="346" x2="200" y2="392" stroke="#8a5a1a" stroke-width="1.6" fill="none" marker-end="url(#seta)"/>
+
+    <rect x="80" y="398" width="200" height="50" fill="#f3e6d3" stroke="#8a5a1a" stroke-width="1.5" rx="8"/>
+    <text x="180" y="418" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">Crescimento do corpo</text>
+    <text x="180" y="432" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#2b2013" text-anchor="middle">de Cristo</text>
+    <text x="180" y="444" font-family="Source Sans 3, sans-serif" font-size="9" fill="#7d6a45" text-anchor="middle">Ef 4:16</text>
+  </svg><figcaption>O uso responsável de um dom é um ciclo: reconhecer, servir, exercer com a atitude certa, e reavaliar se está edificando o corpo.</figcaption></figure>
+
+  <p class="takeaway"><strong>Em resumo:</strong> os sete dons se dividem entre palavra e ação/cuidado, e cada um vem com uma atitude prescrita — o "como" não é acessório, é a instrução.</p>
+
+  <h2 class="section-title"><span class="num">04</span> O dom a serviço do seu chamado</h2>
+  <p class="section-intro">O Tópico 1 mostrou que todo crente é chamado a servir. O dom é o que dá <em>forma concreta</em> a esse chamado — é a ferramenta com que a vocação de fato acontece.</p>
+
+  <p>"Chamado" e "dom" não são a mesma coisa, mas caminham juntos. O <strong>chamado</strong> é a direção — a área e as pessoas que Deus coloca no seu coração. O <strong>dom</strong> é a capacitação que torna essa direção operante: sem ele, a boa intenção não edifica ninguém. Alguém pode sentir um chamado forte pra ensinar e não ter recebido o dom de ensino — nesse caso, Deus normalmente ou desenvolve o dom com o tempo, ou redireciona o chamado pra onde a capacitação já está.</p>
+
+  <div class="box">
+    <span class="box-label">🧭 Onde o seu lugar de serviço aparece</span>
+    <p>Costuma ser na interseção de três coisas: o <strong>dom</strong> que Deus te deu, a <strong>oportunidade</strong> concreta que existe na sua igreja, e a <strong>necessidade</strong> real da comunidade naquele momento. Um dom sem oportunidade fica parado; uma oportunidade sem dom vira sobrecarga; atender uma necessidade que não é real gasta energia à toa. Quando os três se encontram, o serviço flui e gera fruto.</p>
+  </div>
+
+  <p>Alguns exemplos de como isso se encaixa na prática:</p>
+
+  <div class="cards">
+    <div class="card">
+      <span class="card-icon">📚</span>
+      <div class="card-name">Chamado à formação de discípulos</div>
+      <div class="card-desc">O dom de <strong>ensino</strong> é a ferramenta primária — permite comunicar a Palavra com clareza e profundidade, semana após semana, sem esvaziar.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">❤️</span>
+      <div class="card-name">Chamado a cuidar de quem sofre</div>
+      <div class="card-desc">O dom de <strong>misericórdia</strong> sustenta a presença constante junto a doentes, enlutados e famílias em crise — com alegria, não como peso.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🗂️</span>
+      <div class="card-name">Chamado a organizar e conduzir</div>
+      <div class="card-desc">Os dons de <strong>presidir</strong> e <strong>ministério</strong> equipam pra coordenar equipes, agendas e recursos com zelo, liberando os outros pra servirem melhor.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">💰</span>
+      <div class="card-name">Chamado a sustentar a obra</div>
+      <div class="card-desc">O dom de <strong>repartir</strong> com liberalidade torna alguém um pilar silencioso — viabilizando projetos e pessoas que sem esse suporte parariam.</div>
+    </div>
+  </div>
+
+  <div class="verse">
+    <div class="verse-text">"E ele deu uns como apóstolos, e outros como profetas, e outros como evangelistas, e outros como pastores e mestres, tendo em vista o aperfeiçoamento dos santos, para a obra do ministério, para edificação do corpo de Cristo."</div>
+    <div class="verse-ref">Efésios 4:11-12 (Almeida)</div>
+  </div>
+
+  <p>Efésios 4 mostra o desenho completo: os dons de liderança existem para <strong>equipar os santos</strong> — todos os crentes — "para a obra do ministério". Ou seja, a liderança dotada não faz o serviço no lugar do corpo; ela capacita o corpo a servir. É a mesma lógica do sacerdócio universal do Tópico 1, agora aplicada aos dons: ninguém é espectador.</p>
+
+  <div class="box application">
+    <span class="box-label">🛠️ Pra você, novo obreiro</span>
+    <p>Você não precisa ter "certeza absoluta" do seu dom pra começar. Comece servindo em algo concreto, observe onde aparece <em>fruto</em> (as pessoas são edificadas, você não se esvazia, outros confirmam) e ajuste a partir daí. O chamado se esclarece andando, não parado esperando um sinal. Servir cedo, ainda sem título, é exatamente o que este curso propõe.</p>
+  </div>
+
+  <p class="takeaway"><strong>Em resumo:</strong> o chamado é a direção, o dom é a ferramenta que a torna operante, e o lugar de serviço aparece onde dom, oportunidade e necessidade se cruzam — a liderança dotada existe pra equipar o corpo, não pra substituí-lo (Ef 4:11-12).</p>
+
+  <h2 class="section-title"><span class="num">05</span> Como identificar e desenvolver o seu</h2>
+  <p class="section-intro">O texto bíblico não dá um método passo a passo. O que segue é uma leitura prática, apoiada no princípio de que o dom se manifesta no uso e é confirmado pela comunidade.</p>
+
+  <p><strong>Identificar</strong> costuma envolver cinco frentes, em paralelo — não em ordem fixa:</p>
+
+  <div class="cards">
+    <div class="card">
+      <span class="card-icon">🙏</span>
+      <div class="card-name">Oração</div>
+      <div class="card-desc">Pedir discernimento a Deus. O Espírito, que distribui os dons "como quer" (1Co 12:11), é quem os revela.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">📖</span>
+      <div class="card-name">Estudo da Palavra</div>
+      <div class="card-desc">Conhecer as passagens que listam e descrevem os dons (Rm 12, 1Co 12, Ef 4) pra saber o que procurar.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🪞</span>
+      <div class="card-name">Autoavaliação</div>
+      <div class="card-desc">Onde você se sente mais realizado servindo? Onde seu esforço gera resultado real para os outros?</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">👥</span>
+      <div class="card-name">Confirmação da comunidade</div>
+      <div class="card-desc">Líderes e irmãos costumam enxergar em você dons que você ainda não percebeu — pergunte a eles.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🧭</span>
+      <div class="card-name">Experimentação</div>
+      <div class="card-desc">Servir em áreas diferentes. É no uso que o dom aparece e se confirma.</div>
+    </div>
+  </div>
+
+  <p><strong>Desenvolver</strong>, depois de identificado, é aprender a usar melhor essa capacitação:</p>
+
+  <ul>
+    <li><strong>Prática constante</strong> — como músculo, o dom se fortalece com uso regular; Paulo diz a Timóteo para "não desprezar o dom" e depois para "reavivá-lo" (1Tm 4:14; 2Tm 1:6).</li>
+    <li><strong>Aprendizado e mentoria</strong> — buscar treino e aprender com quem já exerce o mesmo dom com maturidade.</li>
+    <li><strong>Dependência de Deus</strong> — a eficácia vem dele; manter vida de oração e submissão ao Espírito.</li>
+    <li><strong>Fidelidade e humildade</strong> — usar o dom pra edificar o corpo, não pra reconhecimento pessoal.</li>
+  </ul>
+
+  <div class="box application">
+    <span class="box-label">💡 É um processo contínuo</span>
+    <p>Identificar um dom raramente é um evento único e definitivo. Ao longo da caminhada é possível descobrir novos dons, ou ver os que você já conhece se aprofundarem e se manifestarem de outras formas.</p>
+  </div>
+
+  <p class="takeaway"><strong>Em resumo:</strong> o dom se descobre no uso e na confirmação da igreja (oração, Palavra, autoavaliação, comunidade, prática) e se desenvolve como um músculo — com uso regular, mentoria e dependência de Deus.</p>
+
+  <h2 class="section-title"><span class="num">06</span> Unidade do corpo, sem hierarquia</h2>
+  <p class="section-intro">A diversidade dos dons existe para unir, não para classificar quem vale mais.</p>
+
+  <figure class="inline-img">
+    <img src="http://localhost:8100/static/course-images/curso8/topico2-dons-corpo-servindo-ia.png" alt="Crentes servindo ao mesmo tempo com dons diferentes numa sala de igreja: louvor, ensino, som, acolhimento e oração">
+    <figcaption>Dons diferentes, o mesmo Espírito, o mesmo corpo trabalhando junto (1Co 12:4-6).</figcaption>
+  </figure>
+
+  <div class="verse">
+    <div class="verse-text">"Ora, há diversidade de dons, mas o Espírito é o mesmo. E há diversidade de ministérios, mas o Senhor é o mesmo. E há diversidade de operações, mas é o mesmo Deus que opera tudo em todos."</div>
+    <div class="verse-ref">1 Coríntios 12:4-6 (Almeida)</div>
+  </div>
+
+  <p>Paulo lista os dons em Romanos 12:6-8 <strong>sem</strong> colocar um acima do outro. Nenhum é autossuficiente, e a ausência ou o desprezo de um afeta o corpo inteiro. A comparação de dons costuma produzir três coisas ruins — inveja, orgulho e desânimo — e as três minam a unidade.</p>
+
+  <div class="verse">
+    <div class="verse-text">"E o olho não pode dizer à mão: Não tenho necessidade de ti; nem ainda a cabeça aos pés: Não tenho necessidade de vós."</div>
+    <div class="verse-ref">1 Coríntios 12:21 (Almeida)</div>
+  </div>
+
+  <div class="box">
+    <span class="box-label">📖 O que vem logo depois: o amor</span>
+    <p>Não é acidente que, terminando de falar dos dons em 1 Coríntios 12, Paulo emende com o capítulo 13: "ainda que eu tivesse o dom de profecia [...] e não tivesse amor, nada seria" (1Co 13:2). O amor não é mais um dom da lista — é o modo sem o qual nenhum dom edifica. Um obreiro tecnicamente dotado e sem amor faz barulho, não construção.</p>
+  </div>
+
+  <div class="box application">
+    <span class="box-label">💡 Valorizar cada contribuição</span>
+    <p>A contribuição de um membro, por mais discreta que pareça, é tão essencial quanto a de outro que atua de forma mais visível. A força da igreja está em reconhecer, encorajar e integrar todas essas manifestações da graça — e o obreiro é chamado a discernir como o seu dom apoia o dos outros, não a operar isolado.</p>
+  </div>
+
+  <p class="takeaway"><strong>Em resumo:</strong> a variedade de dons serve à unidade, não à hierarquia (1Co 12:4-6, 21) — e o amor (1Co 13) é a condição sem a qual nenhum dom edifica.</p>
+
+  <div class="reflect">
+    <h3>Pra refletir antes do próximo tópico</h3>
+    <ol>
+      <li>Antes deste tópico, você já sabia identificar qual dom Deus te deu, ou essa é a primeira vez que parou pra pensar nisso? O que mais chamou sua atenção na lista de Romanos 12:6-8?</li>
+      <li>O texto liga cada dom a uma atitude (fé, dedicação, liberalidade, zelo, alegria) — não só à ação. Lembre de alguém exercendo um dom sem essa atitude (por obrigação, por orgulho, por comparação). O que isso mudou no resultado?</li>
+      <li>Pense no seu chamado — a área e as pessoas que Deus tem colocado no seu coração. Que dom da lista seria a "ferramenta" natural pra esse chamado? Ele já aparece em você, ou é algo a desenvolver?</li>
+      <li>Conectando com o Tópico 1: se cada crente já é sacerdote (1Pe 2:9) e cada um recebeu ao menos um dom (1Pe 4:10), o que isso muda em como você vê alguém na sua igreja que nunca ocupou nenhuma função formal?</li>
+    </ol>
+  </div>
+
+  <div class="summary-card">
+    <h3>Resumo do Tópico 2</h3>
+    <ul>
+      <li>Dom espiritual é capacitação dada pela <strong>graça</strong> de Deus (<em>chárisma</em> / <em>cháris</em>), distribuída pelo Espírito "como quer" (1Co 12:11) para o serviço no corpo — não é mérito nem talento natural aprimorado pelo esforço.</li>
+      <li><strong>Romanos 12:6-8</strong> lista sete dons (profecia, ministério, ensino, exortação, repartir, presidir, misericórdia) e, para cada um, uma <strong>atitude</strong>: o "como" importa tanto quanto o "quê".</li>
+      <li>"Segundo a medida da fé" (Rm 12:6): exercer o dom com dependência de Deus e em conformidade com a Escritura, sem presunção.</li>
+      <li>A lista não é exaustiva — <strong>1 Coríntios 12</strong> e <strong>Efésios 4</strong> citam outros dons; tradições cristãs os interpretam de formas diferentes, e o curso não assume nenhuma posição.</li>
+      <li>O <strong>dom dá forma ao chamado</strong>: o chamado é a direção, o dom é a ferramenta que a torna operante, e o lugar de serviço aparece onde dom, oportunidade e necessidade se cruzam. A liderança dotada equipa o corpo, não o substitui (<strong>Ef 4:11-12</strong>).</li>
+      <li>Identificar o próprio dom é processo contínuo: oração, estudo da Palavra, autoavaliação, confirmação da comunidade, prática — e desenvolvê-lo é como exercitar um músculo.</li>
+      <li>Os dons existem pra <strong>edificar o corpo</strong> — unidade e interdependência (<strong>1Co 12:4-6, 12, 21</strong>), nunca comparação ou hierarquia; e sem <strong>amor</strong> (1Co 13) nenhum dom edifica.</li>
+      <li>Conecta com o Tópico 1: todo crente já é sacerdote por Cristo (1Pe 2:9) e recebeu ao menos um dom pra exercer esse sacerdócio (1Pe 4:10) — servir não espera função formal.</li>
+    </ul>
+  </div>
+
+  <footer class="sources">
+    <p><strong>Textos bíblicos:</strong> tradução Almeida (domínio público), via bible-api.com.</p>
+    <p><strong>Fontes de apoio:</strong> David Guzik, <em>Enduring Word Bible Commentary</em> (Romanos 12; 1 Coríntios 12; Efésios 4); rascunho gerado com apoio de IA (Gemini + Groq), reorganizado e enriquecido manualmente.</p>
+    <p><strong>Imagens:</strong> geradas por IA no padrão visual do curso (capa "mãos dadas" e cena "dons no corpo servindo"), salvas em <code>static/course-images/curso8/</code>.</p>
+    <p><strong>Status:</strong> pendente revisão doutrinária humana.</p>
+  </footer>
+</main>
+</div>
+</body>
+</html>

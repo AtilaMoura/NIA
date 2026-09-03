@@ -1,8 +1,13 @@
 # backend/app/services/groq_service.py    .
 """
-Serviço para comunicação com Groq API (Llama 3.3)
+Serviço para comunicação com Groq API.
+
+Achado em 2026-08-22: o modelo antigo (llama-3.3-70b-versatile) foi descontinuado pela
+Groq — a conta não tem mais nenhum modelo Llama 3.x disponível, só a nova leva
+(gpt-oss-120b/20b, qwen3.6, compound). Trocado pro maior disponível (gpt-oss-120b).
 """
 
+import asyncio
 import httpx
 import os
 from typing import Optional
@@ -10,7 +15,7 @@ from typing import Optional
 class GroqService:
 
     
-    def __init__(self, model: str = "llama-3.3-70b-versatile"):
+    def __init__(self, model: str = "openai/gpt-oss-120b"):
        
         self.api_key = os.getenv("GROQ_API_KEY")
         
@@ -50,6 +55,12 @@ class GroqService:
             "messages": messages,
             "temperature": temperature,
             "max_tokens": max_tokens,
+            # gpt-oss é um modelo de "raciocínio" — sem isso ele gasta boa parte do
+            # max_tokens pensando (campo "reasoning" separado) e pode devolver
+            # "content" vazio/truncado (visto na prática: max_tokens=50 sem isso
+            # voltou content="", finish_reason="length"). "low" mantém raciocínio
+            # mínimo e sobra orçamento pro JSON de verdade.
+            "reasoning_effort": "low",
         }
         
         # Headers
@@ -58,46 +69,59 @@ class GroqService:
             "Content-Type": "application/json"
         }
         
-        try:
-            # Faz a chamada HTTP
-            async with httpx.AsyncClient(timeout=120.0) as client:
-                response = await client.post(
-                    f"{self.base_url}/chat/completions",
-                    json=payload,
-                    headers=headers
-                )
-                
-                # Verifica se deu erro
-                response.raise_for_status()
-                
-                # Extrai o texto da resposta
-                data = response.json()
-                content = data["choices"][0]["message"]["content"]
-                
-                return content
-        
-        except httpx.HTTPStatusError as e:
-            error_detail = e.response.json() if e.response else str(e)
-            raise Exception(f"❌ Erro na API do Groq: {error_detail}")
-        
-        except Exception as e:
-            raise Exception(f"❌ Erro ao chamar Groq: {str(e)}")
+        # Retry com backoff pro rate limit de 8000 tokens/min do tier gratuito (ver
+        # nia-infra-gotchas): "Rate limit reached" (já tem uso recente na janela) e
+        # "Request too large" (esse pedido sozinho passa do teto) são os dois erros
+        # reais vistos gerando o curso de obreiro — ambos passageiros, uma nova
+        # tentativa alguns segundos depois costuma passar porque a janela de 1 min
+        # esvazia. Não faz sentido tentar de novo em erro que não é de rate limit
+        # (ex: chave inválida), por isso só entra no retry quando o code é esse.
+        max_tentativas = 4
+        espera_s = 8
+
+        for tentativa in range(1, max_tentativas + 1):
+            try:
+                async with httpx.AsyncClient(timeout=120.0) as client:
+                    response = await client.post(
+                        f"{self.base_url}/chat/completions",
+                        json=payload,
+                        headers=headers
+                    )
+                    response.raise_for_status()
+                    data = response.json()
+                    return data["choices"][0]["message"]["content"]
+
+            except httpx.HTTPStatusError as e:
+                error_detail = e.response.json() if e.response else str(e)
+                code = (error_detail.get("error") or {}).get("code") if isinstance(error_detail, dict) else None
+
+                if code == "rate_limit_exceeded" and tentativa < max_tentativas:
+                    await asyncio.sleep(espera_s)
+                    espera_s *= 2
+                    continue
+
+                raise Exception(f"❌ Erro na API do Groq: {error_detail}")
+
+            except Exception as e:
+                raise Exception(f"❌ Erro ao chamar Groq: {str(e)}")
     
     async def generate_json(
         self,
         prompt: str,
         system_prompt: Optional[str] = None,
-        max_tokens: int = 8000
+        max_tokens: int = 6000
     ) -> dict:
         """
         Gera resposta em formato JSON
 
         Útil para quando queremos dados estruturados
 
-        max_tokens=8000 (era 4000, herdado do default de generate()): mesmo
-        achado do GeminiService — um tópico completo em modo "comum" (1 chamada
-        só) passa perto de 3000-3500 tokens de saída, e 4000 deixava pouca
-        margem, arriscando truncar o JSON no meio.
+        max_tokens=6000 (era 8000): achado em 2026-08-22 trocando o modelo pra
+        gpt-oss-120b (ver __init__) — a conta free tier da Groq tem um teto de
+        8000 tokens/minuto POR REQUISIÇÃO (prompt + max_tokens reservado, não só
+        o que é de fato gerado). Com max_tokens=8000 uma chamada com prompt de
+        ~1700 tokens já estourava ("Requested 9678"). 6000 deixa folga pro prompt
+        e ainda cobre os ~3000-3500 tokens que um tópico "comum" de fato usa.
         """
 
         # Adiciona instrução para retornar JSON

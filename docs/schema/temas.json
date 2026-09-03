@@ -92,6 +92,38 @@
       "extra_css": ".slides{position:relative;} .slides::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;background:repeating-linear-gradient(180deg,rgba(57,255,106,.04) 0px,rgba(57,255,106,.04) 1px,transparent 1px,transparent 3px);} h1.title,.box-label,strong{text-shadow:0 0 8px rgba(57,255,106,.4);} .progress-fill{animation:consoleBlink 1.6s steps(2) infinite;} @keyframes consoleBlink{50%{opacity:.6}}"
     },
     {
+      "id": "trigo-maduro",
+      "nome": "Trigo Maduro",
+      "descricao": "Identidade específica do curso de Formação do Novo Obreiro — pergaminho dourado, tinta cor de terra, serifada nos títulos. Não é o padrão do sistema, só usado nesse curso.",
+      "padrao_atual": false,
+      "cores": {
+        "bg": "#faf6ee",
+        "surface": "#ffffff",
+        "surface2": "#f3ece0",
+        "border": "#e4d8c3",
+        "borderSoft": "#ede4d0",
+        "text": "#2b241c",
+        "textMuted": "#6b5f4f",
+        "textDim": "#8a7a62",
+        "accent": "#8a5a2b",
+        "accentSoft": "rgba(138,90,43,.14)",
+        "bad": "#a3402f",
+        "badSoft": "rgba(163,64,47,.12)",
+        "blue": "#3d5f6e",
+        "amber": "#b8763a",
+        "violet": "#5a4a72",
+        "accentTextOn": "#fbf3e0"
+      },
+      "radius": "14px",
+      "radiusLg": "20px",
+      "fontFamily": "'Source Sans 3', -apple-system, 'Segoe UI', 'Noto Sans', Roboto, sans-serif",
+      "fontFamilyDisplay": "'Fraunces', Georgia, 'Times New Roman', serif",
+      "googleFonts": "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "pesoTitulo": "600",
+      "letterSpacingLabel": "0.07em",
+      "extra_css": "h1.title{border-bottom:2px solid var(--border);padding-bottom:10px;}"
+    },
+    {
       "id": "aurora-botanica",
       "nome": "Aurora Botânica",
       "descricao": "Índigo escuro com manchas de aurora roxo/verde se movendo devagar no fundo — mais 'app premium' que 'hacker'.",

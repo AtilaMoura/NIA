@@ -1,0 +1,880 @@
+<title>Emaús — Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Archivo:wght@500;600;700&display=swap">
+
+<style>
+  :root {
+    color-scheme: light;
+    --ground: #f4f2ea; --surface: #ffffff; --surface-alt: #ebeee4;
+    --ink: #221f19; --ink-soft: #5b5648; --rule: #ddd9c8;
+    --road: #4a3e6b; --olive: #616b3c; --clay: #ad5836; --ember: #d9682f; --gold: #be9137;
+    --font-display: 'Young Serif', Georgia, serif;
+    --font-body: 'Spectral', Georgia, serif;
+    --font-util: 'Archivo', -apple-system, 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #16151b; --surface: #1e1d25; --surface-alt: #26252f;
+      --ink: #ece6d8; --ink-soft: #a09a89; --rule: #322f3c;
+      --road: #ac9ee0; --olive: #a9b277; --clay: #e2906c; --ember: #f2894c; --gold: #d8b463;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #16151b; --surface: #1e1d25; --surface-alt: #26252f;
+    --ink: #ece6d8; --ink-soft: #a09a89; --rule: #322f3c;
+    --road: #ac9ee0; --olive: #a9b277; --clay: #e2906c; --ember: #f2894c; --gold: #d8b463;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--font-body); overflow: hidden;
+  }
+
+  .deck { position: fixed; inset: 0; overflow: hidden; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: clamp(1.6rem, 6vw, 5rem) clamp(1.4rem, 8vw, 7rem);
+    overflow-y: auto;
+    opacity: 0; visibility: hidden;
+    transition: opacity .34s ease;
+  }
+  .slide.active { opacity: 1; visibility: visible; }
+  .slide > * { max-width: 46rem; width: 100%; margin-inline: auto; flex-shrink: 0; }
+  @media (prefers-reduced-motion: reduce) { .slide { transition: none; } }
+
+  .kick {
+    font-family: var(--font-util); font-weight: 700; font-size: clamp(.7rem, 1.6vw, .82rem);
+    letter-spacing: .18em; text-transform: uppercase; color: var(--clay);
+    margin-bottom: 1.1rem;
+  }
+  .slide h2 {
+    font-family: var(--font-display); font-weight: 400;
+    font-size: clamp(1.7rem, 4.6vw, 3rem); line-height: 1.12;
+    margin: 0 0 1.1rem; text-wrap: balance;
+  }
+  .slide p {
+    font-size: clamp(1.05rem, 2.4vw, 1.4rem); line-height: 1.66; margin: 0 0 1rem;
+  }
+  .slide p.small { font-size: clamp(.92rem, 1.9vw, 1.08rem); color: var(--ink-soft); }
+  .slide em { color: var(--ink); }
+  .slide strong { font-weight: 600; }
+
+  /* cover */
+  .slide.cover { padding: 0; justify-content: flex-end; }
+  .slide.cover .bg {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; z-index: 0; margin: 0; max-width: none;
+  }
+  .slide.cover .cover-band {
+    position: relative; z-index: 1; width: 100%; max-width: none; margin: 0;
+    background: linear-gradient(180deg, transparent, rgba(20,17,28,.55) 30%, rgba(20,17,28,.9));
+    color: #fbf6ea;
+    padding: clamp(3rem, 14vw, 9rem) clamp(1.6rem, 8vw, 7rem) clamp(2rem, 7vw, 4rem);
+  }
+  .slide.cover h1 {
+    font-family: var(--font-display); font-weight: 400;
+    font-size: clamp(2.4rem, 8vw, 5rem); line-height: 1.03; margin: .4rem 0 .8rem;
+    color: #fff; text-wrap: balance;
+  }
+  .slide.cover .kick { color: #e7c98c; }
+  .slide.cover .sub { font-style: italic; color: #e2d6ba; font-size: clamp(1rem, 2.5vw, 1.3rem); max-width: 36rem; }
+
+  /* part divider */
+  .slide.part { background: var(--road); color: #f4efe2; }
+  .slide.part .pnum {
+    font-family: var(--font-util); font-weight: 700; font-size: clamp(3rem, 12vw, 7rem);
+    line-height: 1; color: rgba(255,255,255,.28);
+  }
+  .slide.part h2 { color: #fdfaf1; font-size: clamp(2rem, 6vw, 3.6rem); }
+  .slide.part .kick { color: #e7c98c; }
+
+  /* verse */
+  .slide.verse { background: var(--surface-alt); }
+  .slide.verse blockquote {
+    margin: 0; padding-left: clamp(1rem, 3vw, 1.6rem);
+    border-left: 4px solid var(--clay);
+  }
+  .slide.verse blockquote p {
+    font-style: italic; font-family: var(--font-display);
+    font-size: clamp(1.3rem, 3.4vw, 2.1rem); line-height: 1.5; color: var(--ink);
+  }
+  .slide.verse cite {
+    display: block; margin-top: 1.1rem; font-family: var(--font-util); font-style: normal;
+    font-weight: 700; font-size: clamp(.72rem, 1.6vw, .82rem);
+    letter-spacing: .12em; text-transform: uppercase; color: var(--clay);
+  }
+
+  /* anchor / big statement */
+  .slide.anchor { background: var(--road); color: #f6efe0; }
+  .slide.anchor p {
+    font-family: var(--font-display); font-size: clamp(1.5rem, 4.4vw, 2.6rem);
+    line-height: 1.32; margin: 0;
+  }
+  .slide.anchor .mark {
+    width: 3rem; height: 5px; border-radius: 3px; background: var(--ember);
+    margin-bottom: 1.6rem;
+  }
+
+  /* image slide */
+  .slide.pic { padding: 0; background: #14121a; justify-content: center; }
+  .slide.pic figure { margin: 0; max-width: none; width: 100%; height: 100%;
+    display: flex; flex-direction: column; }
+  .slide.pic img {
+    width: 100%; height: 100%; object-fit: contain; margin: 0; max-width: none;
+    flex: 1; min-height: 0;
+  }
+  .slide.pic figcaption {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, transparent, rgba(10,8,14,.82));
+    color: #f0e9da; font-family: var(--font-util);
+    font-size: clamp(.82rem, 1.9vw, 1rem); line-height: 1.5;
+    padding: clamp(2rem, 6vw, 4rem) clamp(1.4rem, 8vw, 7rem) clamp(1.2rem, 3vw, 2rem);
+  }
+  .slide.pic figcaption b { color: #f0c98a; font-weight: 700; }
+
+  /* points */
+  .plist { display: grid; gap: .9rem; }
+  .plist .pt {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-left: 4px solid var(--gold); border-radius: 10px;
+    padding: 1rem 1.2rem;
+  }
+  .plist .pt h3 {
+    font-family: var(--font-display); font-weight: 400;
+    font-size: clamp(1.05rem, 2.4vw, 1.3rem); margin: 0 0 .3rem;
+  }
+  .plist .pt p { font-size: clamp(.92rem, 1.9vw, 1.08rem); color: var(--ink-soft); margin: 0; }
+  .plist .pt:nth-child(2) { border-left-color: var(--olive); }
+  .plist .pt:nth-child(3) { border-left-color: var(--clay); }
+  .plist .pt:nth-child(4) { border-left-color: var(--ember); }
+
+  /* note */
+  .snote {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+  }
+  .snote .tag {
+    font-family: var(--font-util); font-weight: 700; font-size: clamp(.66rem, 1.5vw, .74rem);
+    letter-spacing: .12em; text-transform: uppercase; color: var(--road);
+    display: block; margin-bottom: .5rem;
+  }
+  .snote p { font-size: clamp(.92rem, 1.9vw, 1.06rem); margin: 0 0 .6rem; }
+  .snote p:last-child { margin: 0; }
+
+  /* diagram wrappers */
+  .dwrap { width: 100%; }
+  .dwrap h2 { font-size: clamp(1.4rem, 3.6vw, 2.1rem); }
+  .dscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .dscroll svg { display: block; height: auto; }
+  .flow { display: grid; gap: .6rem; grid-template-columns: 1fr; }
+  @media (min-width: 46rem) { .flow { grid-template-columns: repeat(5, 1fr); } }
+  .flow .step {
+    border: 1px solid var(--rule); border-top: 3px solid var(--st, var(--gold));
+    border-radius: 10px; background: var(--surface); padding: .8rem .9rem;
+  }
+  .flow .step .k { font-family: var(--font-util); font-weight: 700; font-size: .72rem; color: var(--st, var(--gold)); }
+  .flow .step .t { font-weight: 600; display: block; margin: .25rem 0; font-size: .98rem; }
+  .flow .step .v { font-size: .82rem; color: var(--ink-soft); font-family: var(--font-util); }
+  .flow .step:nth-child(1){--st:var(--gold)} .flow .step:nth-child(2){--st:var(--olive)}
+  .flow .step:nth-child(3){--st:var(--road)} .flow .step:nth-child(4){--st:var(--ember)}
+  .flow .step:nth-child(5){--st:var(--clay)}
+
+  table.st { border-collapse: collapse; width: 100%; font-size: clamp(.8rem, 1.7vw, .95rem); }
+  table.st th {
+    font-family: var(--font-util); font-size: .7rem; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--ink-soft); text-align: left;
+    padding: .45rem .6rem; border-bottom: 2px solid var(--rule);
+  }
+  table.st td { padding: .55rem .6rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  table.st td:first-child { font-weight: 600; }
+  table.st td:nth-child(2) { font-family: var(--font-util); font-size: .8rem; color: var(--clay); white-space: nowrap; }
+  table.st td:nth-child(3) { color: var(--ink-soft); }
+
+  .gloss { display: grid; gap: .7rem; grid-template-columns: 1fr; }
+  @media (min-width: 40rem) { .gloss { grid-template-columns: 1fr 1fr; } }
+  .gloss div { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .8rem 1rem; }
+  .gloss dt { font-family: var(--font-display); color: var(--clay); font-size: 1rem; }
+  .gloss dd { margin: .15rem 0 0; font-family: var(--font-util); font-size: .84rem; color: var(--ink-soft); line-height: 1.5; }
+
+  .slide.closing { background: var(--road); color: #f6efe0; text-align: center; }
+  .slide.closing h2 { color: #fdfaf1; }
+  .slide.closing .kick { color: #e7c98c; }
+
+  /* chrome: controls */
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    display: flex; align-items: center; gap: .8rem;
+    padding: .5rem clamp(.8rem, 3vw, 1.6rem);
+    background: color-mix(in srgb, var(--ground) 86%, transparent);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-util);
+  }
+  .bar button {
+    font: inherit; font-weight: 700; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 8px; padding: .4rem .8rem; cursor: pointer; line-height: 1;
+  }
+  .bar button:hover { border-color: var(--clay); color: var(--clay); }
+  .bar button:focus-visible { outline: 2px solid var(--road); outline-offset: 2px; }
+  .bar .count { font-size: .8rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; min-width: 4.5rem; }
+  .bar .track { flex: 1; height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+  .bar .fill { height: 100%; background: var(--clay); width: 4%; transition: width .34s ease; }
+  .bar .toc-btn { margin-left: auto; }
+  @media (prefers-reduced-motion: reduce) { .bar .fill { transition: none; } }
+
+  .toc {
+    position: fixed; inset: 0; z-index: 30;
+    background: color-mix(in srgb, var(--ground) 94%, transparent);
+    backdrop-filter: blur(10px);
+    padding: clamp(1.6rem, 6vw, 4rem);
+    overflow-y: auto;
+    display: none;
+  }
+  .toc.open { display: block; }
+  .toc h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.4rem; margin: 0 0 1.2rem; }
+  .toc ol { list-style: none; margin: 0; padding: 0; max-width: 40rem; }
+  .toc li { margin: 0 0 .3rem; }
+  .toc button {
+    font-family: var(--font-util); font-size: 1rem; text-align: left; width: 100%;
+    background: none; border: 0; border-radius: 8px; padding: .6rem .7rem;
+    color: var(--ink); cursor: pointer;
+  }
+  .toc button:hover { background: var(--surface-alt); color: var(--clay); }
+  .toc .close {
+    position: absolute; top: clamp(1rem, 4vw, 2rem); right: clamp(1rem, 4vw, 2rem);
+    font-family: var(--font-util); font-weight: 700; background: var(--surface);
+    border: 1px solid var(--rule); border-radius: 8px; padding: .4rem .8rem; cursor: pointer; color: var(--ink);
+  }
+  .hint {
+    position: fixed; top: .8rem; left: 50%; transform: translateX(-50%); z-index: 20;
+    font-family: var(--font-util); font-size: .74rem; color: var(--ink-soft);
+    background: color-mix(in srgb, var(--ground) 86%, transparent);
+    border: 1px solid var(--rule); border-radius: 999px; padding: .3rem .9rem;
+    transition: opacity .5s ease;
+  }
+</style>
+
+<div class="deck" id="deck">
+
+  <section class="slide cover active" data-toc="Abertura">
+    <img class="bg" src="__IMG_01-capa-estrada__" alt="Três caminhantes numa estrada da Judeia ao pôr do sol.">
+    <div class="cover-band">
+      <div class="kick">Lucas 24 · 13&ndash;35 &nbsp;·&nbsp; Estudo em slides</div>
+      <h1>O Caminho de Emaús</h1>
+      <p class="sub">Uma tarde de domingo, onze quil&ocirc;metros, e o Ressuscitado que
+      caminha ao lado sem ser reconhecido.</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kick">Onde estamos</div>
+    <h2>O terceiro dia, e ninguém entendendo</h2>
+    <p>Domingo de manh&atilde;: as mulheres acham o t&uacute;mulo vazio, ouvem dos anjos
+    &ldquo;por que buscais entre os mortos aquele que vive?&rdquo; &mdash; e os
+    ap&oacute;stolos acham que &eacute; <em>&ldquo;del&iacute;rio&rdquo;</em> (24:11).
+    Pedro corre at&eacute; l&aacute;, v&ecirc; os panos de linho e volta sem entender.</p>
+    <p class="small">Nenhum dos disc&iacute;pulos tinha visto Jesus vivo ainda. &Eacute;
+    nesse clima que &ldquo;nesse mesmo dia&rdquo; dois deles pegam a estrada para
+    <em>fora</em> de Jerusal&eacute;m.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kick">Quem</div>
+    <h2>Dois discípulos comuns</h2>
+    <p>Um se chama <strong>Cl&eacute;opas</strong> (v.18); o outro Lucas n&atilde;o nomeia.
+    N&atilde;o eram ap&oacute;stolos famosos.</p>
+    <p class="small">Guzik: Jesus, &ldquo;na gl&oacute;ria da vida ressurreta, Se deu com
+    tanta plenitude a homens desconhecidos e sem distin&ccedil;&atilde;o&rdquo; &mdash;
+    &eacute; o Salvador do crist&atilde;o comum. Lucas provavelmente ouviu esta
+    hist&oacute;ria de um dos dois.</p>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>Nesse mesmo dia, iam dois deles para uma aldeia chamada Ema&uacute;s, que distava
+      de Jerusal&eacute;m sessenta est&aacute;dios; e iam comentando entre si tudo aquilo
+      que havia sucedido.</p>
+      <cite>Lucas 24:13&ndash;14</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide">
+    <div class="kick">Dois detalhes</div>
+    <h2>&ldquo;Sessenta estádios&rdquo; · &ldquo;o terceiro dia&rdquo;</h2>
+    <p><strong>Sessenta est&aacute;dios</strong> &approx; 11 km. Local exato de Ema&uacute;s
+    perdido &mdash; 3 ou 4 candidatas. O ponto n&atilde;o &eacute; o mapa: dava umas 2 a 3
+    horas de caminhada para conversar.</p>
+    <p><strong>O terceiro dia</strong>: sexta &rarr; domingo, contando &agrave; maneira
+    judaica. Jesus tinha dito <em>tr&ecirc;s vezes</em> que ressuscitaria nesse prazo
+    (Lc 9:22; 18:33) &mdash; e &ldquo;eles n&atilde;o entenderam nada disso&rdquo; (18:34).</p>
+  </section>
+
+  <section class="slide part" data-toc="Parte 1 · A cena">
+    <div class="pnum">1</div>
+    <div class="kick">Parte 1</div>
+    <h2>A cena</h2>
+  </section>
+
+  <section class="slide anchor">
+    <div class="mark"></div>
+    <p>A caminhada come&ccedil;a no ponto mais baixo: disc&iacute;pulos de Jesus, indo na
+    dire&ccedil;&atilde;o contr&aacute;ria de Jerusal&eacute;m, convencidos de que a
+    hist&oacute;ria acabou.</p>
+  </section>
+
+  <section class="slide">
+    <div class="dwrap">
+      <div class="kick">Situando</div>
+      <h2>A linha do tempo daquele domingo</h2>
+      <div class="dscroll">
+        <svg viewBox="0 0 860 210" width="860" role="img" aria-label="Linha do tempo do domingo da ressurreição.">
+          <path d="M40 120 Q 300 20 430 60 T 820 130" fill="none" stroke="var(--gold)" stroke-width="2" stroke-dasharray="3 6"/>
+          <circle cx="120" cy="86" r="15" fill="var(--gold)" opacity="0.9"/>
+          <circle cx="760" cy="120" r="13" fill="none" stroke="var(--road)" stroke-width="3"/>
+          <path d="M754 114a9 9 0 1 0 9 12 11 11 0 0 1 -9 -12z" fill="var(--road)"/>
+          <g font-family="Archivo, sans-serif" font-size="11" fill="var(--ink)">
+            <g transform="translate(40 150)"><circle cx="0" cy="-30" r="4" fill="var(--olive)"/><text x="-6" y="0" font-weight="700">Madrugada</text><text x="-6" y="15" fill="var(--ink-soft)">mulheres no t&uacute;mulo</text></g>
+            <g transform="translate(210 168)"><circle cx="0" cy="-48" r="4" fill="var(--olive)"/><text x="-6" y="0" font-weight="700">Manh&atilde;</text><text x="-6" y="15" fill="var(--ink-soft)">ningu&eacute;m cr&ecirc;;</text><text x="-6" y="29" fill="var(--ink-soft)">Pedro e Jo&atilde;o correm</text></g>
+            <g transform="translate(390 150)"><circle cx="0" cy="-30" r="4" fill="var(--olive)"/><text x="-6" y="0" font-weight="700">Dia</text><text x="-6" y="15" fill="var(--ink-soft)">Jesus &rarr; Maria Madalena</text></g>
+            <g transform="translate(545 120)"><rect x="-12" y="-52" width="150" height="34" rx="8" fill="var(--road)" opacity="0.16"/><circle cx="0" cy="-35" r="5" fill="var(--road)"/><text x="-6" y="0" font-weight="700" fill="var(--road)">Tarde &mdash; Ema&uacute;s</text><text x="-6" y="15" fill="var(--ink-soft)">os dois na estrada</text></g>
+            <g transform="translate(690 158)"><circle cx="0" cy="-40" r="4" fill="var(--olive)"/><text x="-6" y="0" font-weight="700">Tarde</text><text x="-6" y="15" fill="var(--ink-soft)">Jesus &rarr; Sim&atilde;o</text></g>
+            <g transform="translate(790 178)"><circle cx="0" cy="-58" r="4" fill="var(--olive)"/><text x="-40" y="0" font-weight="700">Noite</text><text x="-40" y="15" fill="var(--ink-soft)">Jesus &rarr; os Onze</text></g>
+          </g>
+        </svg>
+      </div>
+      <p class="small">Ema&uacute;s encaixa entre a tarde e a noite.</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kick">§ A caminhada triste</div>
+    <h2>&ldquo;O próprio Jesus se aproximou&rdquo;</h2>
+    <p>Enquanto os dois &ldquo;comentavam e discutiam&rdquo;, Jesus vem e caminha junto.
+    Spurgeon: &ldquo;fale d&rsquo;Ele, e logo estar&aacute; falando com Ele&rdquo;.</p>
+    <p>Mas <em>&ldquo;os olhos deles estavam como que fechados&rdquo;</em> (v.16) &mdash;
+    algo os <em>impedia</em> de ver. Lucas emoldura tudo entre dois verbos: olhos fechados
+    (v.16) &rarr; olhos abertos (v.31).</p>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>Ent&atilde;o ele lhes perguntou: Que palavras s&atilde;o essas que, caminhando,
+      trocais entre v&oacute;s? Eles ent&atilde;o pararam tristes.</p>
+      <cite>Lucas 24:17</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide pic">
+    <figure>
+      <img src="__IMG_02-caminhada-triste__" alt="Dois discípulos de rostos abatidos caminham e conversam ao fim da tarde.">
+      <figcaption><b>v.17</b> &mdash; &ldquo;Eles ent&atilde;o pararam tristes.&rdquo; A
+      tristeza estava no rosto e no pr&oacute;prio jeito de andar.</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide anchor">
+    <div class="mark"></div>
+    <p>Jesus pergunta o que j&aacute; sabe &mdash; n&atilde;o porque precise da
+    informa&ccedil;&atilde;o, mas porque eles precisam dizer em voz alta. Ele
+    come&ccedil;a ouvindo.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kick">§ O desconhecido</div>
+    <h2>O leitor sabe; eles não</h2>
+    <p>Por tr&ecirc;s par&aacute;grafos, quem l&ecirc; Lucas sabe que o &ldquo;estranho&rdquo;
+    &eacute; Jesus &mdash; e eles n&atilde;o. Guzik: &ldquo;Jesus pode estar bem &agrave;
+    sua frente, andando e sentando &agrave; mesa com voc&ecirc; &mdash; e os seus olhos
+    podem estar impedidos de v&ecirc;-Lo. Devemos orar para que Deus abra os nossos
+    olhos.&rdquo;</p>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>Depois disso manifestou-se sob outra forma a dois deles que iam de caminho para o
+      campo&hellip; mas nem a estes deram cr&eacute;dito.</p>
+      <cite>Marcos 16:12&ndash;13 &mdash; a mesma história, em uma frase</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide part" data-toc="Parte 2 · A conversa">
+    <div class="pnum">2</div>
+    <div class="kick">Parte 2</div>
+    <h2>A conversa</h2>
+  </section>
+
+  <section class="slide">
+    <div class="kick">§ &ldquo;Só tu és peregrino?&rdquo;</div>
+    <h2>Eles despejam o coração</h2>
+    <p>Cl&eacute;opas responde com ironia (&ldquo;em que caverna voc&ecirc; estava?&rdquo;).
+    Jesus devolve: <em>&ldquo;Quais?&rdquo;</em> &mdash; e abre espa&ccedil;o para eles
+    falarem. N&atilde;o &eacute; que Ele precise ouvir; &ldquo;h&aacute; valor em eles
+    dizerem isso a Jesus&rdquo;.</p>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>Ora, n&oacute;s esper&aacute;vamos que fosse ele quem havia de remir Israel; e,
+      al&eacute;m de tudo isso, &eacute; j&aacute; hoje o terceiro dia desde que essas
+      coisas aconteceram.</p>
+      <cite>Lucas 24:21</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide">
+    <div class="kick">O que eles diziam</div>
+    <h2>Tinham os fatos, faltava a chave</h2>
+    <div class="plist">
+      <div class="pt"><h3>O que sabiam certo</h3><p>Nome, origem, que era profeta &ldquo;poderoso em obras e palavras&rdquo;, entregue pelos l&iacute;deres e crucificado.</p></div>
+      <div class="pt"><h3>A esperança que desabou</h3><p>&ldquo;Esper<em>&aacute;vamos</em>&rdquo; &mdash; no passado. E mal direcionada: esperavam liberta&ccedil;&atilde;o de Roma, n&atilde;o do pecado.</p></div>
+      <div class="pt"><h3>A notícia que não encaixava</h3><p>T&uacute;mulo vazio, &ldquo;vis&atilde;o de anjos&rdquo;, companheiros confirmando &mdash; <em>&ldquo;a ele, por&eacute;m, n&atilde;o o viram&rdquo;</em>.</p></div>
+    </div>
+  </section>
+
+  <section class="slide pic">
+    <figure>
+      <img src="__IMG_03-cleopas-conta__" alt="Cléopas, parado na estrada, gesticula enquanto conta a história; o terceiro caminhante ouve.">
+      <figcaption><b>v.19&ndash;24</b> &mdash; Cl&eacute;opas conta tudo o que sabia; o
+      estranho ouve sem interromper.</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide anchor">
+    <div class="mark"></div>
+    <p>D&aacute; para saber tudo sobre Jesus e ainda estar triste &mdash; se n&atilde;o se
+    enxerga a necessidade e o sentido da cruz.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kick">§ &ldquo;Ó néscios&rdquo;</div>
+    <h2>O problema é do coração, não da cabeça</h2>
+    <p><em>&ldquo;&Oacute; n&eacute;scios, e tardos de cora&ccedil;&atilde;o para
+    crerdes&hellip;&rdquo;</em> &mdash; repreens&atilde;o de m&eacute;dico, n&atilde;o de
+    juiz. Eles tinham lido os profetas a vida toda; faltava <em>crer</em>.</p>
+    <p><em>&ldquo;N&atilde;o <strong>importava</strong> que o Cristo padecesse&hellip; e
+    entrasse na sua gl&oacute;ria?&rdquo;</em> A cruz n&atilde;o foi acidente &mdash; era o
+    plano. Gl&oacute;ria <em>atrav&eacute;s</em> da cruz, n&atilde;o em vez dela.</p>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>E, come&ccedil;ando por Mois&eacute;s, e por todos os profetas, explicou-lhes o que
+      dele se achava em todas as Escrituras.</p>
+      <cite>Lucas 24:27</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide">
+    <div class="dwrap">
+      <div class="kick">v.27, reconstruído</div>
+      <h2>O Cristo nas Escrituras</h2>
+      <div class="dscroll">
+        <table class="st">
+          <thead><tr><th>Sombra no Antigo Testamento</th><th>Ref.</th><th>Em Cristo</th></tr></thead>
+          <tbody>
+            <tr><td>Descend&ecirc;ncia da mulher que fere a serpente</td><td>Gn 3:15</td><td>esmaga a cabe&ccedil;a; tem o calcanhar ferido</td></tr>
+            <tr><td>&ldquo;Deus prover&aacute; o cordeiro&rdquo; &mdash; e caminhavam juntos</td><td>Gn 22:8</td><td>o Cordeiro que Deus prov&ecirc;</td></tr>
+            <tr><td>Serpente de bronze: quem olha, vive</td><td>Nm 21:8&ndash;9</td><td>&ldquo;o Filho do homem ser&aacute; levantado&rdquo;</td></tr>
+            <tr><td>Um profeta como Mois&eacute;s, &ldquo;a ele ouvireis&rdquo;</td><td>Dt 18:15</td><td>o Profeta maior que Mois&eacute;s</td></tr>
+            <tr><td>&ldquo;N&atilde;o&hellip; veja corrup&ccedil;&atilde;o&rdquo;</td><td>Sl 16:10</td><td>a ressurrei&ccedil;&atilde;o ao terceiro dia</td></tr>
+            <tr><td>&ldquo;Por que me desamparaste&rdquo;; &ldquo;transpassaram m&atilde;os e p&eacute;s&rdquo;</td><td>Sl 22</td><td>a cruz, s&eacute;culos antes</td></tr>
+            <tr><td>&ldquo;A pedra que os edificadores rejeitaram&rdquo;</td><td>Sl 118:22</td><td>rejeitado, depois exaltado</td></tr>
+            <tr><td>&ldquo;Ofereci as costas aos que me feriam&rdquo;</td><td>Is 50:6</td><td>o Servo que n&atilde;o esconde o rosto</td></tr>
+            <tr><td>&ldquo;Ferido pelas nossas transgress&otilde;es&hellip; cordeiro ao matadouro&rdquo;</td><td>Is 53</td><td>o sofrimento substitutivo</td></tr>
+            <tr><td>&ldquo;Ao terceiro dia nos levantar&aacute;&rdquo;; tr&ecirc;s dias no peixe</td><td>Os 6:2 · Jn 1:17</td><td>o sinal do terceiro dia</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">Lucas n&atilde;o diz <em>quais</em> textos Jesus usou &mdash; esta
+      lista &eacute; reconstru&iacute;da de como os ap&oacute;stolos pregaram depois
+      (1Co 15:3&ndash;4, &ldquo;segundo as Escrituras&rdquo;).</p>
+    </div>
+  </section>
+
+  <section class="slide pic">
+    <figure>
+      <img src="__IMG_04-jesus-ensina__" alt="Jesus caminha entre os dois discípulos, ensinando com a mão erguida.">
+      <figcaption><b>v.27</b> &mdash; a luz na cena come&ccedil;a a mudar antes de os olhos
+      abrirem.</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide anchor">
+    <div class="mark"></div>
+    <p>A B&iacute;blia toda tem um assunto: Ele. O Cristo que sofre e <em>depois</em> entra
+    na gl&oacute;ria j&aacute; est&aacute; em Mois&eacute;s e nos profetas.</p>
+  </section>
+
+  <section class="slide part" data-toc="Parte 3 · A mesa">
+    <div class="pnum">3</div>
+    <div class="kick">Parte 3</div>
+    <h2>A mesa</h2>
+  </section>
+
+  <section class="slide">
+    <div class="kick">§ &ldquo;Fica connosco&rdquo;</div>
+    <h2>Ele não força a companhia</h2>
+    <p>Perto de Ema&uacute;s, Jesus <em>&ldquo;fez como quem ia para mais longe&rdquo;</em>.
+    Os dois o <strong>constrangem</strong> &mdash; Spurgeon: &ldquo;agarraram a m&atilde;o
+    dele, puxaram a capa, disseram que ele n&atilde;o iria embora&rdquo;. Sem saber quem
+    era, j&aacute; n&atilde;o queriam que fosse.</p>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>Fica conosco; porque &eacute; tarde, e j&aacute; declinou o dia. E entrou para
+      ficar com eles.</p>
+      <cite>Lucas 24:29</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide pic">
+    <figure>
+      <img src="__IMG_05-fica-connosco__" alt="A aldeia de Emaús ao anoitecer; os dois seguram o braço de Jesus, insistindo que ele fique.">
+      <figcaption><b>v.29</b> &mdash; &ldquo;o constrangeram&rdquo;: hospitalidade oferecida
+      a um estranho.</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide">
+    <div class="kick">§ O partir do pão</div>
+    <h2>O convidado age como anfitrião</h2>
+    <p><em>&ldquo;Tomou o p&atilde;o e o aben&ccedil;oou; e, partindo-o, lho dava.&rdquo;</em>
+    Quatro verbos &mdash; tomou, aben&ccedil;oou, partiu, deu &mdash; os mesmos da
+    multiplica&ccedil;&atilde;o dos p&atilde;es e da &Uacute;ltima Ceia.</p>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>Abriram-se-lhes ent&atilde;o os olhos, e o reconheceram; nisto ele desapareceu de
+      diante deles.</p>
+      <cite>Lucas 24:31</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide">
+    <div class="kick">O que abriu os olhos?</div>
+    <h2>O texto não diz</h2>
+    <p>Leituras poss&iacute;veis (Morrison, via Guzik): o ar de anfitri&atilde;o &ldquo;com
+    tranquila majestade&rdquo;; o jeito de dar gra&ccedil;as; <strong>as m&atilde;os
+    furadas</strong> que estendiam o p&atilde;o.</p>
+    <p>Reconhecimento e desaparecimento s&atilde;o simult&acirc;neos. A partir da&iacute;
+    eles O &ldquo;veem&rdquo; na Palavra e na fra&ccedil;&atilde;o do p&atilde;o.</p>
+  </section>
+
+  <section class="slide">
+    <div class="snote">
+      <span class="tag">Onde tradições divergem &mdash; sem tomar partido</span>
+      <p><b>(a)</b> Uma leitura v&ecirc; aqui a <b>Eucaristia</b> &mdash; Cristo reconhecido
+      &ldquo;na fra&ccedil;&atilde;o do p&atilde;o&rdquo; (At 2:42), sacramentalmente
+      presente.</p>
+      <p><b>(b)</b> Outra (Morrison, Guzik): os dois <b>n&atilde;o estiveram na &Uacute;ltima
+      Ceia</b> &mdash; era &ldquo;uma ceia frugal, numa casa de aldeia&rdquo;.</p>
+      <p>As duas concordam: &eacute; &agrave; mesa, no gesto de Cristo, que os olhos se
+      abrem. Este estudo n&atilde;o decide entre elas.</p>
+    </div>
+  </section>
+
+  <section class="slide pic">
+    <figure>
+      <img src="__IMG_06-partir-do-pao__" alt="À mesa, Jesus parte o pão sob a luz de uma lamparina; os dois o reconhecem.">
+      <figcaption><b>v.31</b> &mdash; &ldquo;Abriram-se-lhes os olhos&hellip; nisto ele
+      desapareceu.&rdquo;</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide pic">
+    <figure>
+      <img src="__IMG_07-cadeira-vazia__" alt="A cadeira vazia, o pão ainda na mesa, os dois olhando o lugar onde Jesus estava.">
+      <figcaption>O instante seguinte: a cadeira vazia, o p&atilde;o ainda na mesa.</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide anchor">
+    <div class="mark"></div>
+    <p>Ele parte o p&atilde;o e some &mdash; e n&atilde;o faz falta. O reconhecimento
+    n&atilde;o depende de Ele estar vis&iacute;vel; depende de olhos abertos.</p>
+  </section>
+
+  <section class="slide">
+    <div class="kick">§ &ldquo;Não ardia o coração?&rdquo;</div>
+    <h2>O coração já ardia na estrada</h2>
+    <p>Antes do p&atilde;o, antes de saberem quem era, quando ainda achavam que era um
+    estranho falando da B&iacute;blia. &ldquo;Mesmo sem crer que Ele tinha ressuscitado, o
+    cora&ccedil;&atilde;o deles ardeu por causa da Palavra&rdquo; (Guzik).</p>
+    <p class="small">E cada um s&oacute; soube que o do outro tamb&eacute;m ardia
+    <em>depois</em> que Jesus saiu &mdash; &ldquo;uma comunh&atilde;o de
+    cora&ccedil;&otilde;es em chamas&rdquo;.</p>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>Porventura n&atilde;o se nos abrasava o cora&ccedil;&atilde;o, quando pelo caminho
+      nos falava, e quando nos abria as Escrituras?</p>
+      <cite>Lucas 24:32</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide pic">
+    <figure>
+      <img src="__IMG_08-coracao-ardia__" alt="Os dois discípulos à mesa depois que Jesus saiu, inclinados um para o outro, com um brilho quente.">
+      <figcaption><b>v.32</b> &mdash; primeiro a Escritura abrasa; depois os olhos abrem.</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide part" data-toc="Parte 4 · A missão">
+    <div class="pnum">4</div>
+    <div class="kick">Parte 4</div>
+    <h2>A missão</h2>
+  </section>
+
+  <section class="slide">
+    <div class="kick">§ A volta imediata</div>
+    <h2>&ldquo;E na mesma hora&rdquo;</h2>
+    <p>De noite, 11 km de volta &mdash; o mesmo caminho que fizeram cansados, agora
+    &ldquo;provavelmente muito mais r&aacute;pido&rdquo;. Chegam e ouvem, antes de contar:
+    <em>&ldquo;Realmente o Senhor ressurgiu, e apareceu a Sim&atilde;o!&rdquo;</em></p>
+    <p class="small">A ressurrei&ccedil;&atilde;o j&aacute; n&atilde;o &eacute; relato de
+    duas pessoas &mdash; &eacute; de v&aacute;rios grupos no mesmo dia.</p>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>Ent&atilde;o os dois contaram o que acontecera no caminho, e como se lhes fizera
+      conhecer no partir do p&atilde;o.</p>
+      <cite>Lucas 24:35</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide">
+    <div class="kick">Logo depois</div>
+    <h2>O que foi dado a dois vira o padrão para todos</h2>
+    <p>&ldquo;Enquanto ainda falavam nisso&rdquo;, Jesus aparece no meio de todos
+    (Lc 24:36) e repete a mesma aula: <em>&ldquo;importava que se cumprisse tudo o que de
+    mim estava escrito na Lei de Mois&eacute;s, nos Profetas e nos Salmos&rdquo;</em>
+    (24:44) &mdash; e <em>&ldquo;lhes abriu o entendimento&rdquo;</em> (24:45).</p>
+  </section>
+
+  <section class="slide pic">
+    <figure>
+      <img src="__IMG_09-volta-noite__" alt="Os dois voltam depressa por uma estrada escura, com uma tocha, rumo a Jerusalém iluminada.">
+      <figcaption><b>v.33</b> &mdash; o mesmo caminho, agora de noite e depressa.</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide pic">
+    <figure>
+      <img src="__IMG_10-reunidos-jerusalem__" alt="Sala em Jerusalém, discípulos reunidos à luz de lamparina, os dois recém-chegados contando tudo.">
+      <figcaption><b>v.33&ndash;35</b> &mdash; a ressurrei&ccedil;&atilde;o j&aacute;
+      confirmada por v&aacute;rios; ent&atilde;o eles contam a sua parte.</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide anchor">
+    <div class="mark"></div>
+    <p>O encontro com o Ressuscitado termina em p&eacute;s na estrada. Quem O reconhece
+    n&atilde;o fica sentado &mdash; volta e conta.</p>
+  </section>
+
+  <section class="slide">
+    <div class="dwrap">
+      <div class="kick">§ O padrão de Emaús</div>
+      <h2>Do desânimo ao testemunho</h2>
+      <div class="flow">
+        <div class="step"><span class="k">1 · v.15&ndash;24</span><span class="t">Caminhada &amp; desabafo</span><span class="v">Ele ouve primeiro</span></div>
+        <div class="step"><span class="k">2 · v.25&ndash;27</span><span class="t">A Palavra explicada</span><span class="v">o cora&ccedil;&atilde;o arde</span></div>
+        <div class="step"><span class="k">3 · v.28&ndash;30</span><span class="t">A mesa &amp; a comunh&atilde;o</span><span class="v">&ldquo;fica connosco&rdquo;</span></div>
+        <div class="step"><span class="k">4 · v.31</span><span class="t">Os olhos se abrem</span><span class="v">reconhecimento</span></div>
+        <div class="step"><span class="k">5 · v.33&ndash;35</span><span class="t">A volta &amp; o testemunho</span><span class="v">&ldquo;na mesma hora&rdquo;</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kick">Quatro fios para levar</div>
+    <div class="plist">
+      <div class="pt"><h3>&#128273; A Escritura toda aponta para Cristo</h3><p>Ler o Antigo Testamento sem enxergar Jesus &eacute; ler pela metade.</p></div>
+      <div class="pt"><h3>&#128099; Ele caminha ao lado antes de ser reconhecido</h3><p>A presen&ccedil;a &eacute; real no v.15; o reconhecimento vem no v.31. O intervalo &eacute; a vida de f&eacute;.</p></div>
+      <div class="pt"><h3>&#127838; A mesa é lugar de revelação</h3><p>A igreja primitiva juntou para sempre &ldquo;a doutrina dos ap&oacute;stolos&hellip; e o partir do p&atilde;o&rdquo; (At 2:42).</p></div>
+      <div class="pt"><h3>&#128293; Do coração que arde para os pés na estrada</h3><p>A emo&ccedil;&atilde;o verdadeira da Palavra termina em caminhada de volta e testemunho.</p></div>
+    </div>
+  </section>
+
+  <section class="slide verse">
+    <blockquote>
+      <p>Ent&atilde;o lhes abriu o entendimento para compreenderem as Escrituras.</p>
+      <cite>Lucas 24:45 &mdash; a oração que este estudo deixa</cite>
+    </blockquote>
+  </section>
+
+  <section class="slide" data-toc="Apoio · Mapa">
+    <div class="dwrap">
+      <div class="kick">Apoio</div>
+      <h2>Jerusalém a Emaús</h2>
+      <div class="dscroll">
+        <svg viewBox="0 0 860 300" width="860" role="img" aria-label="Mapa estilizado de Jerusalém a Emaús.">
+          <rect width="860" height="300" fill="var(--surface-alt)"/>
+          <circle cx="430" cy="60" r="28" fill="var(--gold)" opacity="0.5"/>
+          <path d="M0 190 Q 200 155 430 190 T 860 185 V300 H0 Z" fill="var(--olive)" opacity="0.35"/>
+          <path d="M0 230 Q 220 205 430 235 T 860 228 V300 H0 Z" fill="var(--olive)" opacity="0.55"/>
+          <path d="M760 130 Q 620 190 460 160 Q 300 130 150 200" fill="none" stroke="var(--clay)" stroke-width="6" stroke-dasharray="2 10" stroke-linecap="round"/>
+          <g transform="translate(770 104)">
+            <rect x="-6" y="16" width="66" height="32" fill="var(--road)"/>
+            <rect x="4" y="2" width="10" height="16" fill="var(--road)"/>
+            <rect x="24" y="-6" width="10" height="24" fill="var(--road)"/>
+            <text x="28" y="66" font-family="Archivo, sans-serif" font-size="13" font-weight="700" fill="var(--ink)" text-anchor="middle">Jerusal&eacute;m</text>
+          </g>
+          <g transform="translate(108 190)">
+            <rect x="0" y="10" width="24" height="18" fill="var(--clay)"/>
+            <path d="M-4 10 L 12 -2 L 28 10 Z" fill="var(--clay)"/>
+            <text x="20" y="48" font-family="Archivo, sans-serif" font-size="13" font-weight="700" fill="var(--ink)" text-anchor="middle">Ema&uacute;s</text>
+          </g>
+          <text x="440" y="132" font-family="Archivo, sans-serif" font-size="13" font-weight="700" fill="var(--clay)" text-anchor="middle">&approx; 11 km · &ldquo;sessenta est&aacute;dios&rdquo;</text>
+        </svg>
+      </div>
+      <p class="small">Identifica&ccedil;&atilde;o incerta &mdash; candidatas: Ema&uacute;s-
+      Nic&oacute;polis, Qubeibeh, Abu Ghosh, Motza.</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kick">Apoio</div>
+    <h2>Emaús e o encontro cristão de hoje</h2>
+    <p>A estrada (Escritura explicada) e a casa (p&atilde;o partido) viraram a forma da
+    reuni&atilde;o crist&atilde;: Atos 2:42 &mdash; &ldquo;na doutrina dos ap&oacute;stolos
+    e na comunh&atilde;o, no partir do p&atilde;o e nas ora&ccedil;&otilde;es&rdquo;.</p>
+    <p><strong>Palavra + Mesa</strong> &mdash; a mesma ordem de Ema&uacute;s.</p>
+  </section>
+
+  <section class="slide" data-toc="Apoio · Glossário">
+    <div class="dwrap">
+      <div class="kick">Apoio</div>
+      <h2>Glossário</h2>
+      <dl class="gloss">
+        <div><dt>Emaús</dt><dd>Aldeia a &ldquo;sessenta est&aacute;dios&rdquo; (&approx; 11 km); local exato perdido.</dd></div>
+        <div><dt>Cléopas</dt><dd>Um dos dois; citado s&oacute; aqui no NT. N&atilde;o &eacute; um dos Doze.</dd></div>
+        <div><dt>&ldquo;o terceiro dia&rdquo;</dt><dd>Sexta &rarr; domingo, contagem judaica.</dd></div>
+        <div><dt>&ldquo;remir Israel&rdquo;</dt><dd><i>lytro&otilde;</i>: resgatar. Esperavam Roma; veio o pecado.</dd></div>
+        <div><dt>&ldquo;partir do p&atilde;o&rdquo;</dt><dd>Gesto de anfitri&atilde;o; virou nome da comunh&atilde;o crist&atilde; (At 2:42).</dd></div>
+        <div><dt>&ldquo;tardos de cora&ccedil;&atilde;o&rdquo;</dt><dd>Lentos para <i>crer</i> o que j&aacute; se sabe.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="slide closing" data-toc="Fecho">
+    <div class="kick">Lucas 24:32</div>
+    <h2>&ldquo;Não se nos abrasava o coração&hellip;?&rdquo;</h2>
+    <p class="small">Texto: Almeida (dom&iacute;nio p&uacute;blico). Apoio: David Guzik,
+    <i>Enduring Word</i>, como par&aacute;frase atribu&iacute;da. Ilustra&ccedil;&otilde;es
+    geradas para este estudo. &mdash; Estudo pessoal, setembro de 2026.</p>
+  </section>
+
+</div>
+
+<div class="hint" id="hint">use &larr; &rarr; &nbsp;ou&nbsp; espaço &nbsp;·&nbsp; toque nas laterais</div>
+
+<nav class="toc" id="toc" aria-label="Índice">
+  <button class="close" id="tocClose">fechar</button>
+  <h3>Índice</h3>
+  <ol id="tocList"></ol>
+</nav>
+
+<div class="bar">
+  <button id="prev" aria-label="Slide anterior">‹</button>
+  <button id="next" aria-label="Próximo slide">›</button>
+  <span class="count" id="count">1 / 1</span>
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <button class="toc-btn" id="tocBtn" aria-label="Abrir índice">☰ índice</button>
+</div>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var i = 0;
+    var count = document.getElementById('count');
+    var fill = document.getElementById('fill');
+    var hint = document.getElementById('hint');
+    var deck = document.getElementById('deck');
+
+    function clamp(n) { return Math.max(0, Math.min(slides.length - 1, n)); }
+
+    function show(n, push) {
+      i = clamp(n);
+      for (var k = 0; k < slides.length; k++) slides[k].classList.toggle('active', k === i);
+      count.textContent = (i + 1) + ' / ' + slides.length;
+      fill.style.width = ((i + 1) / slides.length * 100) + '%';
+      slides[i].scrollTop = 0;
+      if (push !== false) {
+        try { history.replaceState(null, '', '#' + (i + 1)); } catch (e) {}
+        try { localStorage.setItem('emaus-slide', String(i)); } catch (e) {}
+      }
+    }
+    function next() { show(i + 1); }
+    function prev() { show(i - 1); }
+
+    document.getElementById('next').addEventListener('click', next);
+    document.getElementById('prev').addEventListener('click', prev);
+
+    document.addEventListener('keydown', function (e) {
+      if (document.getElementById('toc').classList.contains('open')) {
+        if (e.key === 'Escape') closeToc();
+        return;
+      }
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); next(); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+      else if (e.key === 'Home') { show(0); }
+      else if (e.key === 'End') { show(slides.length - 1); }
+    });
+
+    // touch: tap left/right third, or swipe
+    var tsx = 0, tsy = 0, tst = 0;
+    deck.addEventListener('touchstart', function (e) {
+      tsx = e.changedTouches[0].clientX; tsy = e.changedTouches[0].clientY; tst = Date.now();
+    }, { passive: true });
+    deck.addEventListener('touchend', function (e) {
+      var dx = e.changedTouches[0].clientX - tsx;
+      var dy = e.changedTouches[0].clientY - tsy;
+      var dt = Date.now() - tst;
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) { dx < 0 ? next() : prev(); return; }
+      if (dt < 350 && Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+        var slide = slides[i];
+        if (slide.scrollHeight > slide.clientHeight + 4) return; // let it scroll
+        (e.changedTouches[0].clientX > window.innerWidth * 0.5) ? next() : prev();
+      }
+    }, { passive: true });
+
+    // TOC
+    var toc = document.getElementById('toc');
+    var list = document.getElementById('tocList');
+    slides.forEach(function (s, idx) {
+      var label = s.getAttribute('data-toc');
+      if (!label) return;
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.textContent = (idx + 1).toString().padStart(2, '0') + '   ' + label;
+      b.addEventListener('click', function () { show(idx); closeToc(); });
+      li.appendChild(b); list.appendChild(li);
+    });
+    function openToc() { toc.classList.add('open'); }
+    function closeToc() { toc.classList.remove('open'); }
+    document.getElementById('tocBtn').addEventListener('click', openToc);
+    document.getElementById('tocClose').addEventListener('click', closeToc);
+
+    // start position: hash wins, else stored
+    var start = 0;
+    var h = parseInt((location.hash || '').replace('#', ''), 10);
+    if (h && h >= 1 && h <= slides.length) start = h - 1;
+    else { try { var st = parseInt(localStorage.getItem('emaus-slide'), 10); if (st >= 0 && st < slides.length) start = st; } catch (e) {} }
+    show(start, false);
+    try { history.replaceState(null, '', '#' + (start + 1)); } catch (e) {}
+
+    setTimeout(function () { hint.style.opacity = '0'; }, 4200);
+  })();
+</script>
