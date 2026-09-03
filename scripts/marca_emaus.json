@@ -1,0 +1,23 @@
+[
+  {
+    "descricao": "Generate an image. A single centered emblem / logo mark, no text, no lettering, on a plain off-white aged-parchment background with generous empty margin all around. Style: warm watercolor and ink illustration, limited warm palette (wheat gold, amber, terracotta, a touch of deep ember orange), loose confident pen linework like a fine old illustrated book, soft washes, slightly hand-made feel, NOT a flat vector icon, NOT 3D, no photorealism, no drop shadows. Subject: an open book seen slightly from above, its two pages gently curved, and rising from the center gutter a small simple flame / ember with a soft warm glow. Balanced, symmetrical, iconic, calm. Square composition, the emblem occupying about 60 percent of the frame, centered.",
+    "modulo": "marca",
+    "aula": "emaus",
+    "topico": "v1",
+    "arquivo": "emaus-simbolo-a.png"
+  },
+  {
+    "descricao": "Generate an image. A single centered emblem / logo mark, no text, no lettering, on a plain off-white aged-parchment background with wide empty margin. Style: minimal warm ink-and-wash illustration, very few strokes, wheat-gold and ember-amber only, hand-drawn but restrained, like a woodcut reduced to essentials, NOT a flat corporate vector, no gradients meshes, no 3D, no shadows. Subject: a very simple open book shape suggested with just a few lines, and a single small teardrop flame rising from its center. Extremely clean and iconic, must still read clearly when shrunk very small. Square, centered, symmetrical.",
+    "modulo": "marca",
+    "aula": "emaus",
+    "topico": "v1",
+    "arquivo": "emaus-simbolo-b.png"
+  },
+  {
+    "descricao": "Generate an image. A single centered circular seal / emblem, no text, no lettering, on a plain off-white aged-parchment background with empty margin around it. Style: warm watercolor and ink illustration, wheat gold, amber and terracotta, loose old-book linework, soft washes, hand-made feel, not a flat vector, no 3D, no photorealism, no heavy shadows. Subject: inside a thin simple circular border, an open book with a small flame / ember rising from its center gutter, a few faint radiating light lines behind the flame like a quiet sunrise. Balanced, symmetrical, iconic, warm and calm. Square composition, the round seal centered and occupying about 70 percent of the frame.",
+    "modulo": "marca",
+    "aula": "emaus",
+    "topico": "v1",
+    "arquivo": "emaus-simbolo-c.png"
+  }
+]
