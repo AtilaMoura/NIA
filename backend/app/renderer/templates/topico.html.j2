@@ -709,6 +709,18 @@ function buildSummary() {
   document.getElementById('statFlags').textContent = flags.length;
   document.getElementById('statOpen').textContent = openCount + ' / ' + OPEN_TOTAL;
   document.getElementById('summaryText').value = lines.join('\n');
+
+  // Quando embutido num iframe (front Emaús), entrega o resumo pronto pro pai —
+  // que oferece "enviar pro tutor" sem o aluno ter que copiar/colar. Inócuo fora
+  // de iframe (o botão "Copiar resumo" continua funcionando igual).
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(
+        { tipo: 'emaus:resumo', topico: TOPICO_NUMERO, texto: lines.join('\n') },
+        '*'
+      );
+    }
+  } catch (e) {}
 }
 
 document.getElementById('copyBtn') && document.getElementById('copyBtn').addEventListener('click', function () {

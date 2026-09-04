@@ -11,10 +11,15 @@ export function Avatar({
   className = "",
 }: {
   nome: string;
-  tamanho?: "sm" | "md";
+  tamanho?: "sm" | "md" | "lg";
   className?: string;
 }) {
-  const dim = tamanho === "sm" ? "h-7 w-7 text-[.7rem]" : "h-9 w-9 text-[.8rem]";
+  const dim =
+    tamanho === "sm"
+      ? "h-7 w-7 text-[.7rem]"
+      : tamanho === "lg"
+        ? "h-16 w-16 text-[1.4rem]"
+        : "h-9 w-9 text-[.8rem]";
   return (
     <span
       title={nome}

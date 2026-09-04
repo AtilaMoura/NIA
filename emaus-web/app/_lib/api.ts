@@ -45,15 +45,46 @@ export type Topico = {
   estimated_read_time_minutes: number | null;
 };
 
+export type FontSize = "sm" | "md" | "lg";
+
 export type UserPrefs = {
   id: number;
   name: string | null;
   email?: string;
   preferred_panel_mode: "light" | "dark";
+  preferred_font_size?: FontSize | null;
   [k: string]: unknown;
 };
 
 export type StatusTopico = "nao_iniciado" | "em_andamento" | "concluido";
+
+export type VeredictoTutor = "dominado" | "reforco";
+
+export type TutorLacuna = {
+  tema: string;
+  evidencia: string;
+  gravidade: "superficial" | "real";
+};
+
+export type TutorReforco = {
+  necessario: boolean;
+  foco: string;
+  instrucao_para_gerar: string;
+};
+
+// O JSON que o TutorAgent devolve (guardado em tutor_analise.ultima_avaliacao).
+export type AvaliacaoTutor = {
+  veredito: VeredictoTutor;
+  resumo_diagnostico: string;
+  pontos_fortes: string[];
+  lacunas: TutorLacuna[];
+  reforco_sugerido: TutorReforco;
+};
+
+export type TutorAnalise = {
+  ultima_avaliacao: AvaliacaoTutor;
+  historico: { veredito: VeredictoTutor; resumo_diagnostico: string }[];
+};
 
 export type TopicoProgress = {
   id: number;
@@ -62,6 +93,20 @@ export type TopicoProgress = {
   status: StatusTopico;
   iniciado_em: string | null;
   concluido_em: string | null;
+  tutor_veredito: VeredictoTutor | null;
+  tutor_analise: TutorAnalise | null;
+  avaliado_em: string | null;
+};
+
+// Progress é por MÓDULO (o de tópico é TopicoProgress). Só os campos que o Emaús lê.
+export type Progress = {
+  id: number;
+  user_id: number;
+  course_id: number;
+  module_id: number;
+  status: string;
+  time_spent_minutes: number | null;
+  last_accessed_at: string | null;
 };
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
@@ -123,7 +168,7 @@ export function updateUser(id: number, data: Record<string, unknown>) {
 }
 
 export function listProgress() {
-  return fetchJson<unknown[]>("/progress/");
+  return fetchJson<Progress[]>("/progress/");
 }
 
 // ---- Progresso por tópico (FASE 2) ----
@@ -135,5 +180,15 @@ export function setTopicoProgress(topicoId: number, userId: number, status: Stat
   return fetchJson<TopicoProgress>(`/topico-progress/${topicoId}`, {
     method: "PUT",
     body: JSON.stringify({ user_id: userId, status }),
+  });
+}
+
+// ---- Avaliação do Tutor por tópico (FASE 4) ----
+// Devolve o TopicoProgress atualizado; a avaliação em si fica em
+// `.tutor_analise.ultima_avaliacao`, o novo status em `.status`.
+export function avaliarTopico(topicoId: number, userId: number, resumoTexto: string) {
+  return fetchJson<TopicoProgress>(`/pipeline/topicos/${topicoId}/avaliar`, {
+    method: "POST",
+    body: JSON.stringify({ user_id: userId, resumo_texto: resumoTexto }),
   });
 }

@@ -12,6 +12,27 @@ from app.routers import test_ai
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
+
+def _ensure_colunas_extras(bind):
+    """`create_all` cria tabela nova mas não faz ALTER em tabela que já existe.
+    Colunas da FASE 4 do front Emaús (Tutor por tópico + tamanho de fonte) —
+    idempotente via ADD COLUMN IF NOT EXISTS (Postgres)."""
+    stmts = [
+        "ALTER TABLE topico_progress ADD COLUMN IF NOT EXISTS tutor_veredito VARCHAR(10)",
+        "ALTER TABLE topico_progress ADD COLUMN IF NOT EXISTS tutor_analise JSONB",
+        "ALTER TABLE topico_progress ADD COLUMN IF NOT EXISTS avaliado_em TIMESTAMPTZ",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS preferred_font_size VARCHAR(4)",
+        "DO $$ BEGIN "
+        "IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'valid_preferred_font_size') THEN "
+        "ALTER TABLE users ADD CONSTRAINT valid_preferred_font_size "
+        "CHECK (preferred_font_size IN ('sm', 'md', 'lg')); "
+        "END IF; END $$;",
+    ]
+    with bind.begin() as conn:
+        for s in stmts:
+            conn.exec_driver_sql(s)
+
+
 def create_app():
     app = FastAPI(
         title="NIA API",
@@ -33,6 +54,7 @@ def create_app():
 
     # Importante para o SQLAlchemy registrar models
     models.Base.metadata.create_all(bind=engine)
+    _ensure_colunas_extras(engine)
 
     # Imagens de capa das aulas (buscadas na internet, sem direito autoral — ver
     # sessão do curso de obreiro) e outros arquivos estáticos servidos direto pelo backend.

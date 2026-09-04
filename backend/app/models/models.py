@@ -50,6 +50,7 @@ class User(Base):
     preferred_mood = Column(String(20), nullable=False, default='musgo')
     preferred_panel_mode = Column(String(10), nullable=False, default='light')
     preferred_panel_layout = Column(String(20), nullable=False, default='retomar')
+    preferred_font_size = Column(String(4))  # 'sm' | 'md' | 'lg' | None (FASE 4 do front Emaús; default de UI = 'md')
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -72,6 +73,10 @@ class User(Base):
         CheckConstraint(
             "preferred_panel_layout IN ('retomar', 'biblioteca', 'trilha')",
             name='valid_preferred_panel_layout',
+        ),
+        CheckConstraint(
+            "preferred_font_size IN ('sm', 'md', 'lg')",
+            name='valid_preferred_font_size',
         ),
     )
 
@@ -403,6 +408,13 @@ class TopicoProgress(Base):
     iniciado_em = Column(DateTime(timezone=True))    # 1ª vez que virou 'em_andamento'
     concluido_em = Column(DateTime(timezone=True))   # quando virou 'concluido' (não é limpo depois)
     time_spent_s = Column(Integer, default=0)        # reservado (FASE 3 popula)
+
+    # Avaliação do Tutor por tópico (FASE 4 do front Emaús). É o análogo, por
+    # TÓPICO, do Progress.tutor_analysis por MÓDULO — o Emaús navega por tópico e
+    # não usa a gamificação que o fluxo de lição dispara.
+    tutor_veredito = Column(String(10))              # 'dominado' | 'reforco' | None
+    tutor_analise = Column(JSONB)                    # { ultima_avaliacao: {...}, historico: [...] }
+    avaliado_em = Column(DateTime(timezone=True))    # última vez que o Tutor avaliou
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

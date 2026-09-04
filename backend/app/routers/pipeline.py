@@ -21,10 +21,11 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.models import Course, Module, Lesson, Topico, Progress, User
+from app.models.models import Course, Module, Lesson, Topico, Progress, TopicoProgress, User
 from app.agents.pipeline import gerar_estrutura_curso, gerar_e_revisar_topico
 from app.agents.tutor_agent import TutorAgent
 from app.agents.perfis import resolver_perfil
+from app.schemas.topico_progress import AvaliarTopicoRequest, TopicoProgressOut
 from app.services.groq_service import GroqService
 from app.services.gemini_service import GeminiService
 from app.services.biblia_service import buscar_todos_textos
@@ -494,3 +495,114 @@ async def avaliar_resumo(lesson_id: int, data: AvaliarResumoRequest, db: Session
     except Exception as e:
         db.rollback()
         raise HTTPException(500, f"Erro ao avaliar resumo: {str(e)}")
+
+
+# ============================================================
+# ALUNO — Tutor por TÓPICO (FASE 4 do front Emaús)
+# ============================================================
+
+# Enquanto não existe Tenant/domain_profile no banco, o perfil de domínio do
+# Tutor é resolvido pelo curso. Só o curso 8 (Formação do Novo Obreiro) é de
+# teologia hoje; o resto cai no perfil "tech" (default de resolver_perfil).
+_PERFIL_POR_CURSO: dict[int, str] = {8: "obreiro"}
+
+
+def _perfil_do_curso(db: Session, topico: Topico) -> str:
+    lesson = db.query(Lesson).filter(Lesson.id == topico.lesson_id).first()
+    module = db.query(Module).filter(Module.id == lesson.module_id).first() if lesson else None
+    course_id = module.course_id if module else None
+    return _PERFIL_POR_CURSO.get(course_id, "tech")
+
+
+def _rate_limited(err: Exception) -> bool:
+    msg = str(err).lower()
+    return "429" in msg or "rate_limit" in msg or "rate limit" in msg
+
+
+@router.post("/topicos/{topico_id}/avaliar", response_model=TopicoProgressOut)
+async def avaliar_resumo_topico(
+    topico_id: int, data: AvaliarTopicoRequest, db: Session = Depends(get_db)
+):
+    """Análogo por TÓPICO do POST /pipeline/licoes/{id}/avaliar: o aluno cola o
+    '=== RESUMO ===' que o render monta no fim do tópico e o Tutor decide
+    dominado/reforço. Grava em TopicoProgress (não em Progress) e NÃO dispara
+    gamificação — o Emaús é sem pontos/selos/streak."""
+    topico = db.query(Topico).filter(Topico.id == topico_id).first()
+    if not topico:
+        raise HTTPException(404, "Tópico não encontrado")
+    if not topico.content or not topico.is_approved:
+        raise HTTPException(400, "Este tópico ainda não está disponível para avaliação.")
+
+    lesson = db.query(Lesson).filter(Lesson.id == topico.lesson_id).first()
+    module = db.query(Module).filter(Module.id == lesson.module_id).first() if lesson else None
+    contexto = topico.titulo
+    if lesson:
+        contexto += f" — aula '{lesson.title}'"
+    if module:
+        contexto += f", módulo {module.module_index}"
+
+    registro = (
+        db.query(TopicoProgress)
+        .filter(
+            TopicoProgress.user_id == data.user_id,
+            TopicoProgress.topico_id == topico_id,
+        )
+        .first()
+    )
+
+    historico_txt = ""
+    if registro and registro.tutor_analise and registro.tutor_analise.get("historico"):
+        historico_txt = "\n".join(
+            f"- {h.get('veredito')}: {h.get('resumo_diagnostico')}"
+            for h in registro.tutor_analise["historico"]
+        )
+
+    perfil_id = _perfil_do_curso(db, topico)
+
+    try:
+        resultado = await TutorAgent(_service(data.modelo)).avaliar_resumo(
+            data.resumo_texto,
+            contexto_topico=contexto,
+            historico_reforcos=historico_txt,
+            perfil=resolver_perfil(perfil_id),
+        )
+    except Exception as e:
+        if _rate_limited(e):
+            raise HTTPException(
+                503, "O tutor está sobrecarregado agora. Tente de novo em alguns minutos."
+            )
+        raise HTTPException(500, f"Erro ao avaliar resumo do tópico: {str(e)}")
+
+    agora = datetime.now(timezone.utc)
+    if not registro:
+        registro = TopicoProgress(
+            user_id=data.user_id, topico_id=topico_id, status="em_andamento"
+        )
+        db.add(registro)
+
+    historico = (registro.tutor_analise or {}).get("historico", [])
+    historico.append(
+        {
+            "veredito": resultado.get("veredito"),
+            "resumo_diagnostico": resultado.get("resumo_diagnostico"),
+        }
+    )
+    registro.tutor_veredito = resultado.get("veredito")
+    registro.tutor_analise = {"ultima_avaliacao": resultado, "historico": historico}
+    registro.avaliado_em = agora
+
+    if resultado.get("veredito") == "dominado":
+        registro.status = "concluido"
+        if registro.iniciado_em is None:
+            registro.iniciado_em = agora
+        if registro.concluido_em is None:
+            registro.concluido_em = agora
+    elif registro.status != "concluido":
+        # reforço: mantém em andamento (não regride um tópico já concluído antes)
+        registro.status = "em_andamento"
+        if registro.iniciado_em is None:
+            registro.iniciado_em = agora
+
+    db.commit()
+    db.refresh(registro)
+    return registro

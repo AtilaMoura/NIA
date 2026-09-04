@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Avatar } from "./Avatar";
 import { AlternarTema } from "./AlternarTema";
+import { MenuUsuario } from "./MenuUsuario";
 import { Logo } from "./Logo";
 
 // Cabeçalho fixo. Abaixo de 640px: marca + avatar na 1ª linha, navegação em
@@ -28,14 +28,7 @@ export function CabecalhoApp({
 
         <div className="order-2 ml-auto flex items-center gap-2 sm:order-3 sm:ml-0">
           <AlternarTema />
-          {nomeUsuario && (
-            <>
-              <Avatar nome={nomeUsuario} tamanho="sm" />
-              <span className="hidden text-[.82rem] text-[var(--tm-ink-muted)] md:inline">
-                {nomeUsuario}
-              </span>
-            </>
-          )}
+          {nomeUsuario && <MenuUsuario nome={nomeUsuario} />}
         </div>
       </div>
     </header>

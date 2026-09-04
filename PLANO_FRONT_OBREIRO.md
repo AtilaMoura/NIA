@@ -160,7 +160,30 @@ Cada fase quebrada em features. OpenCode faz uma feature, Claude valida, próxim
     `emaus-web/public/capas/{slug}.jpg`.
   - Bug corrigido: botão "Tela cheia" (`⛶`) do render não funcionava dentro do `<iframe>` —
     faltava `allow="fullscreen"` em `app/topico/[topicoId]/page.tsx`.
-- [ ] FASE 4 — Progresso/Perfil/Preferências
+- [~] **FASE 4 — Progresso / Perfil / Preferências (+ Tutor por tópico)** — implementada 2026-09-04.
+  Spec: `docs/front-obreiro/FASE-4-progresso-perfil-preferencias.md`. Auth (FASE 1) segue adiada
+  (usuário avisa quando fazer).
+  - Backend: `TopicoProgress` += `tutor_veredito`/`tutor_analise`/`avaliado_em`; `User` +=
+    `preferred_font_size` (CHECK sm/md/lg). `main.py` ganhou `_ensure_colunas_extras()` (ALTER
+    TABLE ADD COLUMN IF NOT EXISTS no startup — `create_all` não altera tabela existente).
+    Novo endpoint `POST /pipeline/topicos/{id}/avaliar` (Tutor por tópico, perfil via
+    `_PERFIL_POR_CURSO={8:"obreiro"}`, grava em `TopicoProgress`, **sem** gamificação, sem tocar
+    `Progress`; 503 amigável em rate-limit). `topico.html.j2`: `postMessage({tipo:"emaus:resumo"})`
+    no fim de `buildSummary()`.
+  - Front (`emaus-web/`): `_lib/api.ts` (tipos `AvaliacaoTutor`/`Progress`/`FontSize`,
+    `avaliarTopico`, `listProgress` tipado), `_lib/arvore.ts` (datas + `tutor_veredito` por tópico,
+    `linhaDoTempo`, `resumo.tempoTotalMin`). Páginas novas: `app/progresso/page.tsx`,
+    `app/perfil/{page,perfil-ui}.tsx`, `app/preferencias/{page,preferencias-ui}.tsx`.
+    `app/topico/[topicoId]/topico-ui.tsx` reescrito (painel do Tutor + fallback textarea).
+    `_ui/MenuUsuario.tsx` novo (menu no avatar: Perfil/Progresso/Preferências), `CabecalhoApp` e
+    `Avatar` (tamanho `lg`) ajustados.
+  - Testes (2026-09-04, backend no ar): `tsc --noEmit` 0 erros; migration verificada
+    (`\d topico_progress`, `users.preferred_font_size` + constraint); `POST
+    /pipeline/topicos/{2,3}/avaliar` OK (reforço mantém `em_andamento`; dominado → `concluido`
+    + `concluido_em`, idempotente); `PUT /users/1` persiste font/mode; rotas `/`, `/inicio`,
+    `/curso/8`, `/progresso`, `/perfil`, `/preferencias`, `/topico/1` → 200 sem erro no log.
+    Dados de teste do tutor resetados. **Pendente só: conferência visual + clicar o fluxo do
+    painel do Tutor no navegador.**
 - [ ] FASE 5 — Revisão (professor)
 - [ ] FASE 6 — Capa + imagens + polish (parte da capa/landing já adiantada acima)
 

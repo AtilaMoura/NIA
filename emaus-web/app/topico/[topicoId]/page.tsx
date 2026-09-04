@@ -52,8 +52,9 @@ export default async function TopicoPage({
   const proximo = ordenados
     .slice(posicao + 1)
     .find((t) => t.content && t.is_approved);
-  const estadoInicial: StatusTopico =
-    progresso.find((p) => p.topico_id === topico.id)?.status ?? "nao_iniciado";
+  const progTopico = progresso.find((p) => p.topico_id === topico.id) ?? null;
+  const estadoInicial: StatusTopico = progTopico?.status ?? "nao_iniciado";
+  const analiseInicial = progTopico?.tutor_analise?.ultima_avaliacao ?? null;
 
   const barraTopo = (
     <div className="flex items-center gap-3 border-b border-[var(--tm-border)] bg-[var(--tm-bg)] px-[clamp(1rem,4vw,2rem)] py-2.5 text-[.82rem]">
@@ -110,6 +111,7 @@ export default async function TopicoPage({
         topicoId={topico.id}
         estadoInicial={estadoInicial}
         proximoTopicoId={proximo?.id ?? null}
+        analiseInicial={analiseInicial}
       />
     </div>
   );

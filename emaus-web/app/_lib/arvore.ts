@@ -9,7 +9,9 @@ import {
   listLessons,
   listTopicos,
   listTopicoProgress,
+  listProgress,
   type Course,
+  type VeredictoTutor,
 } from "./api";
 
 export type TopicoNo = {
@@ -18,6 +20,13 @@ export type TopicoNo = {
   referencia_biblica: string | null;
   topico_index: number;
   estado: EstadoTopico;
+  lesson_id: number;
+  iniciado_em: string | null;
+  concluido_em: string | null;
+  tutor_veredito: VeredictoTutor | null;
+  // preenchidos só na linhaDoTempo (contexto pra exibir fora da árvore)
+  moduloTitulo?: string;
+  aulaTitulo?: string;
 };
 
 export type AulaNo = {
@@ -38,20 +47,28 @@ export type ModuloNo = {
 export type ArvoreCurso = {
   curso: Course;
   modulos: ModuloNo[];
-  resumo: { totalTopicos: number; concluidos: number; percent: number };
+  resumo: { totalTopicos: number; concluidos: number; percent: number; tempoTotalMin: number };
   proximoTopico: { id: number; titulo: string } | null;
+  // Todos os tópicos na ordem do curso, com módulo/aula anexados — pra /progresso.
+  linhaDoTempo: TopicoNo[];
 };
 
 export async function montarArvore(courseId: number): Promise<ArvoreCurso> {
-  const [curso, modules, lessons, topicos, progresso] = await Promise.all([
+  const [curso, modules, lessons, topicos, progresso, progressModulos] = await Promise.all([
     getCourse(courseId),
     listModules(),
     listLessons(),
     listTopicos(),
     listTopicoProgress(ALUNO_USER_ID),
+    listProgress().catch(() => []),
   ]);
 
+  const progressoPorTopico = new Map(progresso.map((p) => [p.topico_id, p]));
   const statusPorTopico = new Map(progresso.map((p) => [p.topico_id, p.status]));
+
+  const tempoTotalMin = progressModulos
+    .filter((p) => p.course_id === courseId && p.user_id === ALUNO_USER_ID)
+    .reduce((soma, p) => soma + (p.time_spent_minutes ?? 0), 0);
 
   const modsDoCurso = modules
     .filter((m) => m.course_id === courseId)
@@ -98,12 +115,17 @@ export async function montarArvore(courseId: number): Promise<ArvoreCurso> {
           } else {
             estado = "disponivel";
           }
+          const prog = progressoPorTopico.get(t.id);
           return {
             id: t.id,
             titulo: t.titulo,
             referencia_biblica: t.referencia_biblica,
             topico_index: t.topico_index,
             estado,
+            lesson_id: t.lesson_id,
+            iniciado_em: prog?.iniciado_em ?? null,
+            concluido_em: prog?.concluido_em ?? null,
+            tutor_veredito: prog?.tutor_veredito ?? null,
           };
         });
         return { id: l.id, titulo: l.title, lesson_index: l.lesson_index, topicos: topicosNo };
@@ -119,7 +141,19 @@ export async function montarArvore(courseId: number): Promise<ArvoreCurso> {
 
   const percent = totalTopicos === 0 ? 0 : Math.round((concluidos / totalTopicos) * 100);
 
-  return { curso, modulos, resumo: { totalTopicos, concluidos, percent }, proximoTopico };
+  const linhaDoTempo: TopicoNo[] = modulos.flatMap((m) =>
+    m.aulas.flatMap((a) =>
+      a.topicos.map((t) => ({ ...t, moduloTitulo: m.titulo, aulaTitulo: a.titulo })),
+    ),
+  );
+
+  return {
+    curso,
+    modulos,
+    resumo: { totalTopicos, concluidos, percent, tempoTotalMin },
+    proximoTopico,
+    linhaDoTempo,
+  };
 }
 
 // Contagem concluídos/total de um módulo — pro cabeçalho do accordion.
