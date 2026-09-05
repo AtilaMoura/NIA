@@ -6,6 +6,7 @@ import { CapaCurso } from "./_ui/CapaCurso";
 import { Logo, LogoSimbolo } from "./_ui/Logo";
 import { CATALOGO, caminhoCapa, type CursoCatalogo } from "./_lib/catalogo";
 import { capaExiste } from "./_lib/capas";
+import { getSessao } from "./_lib/sessao";
 
 export const metadata: Metadata = {
   title: { absolute: "Emaús — cursos de formação bíblica" },
@@ -90,16 +91,23 @@ const PILARES = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
   const disponivel = CATALOGO.find((c) => c.disponivel);
+  const sessao = await getSessao();
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={null} hrefMarca="/">
+      <CabecalhoApp nomeUsuario={sessao?.name ?? null} papel={sessao?.role} hrefMarca="/">
         <span className="text-[var(--tm-accent)]">Cursos</span>
-        <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
-          Continuar estudando
-        </Link>
+        {sessao ? (
+          <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
+            Continuar estudando
+          </Link>
+        ) : (
+          <Link href="/entrar" className="hover:text-[var(--tm-accent)]">
+            Entrar
+          </Link>
+        )}
       </CabecalhoApp>
 
       <main>

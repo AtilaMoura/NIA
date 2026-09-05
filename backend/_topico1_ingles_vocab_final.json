@@ -1,0 +1,573 @@
+{
+  "topico_id": "ingles-modulo1-aula1-topico1-vocabulario",
+  "titulo": "Vocabulário & Expressões — My Way",
+  "aula": 1,
+  "numero": 1,
+  "duracao_estimada_min": 16,
+  "roteiro": [
+    "A estrutura da letra em 6 movimentos",
+    "Abertura: o fim e a certeza",
+    "Afirmação e arrependimentos",
+    "Planejamento e caminhos",
+    "A ponte: tropeços e firmeza",
+    "Exemption vs. exception",
+    "Fecho: os golpes e o legado"
+  ],
+  "badges_capa": [
+    "⏱ ~16 min",
+    "🔊 áudio com controle de velocidade",
+    "✍️ 5 checkpoints + avaliação final"
+  ],
+  "slides": [
+    {
+      "tipo": "capa",
+      "secao": "Início",
+      "titulo": "Vocabulário & Expressões — My Way",
+      "subtitulo": "17 palavras e expressões reais da música, organizadas pela estrutura da letra",
+      "instrucoes_box": {
+        "label": "📋 Como funciona este estudo",
+        "texto": "Use as setas ← → ou os botões embaixo para navegar. Alguns slides são checkpoints — pedem uma resposta antes de liberar o próximo."
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Vocabulário & Expressões",
+      "titulo_secao": "A estrutura da letra, em 6 movimentos",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "\"My Way\" se organiza em 6 movimentos temáticos — saber essa estrutura ajuda a acompanhar a letra de verdade quando você for ouvir a música. Não vamos citar a letra aqui (direitos autorais) — só o que cada parte faz na história."
+        },
+        {
+          "tipo": "fluxo",
+          "passos": [
+            {
+              "texto": "Abertura: anuncia que o fim chegou, encara \"a cortina final\"",
+              "decisao": false
+            },
+            {
+              "texto": "Afirmação: viveu uma vida cheia, fez do seu jeito",
+              "decisao": false
+            },
+            {
+              "texto": "Arrependimentos: teve alguns, poucos demais pra mencionar",
+              "decisao": false
+            },
+            {
+              "texto": "Planejamento: traçou cada rota, cada passo cuidadoso",
+              "decisao": false
+            },
+            {
+              "texto": "A ponte: tropeços — assumiu mais do que dava conta, mas seguiu de cabeça erguida",
+              "decisao": true
+            },
+            {
+              "texto": "Fecho: um homem precisa dizer o que sente de verdade — que fique registrado",
+              "decisao": false
+            }
+          ]
+        },
+        {
+          "tipo": "imagem_sugerida",
+          "descricao": "Um microfone em um palco vazio, com um único foco de luz quente — sem rosto de pessoa real, remetendo à ideia de 'luz de palco' e 'cortina final'.",
+          "legenda": "A luz do palco, antes da cortina final."
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Vocabulário & Expressões",
+      "titulo_secao": "Abertura: o fim e a certeza",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "A abertura da música fala do fim chegando, com certeza do que está sendo dito. Duas peças de vocabulário centrais pra esse movimento:"
+        },
+        {
+          "tipo": "vocab",
+          "termo": "the final curtain",
+          "classe_gramatical": "expressão idiomática",
+          "traducao": "o último ato, o fim definitivo",
+          "exemplo_en": "After thirty years of teaching, she felt it was time for the final curtain.",
+          "exemplo_pt": "Depois de trinta anos ensinando, ela sentiu que era hora do último ato.",
+          "cuidado": "Vem do teatro (a última cortina que fecha marca o fim da peça). Sempre traz a ideia de encerramento definitivo, não é só \"a cortina\" física."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "certain of / certain about",
+          "classe_gramatical": "adjetivo + preposição",
+          "traducao": "certo de / certo sobre",
+          "exemplo_en": "I'm certain of the facts, but not certain about what happens next.",
+          "exemplo_pt": "Tenho certeza dos fatos, mas não tenho certeza sobre o que acontece depois.",
+          "cuidado": "Use \"certain of\" com substantivo/pronome direto; \"certain about\" com assunto mais abstrato, gerúndio ou cláusula. Não confundir com \"right\" (que é sobre não ter errado, não sobre convicção)."
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "Erro comum",
+          "texto": "Muita gente omite a preposição: \"I am certain the exam.\" O correto é sempre \"certain OF/ABOUT + algo\"."
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck1",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "tf",
+          "id": "ck1_1",
+          "enunciado": "A expressão \"the final curtain\" é usada apenas de forma literal, referindo‑se a cortinas reais de teatro.",
+          "cenario": null,
+          "correta_bool": false,
+          "explicacao": "Na música e em outros contextos, \"the final curtain\" funciona como metáfora para o fim definitivo de algo."
+        }
+      ],
+      "tipo_esperado": "tf"
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Vocabulário & Expressões",
+      "titulo_secao": "Afirmação e arrependimentos",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Depois da abertura, a música afirma uma vida cheia e reconhece alguns arrependimentos — poucos demais pra mencionar."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "to state your case",
+          "classe_gramatical": "verbo frasal + objeto",
+          "traducao": "expor seu argumento / apresentar sua posição",
+          "exemplo_en": "During the meeting, she will state her case for a higher budget.",
+          "exemplo_pt": "Durante a reunião, ela vai expor seu argumento por um orçamento maior.",
+          "cuidado": "\"Case\" aqui não é \"caso\" (situação legal) — é \"argumento/posição\". Não confundir com \"to make a case\" (mais formal, sem o possessivo)."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "regret",
+          "classe_gramatical": "verbo / substantivo",
+          "traducao": "arrepender-se / arrependimento",
+          "exemplo_en": "I regret not finishing college when I had the chance.",
+          "exemplo_pt": "Eu me arrependo de não ter terminado a faculdade quando tive a chance.",
+          "cuidado": "Como verbo: \"regret + gerúndio\" (arrependimento de algo já feito) ou \"regret + infinitivo\" (lamentar ter que fazer algo agora, ex: \"we regret to inform you...\"). Como substantivo, precisa de artigo: \"a regret\", \"my regret\"."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "to mention",
+          "classe_gramatical": "verbo",
+          "traducao": "citar, mencionar, referir",
+          "exemplo_en": "It's too small to mention.",
+          "exemplo_pt": "É pequeno demais pra mencionar.",
+          "cuidado": "Implica trazer o assunto à tona sem detalhar — não confundir com \"say\" (dizer) ou \"tell\" (contar)."
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck2",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "open",
+          "id": "ck2_1",
+          "enunciado": "Escreva uma frase em inglês que contenha a expressão \"to state your case\" ou a palavra \"regret\" (relacionada ao sentido da música).",
+          "cenario": null,
+          "placeholder": "Sua frase aqui...",
+          "explicacao": null
+        }
+      ],
+      "tipo_esperado": "open"
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Vocabulário & Expressões",
+      "titulo_secao": "Planejamento e caminhos",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "A música fala de traçar cada rota, cada passo cuidadoso pelos caminhos menores — e de levar tudo até o fim, mesmo com dúvida no caminho."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "to chart a course",
+          "classe_gramatical": "verbo + objeto",
+          "traducao": "traçar uma rota / um plano",
+          "exemplo_en": "She charted a course from intern to director.",
+          "exemplo_pt": "Ela traçou uma rota de estagiária a diretora.",
+          "cuidado": "Usado tanto pra navegação literal quanto pra planos de vida/carreira — sempre no sentido de decidir o caminho com cuidado."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "byway",
+          "classe_gramatical": "substantivo",
+          "traducao": "estrada secundária",
+          "exemplo_en": "We took the byways to avoid tolls.",
+          "exemplo_pt": "Pegamos as estradas secundárias pra evitar pedágios.",
+          "cuidado": "Contraste com \"highway\" (rodovia principal) — \"byway\" é sempre o caminho menos óbvio, mais devagar."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "doubt",
+          "classe_gramatical": "substantivo / verbo",
+          "traducao": "dúvida / duvidar",
+          "exemplo_en": "When in doubt, ask.",
+          "exemplo_pt": "Na dúvida, pergunte.",
+          "cuidado": "\"When in doubt\" é uma expressão fixa muito comum — não traduza como \"quando em dúvida\", em português soa mais natural \"na dúvida\"."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "to see it through",
+          "classe_gramatical": "phrasal verb",
+          "traducao": "levar até o fim, concluir algo",
+          "exemplo_en": "The project was hard, but we saw it through.",
+          "exemplo_pt": "O projeto foi difícil, mas nós levamos até o fim.",
+          "cuidado": "Não tem nada a ver com visão física — é sobre persistência. O \"it\" sempre se refere a algo já mencionado antes."
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck3",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "associar",
+          "id": "ck3_1",
+          "enunciado": "Associe cada expressão ao significado correto.",
+          "cenario": null,
+          "rotulos_opcoes": [
+            {
+              "valor": "A",
+              "rotulo": "traçar uma rota / plano"
+            },
+            {
+              "valor": "B",
+              "rotulo": "estrada secundária"
+            },
+            {
+              "valor": "C",
+              "rotulo": "dúvida"
+            },
+            {
+              "valor": "D",
+              "rotulo": "levar até o fim"
+            }
+          ],
+          "itens": [
+            {
+              "id": "ck3_1_1",
+              "texto": "to chart a course",
+              "correta": "A"
+            },
+            {
+              "id": "ck3_1_2",
+              "texto": "byway",
+              "correta": "B"
+            },
+            {
+              "id": "ck3_1_3",
+              "texto": "doubt",
+              "correta": "C"
+            },
+            {
+              "id": "ck3_1_4",
+              "texto": "to see it through",
+              "correta": "D"
+            }
+          ],
+          "explicacao": "Cada expressão corresponde ao significado indicado nas opções."
+        }
+      ],
+      "tipo_esperado": "associar"
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Vocabulário & Expressões",
+      "titulo_secao": "A ponte: tropeços e firmeza",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Na ponte da música, o eu-lírico admite ter assumido mais do que dava conta — mas encarou, engoliu e seguiu de cabeça erguida, mesmo sem ter certeza."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "to bite off more than you can chew",
+          "classe_gramatical": "expressão idiomática",
+          "traducao": "assumir mais do que dá conta",
+          "exemplo_en": "I bit off more than I could chew with two jobs.",
+          "exemplo_pt": "Eu assumi mais do que dava conta com dois empregos.",
+          "cuidado": "Imagem literal: morder um pedaço grande demais pra mastigar. Sempre no sentido de compromisso/tarefa maior do que a pessoa consegue lidar."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "to stand tall",
+          "classe_gramatical": "expressão verbal",
+          "traducao": "manter-se firme e digno",
+          "exemplo_en": "They lost the vote but stood tall.",
+          "exemplo_pt": "Eles perderam a votação, mas se mantiveram firmes e dignos.",
+          "cuidado": "Não é sobre altura física — é sobre dignidade mesmo perdendo ou passando por dificuldade."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "naught",
+          "classe_gramatical": "substantivo (arcaico/poético)",
+          "traducao": "nada",
+          "exemplo_en": "All that effort came to naught.",
+          "exemplo_pt": "Todo aquele esforço não deu em nada.",
+          "cuidado": "Forma antiga de \"nothing\" — hoje só aparece em contextos formais, poéticos ou em frases fixas como \"came to naught\". Não use em conversa comum."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "to kneel",
+          "classe_gramatical": "verbo",
+          "traducao": "ajoelhar-se; submeter-se",
+          "exemplo_en": "He refused to kneel to the king.",
+          "exemplo_pt": "Ele se recusou a se ajoelhar diante do rei.",
+          "cuidado": "Verbo irregular: kneel–knelt–knelt (ou kneeled, também aceito). Sentido literal e figurado (submeter-se)."
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck4",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "mc",
+          "id": "ck4_1",
+          "enunciado": "O que significa a expressão idiomática \"to bite off more than you can chew\"?",
+          "cenario": null,
+          "opcoes": [
+            "Assumir uma tarefa que está além da sua capacidade",
+            "Comer rapidamente sem mastigar",
+            "Falar demais sem pensar",
+            "Desistir de algo antes de começar"
+          ],
+          "correta_idx": 0,
+          "explicacao": "A expressão indica assumir mais responsabilidades ou compromissos do que se consegue manejar."
+        }
+      ],
+      "tipo_esperado": "mc"
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Vocabulário & Expressões",
+      "titulo_secao": "Duas palavras parecidas: exemption vs. exception",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Nota de honestidade: a linha da 3ª estrofe aparece em versões diferentes da música como \"without exemption\" e \"without exception\" — vale a pena aprender as duas, já que são bem parecidas mas não são sinônimos."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "exemption",
+          "classe_gramatical": "substantivo",
+          "traducao": "dispensa, isenção",
+          "exemplo_en": "Students with a medical condition may apply for an exemption from the physical education requirement.",
+          "exemplo_pt": "Estudantes com condição médica podem solicitar uma dispensa da exigência de educação física.",
+          "cuidado": "\"Exemption\" é ser liberado de algo que normalmente seria obrigatório (ex.: isenção de imposto)."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "exception",
+          "classe_gramatical": "substantivo",
+          "traducao": "exceção",
+          "exemplo_en": "Everyone came, without exception.",
+          "exemplo_pt": "Todo mundo veio, sem exceção.",
+          "cuidado": "\"Exception\" é algo que foge da regra geral — a regra continua existindo pros outros, só aquele caso é diferente."
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "Resumo da distinção",
+          "texto": "\"Exemption\" = permissão pra NÃO seguir uma regra. \"Exception\" = um caso que a regra simplesmente não cobre. Não são intercambiáveis."
+        }
+      ]
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "Vocabulário & Expressões",
+      "titulo_secao": "Fecho: os golpes e o que fica registrado",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "No fecho, a música fala de levar os golpes da vida — e de deixar registrado que isso foi feito do seu próprio jeito."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "the blows",
+          "classe_gramatical": "substantivo (plural)",
+          "traducao": "os golpes, os baques",
+          "exemplo_en": "Life's hard blows taught her resilience.",
+          "exemplo_pt": "Os golpes duros da vida ensinaram resiliência a ela.",
+          "cuidado": "Sempre no plural nesse sentido figurado (dificuldades da vida); \"a blow\" no singular também existe (um golpe específico)."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "let the record show",
+          "classe_gramatical": "expressão formal",
+          "traducao": "que fique registrado",
+          "exemplo_en": "Let the record show that I disagreed with this decision.",
+          "exemplo_pt": "Que fique registrado que eu discordei dessa decisão.",
+          "cuidado": "Expressão fixa e formal (usada em atas, tribunais) — não muda a ordem das palavras nem o \"the\"."
+        },
+        {
+          "tipo": "audio_video",
+          "midia_tipo": "audio",
+          "legenda": "Pronúncia de \"let the record show\"",
+          "descricao": "Áudio curto com a pronúncia da expressão \"let the record show\", destacando o linking entre as palavras."
+        }
+      ]
+    },
+    {
+      "tipo": "checkpoint",
+      "secao": "Checkpoint",
+      "gate_id": "ck5",
+      "titulo_secao": "Checkpoint rápido",
+      "perguntas": [
+        {
+          "tipo": "lacuna",
+          "id": "ck5_1",
+          "enunciado": "Complete a frase: \"Let the record ___ that I tried my best.\"",
+          "cenario": null,
+          "placeholder": "____",
+          "respostas_aceitas": [
+            "show",
+            "shows"
+          ],
+          "explicacao": "A forma correta é \"show\" (imperativo da expressão fixa \"let the record show\")."
+        }
+      ],
+      "tipo_esperado": "lacuna"
+    },
+    {
+      "tipo": "avaliacao_intro",
+      "secao": "Avaliação Final",
+      "titulo": "Avaliação Final",
+      "subtitulo": "5 questões — algumas juntam mais de um conceito. Duas são abertas.",
+      "instrucoes_box": {
+        "label": "📋 Antes de começar",
+        "texto": "A correção objetiva já aparece na hora. Mas a avaliação final de verdade — com feedback honesto e a decisão de seguir ou reforçar — acontece quando você levar o resumo desta tela pro chat com o Claude."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef1",
+      "pergunta": {
+        "tipo": "mc",
+        "id": "ef1_1",
+        "enunciado": "Qual expressão significa \"o fim definitivo\"?",
+        "cenario": null,
+        "opcoes": [
+          "the final curtain",
+          "the closing door",
+          "the last page",
+          "the final act"
+        ],
+        "correta_idx": 0,
+        "explicacao": "\"The final curtain\" é a expressão idiomática que indica o encerramento definitivo."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef2",
+      "pergunta": {
+        "tipo": "tf",
+        "id": "ef2_1",
+        "enunciado": "\"Exemption\" e \"exception\" são sinônimos intercambiáveis em qualquer contexto.",
+        "cenario": null,
+        "correta_bool": false,
+        "explicacao": "\"Exemption\" indica isenção de uma obrigação; \"exception\" indica um caso que foge à regra."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef3",
+      "pergunta": {
+        "tipo": "classify",
+        "id": "ef3_1",
+        "enunciado": "Classifique cada expressão como relacionada a 'planejamento' ou a 'persistência diante de dificuldade'.",
+        "cenario": null,
+        "rotulos_opcoes": [
+          {
+            "valor": "planejamento",
+            "rotulo": "Planejamento"
+          },
+          {
+            "valor": "persistencia",
+            "rotulo": "Persistência diante de dificuldade"
+          }
+        ],
+        "itens": [
+          {
+            "id": "ef3_1_1",
+            "texto": "to chart a course",
+            "correta": "planejamento"
+          },
+          {
+            "id": "ef3_1_2",
+            "texto": "to see it through",
+            "correta": "persistencia"
+          },
+          {
+            "id": "ef3_1_3",
+            "texto": "to bite off more than you can chew",
+            "correta": "persistencia"
+          },
+          {
+            "id": "ef3_1_4",
+            "texto": "to stand tall",
+            "correta": "persistencia"
+          }
+        ],
+        "explicacao": "As expressões foram agrupadas conforme seu sentido principal."
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef4",
+      "pergunta": {
+        "tipo": "open",
+        "id": "ef4_1",
+        "enunciado": "Escolha duas expressões estudadas nesta aula e escreva uma frase sua em inglês para cada uma, relacionando‑as ao sentido geral da música (sem citar a letra).",
+        "cenario": null,
+        "placeholder": "Sua frases aqui...",
+        "explicacao": null
+      }
+    },
+    {
+      "tipo": "avaliacao_pergunta",
+      "secao": "Avaliação Final",
+      "gate_id": "ef5",
+      "pergunta": {
+        "tipo": "mc",
+        "id": "ef5_1",
+        "enunciado": "\"Let the record show\" é uma expressão de registro:",
+        "cenario": null,
+        "opcoes": [
+          "informal, usada entre amigos",
+          "formal, usada em atas/registros oficiais",
+          "só usada em música",
+          "arcaica, não usada hoje"
+        ],
+        "correta_idx": 1,
+        "explicacao": "A expressão é formal e costuma aparecer em documentos oficiais ou declarações formais."
+      }
+    },
+    {
+      "tipo": "resultado",
+      "secao": "Resultado",
+      "titulo": "Resultado desta sessão",
+      "proximo_topico_label": "Gramática em foco"
+    }
+  ]
+}

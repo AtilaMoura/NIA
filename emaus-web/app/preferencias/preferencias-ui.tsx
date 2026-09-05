@@ -7,15 +7,12 @@ import {
   type TmFontsize,
   type TmTheme,
 } from "../_lib/theme";
-import { ALUNO_USER_ID } from "../_lib/config";
-import { updateUser } from "../_lib/api";
+import { salvarPreferencia } from "../_lib/api";
 
 // Persiste no banco em paralelo à aplicação imediata no <html>. Fire-and-forget:
 // a UI já respondeu; se o PUT falhar, o cookie ainda segura a preferência.
-function salvar(campo: string, valor: string) {
-  updateUser(ALUNO_USER_ID, { [campo]: valor }).catch((e) =>
-    console.error(`falha ao salvar ${campo}`, e),
-  );
+function salvar(campo: "preferred_panel_mode" | "preferred_font_size", valor: string) {
+  salvarPreferencia(campo, valor).catch((e) => console.error(`falha ao salvar ${campo}`, e));
 }
 
 const MODOS: { valor: TmTheme; rotulo: string }[] = [

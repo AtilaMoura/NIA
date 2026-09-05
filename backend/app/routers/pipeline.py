@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.models import Course, Module, Lesson, Topico, Progress, TopicoProgress, User
+from app.core.auth import get_current_user
 from app.agents.pipeline import gerar_estrutura_curso, gerar_e_revisar_topico
 from app.agents.tutor_agent import TutorAgent
 from app.agents.perfis import resolver_perfil
@@ -502,9 +503,10 @@ async def avaliar_resumo(lesson_id: int, data: AvaliarResumoRequest, db: Session
 # ============================================================
 
 # Enquanto não existe Tenant/domain_profile no banco, o perfil de domínio do
-# Tutor é resolvido pelo curso. Só o curso 8 (Formação do Novo Obreiro) é de
-# teologia hoje; o resto cai no perfil "tech" (default de resolver_perfil).
-_PERFIL_POR_CURSO: dict[int, str] = {8: "obreiro"}
+# Tutor é resolvido pelo curso. Curso 8 = Formação do Novo Obreiro (teologia);
+# curso 9 = estudo pessoal de Inglês; o resto cai no perfil "tech" (default de
+# resolver_perfil).
+_PERFIL_POR_CURSO: dict[int, str] = {8: "obreiro", 9: "ingles"}
 
 
 def _perfil_do_curso(db: Session, topico: Topico) -> str:
@@ -521,12 +523,19 @@ def _rate_limited(err: Exception) -> bool:
 
 @router.post("/topicos/{topico_id}/avaliar", response_model=TopicoProgressOut)
 async def avaliar_resumo_topico(
-    topico_id: int, data: AvaliarTopicoRequest, db: Session = Depends(get_db)
+    topico_id: int,
+    data: AvaliarTopicoRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Análogo por TÓPICO do POST /pipeline/licoes/{id}/avaliar: o aluno cola o
     '=== RESUMO ===' que o render monta no fim do tópico e o Tutor decide
     dominado/reforço. Grava em TopicoProgress (não em Progress) e NÃO dispara
     gamificação — o Emaús é sem pontos/selos/streak."""
+    # Mesma trava de identidade do /topico-progress: ninguém envia avaliação "como"
+    # outra pessoa (achado de segurança 2026-09-04).
+    if data.user_id != current_user.id:
+        raise HTTPException(403, "Só é possível avaliar o próprio progresso.")
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
     if not topico:
         raise HTTPException(404, "Tópico não encontrado")

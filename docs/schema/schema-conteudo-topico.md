@@ -73,6 +73,10 @@ Uma pergunta por slide na avaliação final (mesmo padrão de `Pergunta` do chec
 | `cards` | `itens: [{icone,nome,descricao}]` | `.type-cards` (ex: tipologia de alucinação) |
 | `quote` | `texto` | `.quote-block` |
 | `diagrama` | `id`, `descricao` (pro agente/futuro gerador entender a intenção), `svg_raw` (markup já pronto, opcional nesta fase) | `<svg class="diagram">` |
+| `imagem_sugerida` | `url` (opcional — se ausente, mostra placeholder), `alt`, `legenda`, `descricao` | `<img>`/`<figure>` |
+| `audio_video` | `midia_tipo` (`youtube`\|`audio`), `url` (opcional — sem ela mostra placeholder; pra `youtube`, precisa ser o link de **embed**, ex. `https://www.youtube.com/embed/ID`, não o link normal de "watch"), `legenda`, `descricao` (usada só no placeholder) | `<iframe>`/`<audio>` |
+| `vocab` | `termo`, `classe_gramatical` (opcional), `traducao`, `exemplo_en` (opcional), `exemplo_pt` (opcional), `cuidado` (opcional — armadilha/falso cognato do português) | `.vocab-card` — card estruturado; vários seguidos tiling em 2 colunas automaticamente. **Prefira este bloco a `box variante="def"` pra vocabulário novo** — `box` é texto livre, `vocab` tem os campos certos e não vira parede de texto. |
+| `fluxo` | `passos: [{texto, decisao: bool}]` | `.fluxo-wrap` — sequência de passos ligados por seta, desenhada em HTML/CSS (não SVG). **Prefira este bloco a `diagrama`/`svg_raw` gerado por IA** — SVG cru escrito por um LLM tende a sair com coordenadas erradas e texto vazando das caixas (achado real, 2026-09-04); `fluxo` nunca estoura porque o texto quebra linha normalmente. `diagrama` continua existindo pra SVG desenhado à mão. |
 
 `diagrama.svg_raw` existe porque hoje os diagramas ainda são desenhados à mão (ou por mim). Decisão em aberto pra uma fase futura: substituir por um `diagram_spec` estruturado (nós + arestas + posições) que o renderizador desenha sozinho, sem depender de SVG literal gerado por IA (isso tende a sair com coordenadas ruins se pedido cru pra um LLM). Por ora, a Fase 2 deve gerar `descricao` sempre, e `svg_raw` só quando disponível.
 
@@ -81,7 +85,7 @@ Uma pergunta por slide na avaliação final (mesmo padrão de `Pergunta` do chec
 ```
 {
   "id": string,
-  "tipo": "mc" | "tf" | "classify" | "open",
+  "tipo": "mc" | "tf" | "classify" | "associar" | "lacuna" | "open",
   "enunciado": string,
   "cenario": string | null,       // caixa itálica de contexto, ex: diálogo cliente/agente
 
@@ -97,10 +101,25 @@ Uma pergunta por slide na avaliação final (mesmo padrão de `Pergunta` do chec
      // ex: [{"valor":"baixa","rotulo":"Temperatura baixa"},{"valor":"alta","rotulo":"Temperatura alta"}]
   "itens": [ {"id": string, "texto": string, "correta": string} ],  // "correta" usa um dos "valor" acima
 
+  // tipo == "associar" (associação/matching 1:1 — MESMO formato de "classify" por baixo
+  // dos panos, o renderizador trata os dois igual; a diferença é só de intenção: aqui
+  // "rotulos_opcoes" tende a ter o mesmo tamanho de "itens", 1 opção certa por item, em
+  // vez de poucas categorias reusadas por vários itens)
+  "rotulos_opcoes": [ {"valor": string, "rotulo": string}, ... ],
+  "itens": [ {"id": string, "texto": string, "correta": string} ],
+
+  // tipo == "lacuna" (preencher lacuna com texto livre, corrigido por comparação de
+  // string — case/acento insensível)
+  "placeholder": string,
+  "respostas_aceitas": [string, ...],  // aceita variações, ex: ["certain", "sure"]
+
   // tipo == "open"
   "placeholder": string,
+  "resposta_modelo": string | null,  // opcional — se presente, mostra um botão "Ver
+     // resposta-modelo" que revela o texto DEPOIS que o aluno já escreveu a dele (não é
+     // correção automática, é só uma resposta de referência pra comparar)
 
-  // comum a mc/tf/classify (correção objetiva)
+  // comum a mc/tf/classify/associar/lacuna (correção objetiva)
   "explicacao": string
 }
 ```

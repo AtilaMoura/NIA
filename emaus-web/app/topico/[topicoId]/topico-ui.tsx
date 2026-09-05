@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Botao, LinkBotao } from "../../_ui/Botao";
 import { Chip } from "../../_ui/Chip";
-import { ALUNO_USER_ID, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
+import { TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import {
-  avaliarTopico,
-  setTopicoProgress,
+  enviarAvaliacaoTutor,
+  marcarProgresso,
   type AvaliacaoTutor,
   type StatusTopico,
 } from "../../_lib/api";
@@ -41,7 +41,7 @@ export function AcoesTopico({
   // Ao abrir: marca em_andamento (só se ainda não começou). Fire-and-forget.
   useEffect(() => {
     if (estadoInicial === "nao_iniciado") {
-      setTopicoProgress(topicoId, ALUNO_USER_ID, "em_andamento").catch((e) =>
+      marcarProgresso(topicoId, "em_andamento").catch((e) =>
         console.error("falha ao marcar em_andamento", e),
       );
     }
@@ -77,7 +77,7 @@ export function AcoesTopico({
       setEnviando(true);
       setErroTutor(null);
       try {
-        const prog = await avaliarTopico(topicoId, ALUNO_USER_ID, limpo);
+        const prog = await enviarAvaliacaoTutor(topicoId, limpo);
         const nova = prog.tutor_analise?.ultima_avaliacao ?? null;
         setAvaliacao(nova);
         if (prog.status === "concluido") {
@@ -104,7 +104,7 @@ export function AcoesTopico({
     setErro(false);
     setConcluido(true); // otimista
     try {
-      await setTopicoProgress(topicoId, ALUNO_USER_ID, "concluido");
+      await marcarProgresso(topicoId, "concluido");
       router.refresh();
     } catch (e) {
       console.error("falha ao concluir tópico", e);

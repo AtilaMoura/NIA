@@ -23,6 +23,34 @@
   {% endif %}
 {%- endmacro %}
 
+{% macro render_vocab(bloco) -%}
+  <div class="vocab-card">
+    <div class="vocab-head">
+      <span class="vocab-termo">{{ bloco.termo }}</span>
+      {% if bloco.classe_gramatical %}<span class="vocab-classe">{{ bloco.classe_gramatical }}</span>{% endif %}
+    </div>
+    <div class="vocab-traducao">{{ bloco.traducao }}</div>
+    {% if bloco.exemplo_en %}
+    <div class="vocab-exemplo">
+      <span class="vocab-exemplo-en">{{ bloco.exemplo_en }}</span>
+      {% if bloco.exemplo_pt %}<span class="vocab-exemplo-pt">{{ bloco.exemplo_pt }}</span>{% endif %}
+    </div>
+    {% endif %}
+    {% if bloco.cuidado %}
+    <div class="vocab-cuidado"><span aria-hidden>⚠️</span> {{ bloco.cuidado }}</div>
+    {% endif %}
+  </div>
+{%- endmacro %}
+
+{% macro render_fluxo(bloco) -%}
+  <div class="fluxo-wrap">
+    {% for passo in bloco.passos %}
+    <div class="fluxo-passo{% if passo.decisao %} fluxo-decisao{% endif %}">{{ passo.texto }}</div>
+    {% if not loop.last %}<div class="fluxo-seta" aria-hidden>→</div>{% endif %}
+    {% endfor %}
+  </div>
+{%- endmacro %}
+
 {% macro render_bloco(bloco) -%}
   {% if bloco.tipo == 'paragrafo' %}
     <p>{{ bloco.texto }}</p>
@@ -60,6 +88,10 @@
     </div>
   {% elif bloco.tipo == 'quote' %}
     <div class="quote-block">{{ bloco.texto }}</div>
+  {% elif bloco.tipo == 'vocab' %}
+    {{ render_vocab(bloco) }}
+  {% elif bloco.tipo == 'fluxo' %}
+    {{ render_fluxo(bloco) }}
   {% elif bloco.tipo == 'diagrama' %}
     {{ render_diagrama(bloco) }}
   {% elif bloco.tipo == 'imagem_sugerida' %}
@@ -72,6 +104,24 @@
     <div class="box box-instr">
       <div class="box-label">🖼️ Imagem sugerida (placeholder — nenhuma imagem foi gerada)</div>
       {{ bloco.descricao }}
+    </div>
+    {% endif %}
+  {% elif bloco.tipo == 'audio_video' %}
+    {% if bloco.url %}
+    <figure class="fig-wrap" style="padding:0; overflow:hidden;">
+      {% if bloco.midia_tipo == 'audio' %}
+      <audio controls style="width:100%; display:block;" src="{{ bloco.url }}"></audio>
+      {% else %}
+      <div style="position:relative; padding-top:56.25%;">
+        <iframe src="{{ bloco.url }}" title="{{ bloco.legenda or 'vídeo' }}" style="position:absolute; inset:0; width:100%; height:100%; border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      {% endif %}
+      {% if bloco.legenda %}<figcaption style="font-size:12px; color:var(--text-muted); padding:8px 12px;">{{ bloco.legenda }}</figcaption>{% endif %}
+    </figure>
+    {% else %}
+    <div class="box box-instr">
+      <div class="box-label">{{ '🔊 Áudio sugerido' if bloco.midia_tipo == 'audio' else '🎬 Vídeo sugerido' }} (placeholder — nenhuma mídia foi gerada)</div>
+      {{ bloco.legenda or bloco.descricao }}
     </div>
     {% endif %}
   {% endif %}
@@ -90,6 +140,8 @@
         {%- if p.tipo == 'mc' -%}Múltipla escolha
         {%- elif p.tipo == 'tf' -%}Verdadeiro / Falso
         {%- elif p.tipo == 'classify' -%}Classificação
+        {%- elif p.tipo == 'associar' -%}Associação
+        {%- elif p.tipo == 'lacuna' -%}Complete a lacuna
         {%- elif p.tipo == 'open' -%}Aplicação aberta
         {%- endif -%}
       </span>
@@ -109,7 +161,7 @@
       <button class="tf-btn" data-v="verdadeiro">Verdadeiro</button>
       <button class="tf-btn" data-v="falso">Falso</button>
     </div>
-    {% elif p.tipo == 'classify' %}
+    {% elif p.tipo == 'classify' or p.tipo == 'associar' %}
     <div data-gate-group="{{ p.id }}">
       {% for item in p.itens %}
       <div class="classify-item gate-item" data-correct="{{ item.correta }}" data-qid="{{ item.id }}">
@@ -122,9 +174,18 @@
       </div>
       {% endfor %}
     </div>
+    {% elif p.tipo == 'lacuna' %}
+    <div class="lacuna-wrap gate-item" data-qid="{{ p.id }}" data-answers='{{ p.respostas_aceitas | tojson }}'>
+      <input type="text" class="lacuna-input" placeholder="{{ p.placeholder or 'Digite sua resposta' }}">
+      <button class="register-btn lacuna-check-btn">Corrigir</button>
+    </div>
     {% elif p.tipo == 'open' %}
     <textarea data-open="{{ p.id }}" placeholder="{{ p.placeholder }}"></textarea>
     <button class="register-btn gate-item" data-qid="{{ p.id }}" data-register="{{ p.id }}">Registrar resposta</button>
+    {% if p.resposta_modelo %}
+    <button class="reveal-btn" data-target="{{ p.id }}-modelo">Ver resposta-modelo</button>
+    <div class="explanation" data-exp="{{ p.id }}-modelo">{{ p.resposta_modelo }}</div>
+    {% endif %}
     {% endif %}
 
     {% if p.explicacao %}<div class="explanation" data-exp="{{ p.id }}">{{ p.explicacao }}</div>{% endif %}
@@ -164,6 +225,7 @@
     --radius: {{ tema.radius }};
     --radius-lg: {{ tema.radiusLg }};
     --font-display: {{ tema.fontFamilyDisplay | default(tema.fontFamily) }};
+    --font-label: {{ tema.fontFamilyLabel | default(tema.fontFamily) }};
   }
   html, body {
     margin: 0; padding: 0;
@@ -217,8 +279,8 @@
   strong { color: var(--accent); font-weight: 600; }
   code { font-family: 'SF Mono', 'Courier New', monospace; background: var(--surface-2); padding: 2px 6px; border-radius: 3px; color: var(--accent); font-size: 13px; }
 
-  .box { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 15px 16px; margin: 12px 0; font-size: 14.5px; line-height: 1.6; }
-  .box-label { font-size: 10px; font-weight: 700; letter-spacing: {{ tema.letterSpacingLabel }}; text-transform: uppercase; margin-bottom: 7px; }
+  .box { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 15px 16px; margin: 12px 0; font-size: 14.5px; line-height: 1.6; white-space: pre-line; }
+  .box-label { font-family: var(--font-label); font-size: 10px; font-weight: 700; letter-spacing: {{ tema.letterSpacingLabel }}; text-transform: uppercase; margin-bottom: 7px; }
   .box-def { border-left: 2px solid var(--blue); } .box-def .box-label { color: var(--blue); }
   .box-analogy { border-left: 2px solid var(--amber); } .box-analogy .box-label { color: var(--amber); }
   .box-app { border-left: 2px solid var(--accent); } .box-app .box-label { color: var(--accent); }
@@ -233,7 +295,7 @@
   .cols2 > div { flex: 1; min-width: 240px; }
 
   .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
-  .badge { font-size: 10.5px; background: var(--surface-2); border: 1px solid var(--border-soft); color: var(--text-muted); padding: 6px 11px; border-radius: 20px; font-weight: 500; }
+  .badge { font-family: var(--font-label); font-size: 10.5px; background: var(--surface-2); border: 1px solid var(--border-soft); color: var(--text-muted); padding: 6px 11px; border-radius: 20px; font-weight: 500; }
 
   .roadmap { display: flex; flex-direction: column; gap: 8px; margin: 18px 0; }
   .roadmap-item { display: flex; align-items: center; gap: 11px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 11px 13px; font-size: 13.5px; color: var(--text-muted); transition: border-color .15s ease; }
@@ -247,6 +309,23 @@
   .type-card-icon { font-size: 20px; margin-bottom: 6px; display: block; }
   .type-card-name { font-weight: 600; font-size: 13.5px; color: var(--text); margin-bottom: 4px; }
   .type-card-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+
+  .vocab-card { display: inline-block; width: calc(50% - 12px); vertical-align: top; box-sizing: border-box; background: var(--surface); border: 1px solid var(--border-soft); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 13px 14px; margin: 0 12px 12px 0; }
+  @media (max-width: 520px) { .vocab-card { width: 100%; margin-right: 0; } }
+  .vocab-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .vocab-termo { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--accent); }
+  .vocab-classe { font-family: var(--font-label); font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); background: var(--surface-2); padding: 2px 7px; border-radius: 10px; }
+  .vocab-traducao { font-size: 13.5px; color: var(--text-muted); margin-bottom: 8px; }
+  .vocab-exemplo { background: var(--surface-2); border-radius: var(--radius); padding: 8px 10px; margin-bottom: 6px; font-size: 13px; line-height: 1.5; }
+  .vocab-exemplo-en { display: block; color: var(--text); font-style: italic; }
+  .vocab-exemplo-pt { display: block; color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+  .vocab-cuidado { font-size: 12px; color: var(--bad); line-height: 1.5; }
+
+  .fluxo-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0; }
+  .fluxo-passo { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 10px 13px; font-size: 13px; line-height: 1.45; color: var(--text); flex: 1 1 160px; max-width: 220px; }
+  .fluxo-decisao { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
+  .fluxo-seta { color: var(--accent); font-size: 16px; flex: 0 0 auto; }
+  @media (max-width: 520px) { .fluxo-wrap { flex-direction: column; align-items: stretch; } .fluxo-passo { max-width: none; } .fluxo-seta { align-self: center; transform: rotate(90deg); } }
 
   .timeline { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
   .tl-item { position: relative; padding: 4px 0 22px 32px; }
@@ -263,7 +342,7 @@
 
   .question { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); padding: 16px; margin: 14px 0; }
   .q-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
-  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; padding: 4px 10px; border-radius: 20px; background: var(--surface-2); color: var(--text-muted); }
+  .q-type { font-family: var(--font-label); font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; padding: 4px 10px; border-radius: 20px; background: var(--surface-2); color: var(--text-muted); }
   .q-text { font-size: 15px; font-weight: 500; color: var(--text); margin: 6px 0 11px 0; line-height: 1.55; }
   .q-scenario { background: var(--surface-2); border-left: 2px solid var(--amber); padding: 11px 13px; font-size: 14px; font-style: italic; color: var(--text-muted); margin-bottom: 11px; border-radius: var(--radius); }
 
@@ -576,6 +655,33 @@ document.querySelectorAll('.reveal-btn').forEach(function (btn) {
   });
 });
 
+function normalizarResposta(s) {
+  return (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+document.querySelectorAll('.lacuna-wrap').forEach(function (wrap) {
+  const qid = wrap.dataset.qid;
+  const aceitas = JSON.parse(wrap.dataset.answers || '[]').map(normalizarResposta);
+  const input = wrap.querySelector('.lacuna-input');
+  const btn = wrap.querySelector('.lacuna-check-btn');
+  const question = wrap.closest('.question');
+  const exp = question.querySelector('.explanation');
+  btn.addEventListener('click', function () {
+    if (wrap.dataset.answered) return;
+    const valor = input.value.trim();
+    if (!valor) { input.focus(); return; }
+    const isCorrect = aceitas.indexOf(normalizarResposta(valor)) !== -1;
+    wrap.dataset.answered = '1';
+    input.disabled = true;
+    btn.disabled = true;
+    btn.classList.add('done');
+    input.style.borderColor = isCorrect ? 'var(--accent)' : 'var(--bad)';
+    ensureQ(qid).correct = isCorrect;
+    if (exp) exp.classList.add('show');
+    checkGate(wrap.closest('.slide'));
+    updateStatsLive();
+  });
+});
+
 document.querySelectorAll('.register-btn').forEach(function (btn) {
   btn.addEventListener('click', function () {
     const qid = btn.dataset.register;
@@ -631,6 +737,20 @@ function showSlide(idx) {
   nextBtn.textContent = idx === slides.length - 1 ? 'Fim' : 'Próximo ▶';
   if (slideEl.dataset.gate) { checkGate(slideEl); } else { nextBtn.disabled = false; }
   if (idx === slides.length - 1) buildSummary();
+
+  // Avisa o pai (front Emaús, área de revisão) qual slide está na tela — inócuo fora
+  // de iframe. O aluno não usa isso; é o painel do professor que escuta.
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        tipo: 'emaus:slide',
+        indice: idx,
+        total: slides.length,
+        secao: slideEl.dataset.section || '',
+        temImagem: !!slideEl.querySelector('img'),
+      }, '*');
+    }
+  } catch (e) {}
 }
 
 document.getElementById('prevBtn').addEventListener('click', function () { if (current > 0) showSlide(current - 1); });

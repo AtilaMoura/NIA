@@ -37,19 +37,25 @@ no conteúdo (uma lista de 1 a 2 perguntas cada). As chaves de "avaliacao" devem
 exatamente ef1..ef5, seguindo o "tipo" e o "testar" de cada item em "avaliacao_conceitos".
 
 REGRA CRÍTICA DE TIPO: cada "checkpoint_apos" no conteúdo já vem com um campo "tipo"
-(mc/tf/classify/open) — a pergunta que você escrever pra aquele gate_id TEM que usar
+(mc/tf/classify/associar/lacuna/open) — a pergunta que você escrever pra aquele gate_id TEM que usar
 EXATAMENTE esse tipo, não escolha livremente. Isso existe porque, sem essa trava, os
 checkpoints tendem a sair todos do mesmo tipo (geralmente todos "open") — já aconteceu
 numa geração real (ver Fase 2b no plano) e deixa a avaliação desbalanceada, com mais
 digitação pro aluno do que o necessário.
 
-Cada objeto Pergunta é um desses 4 formatos — e TODOS OS QUATRO exigem o campo
-"tipo" LITERALMENTE ESCRITO DENTRO DO OBJETO (não é só a categoria, é uma chave
+Cada objeto Pergunta é um desses formatos — e TODOS exigem o campo "tipo"
+LITERALMENTE ESCRITO DENTRO DO OBJETO (não é só a categoria, é uma chave
 de verdade: {"tipo": "mc", "id": ..., ...}). Um objeto Pergunta sem a chave "tipo"
 é inválido, mesmo que todos os outros campos estejam certos:
 - "tipo":"mc": {tipo, id, enunciado, cenario:null, opcoes:[string,string,string], correta_idx, explicacao}
 - "tipo":"tf": {tipo, id, enunciado, cenario:null, correta_bool, explicacao}
 - "tipo":"classify": {tipo, id, enunciado, cenario:null, rotulos_opcoes:[{valor,rotulo},{valor,rotulo}], itens:[{id,texto,correta}] (3 a 5 itens), explicacao}
+- "tipo":"associar": MESMO formato de "classify" (rotulos_opcoes + itens) — use quando o
+  checkpoint pedir "associar" em vez de "classify": aqui "rotulos_opcoes" tende a ter o
+  MESMO tamanho de "itens" (pares 1:1 — cada opção usada uma vez), não poucas categorias
+  reaproveitadas.
+- "tipo":"lacuna": {tipo, id, enunciado, cenario:null, placeholder, respostas_aceitas:
+  [string,...] (aceite variações razoáveis, ex: com/sem contração), explicacao}
 - "tipo":"open": {tipo, id, enunciado, cenario (string ou null — use pra cenários de checkpoint aplicado), placeholder, explicacao: null}
 
 REGRA CRÍTICA: nenhum "enunciado" pode se repetir nem ser muito parecido com outro

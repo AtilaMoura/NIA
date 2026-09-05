@@ -4,7 +4,10 @@ from passlib.context import CryptContext
 
 SECRET_KEY = "sua_chave_super_secreta_aqui"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+# 30 dias — subido de 60min (2026-09-04) pro Emaús (front de formação bíblica) não exigir
+# relogin toda hora durante o desenvolvimento. Compartilhado com o frontend/ (pausado),
+# risco baixo nesta fase do projeto.
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

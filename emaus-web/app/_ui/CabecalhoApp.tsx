@@ -3,15 +3,18 @@ import type { ReactNode } from "react";
 import { AlternarTema } from "./AlternarTema";
 import { MenuUsuario } from "./MenuUsuario";
 import { Logo } from "./Logo";
+import type { Papel } from "../_lib/papel";
 
 // Cabeçalho fixo. Abaixo de 640px: marca + avatar na 1ª linha, navegação em
 // linha própria (scroll horizontal se não couber).
 export function CabecalhoApp({
   nomeUsuario,
+  papel,
   hrefMarca = "/inicio",
   children,
 }: {
   nomeUsuario?: string | null;
+  papel?: Papel | null;
   hrefMarca?: string;
   children?: ReactNode;
 }) {
@@ -28,7 +31,7 @@ export function CabecalhoApp({
 
         <div className="order-2 ml-auto flex items-center gap-2 sm:order-3 sm:ml-0">
           <AlternarTema />
-          {nomeUsuario && <MenuUsuario nome={nomeUsuario} />}
+          {nomeUsuario && <MenuUsuario nome={nomeUsuario} papel={papel ?? null} />}
         </div>
       </div>
     </header>

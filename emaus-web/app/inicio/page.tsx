@@ -5,25 +5,30 @@ import { BarraProgresso } from "../_ui/BarraProgresso";
 import { LinkBotao } from "../_ui/Botao";
 import { LogoSimbolo } from "../_ui/Logo";
 import { Rodape } from "../_ui/Rodape";
-import { ALUNO_USER_ID, TEOLOGIA_COURSE_IDS } from "../_lib/config";
+import { redirect } from "next/navigation";
+import { TEOLOGIA_COURSE_IDS } from "../_lib/config";
 import { getUser } from "../_lib/api";
 import { montarArvore } from "../_lib/arvore";
+import { getSessao } from "../_lib/sessao";
 
 const CURSO_ID = TEOLOGIA_COURSE_IDS[0];
 
 export const metadata: Metadata = { title: "Meu estudo" };
 
 export default async function InicioPage() {
+  const sessao = await getSessao();
+  if (!sessao) redirect("/entrar?next=/inicio");
+
   const [arvore, usuario] = await Promise.all([
-    montarArvore(CURSO_ID),
-    getUser(ALUNO_USER_ID).catch(() => null),
+    montarArvore(CURSO_ID, sessao.id),
+    getUser(sessao.id).catch(() => null),
   ]);
   const { curso, resumo, proximoTopico } = arvore;
   const primeiroNome = (usuario?.name ?? "").split(/\s+/)[0] || null;
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"}>
+      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role}>
         <span className="text-[var(--tm-accent)]">Início</span>
         <Link href={`/curso/${CURSO_ID}`} className="hover:text-[var(--tm-accent)]">
           Curso
@@ -92,7 +97,7 @@ export default async function InicioPage() {
         </section>
       </main>
 
-      <Rodape />
+      <Rodape papel={sessao.role} />
     </>
   );
 }

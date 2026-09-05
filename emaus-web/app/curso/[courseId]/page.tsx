@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { CabecalhoApp } from "../../_ui/CabecalhoApp";
 import { BarraProgresso } from "../../_ui/BarraProgresso";
 import { Rodape } from "../../_ui/Rodape";
-import { ALUNO_USER_ID, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
+import { TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getCourse, getUser } from "../../_lib/api";
 import { montarArvore } from "../../_lib/arvore";
+import { getSessao } from "../../_lib/sessao";
 import { ArvoreCursoUI } from "./arvore-ui";
 
 export async function generateMetadata({
@@ -30,9 +31,12 @@ export default async function CursoPage({
     notFound();
   }
 
+  const sessao = await getSessao();
+  if (!sessao) redirect(`/entrar?next=/curso/${courseId}`);
+
   const [arvore, usuario] = await Promise.all([
-    montarArvore(courseId),
-    getUser(ALUNO_USER_ID).catch(() => null),
+    montarArvore(courseId, sessao.id),
+    getUser(sessao.id).catch(() => null),
   ]);
   const { curso, modulos, resumo, proximoTopico } = arvore;
 
@@ -44,7 +48,7 @@ export default async function CursoPage({
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"}>
+      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role}>
         <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
           Início
         </Link>
@@ -81,7 +85,7 @@ export default async function CursoPage({
         <ArvoreCursoUI modulos={modulos} moduloAbertoId={moduloAbertoId} />
       </main>
 
-      <Rodape />
+      <Rodape papel={sessao.role} />
     </>
   );
 }

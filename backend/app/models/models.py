@@ -37,8 +37,10 @@ class User(Base):
     streak_days = Column(Integer, default=0)
     last_activity_date = Column(DateTime(timezone=True))
 
-    # Papel de acesso
-    role = Column(String(20), nullable=False, default='aluno')  # 'aluno' ou 'admin'
+    # Papel de acesso. 'admin' = compatibilidade com o front tech (frontend/, pausado);
+    # 'master'/'professor' = governança do Emaús (FASE 1/5b do front de formação bíblica):
+    # master controla tudo, admin tem menos alcance, professor é tutor de cursos específicos.
+    role = Column(String(20), nullable=False, default='aluno')
 
     # Preferências
     preferred_topics = Column(JSONB, default=[])
@@ -64,7 +66,7 @@ class User(Base):
     # Constraints
     __table_args__ = (
         CheckConstraint('level >= 1 AND level <= 100', name='valid_level'),
-        CheckConstraint("role IN ('aluno', 'admin')", name='valid_role'),
+        CheckConstraint("role IN ('aluno', 'admin', 'master', 'professor')", name='valid_role'),
         CheckConstraint(
             "preferred_mood IN ('musgo', 'ambar', 'mare', 'framboesa', 'lavanda')",
             name='valid_preferred_mood',
@@ -113,6 +115,11 @@ class Course(Base):
     # Status
     status = Column(String(50), default='draft')
     is_public = Column(Boolean, default=False)
+
+    # Governança de publicação (FASE 5b do front Emaús) — quem precisa aprovar antes de
+    # `status` virar 'published'. Ver routers/governanca.py pra regra de cálculo.
+    aprovacao_master_basta = Column(Boolean, nullable=False, default=False)
+    aprovacao_exige_todos_tutores = Column(Boolean, nullable=False, default=False)
 
     # Autoria
     created_by = Column(String(255))
@@ -433,3 +440,143 @@ class TopicoProgress(Base):
 
     def __repr__(self):
         return f"<TopicoProgress(id={self.id}, user_id={self.user_id}, topico_id={self.topico_id}, status='{self.status}')>"
+
+
+# ------------------------------------------------------------
+# 7. MODEL: TOPICO_COMMENT (NOVA! — FASE 5a do front Emaús)
+# ------------------------------------------------------------
+# Anotação do revisor (master/admin/professor) por SLIDE do tópico — sincronizado
+# com o <iframe> do render via postMessage. slide_index nulo = comentário geral do
+# tópico, não de um slide específico. Sem DELETE (soft — padrão do projeto).
+
+class TopicoComment(Base):
+    __tablename__ = "topico_comments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    slide_index = Column(Integer)              # null = comentário geral do tópico
+    reacao = Column(String(10))                # 'positivo' | 'negativo' | None
+    imagem_sugerida = Column(String(10))       # 'antes' | 'depois' | None — pedido de imagem nova
+    sobre_imagem = Column(Boolean, default=False)  # comentário é sobre a imagem já presente no slide
+    texto = Column(Text)                       # pode ser só reação, sem texto
+    resolvido = Column(Boolean, default=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    topico = relationship("Topico", backref="comentarios")
+    user = relationship("User", backref="comentarios_topico")
+
+    __table_args__ = (
+        CheckConstraint("reacao IN ('positivo', 'negativo')", name='valid_comment_reacao'),
+        CheckConstraint("imagem_sugerida IN ('antes', 'depois')", name='valid_comment_imagem_sugerida'),
+    )
+
+    def __repr__(self):
+        return f"<TopicoComment(id={self.id}, topico_id={self.topico_id}, user_id={self.user_id}, slide={self.slide_index})>"
+
+
+# ------------------------------------------------------------
+# 8. MODEL: TOPICO_CHECKLIST (NOVA! — FASE 5a do front Emaús)
+# ------------------------------------------------------------
+# O ato de aprovar/reprovar um tópico. 1 checklist por (tópico, revisor) — upsert,
+# igual ao padrão do TopicoProgress. Topico.is_approved é recalculado a cada save
+# (ver routers/revisao.py) — nesta fase, 1 aprovação de papel elevado já libera; a
+# regra de quórum por curso (vários tutores, todos vs. um) é a FASE 5b.
+
+class TopicoChecklist(Base):
+    __tablename__ = "topico_checklists"
+
+    id = Column(Integer, primary_key=True, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    profundidade = Column(String(20), nullable=False)     # 'raso' | 'adequado' | 'aprofundado'
+    clareza = Column(String(20), nullable=False)           # 'confuso' | 'parcialmente_claro' | 'claro'
+    qualidade_geral = Column(String(20), nullable=False)   # 'fraca' | 'regular' | 'boa' | 'excelente'
+    observacao_final = Column(Text)
+    aprovado = Column(Boolean, nullable=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    topico = relationship("Topico", backref="checklists")
+    user = relationship("User", backref="checklists_topico")
+
+    __table_args__ = (
+        CheckConstraint(
+            "profundidade IN ('raso', 'adequado', 'aprofundado')", name='valid_checklist_profundidade'
+        ),
+        CheckConstraint(
+            "clareza IN ('confuso', 'parcialmente_claro', 'claro')", name='valid_checklist_clareza'
+        ),
+        CheckConstraint(
+            "qualidade_geral IN ('fraca', 'regular', 'boa', 'excelente')",
+            name='valid_checklist_qualidade',
+        ),
+        UniqueConstraint('topico_id', 'user_id', name='uq_topico_checklist_user_topico'),
+    )
+
+    def __repr__(self):
+        return f"<TopicoChecklist(id={self.id}, topico_id={self.topico_id}, user_id={self.user_id}, aprovado={self.aprovado})>"
+
+
+# ------------------------------------------------------------
+# 9. MODEL: COURSE_TUTOR (NOVA! — FASE 5b do front Emaús)
+# ------------------------------------------------------------
+# Quais professores são tutores DESTE curso (de um pool de N professores
+# cadastrados) — quem o master/admin atribui na tela de governança do curso.
+
+class CourseTutor(Base):
+    __tablename__ = "course_tutors"
+
+    id = Column(Integer, primary_key=True, index=True)
+    course_id = Column(Integer, ForeignKey('courses.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    course = relationship("Course", backref="tutores")
+    user = relationship("User", backref="cursos_como_tutor")
+
+    __table_args__ = (
+        UniqueConstraint('course_id', 'user_id', name='uq_course_tutor'),
+    )
+
+    def __repr__(self):
+        return f"<CourseTutor(course_id={self.course_id}, user_id={self.user_id})>"
+
+
+# ------------------------------------------------------------
+# 10. MODEL: COURSE_APROVACAO (NOVA! — FASE 5b do front Emaús)
+# ------------------------------------------------------------
+# O ato de aprovar/reprovar a PUBLICAÇÃO do curso inteiro — diferente de
+# TopicoChecklist (aprova um tópico). 1 registro por (curso, revisor) — upsert.
+# Quem pode registrar aqui: master, admin, ou professor que seja CourseTutor
+# deste curso (ver routers/governanca.py).
+
+class CourseAprovacao(Base):
+    __tablename__ = "course_aprovacoes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    course_id = Column(Integer, ForeignKey('courses.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    papel_no_momento = Column(String(20), nullable=False)  # snapshot do role na hora de aprovar
+    aprovado = Column(Boolean, nullable=False)
+    observacao = Column(Text)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    course = relationship("Course", backref="aprovacoes_publicacao")
+    user = relationship("User", backref="aprovacoes_curso")
+
+    __table_args__ = (
+        UniqueConstraint('course_id', 'user_id', name='uq_course_aprovacao'),
+    )
+
+    def __repr__(self):
+        return f"<CourseAprovacao(course_id={self.course_id}, user_id={self.user_id}, aprovado={self.aprovado})>"

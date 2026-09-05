@@ -2,7 +2,7 @@
 // o front de tecnologia). Quando um curso "em breve" sair do papel, ele vira um
 // curso real no NIA e o card passa a apontar pro /curso/{id}.
 
-export type TomCurso = "trigo" | "oliveira" | "vinho" | "indigo" | "terracota" | "pedra";
+export type TomCurso = "trigo" | "oliveira" | "vinho" | "indigo" | "terracota" | "pedra" | "latao";
 
 export type CursoCatalogo = {
   slug: string;
@@ -23,9 +23,20 @@ export const GRADIENTE_TOM: Record<TomCurso, string> = {
   indigo: "linear-gradient(135deg, #2c3350 0%, #5b6a97 100%)",
   terracota: "linear-gradient(135deg, #7a3520 0%, #c9743f 100%)",
   pedra: "linear-gradient(135deg, #4a423a 0%, #8f8377 100%)",
+  latao: "linear-gradient(135deg, #6b551f 0%, #c9973f 100%)",
 };
 
 export const CATALOGO: CursoCatalogo[] = [
+  {
+    slug: "ingles",
+    titulo: "Inglês",
+    subtitulo: "Estudo pessoal, do zero à prática com prompts e tecnologia",
+    descricao:
+      "Ciclos de 30 dias combinando música, vídeos de conversação e inglês para ler e escrever prompts técnicos — conteúdo gerado e revisado tópico a tópico.",
+    tom: "latao",
+    courseId: 9,
+    disponivel: true,
+  },
   {
     slug: "formacao-novo-obreiro",
     titulo: "Formação Geral do Novo Obreiro Cristão",

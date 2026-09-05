@@ -110,14 +110,17 @@ def validar_topico(content: dict) -> list[str]:
     if duracao is not None and not (10 <= duracao <= 20):
         problemas.append(f"duracao_estimada_min = {duracao}, fora da faixa esperada (10-20).")
 
-    # 8. Pelo menos 1 diagrama no tópico inteiro (independe de modo Comum ou Pro).
+    # 8. Pelo menos 1 diagrama/fluxo no tópico inteiro (independe de modo Comum ou Pro).
+    # "fluxo" conta igual a "diagrama" — achado 2026-09-04: SVG cru gerado por IA
+    # (diagrama) tende a vazar texto das caixas; "fluxo" é a alternativa recomendada
+    # (HTML/CSS, nunca estoura), então também satisfaz essa checagem.
     tem_diagrama = any(
-        b["tipo"] == "diagrama"
+        b["tipo"] in ("diagrama", "fluxo")
         for s in content.get("slides", []) if s["tipo"] == "conteudo"
         for b in s.get("blocos", [])
     )
     if not tem_diagrama:
-        problemas.append("Nenhum bloco 'diagrama' encontrado no tópico inteiro.")
+        problemas.append("Nenhum bloco 'diagrama' ou 'fluxo' encontrado no tópico inteiro.")
 
     return problemas
 

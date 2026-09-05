@@ -22,6 +22,8 @@ def _inferir_tipo_pergunta(p: dict) -> dict:
         p["tipo"] = "tf"
     elif "rotulos_opcoes" in p and "itens" in p:
         p["tipo"] = "classify"
+    elif "respostas_aceitas" in p:
+        p["tipo"] = "lacuna"
     elif "placeholder" in p:
         p["tipo"] = "open"
     return p

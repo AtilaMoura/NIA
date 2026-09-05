@@ -52,13 +52,13 @@ def montar_question_order(content: dict) -> list[dict]:
 
 
 def _perguntas_para_ordem(secao: str, pergunta: dict) -> list[dict]:
-    if pergunta["tipo"] == "classify":
+    if pergunta["tipo"] in ("classify", "associar"):
         out = []
         for item in pergunta["itens"]:
             out.append({
                 "id": item["id"],
                 "label": _label_pergunta(secao, "item: " + item["texto"]),
-                "tipo": "classify_item",
+                "tipo": pergunta["tipo"] + "_item",
             })
         return out
     return [{

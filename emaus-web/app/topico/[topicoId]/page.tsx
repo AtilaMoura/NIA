@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { LinkBotao } from "../../_ui/Botao";
 import { LogoSimbolo } from "../../_ui/Logo";
 import { AcoesTopico } from "./topico-ui";
-import { ALUNO_USER_ID, THEME_TOPICO, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
+import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
+import { getSessao } from "../../_lib/sessao";
 import {
   getTopico,
   listLessons,
+  listModules,
   listTopicos,
   listTopicoProgress,
   topicoRenderUrl,
   type StatusTopico,
 } from "../../_lib/api";
 
-const CURSO_ID = TEOLOGIA_COURSE_IDS[0];
+const CURSO_ID_FALLBACK = TEOLOGIA_COURSE_IDS[0];
 
 export async function generateMetadata({
   params,
@@ -35,18 +37,25 @@ export default async function TopicoPage({
   const topicoId = Number(raw);
   if (!Number.isInteger(topicoId)) notFound();
 
+  const sessao = await getSessao();
+  if (!sessao) redirect(`/entrar?next=/topico/${topicoId}`);
+
   const topico = await getTopico(topicoId).catch(() => null);
   if (!topico) notFound();
 
   const emPreparacao = !topico.content || !topico.is_approved;
 
-  const [lessons, irmaos, progresso] = await Promise.all([
+  const [lessons, modules, irmaos, progresso] = await Promise.all([
     listLessons(),
+    listModules(),
     listTopicos(topico.lesson_id),
-    listTopicoProgress(ALUNO_USER_ID),
+    listTopicoProgress(sessao.id),
   ]);
 
   const aula = lessons.find((l) => l.id === topico.lesson_id) ?? null;
+  const modulo = aula ? modules.find((m) => m.id === aula.module_id) ?? null : null;
+  const CURSO_ID = modulo?.course_id ?? CURSO_ID_FALLBACK;
+  const tema = TEMA_POR_CURSO[CURSO_ID] ?? THEME_TOPICO;
   const ordenados = [...irmaos].sort((a, b) => a.topico_index - b.topico_index);
   const posicao = ordenados.findIndex((t) => t.id === topico.id);
   const proximo = ordenados
@@ -101,7 +110,7 @@ export default async function TopicoPage({
       {/* conteúdo do backend, confiável — sem sandbox pra não quebrar o JS de slides.
           allow="fullscreen" é o que faz o botão "Tela cheia" do render funcionar dentro do iframe. */}
       <iframe
-        src={topicoRenderUrl(topico.id, { userId: ALUNO_USER_ID, theme: THEME_TOPICO })}
+        src={topicoRenderUrl(topico.id, { userId: sessao.id, theme: tema })}
         title={topico.titulo}
         className="w-full flex-1 border-0"
         allow="fullscreen"

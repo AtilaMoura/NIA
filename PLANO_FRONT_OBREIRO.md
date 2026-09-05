@@ -123,7 +123,13 @@ Cada fase quebrada em features. OpenCode faz uma feature, Claude valida, próxim
     `emaus-web/app/layout.tsx`, `emaus-web/app/_ui/{Botao,Card,Chip,BarraProgresso,Selo,Avatar,CabecalhoApp,Rodape}.tsx`,
     `emaus-web/app/dev/page.tsx`.
   - **Pendente: conferência visual nos 2 modos** (extensão do Chrome não conectou).
-- [ ] FASE 1 — Auth — **adiada** (opção C: usuário fixo `ALUNO_USER_ID = 1` por ora).
+- [x] **FASE 1 — Auth** — retomada e implementada 2026-09-04. Spec/estado completo em
+  `docs/front-obreiro/FASE-1-autenticacao.md`. Reaproveitou `/auth/*` que já existia no
+  backend; `role` ganhou `master`/`professor`; 9 usuários seedados
+  (`backend/_seed_emaus_users.py`, senha `emaus2026`); sessão via cookie httpOnly +
+  `middleware.ts`; todas as páginas trocaram `ALUNO_USER_ID` fixo pela sessão real. Testado
+  via curl (login/logout/gate de papel/registro/login rápido de dev), `tsc` 0 erros.
+  **Pendente: conferência visual.**
 - [~] **FASE 2 — Índice do curso + navegação por tópico** — implementada 2026-09-03.
   Spec: `docs/front-obreiro/FASE-2-arvore.md`.
   - Backend: model `TopicoProgress` + schema + router `GET/PUT /topico-progress/`
@@ -184,7 +190,26 @@ Cada fase quebrada em features. OpenCode faz uma feature, Claude valida, próxim
     `/curso/8`, `/progresso`, `/perfil`, `/preferencias`, `/topico/1` → 200 sem erro no log.
     Dados de teste do tutor resetados. **Pendente só: conferência visual + clicar o fluxo do
     painel do Tutor no navegador.**
-- [ ] FASE 5 — Revisão (professor)
+- [x] **FASE 5a — Revisão (professor), slide-a-slide + checklist** — implementada e testada
+  2026-09-04. Spec: `docs/front-obreiro/FASE-5-revisao.md`. Backend: `TopicoComment`/
+  `TopicoChecklist` novos + `routers/revisao.py` (exige login `master`/`admin`/`professor`,
+  1 aprovação já libera `Topico.is_approved` nesta fase). `topico.html.j2` ganhou
+  `postMessage` de slide. Front: `/revisao` (fila), `/revisao/topico/[id]` (painel de
+  anotação por slide + checklist), `/revisao/alunos` + `/revisao/aluno/[userId]`
+  (progresso, leitura). Testado ao vivo (guarda de papel, criar/resolver comentário,
+  aprovar/reprovar mudando `is_approved` de verdade). `tsc` 0 erros.
+  **Cortado desta rodada:** comparar Groq×Gemini (precisa de mudança no
+  `docker-compose.yml`, baixo valor — registrado na spec).
+- [x] **FASE 5b — Governança/publicação** — implementada e testada 2026-09-04. `Course` +=
+  `aprovacao_master_basta`/`aprovacao_exige_todos_tutores`; tabelas novas `CourseTutor`/
+  `CourseAprovacao`; `routers/governanca.py` (config, aprovar, publicar/despublicar com regra
+  de quórum). Front: `/revisao/curso/[courseId]` (publicar + config de tutores/regras +
+  aprovação individual). Testado ao vivo o cenário completo (quórum "todos os tutores",
+  bloqueios de papel, master publica sozinho, despublicar só master). Usuário optou por manter
+  os placeholders Admin/Professor por ora.
+  **Não feito de propósito:** `status` do curso ainda não gateia acesso do aluno em
+  `/curso`/`/topico` (quebraria o curso 8 e o 9 da sessão paralela) — próximo passo quando
+  coordenar com `catalogo.ts`.
 - [ ] FASE 6 — Capa + imagens + polish (parte da capa/landing já adiantada acima)
 
 Dev server do emaus-web: `cd emaus-web && npx next dev -p 4200`. Backend NIA: Docker `nia_backend` em `:8100`.

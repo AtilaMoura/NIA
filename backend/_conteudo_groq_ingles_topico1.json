@@ -1,0 +1,446 @@
+{
+  "topico_id": "ingles-modulo1-aula1-topico1-historia",
+  "titulo": "My Way – História & Contexto da Música",
+  "aula": 1,
+  "numero": 1,
+  "duracao_estimada_min": 14,
+  "roteiro": [
+    "Apresentação geral da aula e objetivo",
+    "Definição técnica da música como obra cultural adaptada",
+    "Analogia simples para fixar a ideia de adaptação",
+    "Exploração da origem francesa de \"Comme d'habitude\"",
+    "Narrativa da descoberta por Paul Anka e compra dos direitos",
+    "Transformação da letra para a voz de Frank Sinatra",
+    "Gravação e impacto de \"My Way\" (1969)",
+    "Curiosidades culturais e versões posteriores",
+    "Orientação para consulta da letra completa"
+  ],
+  "slides": [
+    {
+      "tipo": "capa",
+      "secao": "Início",
+      "titulo": "My Way – História & Contexto da Música",
+      "subtitulo": "Aula 1, Tópico 1 – Origem, adaptação e curiosidades",
+      "instrucoes_box": {
+        "label": "📋 Como funciona este estudo",
+        "texto": "Use as setas ← → ou os botões embaixo para navegar. Alguns slides são checkpoints — pedem uma resposta antes de liberar o próximo."
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "historia-contexto-musica",
+      "titulo_secao": "História & Contexto da Música",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Adaptar uma canção de um idioma para outro vai além de traduzir palavra por palavra. É preciso manter a melodia, o ritmo e a carga emocional, ao mesmo tempo que se ajusta o texto para que faça sentido culturalmente."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📌 Definição técnica de adaptação musical",
+          "texto": "Adaptação musical (musical adaptation) = processo de reescrever a letra de uma música em outro idioma, preservando a métrica, a rima e a intenção original. Ex.: 'La Vie en Rose' foi adaptada para o inglês como 'Life in Pink', mantendo a melodia, mas alterando expressões para que soem naturais em inglês."
+        },
+        {
+          "tipo": "box",
+          "variante": "analogy",
+          "label": "🔄 Analogia com legendagem de filme",
+          "texto": "Assim como um tradutor de filmes pode mudar diálogos para que o público local compreenda piadas ou referências culturais, o adaptador musical altera frases para que rimem e encaixem no compasso da música. Em ambos os casos, o objetivo não é uma tradução literal, mas uma transposição que preserve o efeito original."
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "⚠️ Armadilha comum",
+          "texto": "Traduzir literalmente pode quebrar a métrica. Ex.: 'I love you' (3 sílabas) não cabe em um verso que originalmente tem 5 sílabas em português. O correto é buscar equivalentes que mantenham o número de sílabas, como 'I adore you' (4 sílabas) ou reestruturar a frase."
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "📝 Resumo",
+          "texto": "Adaptação musical = tradução criativa + ajuste rítmico. É como adaptar um roteiro de filme: preserva a essência, mas modifica detalhes para que o público-alvo se identifique."
+        }
+      ],
+      "checkpoint_apos": null
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "historia_contexto",
+      "titulo_secao": "Origem francesa: \"Comme d'habitude\" (1967‑68)",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "A canção \"Comme d'habitude\" foi lançada na França em 1967. A melodia foi composta por Claude François e Jacques Revaux, enquanto a letra original em francês foi escrita por Gilles Thibaut. O tema da música é melancólico: descreve a rotina vazia de alguém que continua a viver o dia a dia depois de um término amoroso, sem demonstrar emoções."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📌 Vocabulário",
+          "texto": "melancholic (adjetivo) = melancólico, triste. Ex.: \"The song has a melancholic mood that reflects the singer's loneliness.\" Cuidado: em português usamos \"melancólico\" como adjetivo, mas em inglês \"melancholy\" pode ser substantivo (\"a feeling of melancholy\")."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📌 Vocabulário",
+          "texto": "routine (substantivo) = rotina. Ex.: \"She follows the same routine every morning, even after the breakup.\" Atenção: em português \"rotina\" pode ser usada como verbo informal (\"rotinar\"), mas em inglês o verbo correspondente é \"to follow a routine\"."
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Composição da melodia",
+              "descricao": "Claude François e Jacques Revaux criam a melodia instrumental que será a base da canção."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "Letra original",
+              "descricao": "Gilles Thibaut escreve a letra em francês, abordando a sensação de seguir vivendo sem paixão."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "Gravação e lançamento",
+              "descricao": "Claude François grava \"Comme d'habitude\" e a lança como single em 1967, alcançando sucesso nas paradas francesas."
+            }
+          ]
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "⚠️ Armadilha comum",
+          "texto": "Não confunda \"composer\" (quem cria a melodia) com \"lyricist\" (quem escreve a letra). Em francês, Claude François foi tanto intérprete quanto co‑compositor, enquanto Gilles Thibaut foi o lyricist."
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "🗒️ Resumo rápido",
+          "texto": "« Comme d'habitude » (1967‑68):\n- Música: Claude François & Jacques Revaux\n- Letra: Gilles Thibaut\n- Tema: rotina melancólica após um fim de relacionamento."
+        }
+      ],
+      "checkpoint_apos": {
+        "gate_id": "ck1",
+        "tipo": "tf",
+        "testar": "A melodia de \"Comme d'habitude\" foi escrita por Paul Anka."
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "historia_contexto_musica",
+      "titulo_secao": "Paul Anka e a compra dos direitos de adaptação",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Em 1968, enquanto estava em Paris, Paul Anka ouviu a canção francesa \"Comme d'habitude\". Impressionado com a melodia, ele procurou o editor da música, comprou os direitos de adaptação e escreveu uma nova letra em inglês, que se tornaria \"My Way\"."
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Anka ouve a música em Paris",
+              "descricao": "Durante uma visita à cidade, Paul Anka escuta \"Comme d'habitude\" em um café."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "Contato com o editor",
+              "descricao": "Ele entra em contato com o detentor dos direitos, a editora francesa, para negociar a compra."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "Aquisição dos direitos",
+              "descricao": "Anka paga a taxa acordada e obtém a licença para adaptar a melodia."
+            },
+            {
+              "numero": 4,
+              "cor": "#2c7fb8",
+              "titulo": "Criação da letra em inglês",
+              "descricao": "Com os direitos em mãos, Paul Anka escreve a nova letra, que será cantada por Frank Sinatra."
+            }
+          ]
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📌 Vocabulário",
+          "texto": "license (substantivo) = autorização legal para usar algo protegido por direitos autorais. Ex.: \"He obtained a license to adapt the song for English audiences.\" Cuidado: em português usamos \"licença\" como documento, mas em inglês \"license\" pode ser tanto o ato de licenciar quanto o documento."
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "⚠️ Armadilha comum",
+          "texto": "Não confunda \"buy the rights\" com \"buy the song\". \"Buy the rights\" significa adquirir a permissão legal; \"buy the song\" poderia ser entendido como comprar uma cópia física."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "analogy",
+            "label": "🔄 Analogia",
+            "texto": "Comprar os direitos de adaptação é como adquirir a patente de um invento para poder fabricá‑lo em outro país."
+          },
+          "direita": {
+            "variante": "app",
+            "label": "💡 Aplicação",
+            "texto": "Quando você quiser adaptar uma música estrangeira, primeiro verifique quem detém os direitos e negocie a licença antes de escrever sua própria letra."
+          }
+        },
+        {
+          "tipo": "diagrama",
+          "id": "flow_adaptacao",
+          "descricao": "Fluxo da compra e adaptação da música por Paul Anka",
+          "svg_raw": null,
+          "texto": "Ouvir a música → Contatar o editor → Decisão: comprar os direitos? → Sim → Obter licença → Escrever letra em inglês → Negociar com artista"
+        },
+        {
+          "tipo": "quote",
+          "texto": "\"I liked the melody so much that I thought, why not make it my own?\" – Paul Anka, recounting his decision to buy the rights."
+        }
+      ],
+      "checkpoint_apos": null
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "historia_contexto_musica",
+      "titulo_secao": "A proposta de Sinatra: a “última música”",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Depois que Paul Anka comprou os direitos da canção francesa \"Comme d'habitude\", ele procurou Frank Sinatra para discutir a adaptação. Sinatra queria que a nova letra falasse sobre a sua própria trajetória – o glamour, as noites de festa, os amores perdidos e a sensação de estar no fim de uma era. Por isso, Anka escreveu uma letra que descrevia \"a última música que ele cantaria\", em vez de manter o tema melancólico da versão francesa."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📌 Vocabulário",
+          "texto": "legacy (substantivo) = legado, o que alguém deixa como herança cultural ou artística. Ex.: \"Sinatra was concerned about the legacy he would leave behind.\" Cuidado: em português usamos \"legado\" como substantivo, mas em inglês \"legacy\" costuma aparecer depois de verbos como \"leave\" ou \"build\"."
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "⚠️ Armadilha comum",
+          "texto": "Falso cognato: \"última\" ≠ \"last\" quando se refere a \"última música\" no sentido de \"a última que ele gravará\". Em inglês, a frase correta é \"the last song he will ever record\", não \"the last music\"."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "def",
+            "label": "🗣️ Expressão",
+            "texto": "\"to reflect on\" (verbo) = refletir sobre, considerar. Ex.: \"The new lyrics reflect on Sinatra's long career.\""
+          },
+          "direita": {
+            "variante": "def",
+            "label": "🗣️ Expressão",
+            "texto": "\"to capture the spirit of\" (verbo) = capturar o espírito de. Ex.: \"Anka wanted to capture the spirit of Sinatra's golden era in the song.\""
+          }
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "Anka adquire os direitos",
+              "descricao": "Paul Anka compra os direitos de adaptação de \"Comme d'habitude\" em 1968."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "Encontro com Sinatra",
+              "descricao": "Anka apresenta a ideia a Frank Sinatra, que sugere focar na própria vida do cantor."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "Criação da nova letra",
+              "descricao": "Anka escreve a letra em inglês, enfatizando a sensação de ser a \"última música\" de Sinatra."
+            },
+            {
+              "numero": 4,
+              "cor": "#2c7fb8",
+              "titulo": "Gravação",
+              "descricao": "Sinatra grava a canção, que se torna \"My Way\", símbolo da sua carreira."
+            }
+          ]
+        },
+        {
+          "tipo": "quote",
+          "texto": "\"I want a song that says I'm looking back at my life, not a sad French ballad.\" – Frank Sinatra, 1968"
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "🔎 Resumo rápido",
+          "texto": "Sinatra pediu que a adaptação falasse da sua própria história. Anka escreveu uma letra que celebra o legado do cantor, transformando a melancolia francesa em um hino de auto‑reflexão."
+        }
+      ],
+      "checkpoint_apos": {
+        "gate_id": "ck2",
+        "tipo": "mc",
+        "testar": "Qual era o objetivo de Frank Sinatra ao gravar \"My Way\"?\\nA) Celebrar um novo álbum\\nB) Ter uma música de despedida\\nC) Promover um filme"
+      }
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "historia_contexto_musica",
+      "titulo_secao": "Gravação e sucesso de \"My Way\" (1969)",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Frank Sinatra gravou \"My Way\" em 30 de outubro de 1968, em um único take, ou seja, a versão final foi capturada em uma única tomada sem cortes. O single foi lançado em março de 1969 e rapidamente se tornou a canção‑assinatura de Sinatra, aparecendo em shows, discos de compilação e sendo reconhecida como um hino de autonomia pessoal."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📌 Vocabulário",
+          "texto": "single (substantivo) = lançamento de uma música individual, geralmente em vinil ou CD. Ex.: \"The record label released the single in March 1969.\" Cuidado: em português \"single\" pode ser traduzido como \"single\" ou \"faixa única\", mas não como \"único\"; o sentido é de \"lançamento\"."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📌 Vocabulário",
+          "texto": "take (substantivo) = tentativa de gravação de uma parte da música. Ex.: \"Sinatra nailed the perfect take on the first try.\" Armadilha: não confunda com \"take\" como verbo (\"to take\" = pegar). Aqui é um substantivo que indica a gravação."
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "⚠️ Erro comum",
+          "texto": "Português: \"Ele gravou em uma única gravação.\" Inglês natural: \"He recorded it in one take.\" O verbo \"record\" já implica o ato de gravar; repetir \"record\" e \"gravação\" soa redundante."
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "30/10/1968",
+              "descricao": "Sessão de gravação em Hollywood; Sinatra completa a faixa em um único take."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "Março 1969",
+              "descricao": "Lançamento do single \"My Way\" pela Reprise Records."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "Final de 1969",
+              "descricao": "A música atinge o topo das paradas nos EUA e no Reino Unido, consolidando‑se como marca‑registro de Sinatra."
+            }
+          ]
+        },
+        {
+          "tipo": "box",
+          "variante": "summary",
+          "label": "🔑 Resumo",
+          "texto": "A gravação de \"My Way\" foi feita em um take, lançada como single em março de 1969 e rapidamente se tornou a assinatura musical de Frank Sinatra, simbolizando sua independência artística."
+        }
+      ],
+      "checkpoint_apos": null
+    },
+    {
+      "tipo": "conteudo",
+      "secao": "curiosidades_culturais_versoes_posteriores",
+      "titulo_secao": "Curiosidades culturais e versões posteriores de “My Way”",
+      "blocos": [
+        {
+          "tipo": "paragrafo",
+          "texto": "Depois de se tornar o hino pessoal de Frank Sinatra, \"My Way\" entrou na cultura popular de maneiras inesperadas. A melodia foi adotada em cerimônias fúnebres, em noites de karaokê e reinterpretada por artistas de estilos muito diferentes, como o punk rocker Sid Vicious e o rei do rock Elvis Presley."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📌 Vocabulário",
+          "texto": "funeral (substantivo) = cerimônia que marca a morte de alguém. Ex.: \"My Way is often played at funerals because of its reflective lyrics.\" Cuidado: em português usamos \"funeral\" como substantivo, mas em inglês a preposição correta é \"at\" (\"at a funeral\"), não \"in\"."
+        },
+        {
+          "tipo": "box",
+          "variante": "def",
+          "label": "📌 Vocabulário",
+          "texto": "karaoke (substantivo) = atividade de cantar músicas acompanhadas de gravações instrumentais. Ex.: \"People love singing My Way at karaoke bars because it lets them express confidence.\" Atenção: a palavra vem do japonês, mas em inglês é usada sem artigo definido antes (\"do karaoke\", não \"do the karaoke\")."
+        },
+        {
+          "tipo": "cols2",
+          "esquerda": {
+            "variante": "app",
+            "label": "Uso em funerais",
+            "texto": "A letra \"I’ve lived a life that’s full…\" transmite a ideia de uma vida bem vivida, o que a torna escolha frequente em serviços memorialísticos. Muitos diretores de funerais recomendam a canção para quem deseja uma despedida digna e inspiradora."
+          },
+          "direita": {
+            "variante": "app",
+            "label": "Uso em karaokê",
+            "texto": "No karaokê, \"My Way\" é popular porque permite ao cantor mostrar controle vocal e emoção. A estrutura simples (verso‑refrão‑verso) facilita a memorização, e a mensagem de autonomia ressoa com o público que busca se destacar."
+          }
+        },
+        {
+          "tipo": "timeline",
+          "itens": [
+            {
+              "numero": 1,
+              "cor": "#2c7fb8",
+              "titulo": "1978 – Sid Vicious",
+              "descricao": "O baixista dos Sex Pistols gravou uma versão punk de \"My Way\" para o álbum \"Sid Sings\". A interpretação agressiva e o vocal rasgado contrastam com o tom elegante de Sinatra, mostrando a versatilidade da melodia."
+            },
+            {
+              "numero": 2,
+              "cor": "#2c7fb8",
+              "titulo": "1970 – Elvis Presley",
+              "descricao": "Elvis incluiu \"My Way\" em seu álbum \"Elvis Country\" (1970), trazendo um arranjo country‑rock. A gravação demonstra como a canção pode ser adaptada a diferentes gêneros sem perder sua essência."
+            },
+            {
+              "numero": 3,
+              "cor": "#2c7fb8",
+              "titulo": "1990‑presente – Versões em TV e filmes",
+              "descricao": "Diversas trilhas sonoras de séries e filmes utilizam trechos de \"My Way\" para enfatizar momentos de superação ou despedida, consolidando seu papel como símbolo cultural de autoafirmação."
+            }
+          ]
+        },
+        {
+          "tipo": "box",
+          "variante": "error",
+          "label": "⚠️ Armadilha comum",
+          "texto": "Não confunda \"My Way\" com \"My Way\" como \"meu caminho\" literal. Em inglês, a frase \"my way\" pode significar \"do meu jeito\" (ex.: \"Do it my way\"), mas na canção o sentido é reflexivo sobre a vida inteira, não apenas uma preferência momentânea."
+        },
+        {
+          "tipo": "quote",
+          "texto": "\"And now, the end is near, and so I face the final curtain…\" – trecho que reforça o uso da música em contextos de despedida."
+        }
+      ],
+      "checkpoint_apos": {
+        "gate_id": "ck3",
+        "tipo": "classify",
+        "testar": "Classifique as versões abaixo como original (francesa), adaptação (inglês) ou cover (outro artista):\\n1) Frank Sinatra – My Way\\n2) Sid Vicious – My Way (1978)\\n3) Claude François – Comme d'habitude"
+      }
+    }
+  ],
+  "avaliacao_conceitos": [
+    {
+      "gate_id": "ef1",
+      "tipo": "mc",
+      "testar": "Quem compôs a melodia de \"Comme d'habitude\"?\\nA) Paul Anka\\nB) Jacques Revaux\\nC) Frank Sinatra\\nD) Claude François"
+    },
+    {
+      "gate_id": "ef2",
+      "tipo": "tf",
+      "testar": "A letra inglesa de \"My Way\" fala sobre um relacionamento terminado."
+    },
+    {
+      "gate_id": "ef3",
+      "tipo": "open",
+      "testar": "Explique em duas frases por que a letra de \"My Way\" difere do tema original francês."
+    },
+    {
+      "gate_id": "ef4",
+      "tipo": "mc",
+      "testar": "Qual ano foi lançada a gravação de \"My Way\" por Frank Sinatra?\\nA) 1965\\nB) 1967\\nC) 1969\\nD) 1971"
+    },
+    {
+      "gate_id": "ef5",
+      "tipo": "tf",
+      "testar": "Sid Vicious gravou um cover de \"My Way\" em estilo punk."
+    }
+  ]
+}

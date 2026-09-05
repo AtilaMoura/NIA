@@ -8,6 +8,8 @@ from app.models import models
 from app.routers import users, courses, modules, progress, lessons, pipeline, topicos
 from app.routers import auth
 from app.routers import topico_progress
+from app.routers import revisao
+from app.routers import governanca
 from app.routers import test_ai
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
@@ -27,6 +29,14 @@ def _ensure_colunas_extras(bind):
         "ALTER TABLE users ADD CONSTRAINT valid_preferred_font_size "
         "CHECK (preferred_font_size IN ('sm', 'md', 'lg')); "
         "END IF; END $$;",
+        # FASE 1 do front Emaús: role ganha 'master'/'professor' (além de 'aluno'/'admin').
+        # A CHECK original só tinha 'aluno'/'admin' — precisa dropar e recriar.
+        "ALTER TABLE users DROP CONSTRAINT IF EXISTS valid_role",
+        "ALTER TABLE users ADD CONSTRAINT valid_role "
+        "CHECK (role IN ('aluno', 'admin', 'master', 'professor'))",
+        # FASE 5b: governança de publicação por curso.
+        "ALTER TABLE courses ADD COLUMN IF NOT EXISTS aprovacao_master_basta BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE courses ADD COLUMN IF NOT EXISTS aprovacao_exige_todos_tutores BOOLEAN NOT NULL DEFAULT FALSE",
     ]
     with bind.begin() as conn:
         for s in stmts:
@@ -70,6 +80,8 @@ def create_app():
     app.include_router(lessons.router)
     app.include_router(topicos.router)
     app.include_router(topico_progress.router)
+    app.include_router(revisao.router)
+    app.include_router(governanca.router)
     app.include_router(pipeline.router)
     app.include_router(test_ai.router)
 

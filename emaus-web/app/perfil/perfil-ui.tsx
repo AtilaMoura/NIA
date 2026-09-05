@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Botao } from "../_ui/Botao";
-import { ALUNO_USER_ID } from "../_lib/config";
-import { updateUser } from "../_lib/api";
+import { salvarPerfil } from "../_lib/api";
 
 export function EditarNome({ nomeInicial }: { nomeInicial: string }) {
   const router = useRouter();
@@ -22,7 +21,7 @@ export function EditarNome({ nomeInicial }: { nomeInicial: string }) {
     setSalvando(true);
     setErro(false);
     try {
-      await updateUser(ALUNO_USER_ID, { name: limpo });
+      await salvarPerfil(limpo);
       setEditando(false);
       router.refresh();
     } catch (e) {

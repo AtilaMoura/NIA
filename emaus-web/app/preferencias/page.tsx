@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { CabecalhoApp } from "../_ui/CabecalhoApp";
 import { Rodape } from "../_ui/Rodape";
-import { ALUNO_USER_ID } from "../_lib/config";
 import { getUser, type FontSize } from "../_lib/api";
+import { getSessao } from "../_lib/sessao";
 import { Preferencias } from "./preferencias-ui";
 
 export const metadata: Metadata = { title: "Preferências" };
 
 export default async function PreferenciasPage() {
+  const sessao = await getSessao();
+  if (!sessao) redirect("/entrar?next=/preferencias");
+
   const [usuario, jar] = await Promise.all([
-    getUser(ALUNO_USER_ID).catch(() => null),
+    getUser(sessao.id).catch(() => null),
     cookies(),
   ]);
 
@@ -25,7 +29,7 @@ export default async function PreferenciasPage() {
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"}>
+      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role}>
         <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
           Início
         </Link>
@@ -40,7 +44,7 @@ export default async function PreferenciasPage() {
         </p>
       </main>
 
-      <Rodape />
+      <Rodape papel={sessao.role} />
     </>
   );
 }

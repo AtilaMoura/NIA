@@ -108,10 +108,73 @@ PERFIL_OBREIRO = PerfilDominio(
 )
 
 
+FIO_CONDUTOR_INGLES = """
+Fio condutor pedagógico obrigatório desta área (nunca contradizer):
+Isto é uma aula de inglês pra um brasileiro adulto em estudo pessoal (nível calibrado por
+diagnóstico, entre A1 e B2 — assuma o nível informado no pedido, nunca invente um nível
+diferente). Regras inegociáveis:
+- NUNCA inventar palavra, expressão idiomática ou exemplo de frase em inglês que não seja
+  uso real e comprovado da língua — isso é o equivalente, aqui, de "nunca citar fato de
+  memória" na área de teologia/tech. Na dúvida sobre se uma expressão é natural, prefira
+  uma mais simples e comprovadamente comum a arriscar uma invenção.
+- Todo vocabulário ou estrutura nova PRECISA vir acompanhado de pelo menos 1 frase de
+  exemplo completa e natural, usando a palavra em contexto real — nunca só a tradução
+  isolada.
+- Ser sempre explícito sobre QUAL tempo verbal ou estrutura gramatical está sendo
+  ensinado (ex: "present perfect", não só "isso é usado quando..."), nomeando o padrão.
+- Quando fizer sentido pedagógico, contrastar com armadilhas comuns de quem fala
+  português (falsos cognatos, ordem de palavras, preposições que não têm equivalente
+  direto) — isso ajuda mais que só explicar a regra em inglês isolada.
+- Nunca reproduzir letra de música, trecho de vídeo com direitos autorais ou texto longo
+  protegido por copyright como se fosse citação literal — parafrasear o sentido, comentar
+  vocabulário/gramática em cima dele, e indicar a fonte original pra quem quiser conferir
+  (mesmo espírito da regra de citação bíblica: nunca "completar de memória").
+- Pra palavra/expressão nova, use o bloco "vocab" (campos: termo, classe_gramatical,
+  traducao, exemplo_en, exemplo_pt, cuidado opcional) — NÃO o bloco "box" genérico. O
+  "box" vira parede de texto (achado real, 2026-09-04: várias palavras espremidas no
+  mesmo "texto" saem ilegíveis); "vocab" é um card estruturado, um por palavra.
+- Pra fluxo/processo (ex.: passos de como algo aconteceu), use o bloco "fluxo" (campos:
+  passos: [{texto, decisao: bool}]) — NÃO peça um "diagrama" com svg_raw pra isso: SVG
+  cru escrito por IA sai com coordenadas erradas e texto vazando das caixas (achado real
+  testando este curso). "fluxo" desenha em HTML/CSS e nunca quebra.
+""".strip()
+
+EXEMPLO_CALIBRACAO_INGLES = """
+Exemplo real do nível de detalhe esperado pra uma palavra nova — bloco "vocab", não
+"box" (o "box" genérico é só pra explicação em prosa, nunca pra vocabulário):
+
+{
+  "tipo": "vocab", "termo": "certain", "classe_gramatical": "adjetivo",
+  "traducao": "seguro, convicto de algo",
+  "exemplo_en": "I am certain that this will work.",
+  "exemplo_pt": "Tenho certeza de que isso vai funcionar.",
+  "cuidado": "Em português dizemos 'estou certo' com o verbo 'estar', mas em inglês
+  'certain' também vem depois de 'be' — o que muda é que 'sure' é intercambiável aqui
+  ('I am sure' = 'I am certain'), mas 'right' NÃO é ('estou certo' no sentido de 'não
+  errei' é 'I am right', não 'I am certain')."
+}
+
+PROIBIDO: dar só a tradução ("certain = certo") sem exemplo, ou inventar uma frase que
+soe não-natural em inglês só pra caber no exemplo. PROIBIDO também amontoar 2+ palavras
+num "box" só de texto corrido — cada palavra nova é o seu próprio bloco "vocab".
+""".strip()
+
+PERFIL_INGLES = PerfilDominio(
+    id="ingles",
+    contexto_curso=(
+        "curso pessoal de inglês (estudo próprio, nível calibrado por diagnóstico entre "
+        "A1 e B2)"
+    ),
+    fio_condutor=FIO_CONDUTOR_INGLES,
+    exemplo_calibracao=EXEMPLO_CALIBRACAO_INGLES,
+)
+
+
 PERFIS: dict[str, PerfilDominio] = {
     PERFIL_TECH.id: PERFIL_TECH,
     PERFIL_TEOLOGIA.id: PERFIL_TEOLOGIA,
     PERFIL_OBREIRO.id: PERFIL_OBREIRO,
+    PERFIL_INGLES.id: PERFIL_INGLES,
 }
 
 

@@ -3,10 +3,14 @@ import Link from "next/link";
 import { CabecalhoApp } from "../_ui/CabecalhoApp";
 import { BarraProgresso } from "../_ui/BarraProgresso";
 import { Avatar } from "../_ui/Avatar";
+import { Chip } from "../_ui/Chip";
 import { Rodape } from "../_ui/Rodape";
-import { ALUNO_USER_ID, TEOLOGIA_COURSE_IDS } from "../_lib/config";
+import { redirect } from "next/navigation";
+import { TEOLOGIA_COURSE_IDS } from "../_lib/config";
 import { getUser } from "../_lib/api";
 import { montarArvore } from "../_lib/arvore";
+import { getSessao } from "../_lib/sessao";
+import { INFO_PAPEL } from "../_lib/papel";
 import { EditarNome } from "./perfil-ui";
 
 const CURSO_ID = TEOLOGIA_COURSE_IDS[0];
@@ -14,16 +18,19 @@ const CURSO_ID = TEOLOGIA_COURSE_IDS[0];
 export const metadata: Metadata = { title: "Seu perfil" };
 
 export default async function PerfilPage() {
+  const sessao = await getSessao();
+  if (!sessao) redirect("/entrar?next=/perfil");
+
   const [arvore, usuario] = await Promise.all([
-    montarArvore(CURSO_ID),
-    getUser(ALUNO_USER_ID).catch(() => null),
+    montarArvore(CURSO_ID, sessao.id),
+    getUser(sessao.id).catch(() => null),
   ]);
   const { curso, resumo, proximoTopico } = arvore;
   const nome = usuario?.name ?? "Aluno";
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={nome}>
+      <CabecalhoApp nomeUsuario={nome} papel={sessao.role}>
         <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
           Início
         </Link>
@@ -34,7 +41,10 @@ export default async function PerfilPage() {
         <section className="flex items-center gap-4">
           <Avatar nome={nome} tamanho="lg" />
           <div className="min-w-0">
-            <EditarNome nomeInicial={usuario?.name ?? ""} />
+            <div className="flex flex-wrap items-center gap-2">
+              <EditarNome nomeInicial={usuario?.name ?? ""} />
+              <Chip tom={INFO_PAPEL[sessao.role].tom}>{INFO_PAPEL[sessao.role].rotulo}</Chip>
+            </div>
             {usuario?.email && (
               <p className="m-0 text-[.86rem] text-[var(--tm-ink-muted)]">{usuario.email}</p>
             )}
@@ -63,7 +73,7 @@ export default async function PerfilPage() {
         </section>
       </main>
 
-      <Rodape />
+      <Rodape papel={sessao.role} />
     </>
   );
 }

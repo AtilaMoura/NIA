@@ -51,6 +51,14 @@ Bloco (dentro de "blocos"), campo "tipo":
   (mapa, foto histórica, rota, retrato) ajudaria muito mais que texto/diagrama. A maioria
   dos slides NÃO deveria ter isso — não force um bloco desses em todo slide nem em toda
   lição. Não gera imagem nenhuma, só descreve o que seria útil pra alguém buscar depois.
+- "vocab": {termo, classe_gramatical, traducao, exemplo_en, exemplo_pt, cuidado} — pra
+  palavra/expressão nova de idioma. Use isso em vez de "box" quando o perfil do domínio
+  pedir (ver fio_condutor do perfil) — "box" vira parede de texto se usado pra
+  vocabulário.
+- "fluxo": {passos: [{texto, decisao: bool}]} — sequência de passos desenhada em
+  HTML/CSS, sem coordenada nenhuma pra acertar. Prefira isso a "diagrama"/svg_raw quando
+  só precisar mostrar uma sequência linear (com no máximo 1 decisão) — svg_raw cru
+  escrito por você tende a sair com texto vazando das caixas.
 
 "avaliacao_conceitos": exatamente 5 itens, gate_ids ef1..ef5, cada um com "tipo" (mc, mc,
 tf-ou-classify, open, open — a última open sendo integrativa, testando conexão com tópicos
@@ -219,8 +227,19 @@ Bloco, campo "tipo":
 - "cards": {{itens:[{{icone,nome,descricao}}]}}
 - "quote": {{texto}}
 - "diagrama": {{id, descricao (FLUXO de 3+ passos com uma decisão, nunca frase única), svg_raw: null}}
+- "vocab": {{termo, classe_gramatical, traducao, exemplo_en, exemplo_pt, cuidado}} — use no
+  lugar de "box" pra palavra/expressão nova, se o fio_condutor do perfil pedir.
+- "fluxo": {{passos: [{{texto, decisao: bool}}]}} — sequência linear em HTML/CSS (sem
+  coordenada nenhuma pra acertar); prefira a "diagrama" quando o fluxo for só uma
+  sequência de passos com no máximo 1 decisão.
+- "imagem_sugerida": {{descricao, alt, legenda}} — SEM "url" (você não gera imagem, só
+  descreve o que deveria existir ali; alguém gera depois e preenche "url"). USE RARAMENTE
+  — só quando uma referência visual real ajudaria muito mais que texto.
+- "audio_video": {{midia_tipo: "youtube"|"audio", legenda}} — SEM "url" pelo mesmo motivo
+  (espaço reservado, alguém preenche depois). Só quando fizer sentido de verdade (ex.:
+  ouvir a pronúncia de uma expressão, ou trecho de vídeo/música sendo estudado).
 
-{("OBRIGATÓRIO: inclua um bloco 'diagrama' neste assunto, narrando um fluxo real (não decorativo), com pelo menos 3 passos ligados por seta (→) e 1 decisão explícita." + chr(10) + chr(10) + perfil.exemplo_diagrama) if precisa_diagrama else "Não é obrigatório usar diagrama neste assunto."}
+{("OBRIGATÓRIO: narre um fluxo real (não decorativo) com pelo menos 3 passos e 1 decisão explícita neste assunto — use o bloco 'fluxo' (preferível, nunca estoura) OU 'diagrama' com svg_raw desenhado à mão." + chr(10) + chr(10) + perfil.exemplo_diagrama) if precisa_diagrama else "Não é obrigatório usar diagrama/fluxo neste assunto."}
 
 Todo texto em português do Brasil.
 """

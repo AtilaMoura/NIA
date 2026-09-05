@@ -53,13 +53,18 @@ export type ArvoreCurso = {
   linhaDoTempo: TopicoNo[];
 };
 
-export async function montarArvore(courseId: number): Promise<ArvoreCurso> {
+// userId opcional (default = ALUNO_USER_ID) — a partir da FASE 1 (auth), quem chama
+// deve sempre passar o id da sessão de verdade; o default fica só de fallback.
+export async function montarArvore(
+  courseId: number,
+  userId: number = ALUNO_USER_ID,
+): Promise<ArvoreCurso> {
   const [curso, modules, lessons, topicos, progresso, progressModulos] = await Promise.all([
     getCourse(courseId),
     listModules(),
     listLessons(),
     listTopicos(),
-    listTopicoProgress(ALUNO_USER_ID),
+    listTopicoProgress(userId),
     listProgress().catch(() => []),
   ]);
 
@@ -67,7 +72,7 @@ export async function montarArvore(courseId: number): Promise<ArvoreCurso> {
   const statusPorTopico = new Map(progresso.map((p) => [p.topico_id, p.status]));
 
   const tempoTotalMin = progressModulos
-    .filter((p) => p.course_id === courseId && p.user_id === ALUNO_USER_ID)
+    .filter((p) => p.course_id === courseId && p.user_id === userId)
     .reduce((soma, p) => soma + (p.time_spent_minutes ?? 0), 0);
 
   const modsDoCurso = modules
