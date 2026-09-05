@@ -162,12 +162,41 @@ melhores no navegador (Claude-in-Chrome agora conecta).
   `como-funciona`, e `recortar <origem> <destino>` genérico. `recortar_fundo()` virou
   função reusável.
 
-**Falta (rodada 2):**
-- Usuário gerar as imagens (`gerar_imagem_gemini.py` nos 3 JSONs) → `preparar_imagens_emaus.py`
-  → escolher símbolo de logo + trocar placeholders do carrossel/como-funciona.
-- Curso 9 (Inglês) não tem capa — card fica com degradê liso. Decidir com a sessão do
-  Inglês (gerar capa ou tirar do catálogo público).
-- Conferência de verdade no mobile (o `resize_window` do Claude-in-Chrome não muda o
-  viewport do screenshot).
-- Polish: espaçamento fino, hover states, claro/escuro, a11y, favicon + og-image novos.
-- Depoimentos + FAQ (quando o usuário liberar).
+**Rodada 2 (2026-09-05) — imagens geradas (13, via Gemini web / script):**
+- Fix no `gerar_imagem_gemini.py`: `insert_text` no lugar de `type(delay=8)` — o editor
+  Quill do Gemini novo estourava o timeout com prompt longo (commitado separado).
+- `imagem/marca/emaus/v2/` — 5 símbolos → `preparar_imagens_emaus.py simbolos` →
+  `emaus-web/public/marca/v2/*.png` (fundo recortado). Página de comparação em
+  `emaus-web/app/dev/marca/page.tsx` (`/dev/marca`) — mostra cada um em 6 tamanhos
+  (18→140px) sobre claro/escuro + mockup "Emaús".
+  - Leitura do Claude (falta o usuário escolher): **`simbolo-traco-unico`** segura melhor
+    pequeno e é o mais "logo"; `simbolo-livro-brasa` é o mais bonito grande mas some no
+    favicon; `simbolo-selo` só serve grande; `simbolo-brasa`/`simbolo-livro` perdem
+    metade do significado (só fogo / só livro).
+- `imagem/heroi/emaus/v1/` — 4 ilustrações → `preparar_imagens_emaus.py heroi` →
+  `emaus-web/public/heroi/{estrada,lamparina,folhear,grupo}.jpg` (crop quadrado central,
+  1200px). **`slidesHeroi()` já pega elas automaticamente** — carrossel do herói agora
+  usa as reais (não mais as capas placeholder). Todas no estilo certo (aquarela+tinta,
+  pergaminho). Melhores: `estrada` (estrada de Emaús) e `folhear` (mãos no livro).
+- `imagem/como-funciona/emaus/v1/` — 4 spots → `preparar_imagens_emaus.py como-funciona`
+  → `emaus-web/public/como-funciona/passo-{1..4}-*.png` (fundo recortado). A landing já
+  troca o número pelo spot quando o arquivo existe.
+
+**Falta (rodada 3):**
+- **Usuário escolher o símbolo do logo** em `/dev/marca` → aplicar no `Logo.tsx`
+  (`LogoSimbolo` volta a poder usar `<img>` do escolhido, ou refaço o SVG à mão baseado
+  nele) + favicon (`app/icon.svg` ou `.png`) + og-image novos.
+- Conferir a landing com as imagens reais no navegador (carrossel + como-funciona) e
+  ajustar enquadramento/moldura (o herói tem margem de pergaminho; no tema escuro pode
+  precisar de um frame/inner-shadow).
+- Curso 9 (Inglês) sem capa — degradê liso. Decidir com a sessão do Inglês.
+- Conferência no mobile de verdade.
+- Polish: espaçamento fino, hover, claro/escuro, a11y.
+- Depoimentos + FAQ (quando o usuário liberar — seguem anotados, fora de escopo).
+
+**Como regerar/reprocessar imagens:**
+```
+python scripts/gerar_imagem_gemini.py scripts/<marca_emaus_v2|heroi_emaus|como_funciona_emaus>.json
+python scripts/preparar_imagens_emaus.py <simbolos|heroi|como-funciona>
+```
+(dirige o Gemini web num perfil Chrome isolado `~/.nia-playwright-profile`, ~1min/img.)
