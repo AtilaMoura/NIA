@@ -10,6 +10,7 @@ import { TEOLOGIA_COURSE_IDS } from "../_lib/config";
 import { getUser } from "../_lib/api";
 import { montarArvore } from "../_lib/arvore";
 import { getSessao } from "../_lib/sessao";
+import { papelPodeRevisar } from "../_lib/papel";
 
 const CURSO_ID = TEOLOGIA_COURSE_IDS[0];
 
@@ -24,6 +25,12 @@ export default async function InicioPage() {
     getUser(sessao.id).catch(() => null),
   ]);
   const { curso, resumo, proximoTopico } = arvore;
+
+  // Curso do aluno ainda não publicado: manda pra vitrine (nada pra estudar aqui).
+  if (curso.status !== "published" && !papelPodeRevisar(sessao.role)) {
+    redirect("/");
+  }
+
   const primeiroNome = (usuario?.name ?? "").split(/\s+/)[0] || null;
 
   return (

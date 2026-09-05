@@ -7,6 +7,7 @@ import { Logo, LogoSimbolo } from "./_ui/Logo";
 import { CATALOGO, caminhoCapa, type CursoCatalogo } from "./_lib/catalogo";
 import { capaExiste } from "./_lib/capas";
 import { getSessao } from "./_lib/sessao";
+import { listCourses } from "./_lib/api";
 
 export const metadata: Metadata = {
   title: { absolute: "Emaús — cursos de formação bíblica" },
@@ -14,16 +15,18 @@ export const metadata: Metadata = {
     "Cursos de Bíblia, doutrina e vida cristã feitos para a pessoa comum entender de verdade. Sem viés de denominação, no seu ritmo.",
 };
 
-function CardCurso({ curso }: { curso: CursoCatalogo }) {
+function CardCurso({ curso, publicado }: { curso: CursoCatalogo; publicado: boolean }) {
   const capaUrl = capaExiste(curso.slug) ? caminhoCapa(curso.slug) : null;
+  // "Acessível" = está no catálogo como disponível E foi publicado de verdade no NIA.
+  const acessivel = curso.disponivel && curso.courseId != null && publicado;
 
   const corpo = (
     <>
       <div className="relative">
         <CapaCurso titulo={curso.titulo} tom={curso.tom} capaUrl={capaUrl} />
-        {!curso.disponivel && (
+        {!acessivel && (
           <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-[var(--tm-radius-pill)] bg-black/45 px-2.5 py-1 text-[.7rem] font-semibold text-white backdrop-blur">
-            <span aria-hidden>🔒</span> Em breve
+            <span aria-hidden>🔒</span> {curso.disponivel ? "Em revisão" : "Em breve"}
           </span>
         )}
       </div>
@@ -36,10 +39,12 @@ function CardCurso({ curso }: { curso: CursoCatalogo }) {
           {curso.descricao}
         </p>
         <div className="mt-3">
-          {curso.disponivel ? (
+          {acessivel ? (
             <span className="text-[.82rem] font-semibold text-[var(--tm-accent)]">Começar →</span>
           ) : (
-            <span className="text-[.82rem] text-[var(--tm-ink-muted)]">Em preparação</span>
+            <span className="text-[.82rem] text-[var(--tm-ink-muted)]">
+              {curso.disponivel ? "Aguardando publicação" : "Em preparação"}
+            </span>
           )}
         </div>
       </div>
@@ -49,7 +54,7 @@ function CardCurso({ curso }: { curso: CursoCatalogo }) {
   const base =
     "flex flex-col overflow-hidden rounded-[var(--tm-radius-lg)] border border-[var(--tm-border)] bg-[var(--tm-surface)] shadow-[var(--tm-shadow)]";
 
-  if (curso.disponivel && curso.courseId != null) {
+  if (acessivel) {
     return (
       <Link
         href={`/curso/${curso.courseId}`}
@@ -92,8 +97,15 @@ const PILARES = [
 ];
 
 export default async function LandingPage() {
-  const disponivel = CATALOGO.find((c) => c.disponivel);
-  const sessao = await getSessao();
+  const [sessao, cursosNia] = await Promise.all([
+    getSessao(),
+    listCourses().catch(() => []),
+  ]);
+  const publicadoPorId = new Map(cursosNia.map((c) => [c.id, c.status === "published"]));
+  const estaPublicado = (curso: CursoCatalogo) =>
+    curso.courseId != null && publicadoPorId.get(curso.courseId) === true;
+
+  const primeiroAcessivel = CATALOGO.find((c) => c.disponivel && estaPublicado(c));
 
   return (
     <>
@@ -130,10 +142,10 @@ export default async function LandingPage() {
                 Cursos de Bíblia, doutrina e vida cristã para quem quer entender de verdade —
                 sem viés de denominação, no seu ritmo.
               </p>
-              {disponivel?.courseId != null && (
+              {primeiroAcessivel?.courseId != null && (
                 <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <LinkBotao href={`/curso/${disponivel.courseId}`}>
-                    Começar por “{disponivel.titulo}”
+                  <LinkBotao href={`/curso/${primeiroAcessivel.courseId}`}>
+                    Começar por “{primeiroAcessivel.titulo}”
                   </LinkBotao>
                   <Link
                     href="#cursos"
@@ -184,13 +196,13 @@ export default async function LandingPage() {
           <div className="mb-6 flex items-baseline justify-between gap-4">
             <h2 className="m-0 text-[1.4rem]">Todos os cursos</h2>
             <span className="text-[.8rem] text-[var(--tm-ink-muted)]">
-              {CATALOGO.filter((c) => c.disponivel).length} disponível ·{" "}
-              {CATALOGO.filter((c) => !c.disponivel).length} em preparação
+              {CATALOGO.filter((c) => c.disponivel && estaPublicado(c)).length} disponível ·{" "}
+              {CATALOGO.filter((c) => !(c.disponivel && estaPublicado(c))).length} em preparação
             </span>
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {CATALOGO.map((curso) => (
-              <CardCurso key={curso.slug} curso={curso} />
+              <CardCurso key={curso.slug} curso={curso} publicado={estaPublicado(curso)} />
             ))}
           </div>
         </section>

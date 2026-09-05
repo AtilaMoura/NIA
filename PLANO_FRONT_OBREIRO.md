@@ -207,9 +207,10 @@ Cada fase quebrada em features. OpenCode faz uma feature, Claude valida, próxim
   aprovação individual). Testado ao vivo o cenário completo (quórum "todos os tutores",
   bloqueios de papel, master publica sozinho, despublicar só master). Usuário optou por manter
   os placeholders Admin/Professor por ora.
-  **Não feito de propósito:** `status` do curso ainda não gateia acesso do aluno em
-  `/curso`/`/topico` (quebraria o curso 8 e o 9 da sessão paralela) — próximo passo quando
-  coordenar com `catalogo.ts`.
+- [x] **Gate de publicação** (2026-09-05) — `Course.status` controla o acesso do aluno:
+  `/curso/[id]`, `/topico/[id]`, `/inicio` só liberam se `published`; revisor sempre passa e
+  vê "prévia". Landing mostra cadeado "Em revisão" nos cursos não publicados. Cursos 8 e 9
+  publicados antes de ligar. Testado (despublicar/republicar).
 - [ ] FASE 6 — Capa + imagens + polish (parte da capa/landing já adiantada acima)
 
 Dev server do emaus-web: `cd emaus-web && npx next dev -p 4200`. Backend NIA: Docker `nia_backend` em `:8100`.

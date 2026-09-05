@@ -6,7 +6,9 @@ import { LogoSimbolo } from "../../_ui/Logo";
 import { AcoesTopico } from "./topico-ui";
 import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getSessao } from "../../_lib/sessao";
+import { papelPodeRevisar } from "../../_lib/papel";
 import {
+  getCourse,
   getTopico,
   listLessons,
   listModules,
@@ -56,6 +58,22 @@ export default async function TopicoPage({
   const modulo = aula ? modules.find((m) => m.id === aula.module_id) ?? null : null;
   const CURSO_ID = modulo?.course_id ?? CURSO_ID_FALLBACK;
   const tema = TEMA_POR_CURSO[CURSO_ID] ?? THEME_TOPICO;
+
+  // Curso não publicado: só quem revisa passa (o aluno vê "em preparação").
+  const curso = await getCourse(CURSO_ID).catch(() => null);
+  if (curso && curso.status !== "published" && !papelPodeRevisar(sessao.role)) {
+    return (
+      <main className="mx-auto flex min-h-[100dvh] max-w-md flex-col items-start justify-center gap-4 px-[clamp(1rem,4vw,2rem)]">
+        <h1 className="text-[1.4rem]">Curso em preparação</h1>
+        <p className="m-0 text-[.9rem] text-[var(--tm-ink-muted)]">
+          Este curso ainda não foi publicado.
+        </p>
+        <LinkBotao href="/" variante="fantasma">
+          Ver os cursos disponíveis
+        </LinkBotao>
+      </main>
+    );
+  }
   const ordenados = [...irmaos].sort((a, b) => a.topico_index - b.topico_index);
   const posicao = ordenados.findIndex((t) => t.id === topico.id);
   const proximo = ordenados

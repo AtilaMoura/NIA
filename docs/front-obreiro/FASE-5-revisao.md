@@ -232,11 +232,15 @@ do aluno reflete · `frontend/` intocado.
     professor barrado (403, só master) → despublicado por master. Testei também
     `aprovacao_master_basta`. Config resetada pro estado limpo (sem tutor, sem regra, draft)
     ao final. `tsc` 0 erros, `py_compile` OK, 13 rotas → 200.
-  - **Decisão consciente, não implementada nesta rodada**: o `status`/`is_public` do curso
-    ainda **não gateia** `/curso/[id]` nem `/topico/[id]` pro aluno — fazer isso agora
-    quebraria o curso 8 (que não tem tutor/aprovação configurada, ficaria inacessível) e
-    arriscava quebrar o curso 9 que a sessão paralela estava testando. Fica registrado como
-    o próximo passo natural quando fizer sentido coordenar com o catálogo (`catalogo.ts`).
+  - **Gate de publicação — FEITO 2026-09-05 (commit seguinte).** `Course.status` agora
+    controla o acesso do aluno: `/curso/[id]`, `/topico/[id]` e `/inicio` só liberam pro
+    aluno se `status === "published"`; quem revisa (master/admin/professor) sempre passa e vê
+    um aviso de "prévia" com link pra `/revisao/curso/[id]`. Landing (`page.tsx`) busca o
+    `status` real e mostra cadeado "Em revisão" nos cursos do catálogo que não estão
+    publicados (não mexeu em `catalogo.ts`, que segue sendo só o "existe/está no plano").
+    Cursos 8 e 9 foram publicados (`POST /cursos/{id}/publicar` como master) antes de ligar
+    o gate, pra nada quebrar. Testado: despublicar → aluno vê "em preparação", revisor vê a
+    prévia; republicar → aluno volta a acessar.
 
 **Nota (2026-09-04):** sessão de FASE 5a rodou em paralelo com outra sessão
 (`english-course-structure`) editando o mesmo `emaus-web/`/`backend/` (curso 9 de Inglês).

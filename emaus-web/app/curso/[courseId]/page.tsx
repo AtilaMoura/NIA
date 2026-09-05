@@ -8,6 +8,8 @@ import { TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getCourse, getUser } from "../../_lib/api";
 import { montarArvore } from "../../_lib/arvore";
 import { getSessao } from "../../_lib/sessao";
+import { papelPodeRevisar } from "../../_lib/papel";
+import { LinkBotao } from "../../_ui/Botao";
 import { ArvoreCursoUI } from "./arvore-ui";
 
 export async function generateMetadata({
@@ -40,6 +42,28 @@ export default async function CursoPage({
   ]);
   const { curso, modulos, resumo, proximoTopico } = arvore;
 
+  const publicado = curso.status === "published";
+  const podeRevisar = papelPodeRevisar(sessao.role);
+
+  // Curso não publicado: aluno não entra; quem revisa vê com um aviso de prévia.
+  if (!publicado && !podeRevisar) {
+    return (
+      <>
+        <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role} />
+        <main className="mx-auto flex max-w-md flex-col items-start gap-4 px-[clamp(1rem,4vw,2rem)] py-16">
+          <h1 className="m-0 text-[1.5rem]">{curso.title}</h1>
+          <p className="m-0 text-[.92rem] text-[var(--tm-ink-muted)]">
+            Este curso ainda está em preparação e não foi publicado. Volte em breve.
+          </p>
+          <LinkBotao href="/" variante="fantasma">
+            Ver os cursos disponíveis
+          </LinkBotao>
+        </main>
+        <Rodape papel={sessao.role} />
+      </>
+    );
+  }
+
   // Módulo que contém o próximo tópico — fica aberto no accordion.
   const moduloAbertoId =
     modulos.find((m) =>
@@ -56,6 +80,14 @@ export default async function CursoPage({
       </CabecalhoApp>
 
       <main className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-6 px-[clamp(1rem,4vw,2rem)] py-8">
+        {!publicado && (
+          <p className="m-0 rounded-[var(--tm-radius)] border border-dashed border-[var(--tm-warn)] bg-[var(--tm-verse-bg)] px-3 py-2 text-[.82rem] text-[var(--tm-warn)]">
+            Prévia — este curso ainda não foi publicado. O aluno não consegue acessá-lo.{" "}
+            <Link href={`/revisao/curso/${courseId}`} className="font-semibold underline">
+              Ir para a governança
+            </Link>
+          </p>
+        )}
         <header className="flex flex-col gap-3">
           <h1 className="text-[1.7rem]">{curso.title}</h1>
           {curso.description && (
