@@ -81,8 +81,14 @@ def fase1_gerar_imagem(page, prompt: str, pasta_debug: Path) -> bytes:
 
     print("[FASE 1] Digitando o prompt...")
     caixa.click()
-    caixa.type(prompt, delay=8)
-    page.wait_for_timeout(500)
+    page.wait_for_timeout(300)
+    # insert_text cola o texto todo de uma vez (sem delay por char) — o editor
+    # Quill do Gemini novo estoura o timeout de .type() em prompt longo.
+    try:
+        page.keyboard.insert_text(prompt)
+    except Exception:
+        caixa.fill(prompt)
+    page.wait_for_timeout(600)
 
     # Conta imagens que ja existem antes de enviar o prompt
     ids_antes = set()
