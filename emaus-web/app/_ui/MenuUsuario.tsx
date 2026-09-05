@@ -6,13 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { Avatar } from "./Avatar";
 import { Chip } from "./Chip";
 import { INFO_PAPEL, type Papel } from "../_lib/papel";
+import { itensUsuario } from "../_lib/nav";
 
-const ITENS = [
-  { href: "/perfil", rotulo: "Perfil" },
-  { href: "/progresso", rotulo: "Progresso" },
-  { href: "/preferencias", rotulo: "Preferências" },
-];
-
+// Dropdown do usuário no desktop. No mobile quem cuida disso é o MenuMobile.
 export function MenuUsuario({ nome, papel }: { nome: string; papel?: Papel | null }) {
   const [aberto, setAberto] = useState(false);
   const [saindo, setSaindo] = useState(false);
@@ -31,10 +27,8 @@ export function MenuUsuario({ nome, papel }: { nome: string; papel?: Papel | nul
     }
   }
 
-  // Fecha ao navegar.
   useEffect(() => setAberto(false), [pathname]);
 
-  // Fecha no Escape / clique fora.
   useEffect(() => {
     if (!aberto) return;
     function aoTeclar(e: KeyboardEvent) {
@@ -70,13 +64,9 @@ export function MenuUsuario({ nome, papel }: { nome: string; papel?: Papel | nul
       {aberto && (
         <div
           role="menu"
-          className="absolute right-0 z-40 mt-2 flex w-48 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[var(--tm-radius)] border border-[var(--tm-border)] bg-[var(--tm-surface)] py-1 shadow-[var(--tm-shadow)]"
+          className="absolute right-0 z-40 mt-2 flex w-52 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[var(--tm-radius)] border border-[var(--tm-border)] bg-[var(--tm-surface)] py-1 shadow-[var(--tm-shadow)]"
         >
-          <div className="flex items-center justify-between gap-2 px-3.5 py-2 md:hidden">
-            <span className="truncate text-[.85rem] font-semibold">{nome}</span>
-            {papel && <Chip tom={INFO_PAPEL[papel].tom}>{INFO_PAPEL[papel].rotulo}</Chip>}
-          </div>
-          {ITENS.map((i) => (
+          {itensUsuario(papel).map((i) => (
             <Link
               key={i.href}
               href={i.href}

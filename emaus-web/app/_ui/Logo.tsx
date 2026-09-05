@@ -1,13 +1,9 @@
 import type { CSSProperties } from "react";
 
-// Marca ilustrada (aquarela) gerada pelo script do Gemini + recorte de fundo
-// (scripts/preparar_imagens_emaus.py) em public/marca/emaus-simbolo.png.
-// Trocar pra `false` volta pro símbolo SVG.
-const MARCA_ILUSTRADA_PRONTA = true;
-
-// Símbolo do Emaús: livro aberto + brasa subindo do centro (Lc 24 — as Escrituras
-// abertas e o coração que arde). Usa currentColor no livro e um tom âmbar fixo na
-// brasa, pra funcionar em claro e escuro.
+// Símbolo do Emaús — SVG (crisp em qualquer tamanho, do favicon ao herói).
+// Livro aberto + brasa subindo do centro: Lc 24, as Escrituras abertas e o
+// coração que arde. O livro usa currentColor; a brasa tem tom âmbar fixo, então
+// funciona em claro e escuro. Traço reforçado pra ler bem a ~20px.
 export function LogoSimbolo({
   size = 28,
   className = "",
@@ -24,21 +20,6 @@ export function LogoSimbolo({
     ? { "aria-hidden": true as const }
     : { role: "img" as const, "aria-label": "Emaús" };
 
-  if (MARCA_ILUSTRADA_PRONTA) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src="/marca/emaus-simbolo.png"
-        alt={decorativo ? "" : "Emaús"}
-        width={size}
-        height={size}
-        className={className}
-        style={style}
-        {...(decorativo ? { "aria-hidden": true } : {})}
-      />
-    );
-  }
-
   return (
     <svg
       width={size}
@@ -49,53 +30,66 @@ export function LogoSimbolo({
       style={style}
       {...a11y}
     >
-      {/* brasa / chama */}
+      {/* brasa — dois traços, do quente pro claro */}
       <path
-        d="M20 3.5c2.4 3 3.9 5.2 3.3 8-.4 1.9-1.7 3-3.3 3.2-1.7-.2-3-1.5-3.3-3.2-.6-2.8 1-5 3.3-8z"
+        d="M20 2.6c3 3.4 4.6 6 3.9 9.2-.5 2.2-2 3.5-3.9 3.7-2-.2-3.5-1.5-3.9-3.7-.7-3.2.9-5.8 3.9-9.2z"
         fill="var(--tm-accent-2, #b8763a)"
       />
       <path
-        d="M20 7.6c1.1 1.6 1.7 2.8 1.4 4.2-.2 1-.8 1.5-1.4 1.6-.7-.1-1.2-.6-1.4-1.6-.3-1.4.3-2.6 1.4-4.2z"
+        d="M20 6.9c1.5 2 2.3 3.5 1.9 5.2-.3 1.2-1 1.8-1.9 2-1-.2-1.6-.8-1.9-2-.4-1.7.4-3.2 1.9-5.2z"
         fill="var(--tm-gold, #d9a441)"
       />
-      {/* páginas do livro aberto */}
+      {/* livro aberto — duas páginas simétricas */}
       <path
-        d="M20 16.8C16.4 14 11.8 13.2 6.5 14.4 5.6 14.6 5 15.4 5 16.3v16.1c0 1.2 1.1 2 2.3 1.8 4.4-.9 8.5-.3 12.7 2.2V16.8z"
+        d="M20 17.4C15.9 14.4 10.8 13.6 5.2 15 4.5 15.2 4 15.9 4 16.6v17.2c0 1.1 1 1.9 2.1 1.7 4.6-1 9-.4 13.9 2.3V17.4z"
         fill="currentColor"
-        opacity="0.92"
       />
       <path
-        d="M20 16.8C23.6 14 28.2 13.2 33.5 14.4c.9.2 1.5 1 1.5 1.9v16.1c0 1.2-1.1 2-2.3 1.8-4.4-.9-8.5-.3-12.7 2.2V16.8z"
+        d="M20 17.4C24.1 14.4 29.2 13.6 34.8 15c.7.2 1.2.9 1.2 1.6v17.2c0 1.1-1 1.9-2.1 1.7-4.6-1-9-.4-13.9 2.3V17.4z"
         fill="currentColor"
+        opacity="0.86"
       />
       {/* vinco central */}
       <path
-        d="M20 16.8v23.2"
+        d="M20 17.4V38"
         stroke="var(--tm-bg, #faf6ee)"
-        strokeWidth="1.4"
+        strokeWidth="1.6"
         strokeLinecap="round"
-        opacity="0.5"
+        opacity="0.55"
       />
     </svg>
   );
 }
 
+// Lockup da marca. `orientacao` horizontal (menu) ou empilhada (herói, rodapé).
 export function Logo({
   size = 26,
   texto = true,
+  orientacao = "horizontal",
   className = "",
 }: {
   size?: number;
   texto?: boolean;
+  orientacao?: "horizontal" | "empilhado";
   className?: string;
 }) {
+  const empilhado = orientacao === "empilhado";
   return (
-    <span className={`inline-flex items-center gap-2 text-[var(--tm-accent)] ${className}`}>
+    <span
+      className={
+        "inline-flex text-[var(--tm-accent)] " +
+        (empilhado ? "flex-col items-center gap-1.5 " : "items-center gap-2 ") +
+        className
+      }
+    >
       <LogoSimbolo size={size} decorativo={texto} />
       {texto && (
         <span
           style={{ fontFamily: "var(--tm-font-display)" }}
-          className="text-[1.15rem] font-semibold tracking-tight text-[var(--tm-ink)]"
+          className={
+            "font-semibold leading-none tracking-[-0.01em] text-[var(--tm-ink)] " +
+            (empilhado ? "text-[1.05rem]" : "text-[1.12rem]")
+          }
         >
           Emaús
         </span>

@@ -1,0 +1,37 @@
+[
+  {
+    "descricao": "Generate an image. A single logo mark / emblem, centered, on a completely plain flat off-white background (#f6f1e6 roughly), with a wide clean empty margin all around it and NOTHING else in the frame. Style: minimal warm ink-and-wash, drawn as if with a broad confident dip pen and a single ochre-amber ink wash — only 3 or 4 deliberate strokes, a slight natural wobble to the line, a hand-made woodcut-reduced-to-essentials feeling. Colors: warm wheat-gold and ember-amber only, plus a very faint soft warm glow behind the flame; no other colors, no black outline, no grey. Absolutely NOT a flat corporate vector, NOT a 3D icon, no gradient meshes, no bevels, no drop shadows, no photorealism, no background texture, no circle frame. Subject: a very simple open book seen slightly from above — two gently curved pages meeting at a soft center gutter, suggested with the fewest possible lines — and rising straight up from the center of the gutter a single small teardrop flame with a faint warm halo. Balanced, upright, symmetrical, calm, iconic. CRITICAL REQUIREMENT: the mark must stay instantly readable and recognizable when scaled down to 24 pixels tall — so keep shapes big and simple, avoid thin details, avoid anything that would merge into a blob at small size. Square composition (1:1), the emblem occupying about 55 percent of the frame, perfectly centered. Strictly NO text, NO letters, NO numbers, NO words, NO watermark.",
+    "modulo": "marca",
+    "aula": "emaus",
+    "topico": "v2",
+    "arquivo": "simbolo-livro-brasa.png"
+  },
+  {
+    "descricao": "Generate an image. A single circular seal / emblem, centered, on a completely plain flat off-white background, with a clean empty margin around it and nothing else in the frame. Style: minimal warm ink-and-wash, few restrained confident strokes with a slight hand-made wobble, like a stamp or a woodcut reduced to its essentials — NOT a flat corporate vector, NOT 3D, no gradients, no bevels, no drop shadows, no photorealism, no background texture. Colors: warm wheat-gold and ember-amber only, with a very faint warm glow around the flame; no black, no grey, no other hue. Subject: a single thin, slightly uneven circular border (one calm hand-drawn ring, not perfectly geometric). Inside the ring, small and simple: an open book drawn with just a few lines near the lower half, a small teardrop flame rising just above the book's center, and behind the flame three or four short straight rays fanning upward like the first light of a quiet sunrise. Everything reduced to the minimum number of lines. Symmetrical, balanced, warm, calm. CRITICAL REQUIREMENT: the seal must still read clearly and hold its shape when scaled down to 24 pixels tall — keep the ring thin but the inner elements bold and well separated, nothing that collapses into mush at small size. Square composition (1:1), the round seal centered and occupying about 78 percent of the frame. Strictly NO text, NO letters, NO numbers, NO words inside or around the ring, NO watermark.",
+    "modulo": "marca",
+    "aula": "emaus",
+    "topico": "v2",
+    "arquivo": "simbolo-selo.png"
+  },
+  {
+    "descricao": "Generate an image. A single tiny logo mark, centered, on a completely plain flat off-white background, with wide empty margin and nothing else in the frame. Style: minimal warm ink-and-wash — just 2 or 3 confident brush strokes, a single ochre-to-amber wash, a slight organic hand-made wobble, and a soft warm glow around it. NOT a flat vector, NOT 3D, no gradient mesh, no bevel, no drop shadow, no photorealism, no outline in black, no background texture, no frame. Colors: ember-amber and a hint of wheat-gold only. Subject: a single small, calm, upright flame / ember — a simple teardrop shape with one gentle inner curl suggesting the heart of the flame, and a faint diffuse warm halo behind it. Nothing else at all in the frame — no book, no circle, no base. Iconic, warm, quiet, steady. CRITICAL REQUIREMENT: must read clearly as a flame when scaled down to 24 pixels tall — keep it one bold simple shape, no thin tails, no fine detail. Square composition (1:1), the flame centered and occupying about 40 percent of the frame height. Strictly NO text, NO letters, NO numbers, NO watermark.",
+    "modulo": "marca",
+    "aula": "emaus",
+    "topico": "v2",
+    "arquivo": "simbolo-brasa.png"
+  },
+  {
+    "descricao": "Generate an image. A single logo mark, centered, on a completely plain flat off-white background, with a wide clean margin and nothing else in the frame. Style: minimal warm ink-and-wash — 4 or 5 confident strokes only, a single warm wheat-gold to amber wash, slight hand-made wobble, woodcut-reduced-to-essentials feel. NOT a flat corporate vector, NOT 3D, no gradient mesh, no bevel, no drop shadow, no photorealism, no black outline, no background texture, no circle frame. Colors: wheat-gold and warm amber only. Subject: a very simple open book seen slightly from above — two gently curved pages rising from a soft central gutter, the outer edges of the pages suggested with a single sweeping line each, maybe one or two short lines hinting at page thickness underneath. No flame, no other element, just the open book. Calm, symmetrical, generous, iconic. CRITICAL REQUIREMENT: must read clearly as an open book when scaled down to 24 pixels tall — big simple shapes, thick enough strokes, nothing fussy. Square composition (1:1), the book centered and occupying about 55 percent of the frame. Strictly NO text, NO letters, NO numbers, NO words on the pages, NO watermark.",
+    "modulo": "marca",
+    "aula": "emaus",
+    "topico": "v2",
+    "arquivo": "simbolo-livro.png"
+  },
+  {
+    "descricao": "Generate an image. A single logo mark drawn as ONE continuous unbroken line, centered, on a completely plain flat off-white background, with a wide clean margin and nothing else in the frame. Style: a single confident continuous ink stroke of even weight in warm ember-amber, with a slight natural hand-made wobble, as if drawn without lifting the pen — no fill, no shading, no second color, NOT a flat vector, NOT 3D, no gradient, no bevel, no drop shadow, no photorealism, no background texture, no frame. Subject: the one line starts at the lower left, sweeps across to trace the simple outline of an open book (two gentle page curves meeting at a center dip), then at the center it rises upward and curls once into a small flame shape before ending. The whole thing should feel like a single elegant gesture — book below, flame above, one stroke. Minimal, graceful, warm, calm. CRITICAL REQUIREMENT: must still read as 'open book with a flame' when scaled down to 24 pixels tall — so keep the line reasonably thick and the shapes generous and well separated, avoid tight loops that would fill in at small size. Square composition (1:1), the mark centered and occupying about 55 percent of the frame. Strictly NO text, NO letters, NO numbers, NO watermark.",
+    "modulo": "marca",
+    "aula": "emaus",
+    "topico": "v2",
+    "arquivo": "simbolo-traco-unico.png"
+  }
+]

@@ -76,8 +76,12 @@ h1, h2, h3 {
   line-height: 1.2;
 }
 
-img { max-width: 100%; height: auto; }
-a { color: inherit; }
+/* Em @layer base pra que utilitários do Tailwind (h-full, h-11, object-cover…)
+   consigam sobrescrever — regra solta venceria o layer de utilities. */
+@layer base {
+  img { max-width: 100%; height: auto; }
+  a { color: inherit; }
+}
 
 :focus-visible {
   outline: 2px solid var(--tm-accent);

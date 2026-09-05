@@ -2,11 +2,13 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { AlternarTema } from "./AlternarTema";
 import { MenuUsuario } from "./MenuUsuario";
+import { MenuMobile } from "./MenuMobile";
 import { Logo } from "./Logo";
 import type { Papel } from "../_lib/papel";
 
-// Cabeçalho fixo. Abaixo de 640px: marca + avatar na 1ª linha, navegação em
-// linha própria (scroll horizontal se não couber).
+// Cabeçalho fixo. Desktop: barra única (marca · navegação · tema+avatar).
+// Mobile (<640px): marca · tema · hambúrguer que abre um drawer com a navegação.
+// `children` = links de navegação contextuais da página (renderizados nos dois).
 export function CabecalhoApp({
   nomeUsuario,
   papel,
@@ -19,19 +21,34 @@ export function CabecalhoApp({
   children?: ReactNode;
 }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-[var(--tm-border)] bg-[var(--tm-bg)]/95 backdrop-blur">
-      <div className="mx-auto flex max-w-[var(--tm-maxw)] flex-wrap items-center gap-x-4 gap-y-2 px-[clamp(1rem,4vw,2rem)] py-3">
+    <header className="sticky top-0 z-30 border-b border-[var(--tm-border)] bg-[var(--tm-bg)]/90 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-[var(--tm-maxw)] items-center gap-5 px-[clamp(1rem,4vw,2rem)]">
         <Link href={hrefMarca} aria-label="Emaús — início" className="shrink-0">
-          <Logo size={34} />
+          <Logo size={30} />
         </Link>
 
-        <nav className="order-3 -mx-1 flex w-full min-w-0 items-center gap-4 overflow-x-auto px-1 text-[.82rem] text-[var(--tm-ink-muted)] sm:order-2 sm:w-auto sm:flex-1 sm:overflow-visible">
+        <nav className="hidden min-w-0 flex-1 items-center gap-5 text-[.85rem] text-[var(--tm-ink-muted)] sm:flex [&_a:hover]:text-[var(--tm-accent)] [&_a]:transition-colors">
           {children}
         </nav>
 
-        <div className="order-2 ml-auto flex items-center gap-2 sm:order-3 sm:ml-0">
+        <div className="ml-auto flex items-center gap-2 sm:ml-0">
           <AlternarTema />
-          {nomeUsuario && <MenuUsuario nome={nomeUsuario} papel={papel ?? null} />}
+          {nomeUsuario && (
+            <span className="hidden sm:block">
+              <MenuUsuario nome={nomeUsuario} papel={papel ?? null} />
+            </span>
+          )}
+          {!nomeUsuario && (
+            <Link
+              href="/entrar"
+              className="hidden rounded-[var(--tm-radius-pill)] border border-[var(--tm-border)] px-3.5 py-1.5 text-[.82rem] font-semibold hover:border-[var(--tm-accent)] hover:text-[var(--tm-accent)] sm:inline-block"
+            >
+              Entrar
+            </Link>
+          )}
+          <MenuMobile nome={nomeUsuario} papel={papel ?? null}>
+            {children}
+          </MenuMobile>
         </div>
       </div>
     </header>

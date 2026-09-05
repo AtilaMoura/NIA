@@ -3,11 +3,13 @@ import type { Metadata } from "next";
 import { CabecalhoApp } from "./_ui/CabecalhoApp";
 import { LinkBotao } from "./_ui/Botao";
 import { CapaCurso } from "./_ui/CapaCurso";
-import { Logo, LogoSimbolo } from "./_ui/Logo";
+import { Logo } from "./_ui/Logo";
+import { Carrossel } from "./_ui/Carrossel";
 import { CATALOGO, caminhoCapa, type CursoCatalogo } from "./_lib/catalogo";
 import { capaExiste } from "./_lib/capas";
+import { imagemExiste, slidesHeroi } from "./_lib/imagens";
 import { getSessao } from "./_lib/sessao";
-import { listCourses } from "./_lib/api";
+import { listCourses, type Course } from "./_lib/api";
 
 export const metadata: Metadata = {
   title: { absolute: "Emaús — cursos de formação bíblica" },
@@ -15,9 +17,23 @@ export const metadata: Metadata = {
     "Cursos de Bíblia, doutrina e vida cristã feitos para a pessoa comum entender de verdade. Sem viés de denominação, no seu ritmo.",
 };
 
-function CardCurso({ curso, publicado }: { curso: CursoCatalogo; publicado: boolean }) {
+const NIVEL_ROTULO: Record<string, string> = {
+  "básico": "Nível básico",
+  "intermediário": "Nível intermediário",
+  "avançado": "Nível avançado",
+  "especialista": "Nível especialista",
+};
+
+function CardCurso({
+  curso,
+  publicado,
+  meta,
+}: {
+  curso: CursoCatalogo;
+  publicado: boolean;
+  meta?: Course;
+}) {
   const capaUrl = capaExiste(curso.slug) ? caminhoCapa(curso.slug) : null;
-  // "Acessível" = está no catálogo como disponível E foi publicado de verdade no NIA.
   const acessivel = curso.disponivel && curso.courseId != null && publicado;
 
   const corpo = (
@@ -25,7 +41,7 @@ function CardCurso({ curso, publicado }: { curso: CursoCatalogo; publicado: bool
       <div className="relative">
         <CapaCurso titulo={curso.titulo} tom={curso.tom} capaUrl={capaUrl} />
         {!acessivel && (
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-[var(--tm-radius-pill)] bg-black/45 px-2.5 py-1 text-[.7rem] font-semibold text-white backdrop-blur">
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-[var(--tm-radius-pill)] bg-black/50 px-2.5 py-1 text-[.72rem] font-semibold text-white backdrop-blur">
             <span aria-hidden>🔒</span> {curso.disponivel ? "Em revisão" : "Em breve"}
           </span>
         )}
@@ -35,9 +51,16 @@ function CardCurso({ curso, publicado }: { curso: CursoCatalogo; publicado: bool
           {curso.titulo}
         </h3>
         <p className="m-0 text-[.82rem] font-semibold text-[var(--tm-accent)]">{curso.subtitulo}</p>
-        <p className="m-0 mt-1 text-[.83rem] leading-relaxed text-[var(--tm-ink-muted)]">
+        <p className="m-0 mt-1 line-clamp-3 text-[.83rem] leading-relaxed text-[var(--tm-ink-muted)]">
           {curso.descricao}
         </p>
+        {acessivel && (
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[.72rem] text-[var(--tm-ink-muted)]">
+            {meta?.level && <span>{NIVEL_ROTULO[meta.level] ?? meta.level}</span>}
+            <span>Com tutor de IA</span>
+            <span>No seu ritmo</span>
+          </div>
+        )}
         <div className="mt-3">
           {acessivel ? (
             <span className="text-[.82rem] font-semibold text-[var(--tm-accent)]">Começar →</span>
@@ -71,19 +94,44 @@ function CardCurso({ curso, publicado }: { curso: CursoCatalogo; publicado: bool
   );
 }
 
-const PILARES = [
+const PASSOS = [
+  {
+    n: 1,
+    slug: "passo-1-conta",
+    titulo: "Crie sua conta",
+    texto: "É de graça e leva um minuto. Nenhum cartão, nenhum compromisso.",
+  },
+  {
+    n: 2,
+    slug: "passo-2-escolher",
+    titulo: "Escolha um curso",
+    texto: "Comece pelo que faz sentido pra você agora — dá pra trocar quando quiser.",
+  },
+  {
+    n: 3,
+    slug: "passo-3-ritmo",
+    titulo: "Estude tópico a tópico",
+    texto: "Leitura, slides e um momento de aplicação. Pare e volte quando puder.",
+  },
+  {
+    n: 4,
+    slug: "passo-4-progresso",
+    titulo: "Progresso e tutor acompanham",
+    texto: "Seu avanço fica salvo, e um tutor aponta o que ficou raso antes de seguir.",
+  },
+];
+
+const DIFERENCIAIS = [
   {
     titulo: "Para entender de verdade",
     texto:
       "Sem jargão. Cada tópico mostra de onde vem a ideia no texto bíblico antes de dizer o que fazer com ela.",
-    icone: (
-      <path d="M4 5c4-1.5 8-1.5 8 1 0-2.5 4-2.5 8-1v13c-4-1.5-8-1.5-8 1 0-2.5-4-2.5-8-1V5z" />
-    ),
+    icone: <path d="M4 5c4-1.5 8-1.5 8 1 0-2.5 4-2.5 8-1v13c-4-1.5-8-1.5-8 1 0-2.5-4-2.5-8-1V5z" />,
   },
   {
     titulo: "No seu ritmo",
     texto:
-      "Leitura, slides e um momento de aplicação em cada tópico. Pare, volte, revise quando quiser — o progresso fica salvo.",
+      "Leitura, slides e aplicação em cada tópico. Pare, volte, revise quando quiser — o progresso fica salvo.",
     icone: <path d="M5 19c3-9 8-11 14-13M5 19h4M5 19v-4" />,
   },
   {
@@ -97,129 +145,238 @@ const PILARES = [
 ];
 
 export default async function LandingPage() {
-  const [sessao, cursosNia] = await Promise.all([
-    getSessao(),
-    listCourses().catch(() => []),
-  ]);
-  const publicadoPorId = new Map(cursosNia.map((c) => [c.id, c.status === "published"]));
+  const [sessao, cursosNia] = await Promise.all([getSessao(), listCourses().catch(() => [])]);
+  const cursoPorId = new Map(cursosNia.map((c) => [c.id, c]));
   const estaPublicado = (curso: CursoCatalogo) =>
-    curso.courseId != null && publicadoPorId.get(curso.courseId) === true;
+    curso.courseId != null && cursoPorId.get(curso.courseId)?.status === "published";
 
   const primeiroAcessivel = CATALOGO.find((c) => c.disponivel && estaPublicado(c));
+  const heroi = slidesHeroi();
+  const disponiveis = CATALOGO.filter((c) => c.disponivel && estaPublicado(c));
+  const emBreve = CATALOGO.filter((c) => !(c.disponivel && estaPublicado(c)));
+
+  const ctaPrimario = primeiroAcessivel?.courseId
+    ? { href: `/curso/${primeiroAcessivel.courseId}`, texto: `Começar por "${primeiroAcessivel.titulo}"` }
+    : { href: sessao ? "/inicio" : "/entrar", texto: "Começar agora" };
 
   return (
     <>
       <CabecalhoApp nomeUsuario={sessao?.name ?? null} papel={sessao?.role} hrefMarca="/">
-        <span className="text-[var(--tm-accent)]">Cursos</span>
-        {sessao ? (
+        <Link href="#cursos" className="hover:text-[var(--tm-accent)]">
+          Cursos
+        </Link>
+        <Link href="#como-funciona" className="hover:text-[var(--tm-accent)]">
+          Como funciona
+        </Link>
+        {sessao && (
           <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
-            Continuar estudando
-          </Link>
-        ) : (
-          <Link href="/entrar" className="hover:text-[var(--tm-accent)]">
-            Entrar
+            Meu estudo
           </Link>
         )}
       </CabecalhoApp>
 
       <main>
-        {/* Hero */}
+        {/* ---------- Herói ---------- */}
         <section className="grao overflow-hidden border-b border-[var(--tm-border)] bg-[var(--tm-surface-2)]">
-          <div className="relative mx-auto max-w-[var(--tm-maxw)] px-[clamp(1rem,4vw,2rem)] py-16 sm:py-24">
-            <LogoSimbolo
-              size={340}
-              decorativo
-              className="pointer-events-none absolute -right-16 -top-10 hidden text-[var(--tm-accent)] opacity-[0.06] sm:block"
-            />
-            <div className="relative flex max-w-2xl flex-col items-start gap-5">
-              <p className="m-0 text-[.78rem] font-semibold uppercase tracking-[.16em] text-[var(--tm-accent)]">
+          <div className="mx-auto grid max-w-[var(--tm-maxw)] items-center gap-10 px-[clamp(1rem,4vw,2rem)] py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+            <div className="flex max-w-xl flex-col items-start gap-5">
+              <p className="m-0 text-[.76rem] font-semibold uppercase tracking-[.18em] text-[var(--tm-accent)]">
                 Formação bíblica
               </p>
-              <h1 className="m-0 text-[clamp(2rem,5.5vw,3.2rem)] leading-[1.08]">
+              <h1 className="m-0 text-[clamp(2.1rem,5.5vw,3.4rem)] leading-[1.06]">
                 Estudar a Bíblia até o coração arder.
               </h1>
-              <p className="m-0 max-w-xl text-[1.02rem] leading-relaxed text-[var(--tm-ink-muted)]">
-                Cursos de Bíblia, doutrina e vida cristã para quem quer entender de verdade —
-                sem viés de denominação, no seu ritmo.
+              <p className="m-0 text-[1.05rem] leading-relaxed text-[var(--tm-ink-muted)]">
+                Cursos de Bíblia, doutrina e vida cristã para a pessoa comum entender de
+                verdade — sem viés de denominação, no seu ritmo, com um tutor que acompanha.
               </p>
-              {primeiroAcessivel?.courseId != null && (
-                <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <LinkBotao href={`/curso/${primeiroAcessivel.courseId}`}>
-                    Começar por “{primeiroAcessivel.titulo}”
-                  </LinkBotao>
-                  <Link
-                    href="#cursos"
-                    className="text-[.85rem] font-semibold text-[var(--tm-accent)] hover:underline"
-                  >
-                    Ver todos os cursos
-                  </Link>
-                </div>
+              <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-3">
+                <LinkBotao href={ctaPrimario.href}>{ctaPrimario.texto}</LinkBotao>
+                <Link
+                  href={sessao && primeiroAcessivel?.courseId ? `/curso/${primeiroAcessivel.courseId}` : "/entrar"}
+                  className="text-[.88rem] font-semibold text-[var(--tm-accent)] hover:underline"
+                >
+                  Espiar um tópico →
+                </Link>
+              </div>
+              <p className="m-0 text-[.8rem] text-[var(--tm-ink-muted)]">
+                Grátis para começar · conteúdo revisado tópico a tópico
+              </p>
+            </div>
+
+            <div className="w-full max-w-[22rem] justify-self-center sm:max-w-[26rem] lg:justify-self-end">
+              {heroi.length > 0 ? (
+                <Carrossel slides={heroi} className="w-full shadow-[var(--tm-shadow)]" />
+              ) : (
+                <div className="aspect-square w-full rounded-[var(--tm-radius-lg)] border border-[var(--tm-border)] bg-[var(--tm-surface)]" />
               )}
             </div>
           </div>
         </section>
 
-        {/* Pilares */}
-        <section className="mx-auto max-w-[var(--tm-maxw)] px-[clamp(1rem,4vw,2rem)] py-14">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-            {PILARES.map((p) => (
-              <div key={p.titulo} className="flex flex-col gap-2">
-                <svg
-                  width="26"
-                  height="26"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="var(--tm-accent)"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  {p.icone}
-                </svg>
-                <h3 style={{ fontFamily: "var(--tm-font-display)" }} className="text-[1.05rem]">
-                  {p.titulo}
+        {/* ---------- Como funciona ---------- */}
+        <section
+          id="como-funciona"
+          className="mx-auto max-w-[var(--tm-maxw)] scroll-mt-20 px-[clamp(1rem,4vw,2rem)] py-16"
+        >
+          <h2 className="m-0 mb-2 text-[1.5rem]">Como funciona</h2>
+          <p className="m-0 mb-10 max-w-lg text-[.92rem] text-[var(--tm-ink-muted)]">
+            Do cadastro ao primeiro tópico estudado, sem burocracia.
+          </p>
+          <ol className="m-0 grid list-none grid-cols-1 gap-x-8 gap-y-10 p-0 sm:grid-cols-2 lg:grid-cols-4">
+            {PASSOS.map((p) => {
+              const img = imagemExiste(`como-funciona/${p.slug}.png`)
+                ? `/como-funciona/${p.slug}.png`
+                : null;
+              return (
+                <li key={p.n} className="flex flex-col gap-3">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-[var(--tm-radius-lg)] border border-[var(--tm-border)] bg-[var(--tm-surface)]">
+                    {img ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={img} alt="" className="h-11 w-11 object-contain" aria-hidden />
+                    ) : (
+                      <span
+                        style={{ fontFamily: "var(--tm-font-display)" }}
+                        className="text-[1.4rem] font-semibold text-[var(--tm-accent)]"
+                      >
+                        {p.n}
+                      </span>
+                    )}
+                  </div>
+                  <h3 style={{ fontFamily: "var(--tm-font-display)" }} className="m-0 text-[1.02rem]">
+                    {p.titulo}
+                  </h3>
+                  <p className="m-0 text-[.86rem] leading-relaxed text-[var(--tm-ink-muted)]">
+                    {p.texto}
+                  </p>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+
+        {/* ---------- Diferenciais ---------- */}
+        <section className="border-y border-[var(--tm-border)] bg-[var(--tm-surface-2)]">
+          <div className="mx-auto grid max-w-[var(--tm-maxw)] grid-cols-1 gap-10 px-[clamp(1rem,4vw,2rem)] py-16 sm:grid-cols-3">
+            {DIFERENCIAIS.map((d) => (
+              <div key={d.titulo} className="flex flex-col gap-3">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--tm-verse-border)] bg-[var(--tm-verse-bg)]">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--tm-accent)"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    {d.icone}
+                  </svg>
+                </span>
+                <h3 style={{ fontFamily: "var(--tm-font-display)" }} className="m-0 text-[1.1rem]">
+                  {d.titulo}
                 </h3>
-                <p className="m-0 text-[.88rem] leading-relaxed text-[var(--tm-ink-muted)]">
-                  {p.texto}
+                <p className="m-0 text-[.9rem] leading-relaxed text-[var(--tm-ink-muted)]">
+                  {d.texto}
                 </p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Catálogo */}
+        {/* ---------- Catálogo ---------- */}
         <section
           id="cursos"
-          className="mx-auto max-w-[var(--tm-maxw)] scroll-mt-20 px-[clamp(1rem,4vw,2rem)] pb-20"
+          className="mx-auto max-w-[var(--tm-maxw)] scroll-mt-20 px-[clamp(1rem,4vw,2rem)] py-16"
         >
-          <div className="mb-6 flex items-baseline justify-between gap-4">
-            <h2 className="m-0 text-[1.4rem]">Todos os cursos</h2>
-            <span className="text-[.8rem] text-[var(--tm-ink-muted)]">
-              {CATALOGO.filter((c) => c.disponivel && estaPublicado(c)).length} disponível ·{" "}
-              {CATALOGO.filter((c) => !(c.disponivel && estaPublicado(c))).length} em preparação
-            </span>
+          <div className="mb-8 flex items-end justify-between gap-4">
+            <div>
+              <h2 className="m-0 text-[1.5rem]">Os cursos</h2>
+              <p className="m-0 mt-1 text-[.9rem] text-[var(--tm-ink-muted)]">
+                {disponiveis.length} disponível{disponiveis.length !== 1 ? "eis" : ""} ·{" "}
+                {emBreve.length} em preparação
+              </p>
+            </div>
           </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {CATALOGO.map((curso) => (
-              <CardCurso key={curso.slug} curso={curso} publicado={estaPublicado(curso)} />
-            ))}
+
+          {disponiveis.length > 0 && (
+            <div className="mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {disponiveis.map((curso) => (
+                <CardCurso
+                  key={curso.slug}
+                  curso={curso}
+                  publicado
+                  meta={curso.courseId != null ? cursoPorId.get(curso.courseId) : undefined}
+                />
+              ))}
+            </div>
+          )}
+
+          {emBreve.length > 0 && (
+            <>
+              <h3 className="m-0 mb-4 text-[.82rem] font-semibold uppercase tracking-[.12em] text-[var(--tm-ink-muted)]">
+                Em preparação
+              </h3>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {emBreve.map((curso) => (
+                  <CardCurso key={curso.slug} curso={curso} publicado={false} />
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+
+        {/* ---------- CTA final ---------- */}
+        <section className="grao border-t border-[var(--tm-border)] bg-[var(--tm-surface-2)]">
+          <div className="mx-auto flex max-w-[var(--tm-maxw)] flex-col items-start gap-4 px-[clamp(1rem,4vw,2rem)] py-16 sm:items-center sm:text-center">
+            <h2 className="m-0 max-w-xl text-[clamp(1.5rem,3.5vw,2rem)] leading-tight">
+              Comece hoje. É de graça.
+            </h2>
+            <p className="m-0 max-w-md text-[.95rem] text-[var(--tm-ink-muted)]">
+              Crie a conta e abra o primeiro tópico agora mesmo.
+            </p>
+            <LinkBotao href={ctaPrimario.href} className="mt-1">
+              {ctaPrimario.texto}
+            </LinkBotao>
           </div>
         </section>
       </main>
 
-      {/* Rodapé próprio da landing (mais completo que o Rodape padrão) */}
-      <footer className="border-t border-[var(--tm-border)] bg-[var(--tm-surface-2)]">
-        <div className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-3 px-[clamp(1rem,4vw,2rem)] py-10">
-          <Logo size={22} />
-          <p
-            className="m-0 max-w-md text-[.9rem] italic leading-relaxed text-[var(--tm-ink-muted)]"
-            style={{ fontFamily: "var(--tm-font-display)" }}
-          >
-            “Não estava ardendo o nosso coração, quando ele nos falava pelo caminho e nos abria
-            as Escrituras?” — Lucas 24.32
-          </p>
-          <p className="m-0 mt-2 text-[.72rem] text-[var(--tm-ink-muted)]">
+      {/* ---------- Rodapé ---------- */}
+      <footer className="border-t border-[var(--tm-border)] bg-[var(--tm-bg)]">
+        <div className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-12">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex max-w-sm flex-col gap-3">
+              <Logo size={26} />
+              <p
+                className="m-0 text-[.9rem] italic leading-relaxed text-[var(--tm-ink-muted)]"
+                style={{ fontFamily: "var(--tm-font-display)" }}
+              >
+                “Não estava ardendo o nosso coração, quando ele nos falava pelo caminho e nos
+                abria as Escrituras?” — Lucas 24.32
+              </p>
+            </div>
+            <nav className="flex flex-col gap-2 text-[.85rem] text-[var(--tm-ink-muted)]">
+              <Link href="#cursos" className="hover:text-[var(--tm-accent)]">
+                Cursos
+              </Link>
+              <Link href="#como-funciona" className="hover:text-[var(--tm-accent)]">
+                Como funciona
+              </Link>
+              {sessao ? (
+                <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
+                  Meu estudo
+                </Link>
+              ) : (
+                <Link href="/entrar" className="hover:text-[var(--tm-accent)]">
+                  Entrar
+                </Link>
+              )}
+            </nav>
+          </div>
+          <p className="m-0 border-t border-[var(--tm-border)] pt-6 text-[.72rem] text-[var(--tm-ink-muted)]">
             Emaús · plataforma de formação bíblica
           </p>
         </div>
