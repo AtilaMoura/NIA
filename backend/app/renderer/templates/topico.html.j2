@@ -27,6 +27,7 @@
   <div class="vocab-card">
     <div class="vocab-head">
       <span class="vocab-termo">{{ bloco.termo }}</span>
+      <button type="button" class="vocab-listen" data-say="{{ bloco.termo }}" aria-label="Ouvir pronúncia" title="Ouvir pronúncia">🔊</button>
       {% if bloco.classe_gramatical %}<span class="vocab-classe">{{ bloco.classe_gramatical }}</span>{% endif %}
     </div>
     <div class="vocab-traducao">{{ bloco.traducao }}</div>
@@ -310,10 +311,12 @@
   .type-card-name { font-weight: 600; font-size: 13.5px; color: var(--text); margin-bottom: 4px; }
   .type-card-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
 
-  .vocab-card { display: inline-block; width: calc(50% - 12px); vertical-align: top; box-sizing: border-box; background: var(--surface); border: 1px solid var(--border-soft); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 13px 14px; margin: 0 12px 12px 0; }
-  @media (max-width: 520px) { .vocab-card { width: 100%; margin-right: 0; } }
+  .vocab-card { background: var(--surface); border: 1px solid var(--border-soft); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 13px 14px; margin: 0 0 12px; }
   .vocab-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
   .vocab-termo { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--accent); }
+  .vocab-listen { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border-soft); background: var(--surface-2); color: var(--accent); font-size: 11px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: border-color .15s ease, transform .12s ease; }
+  .vocab-listen:hover { border-color: var(--accent); }
+  .vocab-listen:active { transform: scale(.9); }
   .vocab-classe { font-family: var(--font-label); font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); background: var(--surface-2); padding: 2px 7px; border-radius: 10px; }
   .vocab-traducao { font-size: 13.5px; color: var(--text-muted); margin-bottom: 8px; }
   .vocab-exemplo { background: var(--surface-2); border-radius: var(--radius); padding: 8px 10px; margin-bottom: 6px; font-size: 13px; line-height: 1.5; }
@@ -679,6 +682,16 @@ document.querySelectorAll('.lacuna-wrap').forEach(function (wrap) {
     if (exp) exp.classList.add('show');
     checkGate(wrap.closest('.slide'));
     updateStatsLive();
+  });
+});
+
+document.querySelectorAll('.vocab-listen').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(btn.dataset.say);
+    utter.lang = 'en-US';
+    window.speechSynthesis.speak(utter);
   });
 });
 

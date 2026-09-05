@@ -70,7 +70,9 @@
         {
           "tipo": "imagem_sugerida",
           "descricao": "Um microfone em um palco vazio, com um único foco de luz quente — sem rosto de pessoa real, remetendo à ideia de 'luz de palco' e 'cortina final'.",
-          "legenda": "A luz do palco, antes da cortina final."
+          "legenda": "A luz do palco, antes da cortina final.",
+          "url": "http://localhost:8100/static/course-images/curso9/topico1-microfone-palco.jpg",
+          "alt": "A luz do palco, antes da cortina final."
         }
       ]
     },
@@ -81,7 +83,7 @@
       "blocos": [
         {
           "tipo": "paragrafo",
-          "texto": "A abertura da música fala do fim chegando, com certeza do que está sendo dito. Duas peças de vocabulário centrais pra esse movimento:"
+          "texto": "A abertura da música fala do fim chegando, com certeza do que está sendo dito. Uma expressão idiomática e um par de preposições centrais pra esse movimento:"
         },
         {
           "tipo": "vocab",
@@ -94,18 +96,34 @@
         },
         {
           "tipo": "vocab",
-          "termo": "certain of / certain about",
+          "termo": "certain of",
           "classe_gramatical": "adjetivo + preposição",
-          "traducao": "certo de / certo sobre",
-          "exemplo_en": "I'm certain of the facts, but not certain about what happens next.",
-          "exemplo_pt": "Tenho certeza dos fatos, mas não tenho certeza sobre o que acontece depois.",
-          "cuidado": "Use \"certain of\" com substantivo/pronome direto; \"certain about\" com assunto mais abstrato, gerúndio ou cláusula. Não confundir com \"right\" (que é sobre não ter errado, não sobre convicção)."
+          "traducao": "certo de, seguro de",
+          "exemplo_en": "I'm certain of the facts.",
+          "exemplo_pt": "Tenho certeza dos fatos.",
+          "cuidado": "Use \"of\" quando vem um substantivo ou pronome direto depois — algo concreto que você já sabe."
+        },
+        {
+          "tipo": "vocab",
+          "termo": "certain about",
+          "classe_gramatical": "adjetivo + preposição",
+          "traducao": "certo sobre, seguro sobre",
+          "exemplo_en": "I'm not certain about what happens next.",
+          "exemplo_pt": "Não tenho certeza sobre o que acontece depois.",
+          "cuidado": "Use \"about\" quando o que segue é mais abstrato — um assunto, plano ou uma pergunta em aberto (não confundir com \"right\", que é sobre não ter errado, não sobre convicção)."
         },
         {
           "tipo": "box",
           "variante": "error",
           "label": "Erro comum",
           "texto": "Muita gente omite a preposição: \"I am certain the exam.\" O correto é sempre \"certain OF/ABOUT + algo\"."
+        },
+        {
+          "tipo": "imagem_sugerida",
+          "descricao": "Uma pesada cortina de teatro entreaberta, com um único feixe de luz quente atravessando a fresta entre as duas metades — o palco escuro ao fundo.",
+          "legenda": "A cortina final.",
+          "alt": "A cortina final.",
+          "url": "http://localhost:8100/static/course-images/curso9/topico1-cortina-final.jpg"
         }
       ]
     },
@@ -161,6 +179,13 @@
           "exemplo_en": "It's too small to mention.",
           "exemplo_pt": "É pequeno demais pra mencionar.",
           "cuidado": "Implica trazer o assunto à tona sem detalhar — não confundir com \"say\" (dizer) ou \"tell\" (contar)."
+        },
+        {
+          "tipo": "imagem_sugerida",
+          "descricao": "Uma ampulheta com areia dourada caindo sobre uma mesa de madeira escura, luz quente ao fundo.",
+          "legenda": "Olhando pra trás, pro tempo vivido.",
+          "alt": "Olhando pra trás, pro tempo vivido.",
+          "url": "http://localhost:8100/static/course-images/curso9/topico1-ampulheta.jpg"
         }
       ]
     },
@@ -225,6 +250,13 @@
           "exemplo_en": "The project was hard, but we saw it through.",
           "exemplo_pt": "O projeto foi difícil, mas nós levamos até o fim.",
           "cuidado": "Não tem nada a ver com visão física — é sobre persistência. O \"it\" sempre se refere a algo já mencionado antes."
+        },
+        {
+          "tipo": "imagem_sugerida",
+          "descricao": "Uma bússola sobre um mapa ilustrado, com um caminho pontilhado serpenteando por colinas até o horizonte — tons quentes de âmbar, minimalista, sem texto no mapa.",
+          "legenda": "Cada rota, cada passo cuidadoso.",
+          "url": "http://localhost:8100/static/course-images/curso9/topico1-bussola-mapa.jpg",
+          "alt": "Cada rota, cada passo cuidadoso."
         }
       ]
     },
@@ -328,6 +360,13 @@
           "exemplo_en": "He refused to kneel to the king.",
           "exemplo_pt": "Ele se recusou a se ajoelhar diante do rei.",
           "cuidado": "Verbo irregular: kneel–knelt–knelt (ou kneeled, também aceito). Sentido literal e figurado (submeter-se)."
+        },
+        {
+          "tipo": "imagem_sugerida",
+          "descricao": "A silhueta de uma pessoa em pé no topo de um caminho íngreme e sinuoso, sem rosto visível, luz quente atrás — minimalista, transmitindo firmeza tranquila.",
+          "legenda": "De cabeça erguida, mesmo depois do tropeço.",
+          "url": "http://localhost:8100/static/course-images/curso9/topico1-silhueta-firmeza.jpg",
+          "alt": "De cabeça erguida, mesmo depois do tropeço."
         }
       ]
     },
@@ -386,6 +425,13 @@
           "variante": "summary",
           "label": "Resumo da distinção",
           "texto": "\"Exemption\" = permissão pra NÃO seguir uma regra. \"Exception\" = um caso que a regra simplesmente não cobre. Não são intercambiáveis."
+        },
+        {
+          "tipo": "imagem_sugerida",
+          "descricao": "Um corredor com várias portas escuras e idênticas, todas fechadas, exceto uma entreaberta no meio, brilhando com luz dourada quente.",
+          "legenda": "O caso que foge à regra.",
+          "alt": "O caso que foge à regra.",
+          "url": "http://localhost:8100/static/course-images/curso9/topico1-porta-diferente.jpg"
         }
       ]
     },
@@ -417,10 +463,11 @@
           "cuidado": "Expressão fixa e formal (usada em atas, tribunais) — não muda a ordem das palavras nem o \"the\"."
         },
         {
-          "tipo": "audio_video",
-          "midia_tipo": "audio",
-          "legenda": "Pronúncia de \"let the record show\"",
-          "descricao": "Áudio curto com a pronúncia da expressão \"let the record show\", destacando o linking entre as palavras."
+          "tipo": "imagem_sugerida",
+          "descricao": "Um livro-ata antigo aberto sobre uma mesa de madeira escura, com uma caneta-tinteiro dourada apoiada na página, luz quente de um lado.",
+          "legenda": "Que fique registrado.",
+          "alt": "Que fique registrado.",
+          "url": "http://localhost:8100/static/course-images/curso9/topico1-livro-registro.jpg"
         }
       ]
     },

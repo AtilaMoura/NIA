@@ -5,11 +5,21 @@ import { CabecalhoApp } from "../_ui/CabecalhoApp";
 import { Chip } from "../_ui/Chip";
 import { Rodape } from "../_ui/Rodape";
 import { TEOLOGIA_COURSE_IDS } from "../_lib/config";
+import { CATALOGO } from "../_lib/catalogo";
 import { getSessao, getToken } from "../_lib/sessao";
 import { papelPodeRevisar } from "../_lib/papel";
 import { montarFilaRevisao, type StatusRevisao } from "../_lib/revisao";
 
-const CURSO_ID = TEOLOGIA_COURSE_IDS[0];
+const CURSO_ID_PADRAO = TEOLOGIA_COURSE_IDS[0];
+
+// Cursos navegáveis na fila de revisão — mesma lista de `TEOLOGIA_COURSE_IDS`, com
+// título pra mostrar no seletor (achado pelo catálogo, que já tem os títulos certos).
+function cursosDisponiveis() {
+  return (TEOLOGIA_COURSE_IDS as readonly number[]).map((id) => ({
+    id,
+    titulo: CATALOGO.find((c) => c.courseId === id)?.titulo ?? `Curso ${id}`,
+  }));
+}
 
 export const metadata: Metadata = { title: "Área de revisão" };
 
@@ -19,10 +29,21 @@ const ROTULO_STATUS: Record<StatusRevisao, { texto: string; tom: "neutro" | "avi
   aprovado: { texto: "Aprovado", tom: "bom" },
 };
 
-export default async function RevisaoPage() {
+export default async function RevisaoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ curso?: string }>;
+}) {
   const sessao = await getSessao();
   if (!sessao) redirect("/entrar?next=/revisao");
   if (!papelPodeRevisar(sessao.role)) redirect("/inicio");
+
+  const { curso: cursoParam } = await searchParams;
+  const cursos = cursosDisponiveis();
+  const CURSO_ID =
+    Number(cursoParam) && cursos.some((c) => c.id === Number(cursoParam))
+      ? Number(cursoParam)
+      : CURSO_ID_PADRAO;
 
   const token = await getToken();
   const { curso, topicos } = await montarFilaRevisao(CURSO_ID, token);
@@ -56,6 +77,23 @@ export default async function RevisaoPage() {
       </CabecalhoApp>
 
       <main className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-8">
+        {cursos.length > 1 && (
+          <nav className="flex flex-wrap gap-2 text-[.82rem]">
+            {cursos.map((c) => (
+              <Link
+                key={c.id}
+                href={`/revisao?curso=${c.id}`}
+                className={
+                  c.id === CURSO_ID
+                    ? "rounded-[var(--tm-radius-pill)] bg-[var(--tm-accent)] px-3 py-1.5 font-semibold text-[var(--tm-accent-ink,#fff)]"
+                    : "rounded-[var(--tm-radius-pill)] border border-[var(--tm-border)] px-3 py-1.5 text-[var(--tm-ink-muted)] hover:border-[var(--tm-accent)]"
+                }
+              >
+                {c.titulo}
+              </Link>
+            ))}
+          </nav>
+        )}
         <header className="flex flex-col gap-2">
           <h1 className="m-0 text-[1.6rem]">Fila de revisão — {curso.title}</h1>
           <div className="flex flex-wrap gap-2 text-[.8rem] text-[var(--tm-ink-muted)]">

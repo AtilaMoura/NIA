@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { LogoSimbolo } from "../../../_ui/Logo";
-import { THEME_TOPICO, ALUNO_USER_ID } from "../../../_lib/config";
+import { THEME_TOPICO, TEMA_POR_CURSO, ALUNO_USER_ID } from "../../../_lib/config";
 import { getSessao, getToken } from "../../../_lib/sessao";
 import { papelPodeRevisar } from "../../../_lib/papel";
 import {
   getTopico,
   listLessons,
+  listModules,
   listTopicoComments,
   listChecklistsTopico,
   topicoRenderUrl,
@@ -51,12 +52,15 @@ export default async function RevisaoTopicoPage({
   }
 
   const token = await getToken();
-  const [lessons, comentarios, checklists] = await Promise.all([
+  const [lessons, modules, comentarios, checklists] = await Promise.all([
     listLessons(),
+    listModules(),
     listTopicoComments(topicoId, token),
     listChecklistsTopico(topicoId, token),
   ]);
   const aula = lessons.find((l) => l.id === topico.lesson_id) ?? null;
+  const modulo = aula ? modules.find((m) => m.id === aula.module_id) ?? null : null;
+  const tema = (modulo && TEMA_POR_CURSO[modulo.course_id]) || THEME_TOPICO;
   const meuChecklist = checklists.find((c) => c.user_id === sessao.id) ?? null;
 
   return (
@@ -78,7 +82,7 @@ export default async function RevisaoTopicoPage({
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <iframe
-          src={topicoRenderUrl(topico.id, { userId: ALUNO_USER_ID, theme: THEME_TOPICO })}
+          src={topicoRenderUrl(topico.id, { userId: ALUNO_USER_ID, theme: tema })}
           title={topico.titulo}
           className="min-h-[45dvh] w-full flex-1 border-0"
           allow="fullscreen"

@@ -1,0 +1,23 @@
+[
+  {
+    "descricao": "Generate an image. Modern flat-style digital illustration, clean bold shapes, warm brass/amber accent light against a cool neutral gray-green background, soft gradients, minimalist and contemporary, no photorealism, no text or lettering, no logos, no recognizable real people or faces — objects and scenes only, warm and quiet mood suitable for a personal language-learning app. Scene: a heavy velvet theater curtain, partially drawn closed, with a single warm spotlight beam cutting through the narrow gap between the two halves, dark stage floor below — evoking the final curtain, a definitive ending.",
+    "modulo": "ingles",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "cortina-final.png"
+  },
+  {
+    "descricao": "Generate an image. Modern flat-style digital illustration, clean bold shapes, warm brass/amber accent light against a cool neutral gray-green background, soft gradients, minimalist and contemporary, no photorealism, no text or lettering, no logos, no recognizable real people or faces — objects and scenes only, warm and quiet mood suitable for a personal language-learning app. Scene: a long hallway lined with identical closed dark doors, all in shadow, except one door near the middle standing slightly ajar and glowing with warm golden light spilling out — representing the one case that stands apart from the rule.",
+    "modulo": "ingles",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "porta-diferente.png"
+  },
+  {
+    "descricao": "Generate an image. Modern flat-style digital illustration, clean bold shapes, warm brass/amber accent light against a cool neutral gray-green background, soft gradients, minimalist and contemporary, no photorealism, no text or lettering, no logos, no recognizable real people or faces — objects and scenes only, warm and quiet mood suitable for a personal language-learning app. Scene: an old open ledger book resting on a dark wooden desk, a golden fountain pen lying diagonally across the open page, warm lamplight from one side casting a soft glow — evoking something being formally written down, recorded for good.",
+    "modulo": "ingles",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "livro-registro.png"
+  }
+]

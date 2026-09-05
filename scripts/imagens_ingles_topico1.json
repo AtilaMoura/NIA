@@ -1,0 +1,23 @@
+[
+  {
+    "descricao": "Generate an image. Modern flat-style digital illustration, clean bold shapes, warm brass/amber accent light against a cool neutral gray-green background, soft gradients, minimalist and contemporary, no photorealism, no text or lettering, no logos, no recognizable real people or faces — objects and scenes only, warm and quiet mood suitable for a personal language-learning app. Scene: a single vintage microphone on an empty stage, lit by one warm spotlight from directly above, soft shadow beneath it, the background fading to near-black at the edges — evoking a final bow, the spotlight just before the last curtain.",
+    "modulo": "ingles",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "microfone-palco.png"
+  },
+  {
+    "descricao": "Generate an image. Modern flat-style digital illustration, clean bold shapes, warm brass/amber accent light against a cool neutral gray-green background, soft gradients, minimalist and contemporary, no photorealism, no text or lettering, no logos, no recognizable real people or faces — objects and scenes only, warm and quiet mood suitable for a personal language-learning app. Scene: a hand-drawn-style compass resting on an open illustrated map, a single dotted path winding through gentle hills toward a distant horizon, no labels or text anywhere on the map.",
+    "modulo": "ingles",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "bussola-mapa.png"
+  },
+  {
+    "descricao": "Generate an image. Modern flat-style digital illustration, clean bold shapes, warm brass/amber accent light against a cool neutral gray-green background, soft gradients, minimalist and contemporary, no photorealism, no text or lettering, no logos, no recognizable real people or faces (silhouette only, no facial features) — warm and quiet mood suitable for a personal language-learning app. Scene: the silhouette of a single person standing tall at the top of a steep winding path, arms relaxed at their sides, warm light glowing behind them, no visible face or identifying features — conveying quiet resilience after a stumble.",
+    "modulo": "ingles",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "silhueta-firmeza.png"
+  }
+]
