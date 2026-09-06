@@ -29,12 +29,7 @@ export default async function PreferenciasPage() {
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role}>
-        <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
-          Início
-        </Link>
-        <span className="text-[var(--tm-accent)]">Preferências</span>
-      </CabecalhoApp>
+      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role} />
 
       <main className="mx-auto flex max-w-xl flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-10">
         <h1 className="m-0 text-[1.5rem]">Preferências</h1>

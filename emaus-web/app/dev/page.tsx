@@ -22,9 +22,7 @@ function Secao({ titulo, children }: { titulo: string; children: React.ReactNode
 export default function DevKitPage() {
   return (
     <>
-      <CabecalhoApp nomeUsuario="Atila Moura">
-        <span>Kit visual</span>
-      </CabecalhoApp>
+      <CabecalhoApp nomeUsuario="Atila Moura" />
 
       <main className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-8">
         <div className="flex flex-wrap items-center justify-between gap-3">

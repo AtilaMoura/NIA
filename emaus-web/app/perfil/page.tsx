@@ -30,12 +30,7 @@ export default async function PerfilPage() {
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={nome} papel={sessao.role}>
-        <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
-          Início
-        </Link>
-        <span className="text-[var(--tm-accent)]">Perfil</span>
-      </CabecalhoApp>
+      <CabecalhoApp nomeUsuario={nome} papel={sessao.role} />
 
       <main className="mx-auto flex max-w-2xl flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-10">
         <section className="flex items-center gap-4">

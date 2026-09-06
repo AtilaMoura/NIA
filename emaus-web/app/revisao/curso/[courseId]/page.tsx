@@ -42,12 +42,7 @@ export default async function GovernancaCursoPage({
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={sessao.name} papel={sessao.role} hrefMarca="/revisao">
-        <Link href="/revisao" className="hover:text-[var(--tm-accent)]">
-          Fila de revisão
-        </Link>
-        <span className="text-[var(--tm-accent)]">Governança do curso</span>
-      </CabecalhoApp>
+      <CabecalhoApp nomeUsuario={sessao.name} papel={sessao.role} />
 
       <main className="mx-auto flex max-w-2xl flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-8">
         <h1 className="m-0 text-[1.5rem]">Governança — {curso.title}</h1>

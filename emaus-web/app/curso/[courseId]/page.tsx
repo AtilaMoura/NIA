@@ -4,12 +4,12 @@ import { notFound, redirect } from "next/navigation";
 import { CabecalhoApp } from "../../_ui/CabecalhoApp";
 import { BarraProgresso } from "../../_ui/BarraProgresso";
 import { Rodape } from "../../_ui/Rodape";
+import { LinkBotao } from "../../_ui/Botao";
 import { TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getCourse, getUser } from "../../_lib/api";
 import { montarArvore } from "../../_lib/arvore";
 import { getSessao } from "../../_lib/sessao";
 import { papelPodeRevisar } from "../../_lib/papel";
-import { LinkBotao } from "../../_ui/Botao";
 import { ArvoreCursoUI } from "./arvore-ui";
 
 export async function generateMetadata({
@@ -66,18 +66,12 @@ export default async function CursoPage({
 
   // Módulo que contém o próximo tópico — fica aberto no accordion.
   const moduloAbertoId =
-    modulos.find((m) =>
-      m.aulas.some((a) => a.topicos.some((t) => t.estado === "atual")),
-    )?.id ?? null;
+    modulos.find((m) => m.aulas.some((a) => a.topicos.some((t) => t.estado === "atual")))?.id ??
+    null;
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role}>
-        <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
-          Início
-        </Link>
-        <span className="text-[var(--tm-accent)]">Curso</span>
-      </CabecalhoApp>
+      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role} />
 
       <main className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-6 px-[clamp(1rem,4vw,2rem)] py-8">
         {!publicado && (

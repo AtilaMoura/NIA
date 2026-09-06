@@ -63,18 +63,7 @@ export default async function RevisaoPage({
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={sessao.name} papel={sessao.role} hrefMarca="/revisao">
-        <span className="text-[var(--tm-accent)]">Revisão</span>
-        <Link href="/revisao/alunos" className="hover:text-[var(--tm-accent)]">
-          Alunos
-        </Link>
-        <Link href={`/revisao/curso/${CURSO_ID}`} className="hover:text-[var(--tm-accent)]">
-          Governança do curso
-        </Link>
-        <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
-          Ver como aluno
-        </Link>
-      </CabecalhoApp>
+      <CabecalhoApp nomeUsuario={sessao.name} papel={sessao.role} />
 
       <main className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-8">
         {cursos.length > 1 && (

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { CabecalhoApp } from "./_ui/CabecalhoApp";
 import { LinkBotao } from "./_ui/Botao";
 import { CapaCurso } from "./_ui/CapaCurso";
-import { Logo } from "./_ui/Logo";
+import { Rodape } from "./_ui/Rodape";
 import { Carrossel } from "./_ui/Carrossel";
 import { CATALOGO, caminhoCapa, type CursoCatalogo } from "./_lib/catalogo";
 import { capaExiste } from "./_lib/capas";
@@ -161,19 +161,7 @@ export default async function LandingPage() {
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={sessao?.name ?? null} papel={sessao?.role} hrefMarca="/">
-        <Link href="#cursos" className="hover:text-[var(--tm-accent)]">
-          Cursos
-        </Link>
-        <Link href="#como-funciona" className="hover:text-[var(--tm-accent)]">
-          Como funciona
-        </Link>
-        {sessao && (
-          <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
-            Meu estudo
-          </Link>
-        )}
-      </CabecalhoApp>
+      <CabecalhoApp nomeUsuario={sessao?.name ?? null} papel={sessao?.role} />
 
       <main>
         {/* ---------- Herói ---------- */}
@@ -344,43 +332,7 @@ export default async function LandingPage() {
         </section>
       </main>
 
-      {/* ---------- Rodapé ---------- */}
-      <footer className="border-t border-[var(--tm-border)] bg-[var(--tm-bg)]">
-        <div className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-12">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex max-w-sm flex-col gap-3">
-              <Logo size={26} />
-              <p
-                className="m-0 text-[.9rem] italic leading-relaxed text-[var(--tm-ink-muted)]"
-                style={{ fontFamily: "var(--tm-font-display)" }}
-              >
-                “Não estava ardendo o nosso coração, quando ele nos falava pelo caminho e nos
-                abria as Escrituras?” — Lucas 24.32
-              </p>
-            </div>
-            <nav className="flex flex-col gap-2 text-[.85rem] text-[var(--tm-ink-muted)]">
-              <Link href="#cursos" className="hover:text-[var(--tm-accent)]">
-                Cursos
-              </Link>
-              <Link href="#como-funciona" className="hover:text-[var(--tm-accent)]">
-                Como funciona
-              </Link>
-              {sessao ? (
-                <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
-                  Meu estudo
-                </Link>
-              ) : (
-                <Link href="/entrar" className="hover:text-[var(--tm-accent)]">
-                  Entrar
-                </Link>
-              )}
-            </nav>
-          </div>
-          <p className="m-0 border-t border-[var(--tm-border)] pt-6 text-[.72rem] text-[var(--tm-ink-muted)]">
-            Emaús · plataforma de formação bíblica
-          </p>
-        </div>
-      </footer>
+      <Rodape logado={!!sessao} papel={sessao?.role} versiculo />
     </>
   );
 }

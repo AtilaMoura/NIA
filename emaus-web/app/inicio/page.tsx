@@ -35,12 +35,7 @@ export default async function InicioPage() {
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role}>
-        <span className="text-[var(--tm-accent)]">Início</span>
-        <Link href={`/curso/${CURSO_ID}`} className="hover:text-[var(--tm-accent)]">
-          Curso
-        </Link>
-      </CabecalhoApp>
+      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role} />
 
       <main className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-10">
         <section className="grao relative overflow-hidden rounded-[var(--tm-radius-lg)] border border-[var(--tm-border)] bg-[var(--tm-surface)] p-6 shadow-[var(--tm-shadow)] sm:p-9">

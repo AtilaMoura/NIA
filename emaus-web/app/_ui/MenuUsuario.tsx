@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Avatar } from "./Avatar";
 import { Chip } from "./Chip";
 import { INFO_PAPEL, type Papel } from "../_lib/papel";
-import { itensUsuario } from "../_lib/nav";
+import { ITENS_AVATAR } from "../_lib/nav";
 
 // Dropdown do usuário no desktop. No mobile quem cuida disso é o MenuMobile.
 export function MenuUsuario({ nome, papel }: { nome: string; papel?: Papel | null }) {
@@ -66,7 +66,7 @@ export function MenuUsuario({ nome, papel }: { nome: string; papel?: Papel | nul
           role="menu"
           className="absolute right-0 z-40 mt-2 flex w-52 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[var(--tm-radius)] border border-[var(--tm-border)] bg-[var(--tm-surface)] py-1 shadow-[var(--tm-shadow)]"
         >
-          {itensUsuario(papel).map((i) => (
+          {ITENS_AVATAR.map((i) => (
             <Link
               key={i.href}
               href={i.href}

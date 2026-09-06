@@ -32,15 +32,7 @@ export default async function ProgressoPage() {
 
   return (
     <>
-      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role}>
-        <Link href="/inicio" className="hover:text-[var(--tm-accent)]">
-          Início
-        </Link>
-        <Link href={`/curso/${CURSO_ID}`} className="hover:text-[var(--tm-accent)]">
-          Curso
-        </Link>
-        <span className="text-[var(--tm-accent)]">Progresso</span>
-      </CabecalhoApp>
+      <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role} />
 
       <main className="mx-auto flex max-w-[var(--tm-maxw)] flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-8">
         <header className="flex flex-col gap-3">

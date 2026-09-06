@@ -1,28 +1,20 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Avatar } from "./Avatar";
 import { Chip } from "./Chip";
 import { INFO_PAPEL, type Papel } from "../_lib/papel";
-import { itensUsuario } from "../_lib/nav";
+import { ITENS_AVATAR, NAV_DESLOGADO, NAV_REVISAO, navPrincipal } from "../_lib/nav";
 
-// Menu do mobile: botão hambúrguer + painel deslizante. Recebe a navegação
-// contextual da página (`children`) e, se logado, os itens do usuário + Sair.
-export function MenuMobile({
-  nome,
-  papel,
-  children,
-}: {
-  nome?: string | null;
-  papel?: Papel | null;
-  children?: ReactNode;
-}) {
+// Menu do mobile: hambúrguer + painel deslizante. Mesma navegação do desktop.
+export function MenuMobile({ nome, papel }: { nome?: string | null; papel?: Papel | null }) {
   const [aberto, setAberto] = useState(false);
+  const [saindo, setSaindo] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const [saindo, setSaindo] = useState(false);
+  const logado = !!nome;
 
   useEffect(() => setAberto(false), [pathname]);
 
@@ -50,6 +42,9 @@ export function MenuMobile({
     }
   }
 
+  const principal = logado ? navPrincipal(papel) : NAV_DESLOGADO;
+  const naRevisao = pathname.startsWith("/revisao");
+
   return (
     <div className="sm:hidden">
       <button
@@ -74,9 +69,9 @@ export function MenuMobile({
           />
           <div className="absolute right-0 top-0 flex h-full w-[min(20rem,86vw)] flex-col gap-1 overflow-y-auto border-l border-[var(--tm-border)] bg-[var(--tm-surface)] p-4 shadow-[var(--tm-shadow)]">
             <div className="mb-2 flex items-center justify-between">
-              {nome ? (
+              {logado ? (
                 <span className="flex items-center gap-2">
-                  <Avatar nome={nome} tamanho="sm" />
+                  <Avatar nome={nome!} tamanho="sm" />
                   <span className="text-[.9rem] font-semibold">{nome}</span>
                   {papel && <Chip tom={INFO_PAPEL[papel].tom}>{INFO_PAPEL[papel].rotulo}</Chip>}
                 </span>
@@ -95,21 +90,29 @@ export function MenuMobile({
               </button>
             </div>
 
-            {children && (
-              <nav className="flex flex-col gap-0.5 border-b border-[var(--tm-border)] pb-2 text-[.9rem] [&_a]:block [&_a]:rounded-[var(--tm-radius)] [&_a]:px-2 [&_a]:py-2 [&_a:hover]:bg-[var(--tm-surface-2)] [&_span]:block [&_span]:px-2 [&_span]:py-2 [&_span]:font-semibold">
-                {children}
+            <nav className="flex flex-col gap-0.5 border-b border-[var(--tm-border)] pb-2 text-[.9rem]">
+              {principal.map((i) => (
+                <Link key={i.href} href={i.href} className="rounded-[var(--tm-radius)] px-2 py-2 hover:bg-[var(--tm-surface-2)]">
+                  {i.rotulo}
+                </Link>
+              ))}
+            </nav>
+
+            {logado && naRevisao && (
+              <nav className="flex flex-col gap-0.5 border-b border-[var(--tm-border)] py-1 pl-2 text-[.85rem] text-[var(--tm-ink-muted)]">
+                {NAV_REVISAO.map((i) => (
+                  <Link key={i.href} href={i.href} className="rounded-[var(--tm-radius)] px-2 py-2 hover:bg-[var(--tm-surface-2)]">
+                    {i.rotulo}
+                  </Link>
+                ))}
               </nav>
             )}
 
-            {nome && (
+            {logado ? (
               <>
                 <nav className="flex flex-col gap-0.5 pt-1 text-[.9rem]">
-                  {itensUsuario(papel).map((i) => (
-                    <Link
-                      key={i.href}
-                      href={i.href}
-                      className="rounded-[var(--tm-radius)] px-2 py-2 hover:bg-[var(--tm-surface-2)]"
-                    >
+                  {ITENS_AVATAR.map((i) => (
+                    <Link key={i.href} href={i.href} className="rounded-[var(--tm-radius)] px-2 py-2 hover:bg-[var(--tm-surface-2)]">
                       {i.rotulo}
                     </Link>
                   ))}
@@ -123,8 +126,7 @@ export function MenuMobile({
                   {saindo ? "Saindo…" : "Sair"}
                 </button>
               </>
-            )}
-            {!nome && (
+            ) : (
               <Link
                 href="/entrar"
                 className="mt-2 rounded-[var(--tm-radius-pill)] bg-[var(--tm-accent)] px-3 py-2 text-center text-[.9rem] font-semibold text-[var(--tm-bg)]"
