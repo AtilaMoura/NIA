@@ -182,10 +182,37 @@ melhores no navegador (Claude-in-Chrome agora conecta).
   → `emaus-web/public/como-funciona/passo-{1..4}-*.png` (fundo recortado). A landing já
   troca o número pelo spot quando o arquivo existe.
 
-**Falta (rodada 3):**
-- **Usuário escolher o símbolo do logo** em `/dev/marca` → aplicar no `Logo.tsx`
-  (`LogoSimbolo` volta a poder usar `<img>` do escolhido, ou refaço o SVG à mão baseado
-  nele) + favicon (`app/icon.svg` ou `.png`) + og-image novos.
+**Rodada 3 (2026-09-06) — navegação unificada + logo repensado do zero:**
+- Usuário rejeitou os 5 símbolos v2 ("1 não gostei deles... não precisa ser a bíblia com
+  fogo... repensa no logo do zero"). E: navegação "muito confusa" — inconsistente por
+  página, logo apontava pra lugares diferentes, "Início" faltando, papel não filtrava.
+- **Navegação unificada** (commit `af9fca1`):
+  - `_lib/nav.ts` = fonte única: `navPrincipal(papel)`, `NAV_DESLOGADO`, `NAV_REVISAO`,
+    `ITENS_AVATAR`, `hrefMarca(logado)`, `itemAtivo(pathname, href)`.
+  - `_ui/NavPrincipal.tsx` (novo): nav primária idêntica em toda página (Início · Cursos ·
+    Meu progresso · Revisão-se-revisor), `aria-current` + destaque do ativo. Sub-nav de
+    revisão (Fila · Alunos) só dentro de `/revisao/*`.
+  - `CabecalhoApp`/`MenuMobile`/`MenuUsuario`/`Rodape` montam a nav a partir da lib (sem
+    prop `children`). Logo sempre → `/inicio` (logado) ou `/` (deslogado).
+  - 11 páginas: removida a nav ad-hoc passada por `children`.
+  - **Conferido no navegador** (`/inicio`, `/revisao`, `/perfil`, `/progresso`, `/`):
+    nav consistente, papel filtra, ativo destaca, rodapé espelha o topo. OK.
+- **Logo repensado do zero** — `scripts/marca_emaus_v3.json`: **16 conceitos** diversos,
+  com e sem o nome, estética moderna/refinada (não woodcut, não vetor corporativo):
+  1. Estrada ao horizonte · 2. Dois caminhantes · 3. O terceiro na estrada ·
+  4. Amanhecer/olhos abertos · 5. Pão partido · 6. Porta e luz · 7. Monograma E-estrada ·
+  8. Coração que arde · 9. Escritura que vira caminho · 10. Colina dourada ·
+  11. Logotipo serif editorial · 12. Logotipo sans humanista · 13. Selo circular (nome +
+  Lucas 24) · 14. Lockup horizontal · 15. Monograma EM/ícone de app · 16. Caligrafia em
+  uma linha. Saída → `imagem/marca/emaus/v3/`.
+  - `preparar_imagens_emaus.py simbolos [v3]` agora aceita a versão como argumento.
+  - `/dev/marca` agora varre todas as pastas `public/marca/v*` (v3 antes de v2) e mostra
+    cada mark em 6 tamanhos + mockup "Emaús".
+
+**Falta (rodada 4):**
+- **Usuário gerar os 16 conceitos v3** (`gerar_imagem_gemini.py scripts/marca_emaus_v3.json`
+  → `preparar_imagens_emaus.py simbolos v3`) e **escolher** em `/dev/marca` → aplicar no
+  `Logo.tsx` + favicon (`app/icon.svg`/`.png`) + og-image novos.
 - Conferir a landing com as imagens reais no navegador (carrossel + como-funciona) e
   ajustar enquadramento/moldura (o herói tem margem de pergaminho; no tema escuro pode
   precisar de um frame/inner-shadow).

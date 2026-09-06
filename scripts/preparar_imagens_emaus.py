@@ -8,8 +8,9 @@ Prepara as imagens geradas pelo Gemini pro front do Emaus.
   python scripts/preparar_imagens_emaus.py marca <arquivo>
       recorta o fundo claro -> transparente  ->  emaus-web/public/marca/emaus-simbolo.png
 
-  python scripts/preparar_imagens_emaus.py simbolos            (FASE 6)
-      imagem/marca/emaus/v2/*.png  -> recorta fundo -> emaus-web/public/marca/v2/{stem}.png
+  python scripts/preparar_imagens_emaus.py simbolos [v3]       (FASE 6)
+      imagem/marca/emaus/<versao>/*.png  -> recorta fundo -> emaus-web/public/marca/<versao>/{stem}.png
+      (versao padrão = v2; passe v3 para a rodada nova de logo)
       (as 5 variacoes, pra comparar no navegador antes de escolher)
 
   python scripts/preparar_imagens_emaus.py heroi               (FASE 6)
@@ -115,9 +116,11 @@ def preparar_heroi() -> None:
     print(f"{len(arquivos)} imagem(ns) de herói prontas")
 
 
-def preparar_simbolos() -> None:
-    src_dir = RAIZ / "imagem" / "marca" / "emaus" / "v2"
-    dst_dir = PUB / "marca" / "v2"
+def preparar_simbolos(versao: str = "v2") -> None:
+    # versao = pasta de origem/destino (v2, v3, ...) — permite gerar rodadas
+    # novas de logo sem sobrescrever as anteriores.
+    src_dir = RAIZ / "imagem" / "marca" / "emaus" / versao
+    dst_dir = PUB / "marca" / versao
     dst_dir.mkdir(parents=True, exist_ok=True)
     arquivos = _pngs(src_dir)
     if not arquivos:
@@ -128,7 +131,7 @@ def preparar_simbolos() -> None:
         dst = dst_dir / (src.stem + ".png")
         img.save(dst, "PNG", optimize=True)
         print(f"  {dst.relative_to(RAIZ)}  {img.size[0]}x{img.size[1]}")
-    print(f"{len(arquivos)} símbolo(s) recortados — compare em /marca/v2/")
+    print(f"{len(arquivos)} símbolo(s) recortados — compare em /marca/{versao}/")
 
 
 def preparar_como_funciona() -> None:
@@ -182,7 +185,7 @@ if __name__ == "__main__":
     elif modo == "heroi":
         preparar_heroi()
     elif modo == "simbolos":
-        preparar_simbolos()
+        preparar_simbolos(sys.argv[2] if len(sys.argv) > 2 else "v2")
     elif modo == "como-funciona":
         preparar_como_funciona()
     elif modo == "marca":
