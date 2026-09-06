@@ -206,11 +206,18 @@ export function getTopico(id: number) {
   return fetchJson<Topico>(`/topicos/${id}`);
 }
 
-export function topicoRenderUrl(id: number, opts: { userId: number; theme?: string }) {
+export function topicoRenderUrl(
+  id: number,
+  opts: { userId: number; theme?: string; contexto?: "revisao" },
+) {
   const params = new URLSearchParams({
     user_id: String(opts.userId),
     theme: opts.theme ?? THEME_TOPICO,
   });
+  // "revisao" faz o render nunca sair do modo Slide (some o toggle Corrido/Slide) —
+  // a fila de revisão depende de saber "qual slide está na tela" (postMessage
+  // emaus:slide) pra sincronizar os comentários por slide.
+  if (opts.contexto) params.set("contexto", opts.contexto);
   return `${API_URL_PUBLICA}/topicos/${id}/render?${params.toString()}`;
 }
 

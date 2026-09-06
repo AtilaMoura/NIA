@@ -22,6 +22,23 @@ _env = Environment(
 )
 
 
+def _para_romano(n: int) -> str:
+    """Numeral romano (1-39 cobre qualquer tópico realista). Usado pelo token de
+    tema `numeracaoEstilo: "romano"` — ex.: rótulo de seção "Cena I", "Cena II"."""
+    valores = [10, 9, 5, 4, 1]
+    simbolos = ["X", "IX", "V", "IV", "I"]
+    n = max(1, int(n))
+    out = []
+    for valor, simbolo in zip(valores, simbolos):
+        while n >= valor:
+            out.append(simbolo)
+            n -= valor
+    return "".join(out)
+
+
+_env.filters["romano"] = _para_romano
+
+
 def carregar_temas() -> dict:
     with open(SCHEMA_DIR / "temas.json", encoding="utf-8") as f:
         data = json.load(f)

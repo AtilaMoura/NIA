@@ -24,13 +24,13 @@
 {%- endmacro %}
 
 {% macro render_vocab(bloco) -%}
-  <div class="vocab-card">
+  <article class="vocab-entry">
     <div class="vocab-head">
       <span class="vocab-termo">{{ bloco.termo }}</span>
       <button type="button" class="vocab-listen" data-say="{{ bloco.termo }}" aria-label="Ouvir pronúncia" title="Ouvir pronúncia">🔊</button>
       {% if bloco.classe_gramatical %}<span class="vocab-classe">{{ bloco.classe_gramatical }}</span>{% endif %}
     </div>
-    <div class="vocab-traducao">{{ bloco.traducao }}</div>
+    <p class="vocab-traducao">{{ bloco.traducao }}</p>
     {% if bloco.exemplo_en %}
     <div class="vocab-exemplo">
       <span class="vocab-exemplo-en">{{ bloco.exemplo_en }}</span>
@@ -38,18 +38,17 @@
     </div>
     {% endif %}
     {% if bloco.cuidado %}
-    <div class="vocab-cuidado"><span aria-hidden>⚠️</span> {{ bloco.cuidado }}</div>
+    <p class="vocab-cuidado"><span aria-hidden>⚠</span> {{ bloco.cuidado }}</p>
     {% endif %}
-  </div>
+  </article>
 {%- endmacro %}
 
 {% macro render_fluxo(bloco) -%}
-  <div class="fluxo-wrap">
+  <ol class="fluxo-lista">
     {% for passo in bloco.passos %}
-    <div class="fluxo-passo{% if passo.decisao %} fluxo-decisao{% endif %}">{{ passo.texto }}</div>
-    {% if not loop.last %}<div class="fluxo-seta" aria-hidden>→</div>{% endif %}
+    <li{% if passo.decisao %} class="fluxo-decisao"{% endif %}>{{ passo.texto }}</li>
     {% endfor %}
-  </div>
+  </ol>
 {%- endmacro %}
 
 {% macro render_bloco(bloco) -%}
@@ -258,6 +257,15 @@
   }
   .fullscreen-btn:hover { background: var(--surface-2); }
   .fullscreen-btn:active { transform: scale(.92); }
+  .modo-btn { width: auto; padding: 0 10px; font-family: var(--font-label); font-size: 10px; letter-spacing: .03em; white-space: nowrap; }
+  .modo-btn[hidden] { display: none; }
+
+  body[data-modo="corrido"] .slide { display: block !important; position: static; height: auto; overflow: visible; padding-bottom: 36px; margin-bottom: 10px; border-bottom: 1px solid var(--border-soft); animation: none !important; }
+  body[data-modo="corrido"] .slide:last-child { border-bottom: none; }
+  body[data-modo="corrido"] .navbar,
+  body[data-modo="corrido"] .topbar-count,
+  body[data-modo="corrido"] .progress-track { display: none; }
+  body[data-modo="corrido"] .slides { height: auto; overflow: visible; padding-bottom: 0; }
   .progress-track { height: 2px; background: var(--border-soft); margin-top: 10px; overflow: hidden; }
   .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
   .section-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--text-dim); margin-top: 8px; font-weight: 600; }
@@ -272,10 +280,23 @@
   @media (prefers-reduced-motion: reduce) { .slide.active { animation: none; } }
   .slide-inner { max-width: 640px; margin: 0 auto; }
 
+  .conteudo-split { display: flex; flex-direction: column; gap: 22px; }
+  .conteudo-split .conteudo-figura { margin: 0; }
+  @media (min-width: 760px) {
+    .conteudo-split { flex-direction: row; align-items: flex-start; gap: 32px; }
+    .conteudo-split.flip { flex-direction: row-reverse; }
+    .conteudo-split .conteudo-texto { flex: 1.3; min-width: 0; }
+    .conteudo-split .conteudo-figura { flex: 1; min-width: 0; position: sticky; top: 88px; }
+  }
+
   h1.title { font-family: var(--font-display); font-size: 24px; color: var(--text); margin: 0 0 8px 0; font-weight: {{ tema.pesoTitulo }}; line-height: 1.28; letter-spacing: -.3px; }
   h2.sub { font-size: 14px; color: var(--text-muted); font-weight: 400; margin: 0 0 20px 0; line-height: 1.55; }
   h3.section-h { font-family: var(--font-display); font-size: 15px; color: var(--text); margin: 22px 0 11px 0; font-weight: 600; display: flex; align-items: center; gap: 9px; letter-spacing: .2px; }
   h3.section-h::before { content: ""; width: 3px; height: 15px; background: var(--accent); flex-shrink: 0; }
+  .section-head { display: flex; align-items: baseline; gap: 14px; margin: 22px 0 11px; flex-wrap: wrap; }
+  .section-head h3.section-h { margin: 0; }
+  .section-head.numerado h3.section-h::before { display: none; }
+  .section-numero { font-family: var(--font-label); font-size: 11.5px; letter-spacing: .06em; color: var(--accent); white-space: nowrap; }
   p { margin: 8px 0; font-size: 15px; line-height: 1.65; color: var(--text); }
   strong { color: var(--accent); font-weight: 600; }
   code { font-family: 'SF Mono', 'Courier New', monospace; background: var(--surface-2); padding: 2px 6px; border-radius: 3px; color: var(--accent); font-size: 13px; }
@@ -311,24 +332,28 @@
   .type-card-name { font-weight: 600; font-size: 13.5px; color: var(--text); margin-bottom: 4px; }
   .type-card-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
 
-  .vocab-card { background: var(--surface); border: 1px solid var(--border-soft); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 13px 14px; margin: 0 0 12px; }
-  .vocab-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
-  .vocab-termo { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--accent); }
+  .vocab-entry { padding: 20px 0; border-top: 1px solid var(--border-soft); }
+  .vocab-entry:first-child { border-top: none; padding-top: 0; }
+  .vocab-head { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .vocab-termo { font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 18px; color: var(--accent); }
   .vocab-listen { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border-soft); background: var(--surface-2); color: var(--accent); font-size: 11px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: border-color .15s ease, transform .12s ease; }
   .vocab-listen:hover { border-color: var(--accent); }
   .vocab-listen:active { transform: scale(.9); }
-  .vocab-classe { font-family: var(--font-label); font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); background: var(--surface-2); padding: 2px 7px; border-radius: 10px; }
-  .vocab-traducao { font-size: 13.5px; color: var(--text-muted); margin-bottom: 8px; }
-  .vocab-exemplo { background: var(--surface-2); border-radius: var(--radius); padding: 8px 10px; margin-bottom: 6px; font-size: 13px; line-height: 1.5; }
+  .vocab-classe { font-family: var(--font-label); font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); border: 1px solid var(--border-soft); padding: 2px 6px; border-radius: 3px; }
+  .vocab-traducao { font-size: 14px; color: var(--text-muted); margin: 5px 0 10px; }
+  .vocab-exemplo { padding-left: 14px; border-left: 2px solid var(--border); margin-bottom: 8px; font-size: 13.5px; line-height: 1.55; }
   .vocab-exemplo-en { display: block; color: var(--text); font-style: italic; }
-  .vocab-exemplo-pt { display: block; color: var(--text-dim); font-size: 12px; margin-top: 2px; }
-  .vocab-cuidado { font-size: 12px; color: var(--bad); line-height: 1.5; }
+  .vocab-exemplo-pt { display: block; color: var(--text-dim); font-size: 12px; margin-top: 3px; }
+  .vocab-cuidado { display: flex; gap: 7px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+  .vocab-cuidado span[aria-hidden] { flex: 0 0 auto; }
 
-  .fluxo-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0; }
-  .fluxo-passo { background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 10px 13px; font-size: 13px; line-height: 1.45; color: var(--text); flex: 1 1 160px; max-width: 220px; }
-  .fluxo-decisao { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
-  .fluxo-seta { color: var(--accent); font-size: 16px; flex: 0 0 auto; }
-  @media (max-width: 520px) { .fluxo-wrap { flex-direction: column; align-items: stretch; } .fluxo-passo { max-width: none; } .fluxo-seta { align-self: center; transform: rotate(90deg); } }
+  .fluxo-lista { list-style: none; margin: 16px 0; padding: 0; counter-reset: fluxopasso; }
+  .fluxo-lista li { counter-increment: fluxopasso; position: relative; padding: 0 0 20px 32px; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+  .fluxo-lista li::before { content: counter(fluxopasso); position: absolute; left: 0; top: 0; width: 21px; height: 21px; border-radius: 50%; border: 1px solid var(--border); font-family: var(--font-label); font-size: 10px; color: var(--accent); display: flex; align-items: center; justify-content: center; }
+  .fluxo-lista li::after { content: ""; position: absolute; left: 10px; top: 23px; bottom: 0; width: 1px; background: var(--border); }
+  .fluxo-lista li:last-child { padding-bottom: 0; }
+  .fluxo-lista li:last-child::after { display: none; }
+  .fluxo-lista li.fluxo-decisao::before { border-color: var(--accent); background: var(--accent-soft); }
 
   .timeline { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
   .tl-item { position: relative; padding: 4px 0 22px 32px; }
@@ -462,6 +487,7 @@
   <div class="topbar-row">
     <span class="topbar-title">📖 Tópico {{ content.numero }} · {{ content.titulo }}</span>
     <span class="topbar-right">
+      <button class="fullscreen-btn modo-btn" id="modoBtn" title="Alternar entre slide e corrido">☰ Corrido</button>
       <span class="topbar-count" id="slideCount">1/{{ content.slides|length }}</span>
       <button class="fullscreen-btn" id="fullscreenBtn" title="Tela cheia">⛶</button>
     </span>
@@ -471,6 +497,7 @@
 </div>
 
 <div class="slides" id="slides">
+{% set ns = namespace(secao_idx=0) %}
 {% for slide in content.slides %}
   <div class="slide{% if loop.first %} active{% endif %}" data-section="{{ slide.secao }}"{% if slide.gate_id %} data-gate="{{ slide.gate_id }}"{% endif %}>
     <div class="slide-inner">
@@ -499,8 +526,29 @@
         </div>
 
       {% elif slide.tipo == 'conteudo' %}
-        {% if slide.titulo_secao %}<h3 class="section-h">{{ slide.titulo_secao }}</h3>{% endif %}
-        {% for bloco in slide.blocos %}{{ render_bloco(bloco) }}{% endfor %}
+        {% set ns.secao_idx = ns.secao_idx + 1 %}
+        {% if slide.titulo_secao %}
+          {% if tema.numeracaoEstilo and tema.numeracaoEstilo != 'nenhum' %}
+          <div class="section-head numerado">
+            <span class="section-numero">{{ tema.rotuloSecao | default('Seção') }} {{ ns.secao_idx | romano if tema.numeracaoEstilo == 'romano' else ns.secao_idx }}</span>
+            <h3 class="section-h">{{ slide.titulo_secao }}</h3>
+          </div>
+          {% else %}
+          <h3 class="section-h">{{ slide.titulo_secao }}</h3>
+          {% endif %}
+        {% endif %}
+        {% set imagens = slide.blocos | selectattr('tipo', 'equalto', 'imagem_sugerida') | list %}
+        {% if imagens | length == 1 %}
+          {% set outros = slide.blocos | rejectattr('tipo', 'equalto', 'imagem_sugerida') | list %}
+          <div class="conteudo-split{% if ns.secao_idx is even %} flip{% endif %}">
+            <div class="conteudo-texto">
+              {% for bloco in outros %}{{ render_bloco(bloco) }}{% endfor %}
+            </div>
+            <div class="conteudo-figura">{{ render_bloco(imagens[0]) }}</div>
+          </div>
+        {% else %}
+          {% for bloco in slide.blocos %}{{ render_bloco(bloco) }}{% endfor %}
+        {% endif %}
 
       {% elif slide.tipo == 'checkpoint' %}
         <h3 class="section-h">{{ slide.titulo_secao }}</h3>
@@ -811,7 +859,7 @@ function speakCurrentSlide() {
 }
 document.getElementById('audioBtn').addEventListener('click', function () { if (speaking) { stopSpeech(); return; } speakCurrentSlide(); });
 
-function updateStatsLive() { if (current === slides.length - 1) buildSummary(); }
+function updateStatsLive() { if (current === slides.length - 1 || document.body.dataset.modo === 'corrido') buildSummary(); }
 
 function buildSummary() {
   let correctCount = 0, objectiveTotal = 0, flags = [], openCount = 0;
@@ -881,6 +929,41 @@ fullscreenBtn.addEventListener('click', function () {
 document.addEventListener('fullscreenchange', syncFullscreenUI);
 
 showSlide(0);
+
+// Modo Corrido / Slide — a fila de revisão do professor (/revisao/topico/[id])
+// abre este render com ?contexto=revisao na URL do iframe porque depende de
+// saber "qual slide está na tela" (postMessage emaus:slide, showSlide() acima)
+// pra sincronizar os comentários por slide — nesse contexto o toggle nem aparece,
+// fica sempre em modo Slide, do jeito que a revisão já espera.
+(function () {
+  var modoBtn = document.getElementById('modoBtn');
+  var isRevisao = new URLSearchParams(window.location.search).get('contexto') === 'revisao';
+
+  function aplicarModo(modo) {
+    document.body.dataset.modo = modo;
+    var corrido = modo === 'corrido';
+    document.documentElement.style.overflow = corrido ? 'auto' : '';
+    document.documentElement.style.height = corrido ? 'auto' : '';
+    document.body.style.overflow = corrido ? 'auto' : '';
+    document.body.style.height = corrido ? 'auto' : '';
+    modoBtn.textContent = corrido ? '▤ Slide' : '☰ Corrido';
+    try { localStorage.setItem('emausTopicoModo', modo); } catch (e) {}
+    if (corrido) { stopSpeech(); buildSummary(); }
+  }
+
+  if (isRevisao) {
+    modoBtn.hidden = true;
+    return;
+  }
+
+  modoBtn.addEventListener('click', function () {
+    aplicarModo(document.body.dataset.modo === 'corrido' ? 'slide' : 'corrido');
+  });
+
+  var modoSalvo = 'slide';
+  try { modoSalvo = localStorage.getItem('emausTopicoModo') || 'slide'; } catch (e) {}
+  if (modoSalvo === 'corrido') aplicarModo('corrido');
+})();
 </script>
 
 </body>

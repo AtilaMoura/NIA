@@ -1,5 +1,5 @@
 {
-  "_nota": "Cada tema define as MESMAS variáveis (mesmo slot --bg/--accent/etc.), pra que o esqueleto de HTML/CSS/JS do renderizador seja 100% compartilhado. 'extra_css' é CSS adicional só daquele tema (efeitos de assinatura: scanlines, aurora animada, glow) — nunca redefine layout/estrutura, só decoração e a fonte.",
+  "_nota": "Cada tema define as MESMAS variáveis (mesmo slot --bg/--accent/etc.), pra que o esqueleto de HTML/CSS/JS do renderizador seja 100% compartilhado. 'extra_css' é CSS adicional só daquele tema (efeitos de assinatura: scanlines, aurora animada, glow) — nunca redefine layout/estrutura, só decoração e a fonte. Dois tokens OPCIONAIS (2026-09-05): 'rotuloSecao' (palavra usada antes do número de cada seção de conteúdo, ex. 'Cena', 'Tópico' — default 'Seção') e 'numeracaoEstilo' ('romano'|'arabico'|'nenhum' — default 'nenhum', sem numeração, comportamento antigo). Nenhum tema precisa defini-los.",
   "temas": [
     {
       "id": "vidro-fume",
@@ -154,6 +154,8 @@
       "googleFonts": "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap",
       "pesoTitulo": "600",
       "letterSpacingLabel": "0.08em",
+      "rotuloSecao": "Cena",
+      "numeracaoEstilo": "romano",
       "extra_css": "h1.title{border-bottom:2px solid var(--border);padding-bottom:10px;} .box-summary{border-left-color:var(--violet);} .box-summary .box-label{color:var(--violet);}"
     },
     {

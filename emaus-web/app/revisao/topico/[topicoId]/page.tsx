@@ -82,7 +82,7 @@ export default async function RevisaoTopicoPage({
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <iframe
-          src={topicoRenderUrl(topico.id, { userId: ALUNO_USER_ID, theme: tema })}
+          src={topicoRenderUrl(topico.id, { userId: ALUNO_USER_ID, theme: tema, contexto: "revisao" })}
           title={topico.titulo}
           className="min-h-[45dvh] w-full flex-1 border-0"
           allow="fullscreen"
