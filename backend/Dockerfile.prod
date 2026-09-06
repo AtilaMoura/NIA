@@ -1,0 +1,34 @@
+# ---- Backend NIA (FastAPI) — imagem de produção ----
+# Roda em VM Arm (Oracle A1) ou x86 — python:3.11-slim tem as duas arquiteturas.
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+# curl: usado pelo healthcheck do compose. build-essential só se algum wheel
+# faltar pra arm (psycopg2-binary/bcrypt/cryptography já têm wheel aarch64).
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Código da aplicação + estáticos + script de seed (rodado via `compose exec`).
+COPY app ./app
+COPY static ./static
+COPY _seed_emaus_users.py ./
+
+# Usuário sem privilégio
+RUN useradd -m -u 10001 nia && chown -R nia:nia /app
+USER nia
+
+EXPOSE 8000
+
+# 2 workers combinam com os 2 OCPUs do A1 Always Free. As "migrations"
+# (create_all + _ensure_colunas_extras) rodam no import de app.main e são
+# idempotentes — cada worker roda, sem problema.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]

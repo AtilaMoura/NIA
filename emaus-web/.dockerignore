@@ -1,0 +1,24 @@
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+
+# Segredos
+.env
+.env.*
+!.env.prod.example
+
+# Git / editores / OS
+.git/
+.gitignore
+.vscode/
+.idea/
+*.log
+.DS_Store
+Thumbs.db
+
+# Build artefato local
+next-env.d.ts
+tsconfig.tsbuildinfo

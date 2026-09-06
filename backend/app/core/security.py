@@ -1,8 +1,12 @@
+import os
 from datetime import datetime, timedelta
 from jose import jwt
 from passlib.context import CryptContext
 
-SECRET_KEY = "sua_chave_super_secreta_aqui"
+# Em produção a SECRET_KEY vem do ambiente (.env / compose). O valor abaixo é só
+# fallback pra rodar local — NUNCA deve ser usado com o serviço exposto na internet
+# (quem tiver essa string consegue forjar token de qualquer usuário, inclusive master).
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-insecure-change-me")
 ALGORITHM = "HS256"
 # 30 dias — subido de 60min (2026-09-04) pro Emaús (front de formação bíblica) não exigir
 # relogin toda hora durante o desenvolvimento. Compartilhado com o frontend/ (pausado),

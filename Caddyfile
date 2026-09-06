@@ -1,0 +1,32 @@
+# ============================================================================
+# Caddy — proxy reverso do stack NIA + Emaús.
+#
+# Cada app fica num subdomínio próprio (ver .env: SITE_API / SITE_NIA / SITE_EMAUS).
+# Se o subdomínio apontar pro IP da VM, o Caddy emite certificado HTTPS do
+# Let's Encrypt sozinho (desafio HTTP na porta 80). Nada mais a configurar.
+#
+# Sem domínio ainda? Use DuckDNS (grátis) — passo a passo em DEPLOY.md.
+# ============================================================================
+
+{
+	email {$ACME_EMAIL}
+}
+
+# --- API (FastAPI) ---
+{$SITE_API} {
+	reverse_proxy backend:8000
+	encode zstd gzip
+}
+
+# --- Front do aluno "tech" (Next) ---
+# Comente este bloco se não subir o serviço `frontend`.
+{$SITE_NIA} {
+	reverse_proxy frontend:3000
+	encode zstd gzip
+}
+
+# --- Emaús (Next 16) ---
+{$SITE_EMAUS} {
+	reverse_proxy emaus:3000
+	encode zstd gzip
+}

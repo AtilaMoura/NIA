@@ -1,8 +1,12 @@
 # Environment Variables
 .env
+.env.*
 .env.local
 .env*.local
 *.env
+# ...mas os modelos versionados sim:
+!.env.prod.example
+!.env.example
 
 # Frontend (Next.js)
 frontend/node_modules/
@@ -11,6 +15,13 @@ frontend/out/
 frontend/dist/
 frontend/.turbo/
 frontend/build/
+
+# Emaús (Next.js)
+emaus-web/node_modules/
+emaus-web/.next/
+emaus-web/out/
+emaus-web/.turbo/
+emaus-web/tsconfig.tsbuildinfo
 
 # Backend (Python)
 backend/**/__pycache__/

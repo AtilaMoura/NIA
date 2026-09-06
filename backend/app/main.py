@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -50,13 +51,21 @@ def create_app():
         version="1.0.0",
     )
 
+    # Em produção, CORS_ORIGINS vem do ambiente (.env) — lista separada por vírgula
+    # com os domínios reais dos fronts. Sem a variável, cai nos hosts de dev.
+    _cors_origins = [
+        o.strip()
+        for o in os.getenv("CORS_ORIGINS", "").split(",")
+        if o.strip()
+    ] or [
+        "http://localhost:3000",
+        "http://localhost:4000",
+        "http://localhost:4200",  # dev server do emaus-web (front de formação bíblica)
+    ]
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            "http://localhost:3000",
-            "http://localhost:4000",
-            "http://localhost:4200",  # dev server do emaus-web (front de formação bíblica)
-        ],
+        allow_origins=_cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

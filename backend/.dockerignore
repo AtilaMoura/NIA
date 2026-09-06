@@ -1,0 +1,30 @@
+# Ambiente virtual e caches Python (a imagem instala tudo do requirements.txt)
+venv/
+.venv/
+env/
+ENV/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Segredos — NUNCA na imagem
+.env
+.env.*
+!.env.prod.example
+
+# Arquivos de scratch / testes manuais que não fazem parte do serviço
+_render_*.html
+_test_*.py
+requirements_old.txt
+*.wav
+
+# Git / editores
+.git/
+.gitignore
+.vscode/
+.idea/
