@@ -1,0 +1,37 @@
+[
+  {
+    "descricao": "Generate an image. Documentary-style editorial photography, warm golden-hour natural light, warm wheat and amber tones. A young adult stands at the threshold of an open modest doorway, warm light spilling in from outside, one hand resting on the door frame, looking forward into the light with a calm, ready expression - about to step forward into service, before any formal role or title has been given. Candid, unposed, shallow depth of field, no text or logos, no denominational symbols.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico3",
+    "arquivo": "topico3-vocacao-limiar-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Illustrated Bible storybook art, hand-painted colourful watercolour and gouache, warm and tender, loose expressive linework, simplified faces, no photorealism, no text or logos, no denominational symbols. A 1st-century Galilean fisherman kneels on a sandy shore at golden-hour, carefully mending a torn fishing net with his hands, needle and cord visible, small wooden boats resting nearby on the beach, calm sea and warm sky behind him - conveying the idea of repairing something back into working condition. Warm amber and turquoise palette, quiet focused mood.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico3",
+    "arquivo": "topico3-remendando-rede-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Documentary-style editorial photography, warm golden-hour natural light, warm wheat and amber tones. A diverse group of about eight people of different ages stand together in a loose circle outdoors, arms around each other's shoulders or holding hands, facing inward toward each other rather than toward any single leader - no pyramid, no single person at the center or on a platform. Candid, warm, joyful but calm mood, no text or logos, no denominational symbols.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico3",
+    "arquivo": "topico3-corpo-maduro-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Illustrated Bible storybook art, hand-painted colourful watercolour and gouache, warm and tender, loose expressive linework, simplified faces, no photorealism, no text or logos, no denominational symbols. Inside a modest 1st-century meeting room, a small circle of ordinary believers of different ages sits in discussion, several with hands raised as if proposing names, an older man listens attentively with an open scroll on his lap - conveying a community carefully and communally choosing who to entrust with a responsibility, before any commissioning happens. Warm lamplight, communal and deliberative mood.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico3",
+    "arquivo": "topico3-igreja-escolhe-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Documentary-style editorial photography, warm golden-hour natural light, warm wheat and amber tones. Close overhead shot of a well-worn open Bible resting on a wooden table beside a simple compass and a small stack of handwritten notes, a lit candle nearby giving warm light, no people visible - conveying quiet, humble study of open questions rather than a confident final answer. Calm, contemplative composition, generous negative space, no text or logos, no denominational symbols.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico3",
+    "arquivo": "topico3-pontos-abertos-ia.png"
+  }
+]

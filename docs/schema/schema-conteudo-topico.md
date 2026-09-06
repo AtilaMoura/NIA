@@ -23,6 +23,12 @@ Princípio-guia: cada slide é uma sequência de **blocos** reaproveitáveis (o 
 
 Todo slide tem `id`, `secao` (rótulo mostrado no topo) e `tipo`. Slides de `tipo: "checkpoint"` ou com perguntas na avaliação final carregam `gate_id` — o renderizador bloqueia o botão "Próximo" até todas as perguntas daquele grupo serem respondidas (mesma função `checkGate()` já usada).
 
+Qualquer slide pode ter opcionalmente um campo **`narracao`** (string, texto corrido em
+pt-BR, tom de professor explicando em voz alta — mais natural/conectivo que os bullets da
+tela, mas sem introduzir fato/citação/data que não esteja nos blocos daquele slide).
+Quando presente, o botão "🔊 ouvir este slide" lê `narracao` em vez do texto visível da
+tela; slide sem `narracao` mantém o comportamento padrão (lê o texto renderizado).
+
 ### `capa`
 Único, sempre o primeiro slide.
 ```

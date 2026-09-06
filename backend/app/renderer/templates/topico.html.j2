@@ -509,7 +509,7 @@
 {% set ns = namespace(secao_idx=0) %}
 {% for slide in content.slides %}
   <div class="slide{% if loop.first %} active{% endif %}" data-section="{{ slide.secao }}"{% if slide.gate_id %} data-gate="{{ slide.gate_id }}"{% endif %}>
-    <div class="slide-inner">
+    <div class="slide-inner"{% if slide.narracao %} data-narracao='{{ slide.narracao | tojson }}'{% endif %}>
 
       {% if slide.tipo == 'capa' %}
         <h1 class="title">{{ slide.titulo }}</h1>
@@ -886,7 +886,8 @@ function stopSpeech() {
 function speakCurrentSlide() {
   if (!('speechSynthesis' in window)) { alert('Seu navegador não suporta leitura em voz alta.'); return; }
   const slideEl = slides[current];
-  const text = slideEl.querySelector('.slide-inner').innerText;
+  const inner = slideEl.querySelector('.slide-inner');
+  const text = inner.dataset.narracao ? JSON.parse(inner.dataset.narracao) : inner.innerText;
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'pt-BR';
   utter.rate = speedLevels[speedIdx];

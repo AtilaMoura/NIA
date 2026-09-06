@@ -1,0 +1,37 @@
+[
+  {
+    "descricao": "Generate an image. Illustrated Bible storybook art, hand-painted colourful watercolour and gouache, warm and tender, loose expressive linework, simplified faces, no photorealism, no text or logos, no denominational symbols (no crucifix, no statues, no liturgical garments). Inside a modest 1st-century home at evening, a small mixed group of ordinary early Christians sits close together on the floor and on simple stools around an oil lamp - a fisherman, a slave woman, an elderly man, a young mother with a child - clearly humble, unremarkable people with no special status or title, listening intently to a letter being read aloud by one of them from a small scroll. Warm golden lamplight, intimate and communal composition.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "topico1-texto-central-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Illustrated Bible storybook art, hand-painted colourful watercolour and gouache, warm and tender, loose expressive linework, simplified faces, no photorealism, no text or logos, no denominational symbols. Wide desert scene at the base of Mount Sinai under a golden-orange sky, a great multitude of ancient Israelites - men, women, children, tents in the distance - standing together looking up toward the mountain, a sense of an entire nation being addressed at once, not a single leader singled out. Warm ochre and amber tones, vast and communal composition, generous negative space of sky.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "topico1-raizes-sinai-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Illustrated Bible storybook art, hand-painted colourful watercolour and gouache, warm and tender, loose expressive linework, simplified faces, no photorealism, no text or logos, no denominational symbols. A quiet symbolic still-life composition on a stone altar or ledge: a simple golden crown resting gently beside a folded priestly linen garment and a small vessel of oil, both softly lit by warm light coming from above, as if two separate offices are being brought together into one. No people in the frame, warm amber and cream palette, generous negative space.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "topico1-sacerdocio-real-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Documentary-style editorial photography, warm golden-hour natural light, warm wheat and amber tones. A single diverse adult sits alone at a plain table at home with eyes closed and hands open in quiet prayer, a small Bible open in front of them, soft warm light coming through a nearby window as if falling directly on them - conveying direct, unmediated access, no other person present in the frame. Candid, unposed, shallow depth of field. No text or logos, no denominational symbols.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "topico1-mediador-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Illustrated Bible storybook art, hand-painted colourful watercolour and gouache, warm and tender, loose expressive linework, simplified faces, no photorealism, no text or logos, no denominational symbols. A 16th-century scene: a man in simple monk-like robes sits at a wooden desk by candlelight, quill in hand, an open handwritten manuscript and a printing press visible in the background of the room, warm amber candlelight contrasted with a cool blue window at night - conveying a historical turning point of recovering an old truth. Warm, intimate, slightly dramatic lighting.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico1",
+    "arquivo": "topico1-reforma-ia.png"
+  }
+]

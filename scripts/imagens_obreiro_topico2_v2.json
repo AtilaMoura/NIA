@@ -1,0 +1,37 @@
+[
+  {
+    "descricao": "Generate an image. Documentary-style editorial photography, warm golden-hour natural light, warm wheat and amber tones. Overhead close-up of many different diverse hands arranged together in a loose circle, each pair doing something different at the same moment - one writing in a notebook, one kneading bread dough, one holding a hammer near wood, one comforting another hand, one holding a small child's hand - conveying many different functions working together as one body. No faces needed, focus entirely on hands. Candid, warm, no text or logos, no denominational symbols.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico2",
+    "arquivo": "topico2-analogia-corpo-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Illustrated Bible storybook art, hand-painted colourful watercolour and gouache, warm and tender, loose expressive linework, simplified faces, no photorealism, no text or logos, no denominational symbols. A 1st-century scribe sits at a small wooden table inside a modest room, carefully writing on a long unrolled scroll by the warm light of an oil lamp, ink pot and reed pen visible, a rolled finished section of the letter beside him - conveying the careful, deliberate composing of an apostolic letter meant to travel far. Warm amber lamplight, quiet and focused mood.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico2",
+    "arquivo": "topico2-carta-romanos-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Documentary-style editorial photography, warm golden-hour natural light, warm wheat and amber tones. Inside a simple modest church fellowship hall, several small distinct moments happening at once in one wide shot: in one corner an older adult teaches two younger people from an open Bible, nearby someone hands a bag of groceries to a person in need, elsewhere someone speaks encouragingly with a hand on another's shoulder, and in the background someone quietly organizes chairs with visible care and diligence - conveying different spiritual gifts being exercised simultaneously with different attitudes. Candid, unposed, diverse ages and ethnicities, no text or logos, no denominational symbols.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico2",
+    "arquivo": "topico2-dons-em-acao-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Documentary-style editorial photography, warm golden-hour natural light, warm wheat and amber tones. A young adult, dressed in simple everyday clothing, stands in a modest room holding a small worn leather toolbox that is open, revealing inside it not physical tools but symbolic everyday items - a well-used Bible, a notebook and pen, a folded prayer list - as if these were the tools for their calling. Thoughtful, quiet expression looking down at the box. Candid, warm, shallow depth of field, no text or logos, no denominational symbols.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico2",
+    "arquivo": "topico2-ferramentas-chamado-ia.png"
+  },
+  {
+    "descricao": "Generate an image. Documentary-style editorial photography, warm golden-hour natural light, warm wheat and amber tones. A single diverse adult sits alone near a window early in the morning with an open Bible and a plain notebook, pen resting on a half-written page, a cup of coffee nearby, soft warm morning light streaming in - conveying a quiet, ongoing personal process of prayer, study and reflection rather than a single dramatic moment. Candid, unposed, shallow depth of field, no text or logos, no denominational symbols.",
+    "modulo": "modulo1",
+    "aula": "aula1",
+    "topico": "topico2",
+    "arquivo": "topico2-identificando-dons-ia.png"
+  }
+]
