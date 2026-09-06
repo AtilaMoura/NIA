@@ -33,7 +33,10 @@
     <p class="vocab-traducao">{{ bloco.traducao }}</p>
     {% if bloco.exemplo_en %}
     <div class="vocab-exemplo">
-      <span class="vocab-exemplo-en">{{ bloco.exemplo_en }}</span>
+      <span class="vocab-exemplo-en">
+        {{ bloco.exemplo_en }}
+        <button type="button" class="vocab-listen vocab-listen-exemplo" data-say="{{ bloco.exemplo_en }}" aria-label="Ouvir exemplo" title="Ouvir exemplo">🔊</button>
+      </span>
       {% if bloco.exemplo_pt %}<span class="vocab-exemplo-pt">{{ bloco.exemplo_pt }}</span>{% endif %}
     </div>
     {% endif %}
@@ -344,6 +347,9 @@
   .vocab-exemplo { padding-left: 14px; border-left: 2px solid var(--border); margin-bottom: 8px; font-size: 13.5px; line-height: 1.55; }
   .vocab-exemplo-en { display: block; color: var(--text); font-style: italic; }
   .vocab-exemplo-pt { display: block; color: var(--text-dim); font-size: 12px; margin-top: 3px; }
+  .vocab-listen-exemplo { width: 17px; height: 17px; font-size: 9px; vertical-align: middle; margin-left: 6px; }
+  .vocab-listen-secao { font-family: var(--font-label); font-size: 10.5px; letter-spacing: .04em; color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: 999px; padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin: 0 0 14px; transition: border-color .15s ease, color .15s ease; }
+  .vocab-listen-secao:hover { border-color: var(--accent); color: var(--accent); }
   .vocab-cuidado { display: flex; gap: 7px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
   .vocab-cuidado span[aria-hidden] { flex: 0 0 auto; }
 
@@ -488,6 +494,9 @@
     <span class="topbar-title">📖 Tópico {{ content.numero }} · {{ content.titulo }}</span>
     <span class="topbar-right">
       <button class="fullscreen-btn modo-btn" id="modoBtn" title="Alternar entre slide e corrido">☰ Corrido</button>
+      {% if cores_dark_json %}
+      <button class="fullscreen-btn modo-btn" id="temaBtn" title="Alternar entre claro e escuro">🌙 Escuro</button>
+      {% endif %}
       <span class="topbar-count" id="slideCount">1/{{ content.slides|length }}</span>
       <button class="fullscreen-btn" id="fullscreenBtn" title="Tela cheia">⛶</button>
     </span>
@@ -536,6 +545,10 @@
           {% else %}
           <h3 class="section-h">{{ slide.titulo_secao }}</h3>
           {% endif %}
+        {% endif %}
+        {% set vocabs_secao = slide.blocos | selectattr('tipo', 'equalto', 'vocab') | list %}
+        {% if vocabs_secao | length > 0 %}
+        <button type="button" class="vocab-listen-secao">🔊 Ouvir vocabulário desta seção</button>
         {% endif %}
         {% set imagens = slide.blocos | selectattr('tipo', 'equalto', 'imagem_sugerida') | list %}
         {% if imagens | length == 1 %}
@@ -734,12 +747,37 @@ document.querySelectorAll('.lacuna-wrap').forEach(function (wrap) {
 });
 
 document.querySelectorAll('.vocab-listen').forEach(function (btn) {
-  btn.addEventListener('click', function () {
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(btn.dataset.say);
     utter.lang = 'en-US';
     window.speechSynthesis.speak(utter);
+  });
+});
+
+document.querySelectorAll('.vocab-listen-secao').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    var slideEl = btn.closest('.slide');
+    var fila = [];
+    slideEl.querySelectorAll('.vocab-entry').forEach(function (entry) {
+      var termoBtn = entry.querySelector('.vocab-listen');
+      var exemploBtn = entry.querySelector('.vocab-listen-exemplo');
+      if (termoBtn) fila.push(termoBtn.dataset.say);
+      if (exemploBtn) fila.push(exemploBtn.dataset.say);
+    });
+    var i = 0;
+    function proxima() {
+      if (i >= fila.length) return;
+      var utter = new SpeechSynthesisUtterance(fila[i]);
+      utter.lang = 'en-US';
+      utter.onend = function () { i++; proxima(); };
+      window.speechSynthesis.speak(utter);
+    }
+    proxima();
   });
 });
 
@@ -964,6 +1002,45 @@ showSlide(0);
   try { modoSalvo = localStorage.getItem('emausTopicoModo') || 'slide'; } catch (e) {}
   if (modoSalvo === 'corrido') aplicarModo('corrido');
 })();
+
+{% if cores_dark_json %}
+// Toggle Escuro/Claro — só existe pra temas que definem 'coresDark' em temas.json.
+// Troca as CSS custom properties direto no client (sem re-render), preferência em
+// localStorage, mesmo padrão do toggle Corrido/Slide acima.
+(function () {
+  var temaBtn = document.getElementById('temaBtn');
+  if (!temaBtn) return;
+  var isRevisao = new URLSearchParams(window.location.search).get('contexto') === 'revisao';
+  if (isRevisao) { temaBtn.hidden = true; return; }
+
+  var coresClaras = {{ tema.cores | tojson }};
+  var coresEscuras = {{ cores_dark_json | safe }};
+  var mapaVar = {
+    bg: '--bg', surface: '--surface', surface2: '--surface-2', border: '--border',
+    borderSoft: '--border-soft', text: '--text', textMuted: '--text-muted',
+    textDim: '--text-dim', accent: '--accent', accentSoft: '--accent-soft',
+    accentTextOn: '--accent-text-on', bad: '--bad', badSoft: '--bad-soft',
+    blue: '--blue', amber: '--amber', violet: '--violet'
+  };
+
+  function aplicarTema(escuro) {
+    var cores = escuro ? coresEscuras : coresClaras;
+    Object.keys(mapaVar).forEach(function (chave) {
+      if (cores[chave]) document.documentElement.style.setProperty(mapaVar[chave], cores[chave]);
+    });
+    temaBtn.textContent = escuro ? '☀ Claro' : '🌙 Escuro';
+    try { localStorage.setItem('emausTopicoTema', escuro ? 'escuro' : 'claro'); } catch (e) {}
+  }
+
+  temaBtn.addEventListener('click', function () {
+    aplicarTema(temaBtn.textContent.indexOf('Escuro') !== -1);
+  });
+
+  var temaSalvo = 'claro';
+  try { temaSalvo = localStorage.getItem('emausTopicoTema') || 'claro'; } catch (e) {}
+  if (temaSalvo === 'escuro') aplicarTema(true);
+})();
+{% endif %}
 </script>
 
 </body>

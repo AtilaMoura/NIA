@@ -1,5 +1,5 @@
 {
-  "_nota": "Cada tema define as MESMAS variáveis (mesmo slot --bg/--accent/etc.), pra que o esqueleto de HTML/CSS/JS do renderizador seja 100% compartilhado. 'extra_css' é CSS adicional só daquele tema (efeitos de assinatura: scanlines, aurora animada, glow) — nunca redefine layout/estrutura, só decoração e a fonte. Dois tokens OPCIONAIS (2026-09-05): 'rotuloSecao' (palavra usada antes do número de cada seção de conteúdo, ex. 'Cena', 'Tópico' — default 'Seção') e 'numeracaoEstilo' ('romano'|'arabico'|'nenhum' — default 'nenhum', sem numeração, comportamento antigo). Nenhum tema precisa defini-los.",
+  "_nota": "Cada tema define as MESMAS variáveis (mesmo slot --bg/--accent/etc.), pra que o esqueleto de HTML/CSS/JS do renderizador seja 100% compartilhado. 'extra_css' é CSS adicional só daquele tema (efeitos de assinatura: scanlines, aurora animada, glow) — nunca redefine layout/estrutura, só decoração e a fonte. Dois tokens OPCIONAIS (2026-09-05): 'rotuloSecao' (palavra usada antes do número de cada seção de conteúdo, ex. 'Cena', 'Tópico' — default 'Seção') e 'numeracaoEstilo' ('romano'|'arabico'|'nenhum' — default 'nenhum', sem numeração, comportamento antigo). Nenhum tema precisa defini-los. Terceiro token OPCIONAL (2026-09-06): 'coresDark' — mesmo formato de 'cores' (as 16 chaves), variante escura da MESMA identidade visual do tema; quando presente, o renderizador mostra um botão 'Escuro/Claro' no topbar que troca as variáveis CSS ao vivo (sem re-render), preferência salva em localStorage. Tema sem 'coresDark' não ganha o botão — comportamento antigo preservado.",
   "temas": [
     {
       "id": "vidro-fume",
@@ -113,6 +113,24 @@
         "amber": "#b8763a",
         "violet": "#5a4a72",
         "accentTextOn": "#fbf3e0"
+      },
+      "coresDark": {
+        "bg": "#201a12",
+        "surface": "#2a2219",
+        "surface2": "#332a1e",
+        "border": "#4a3d2a",
+        "borderSoft": "#3a2f21",
+        "text": "#f2e9d8",
+        "textMuted": "#c2b299",
+        "textDim": "#8f7e64",
+        "accent": "#d3924a",
+        "accentSoft": "rgba(211,146,74,.18)",
+        "bad": "#e0736b",
+        "badSoft": "rgba(224,115,107,.16)",
+        "blue": "#7fa8c4",
+        "amber": "#d9a15a",
+        "violet": "#a897c2",
+        "accentTextOn": "#201a12"
       },
       "radius": "14px",
       "radiusLg": "20px",

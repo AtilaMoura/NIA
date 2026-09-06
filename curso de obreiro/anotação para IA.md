@@ -361,6 +361,7 @@ Arquivos entregues ao usuário: `topico2-comparacao-groq-vs-gemini.html` (lado a
 Montado o conteúdo final: **prosa do Gemini** (mais rica, com continuidade pro Tópico 1) como base, corrigindo os 2 bugs reais achados na comparação (ícones em inglês → emoji; avaliação final sem variedade de tipo), com **3 checkpoints bem distribuídos** (mc/tf/open) igual à disciplina que o Groq mostrou, e **2 imagens reais** (Pexels, mesma licença livre já usada no Tópico 1) — capa (mãos dadas) + 1 inline na seção de unidade do corpo (voluntários trabalhando em equipe).
 
 **3 bugs reais de código encontrados e corrigidos nesse processo** (não só desse tópico — vão se repetir em qualquer tópico rico futuro se não corrigisse):
+
 1. **`QuizAgent` não cortava nada antes de mandar pro modelo** (diferente do `ReviewerAgent`, que já cortava `svg_raw`) — um tópico rico (44 blocos) mandava **14628 tokens numa chamada só** contra o teto de 8000 do Groq. Corrigido: `_resumir_blocos_para_quiz()` novo em `quiz_agent.py`, corta cada campo de texto em 100 chars antes de montar o resumo pro prompt (o conteúdo salvo de verdade continua completo — só o resumo mandado pra IA escrever pergunta é que é cortado).
 2. **`max_tokens` default (6000) não deixava quase espaço pro prompt** dentro do teto de 8000/min do Groq. Corrigido: `BaseAgent.run_json_com_retry()` ganhou parâmetro `max_tokens` opcional, repassado pro service — `QuizAgent` agora pede só 2800 (a resposta esperada é um punhado de perguntas, não um tópico inteiro).
 3. **`montar_topico()` não repassava `imagem_capa`** — só funcionava antes porque o Tópico 1 foi montado à mão, nunca passou pela função de verdade. Corrigido: adicionado ao dict de retorno quando presente.
@@ -380,15 +381,17 @@ Montado o conteúdo final: **prosa do Gemini** (mais rica, com continuidade pro 
 ## O que ficou pronto
 
 **Conteúdo:**
+
 - Tópico 1 (Sacerdócio de Todos os Crentes) — completo, enriquecido (nada resumido em relação ao artigo original), 21 slides, salvo e aprovado.
-- Tópico 2 (Dons Espirituais, Rm 12:6-8) — completo, "melhor dos dois" (prosa do Gemini + disciplina do Groq), 2 bugs corrigidos, 2 imagens reais, 17 slides, salvo e aprovado *estruturalmente* (falta auditoria de conteúdo e revisão humana de verdade — ver pendências).
+- Tópico 2 (Dons Espirituais, Rm 12:6-8) — completo, "melhor dos dois" (prosa do Gemini + disciplina do Groq), 2 bugs corrigidos, 2 imagens reais, 17 slides, salvo e aprovado _estruturalmente_ (falta auditoria de conteúdo e revisão humana de verdade — ver pendências).
 - Tópicos 3-5 da Aula 1 (Vocação e Ofícios, Função no Corpo de Cristo, Integração) — só o título/referência criados na tabela `Topico`, **sem conteúdo ainda**.
 
 **Identidade visual**: tema `trigo-maduro` criado em `docs/schema/temas.json` — âmbar/pergaminho, específico pro curso de obreiro, aplicado nos 2 tópicos prontos.
 
-**Schema/banco novo**: tabela `Topico` (Módulo → Aula → Tópicos, de verdade agora) + router `backend/app/routers/topicos.py` (CRUD + render + geração). `Lesson` passou a representar a *aula*; nada do que já funcionava quebrou.
+**Schema/banco novo**: tabela `Topico` (Módulo → Aula → Tópicos, de verdade agora) + router `backend/app/routers/topicos.py` (CRUD + render + geração). `Lesson` passou a representar a _aula_; nada do que já funcionava quebrou.
 
 **Infra de IA corrigida:**
+
 - `GeminiService` migrado pro SDK novo (`google-genai`) — o antigo estava descontinuado e travava ~60s sempre, mesmo em prompt pequeno.
 - `QuizAgent` agora corta o conteúdo antes de mandar pra IA (achado real: tópico rico estourava o teto de tokens/min do Groq).
 - `BaseAgent.run_json_com_retry` ganhou `max_tokens` configurável por chamada.
@@ -412,6 +415,7 @@ Montado o conteúdo final: **prosa do Gemini** (mais rica, com continuidade pro 
 ## Auditoria de conteúdo do Tópico 2 (2026-08-30, retomando após a pausa)
 
 Feita a auditoria que tinha ficado pendente — sem IA, tudo lido e escrito à mão. O que faltava e foi corrigido:
+
 - **2 referências que só eram citadas de passagem viraram citação real**: 1 Coríntios 12:4-6 (a passagem irmã de Romanos 12, "mesmo Espírito, diversidade de dons" — o próprio texto da legenda da imagem já citava essa referência, mas o versículo nunca tinha sido escrito) e 1 Pedro 4:10 (referenciada só dentro da descrição do diagrama, nunca citada).
 - **Nota de neutralidade doutrinária adicionada** de volta (tinha ficado só na versão do Groq, se perdeu quando montei o híbrido com a prosa do Gemini): 1Co 12 e Ef 4 citam outros dons (cura, línguas, apostolado) que Romanos 12 não cobre, e tradições cristãs divergem sobre esses — o curso não toma posição.
 - **2 slides que faltavam em relação ao padrão do Tópico 1**: "Reflexão" (3 perguntas abertas, sem gate, conectando com o Tópico 1) e "Resumo do Tópico 2" (7 bullets consolidados) — inseridos antes da avaliação final, mesma ordem do Tópico 1.
@@ -423,6 +427,7 @@ Resultado: 44 → 49 blocos, 6 → 8 slides de conteúdo. Testado (gates, imagen
 ## Nota pra detalhar depois — fluxo de imagem com 2 opções (2026-08-30)
 
 Usuário pediu pra anotar, sem implementar ainda: quando a busca/geração de imagem for automatizada (backlog já registrado, ver análise estratégica), o fluxo deve fazer **as duas coisas ao mesmo tempo**, não escolher uma:
+
 1. **Buscar uma imagem real na internet** (Pexels, como já fazemos manualmente) — pronta pra usar direto.
 2. **Gerar uma descrição detalhada da imagem** (prompt de imagem) — pra caso o usuário prefira criar a imagem ele mesmo (gerador de IA de imagem, designer, etc.) e mandar de volta pra substituir a da internet.
 
@@ -444,8 +449,8 @@ Versão em inglês (pra colar direto em gerador de imagem):
 
 **Prompts específicos pro Tópico 2** (pra substituir as fotos de banco atuais, se quiser algo mais no padrão do curso):
 
-- **Capa** (hoje: mãos dadas, foto de banco): *[+ base de estilo] Close-up de várias mãos diferentes (idades e tons de pele diferentes) se estendendo em direção ao centro, palmas abertas, como recebendo ou oferecendo algo — simbolizando dons espirituais dados de graça. Contraluz suave e quente. Sem rostos visíveis, foco inteiro nas mãos.*
-- **Inline, seção "Unidade do Corpo"** (hoje: voluntários em mutirão, foto de banco): *[+ base de estilo] Pequeno grupo de voluntários de igreja, idades diferentes, trabalhando juntos numa tarefa prática (organizando cadeiras, empacotando doações, montando estrutura pra um evento) num salão simples de igreja — cada pessoa fazendo algo visivelmente diferente, transmitindo que dons diferentes servem um propósito só.*
+- **Capa** (hoje: mãos dadas, foto de banco): _[+ base de estilo] Close-up de várias mãos diferentes (idades e tons de pele diferentes) se estendendo em direção ao centro, palmas abertas, como recebendo ou oferecendo algo — simbolizando dons espirituais dados de graça. Contraluz suave e quente. Sem rostos visíveis, foco inteiro nas mãos._
+- **Inline, seção "Unidade do Corpo"** (hoje: voluntários em mutirão, foto de banco): _[+ base de estilo] Pequeno grupo de voluntários de igreja, idades diferentes, trabalhando juntos numa tarefa prática (organizando cadeiras, empacotando doações, montando estrutura pra um evento) num salão simples de igreja — cada pessoa fazendo algo visivelmente diferente, transmitindo que dons diferentes servem um propósito só._
 
 Isso fica documentado pra reaproveitar nos próximos tópicos — sempre a mesma base de estilo + um prompt específico por imagem, mantendo o padrão visual do curso inteiro.
 
@@ -492,17 +497,17 @@ achei 3 divergências no que eu (Claude) tinha escrito de memória no Tópico 2 
 anterior — corrigidas no HTML. Lição: SEMPRE conferir contra `biblia_service`/bible-api,
 mesmo texto "curto e conhecido" que pareça óbvio de cor.
 
-| Critério | Groq | Gemini |
-|---|---|---|
-| Riqueza/profundidade | Boa, mas **assunto 1 e 2 se repetem** (mesma distinção dom/ofício, mesmo texto Ef 4:7-12, duas analogias diferentes — coração/cérebro, depois orquestra) | Muito rica, sem repetição interna, prosa mais desenvolvida |
-| Continuidade c/ Tópicos 1-2 | Fraca — não amarra explicitamente com sacerdócio/dons | Forte — cita "Sacerdócio de Todos os Crentes" e "dons distribuídos como quer o Espírito (1Co 12:11)" várias vezes, natural |
-| Neutralidade doutrinária (3 pontos pedidos: ancião=bispo, apóstolo/profeta hoje, mulheres em ofícios) | Cobre os 3, mas de forma mais resumida; só cita Febe como exemplo | Cobre os 3 com muito mais equilíbrio — cita as duas leituras de cada debate, com mais exemplos bíblicos (Febe, Priscila, filhas de Filipe) |
-| Diagrama (regra: ≥1, com decisão real) | ✅ 1 (fluxo de escolha de ofício, At 6) | ✅ 1 (ciclo Ef 4, com decisão "atingiu a unidade da fé? sim/não") |
-| Fidelidade bíblica | ✅ Toda citação bate com o texto buscado | ✅ Toda citação bate com o texto buscado |
-| Variedade de tipo — checkpoints (3) | ✅ mc, tf, classify | ✅ mc, classify, open |
-| Variedade de tipo — avaliação final (5) | Boa: mc, tf, mc, open, classify — mas **ef1 e ef2 testam Tópico 1/2, não o Tópico 3** (deveria ser só a última a integrar) | ❌ **bug real**: os 5 itens são todos `"tipo":"mc"` — ignorou a regra de variar tipo |
-| Coerência roteiro × slides | Pequeno bug: roteiro lista 7 itens, só 6 viram assunto (1 item fantasma "Introdução ao tema") | ✅ 5 itens do roteiro = 5 assuntos, bate certinho |
-| Ícones/bugs técnicos | Nenhum encontrado | Nenhum encontrado (emoji reais nos `cards`) |
+| Critério                                                                                              | Groq                                                                                                                                                     | Gemini                                                                                                                                     |
+| ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Riqueza/profundidade                                                                                  | Boa, mas **assunto 1 e 2 se repetem** (mesma distinção dom/ofício, mesmo texto Ef 4:7-12, duas analogias diferentes — coração/cérebro, depois orquestra) | Muito rica, sem repetição interna, prosa mais desenvolvida                                                                                 |
+| Continuidade c/ Tópicos 1-2                                                                           | Fraca — não amarra explicitamente com sacerdócio/dons                                                                                                    | Forte — cita "Sacerdócio de Todos os Crentes" e "dons distribuídos como quer o Espírito (1Co 12:11)" várias vezes, natural                 |
+| Neutralidade doutrinária (3 pontos pedidos: ancião=bispo, apóstolo/profeta hoje, mulheres em ofícios) | Cobre os 3, mas de forma mais resumida; só cita Febe como exemplo                                                                                        | Cobre os 3 com muito mais equilíbrio — cita as duas leituras de cada debate, com mais exemplos bíblicos (Febe, Priscila, filhas de Filipe) |
+| Diagrama (regra: ≥1, com decisão real)                                                                | ✅ 1 (fluxo de escolha de ofício, At 6)                                                                                                                  | ✅ 1 (ciclo Ef 4, com decisão "atingiu a unidade da fé? sim/não")                                                                          |
+| Fidelidade bíblica                                                                                    | ✅ Toda citação bate com o texto buscado                                                                                                                 | ✅ Toda citação bate com o texto buscado                                                                                                   |
+| Variedade de tipo — checkpoints (3)                                                                   | ✅ mc, tf, classify                                                                                                                                      | ✅ mc, classify, open                                                                                                                      |
+| Variedade de tipo — avaliação final (5)                                                               | Boa: mc, tf, mc, open, classify — mas **ef1 e ef2 testam Tópico 1/2, não o Tópico 3** (deveria ser só a última a integrar)                               | ❌ **bug real**: os 5 itens são todos `"tipo":"mc"` — ignorou a regra de variar tipo                                                       |
+| Coerência roteiro × slides                                                                            | Pequeno bug: roteiro lista 7 itens, só 6 viram assunto (1 item fantasma "Introdução ao tema")                                                            | ✅ 5 itens do roteiro = 5 assuntos, bate certinho                                                                                          |
+| Ícones/bugs técnicos                                                                                  | Nenhum encontrado                                                                                                                                        | Nenhum encontrado (emoji reais nos `cards`)                                                                                                |
 
 **Decisão**: base = **Gemini** (mais rico, melhor costura com Tópicos 1-2, neutralidade
 doutrinária mais forte — exatamente os 3 pontos pedidos no foco). Ao montar o híbrido
@@ -520,6 +525,7 @@ mesmo sistema visual dos Tópicos 1 e 2, com `.takeaway` no fim de cada seção 
 desenhado à mão do ciclo de Ef 4).
 
 Pesquisa profunda além do que a IA gerou:
+
 - Textos extras buscados via `biblia_service` e citados: Ef 4:1-6 ("vocação"/klésis está no
   próprio texto), 1Co 12:29-30, At 14:23, At 13:1-3, 1Tm 4:14 (junta dom+imposição de
   mãos+ofício), 1Pe 5:1-4 (coração do ofício pastoral, "não como dominadores"), Hb 13:7,17
@@ -573,7 +579,44 @@ cota 0 pra imagem) — só o script de navegador.
 ficam como estão por enquanto; regerar no estilo novo é opcional, decidir tópico a tópico.
 Prompts do Tópico 3 em diante devem já nascer no estilo colorido.
 
+**REVISÃO da diretriz (2026-09-06) — "aquarela" deixa de ser obrigatória:** o Atila
+relaxou a regra acima. Não precisa ser aquarela especificamente — pode ser **fotográfica
+ou ilustrada, o que fizer mais sentido pra cena**, tanto pra época bíblica (Jesus/1º
+século) quanto pra cenas de tempo atual. Regra que continua de pé e é a mais importante:
+**sempre bastante imagem, nunca cortar conteúdo por causa de imagem** — é por isso que o
+processo separa "tópico completo rico" (Passo 1-3) de "gerar/inserir imagem" (etapa
+posterior), pra imagem nunca virar motivo de encolher texto. Vale pros próximos tópicos
+(T4, T5 em diante); T1-T3 não são regeradas por causa disso — só tiveram 2 URLs
+desatualizadas no banco corrigidas nesta sessão (ver nota abaixo).
+
+**Correção técnica feita (2026-09-06), não é sobre estilo de imagem, é sobre sincronia
+banco↔HTML:** o `Topico.content` no banco (o que o renderizador de verdade usa,
+`GET /topicos/{id}/render`) estava desatualizado em relação aos HTMLs de leitura finais
+entregues nas sessões anteriores — T1 ainda apontava pra capa antiga
+(`topico1-luz-maravilhosa.jpg`) em vez da capa final
+(`topico1-sacerdocio-todos-crentes-ia.png`), e T2 ainda tinha a imagem inline antiga
+(`topico2-voluntarios-equipe-ia.png`) em vez da final (`topico2-dons-corpo-servindo-ia.png`).
+Corrigido via `PUT /topicos/1` e `PUT /topicos/2` (só as 2 URLs, resto do conteúdo
+intacto). T3 já estava sincronizado (usa a versão fotográfica, não a "-desenho" — a
+decisão foto×ilustração×misto pro T3 continua em aberto).
+
+**Tema Escuro/Claro no render do tópico** — feito nesta sessão: `docs/schema/temas.json`
+ganhou um campo opcional `coresDark` (mesmo formato de `cores`, 16 chaves), preenchido
+pro tema `trigo-maduro` (pergaminho claro → variante "candlelight", carvão quente/âmbar
+claro). Quando o tema define `coresDark`, aparece um botão "🌙 Escuro"/"☀ Claro" no
+topbar do render do tópico — troca as variáveis CSS ao vivo (sem re-render), preferência
+salva em `localStorage`. Temas sem `coresDark` não ganham o botão, nada muda pra eles.
+
+**Áudio do exemplo de uso (não só a palavra) — feito, vale pra qualquer curso com bloco
+`vocab`:** cada card de vocabulário (curso de Inglês, `topico.html.j2`) ganhou um segundo
+botão 🔊 pequeno ao lado do exemplo em inglês (antes só a palavra isolada tinha
+pronúncia). Também um botão "🔊 Ouvir vocabulário desta seção" por seção, que lê em
+sequência termo→exemplo de cada palavra daquela parte — pra treino de escuta sem clicar
+card por card. Vale automaticamente pra qualquer tópico futuro do curso de Inglês (ou
+qualquer curso que use bloco `vocab`), sem precisar reeditar conteúdo já salvo.
+
 **Ainda falta** (não feito nesta sessão):
+
 - Gerar a imagem de capa (`scripts/imagens_para_gerar.json` já tem o prompt do Tópico 3 —
   rodar `python scripts/gerar_imagem_gemini.py`), copiar pra
   `backend/static/course-images/curso8/topico3-reconhecimento-oficio-ia.png`.
@@ -583,3 +626,77 @@ Prompts do Tópico 3 em diante devem já nascer no estilo colorido.
   da validação do conteúdo, conforme o fluxo que você definiu.
 - Conferir o HTML renderizado no navegador (a extensão do Chrome não conectou nesta sessão;
   só rodou a checagem estrutural — 7 seções, SVG válido, tags balanceadas, sem `null`).
+
+---
+
+dentro no nia precisamos dessa parte 📄 Resumo para colar no chat - outra coisa do jeito que esta agora da para deixar um tema dark e white ?
+
+---
+
+📄 Resumo para colar no chat
+
+=== RESUMO — Tópico 1: Sacerdócio de Todos os Crentes ===
+Checkpoint — A passagem de 1 Pedro 2:4-6 descreve os crentes como...: (não respondido)
+Checkpoint — No Antigo Testamento, as funções de rei e sacerdote...: (não respondido)
+Checkpoint — item: O Novo Testamento não descreve um 'ofício sace...: (não respondido)
+Checkpoint — item: O clero se torna uma classe separada dos leigo...: (não respondido)
+Checkpoint — item: Martinho Lutero redescobre 1 Pedro 2:9 e escre...: (não respondido)
+Checkpoint — item: Escritores como Tertuliano e Hipólito começam...: (não respondido)
+Avaliação Final — De acordo com 1 Pedro 2:9, quem é incluído na descri...: (não respondido)
+Avaliação Final — A imagem das 'pedras vivas' em 1 Pedro 2:4-6, que sã...: (não respondido)
+Avaliação Final — item: Havia uma tribo específica (Levi) separada par...: (não respondido)
+Avaliação Final — item: A promessa de um 'reino sacerdotal' era feita...: (não respondido)
+Avaliação Final — item: A promessa de sacerdócio é estendida a todos o...: (não respondido)
+Avaliação Final — item: O conceito de 'sacerdócio real' une rei e sace...: (não respondido)
+Avaliação Final — Explique, com suas próprias palavras, por que a dout...: (não respondido)
+Avaliação Final — Como a compreensão do 'sacerdócio de todos os crente...: (não respondido)
+
+Pontuação objetiva: 0/0
+Sinalizações (alta confiança + errou): nenhuma
+Questões abertas registradas: 0/2
+
+Peço avaliação honesta como especialista: devo seguir para Tópico 2: Dons Espirituais ou preciso de reforço antes?
+
+Copiar resumo
+
+estou falando desse que tem no final do topico no nia precisa disso ?
+
+2. "da para deixar um tema dark e white?" — tema dark/light pra qual coisa exatamente? O renderizador dos tópicos (topico.html.j2, que já tem paletas por curso mas nenhuma alterna dark↔light dinamicamente) ou o front do Emaús (emaus-web) como um todo? estava falando do topico
+
+Também vale registrar que, olhando o resto do arquivo, ficaram pendências em aberto da última sessão do curso de obreiro (2026-09-02): decidir estilo de imagem definitivo (foto vs. ilustração/aquarela — parece que "aquarela colorida" venceu, mas o Tópico 3 ainda aponta pras imagens antigas), gerar Tópicos 4 e 5, e a revisão humana de verdade (você + seu amigo teólogo) ainda não rodou em nenhum tópico.
+quero que usa coisas colorida não precisa esta na aquarela as imagens quando for fazer da epoca de jesus pode fazer colorida se for do tempo atual tambem, sempre com bastante imagens que faz sentido sem tirar conteudo por isso criamos de forma separada, que audio em todos do curso fazendo leitura ou lendo e vamos ter videos tambem mas o video fica para proxima fase
+
+O que você quer que eu faça com o item do dark/white e do "resumo pra colar no chat"? vamos organizar as terefas que tenho para fazer, não quero a aula de ingles do jeito que esta quero dividir a musica por parte de estuda as palavras ter o audio paravra por palavra entendendo tipo tipoco uma todas as palavras com exemplos de como usar aqulas palavras junção e então tenho que saber toda primeira parte da musica eu estou no basico do ingles, outra coisa é revisa todos os topico que temos criados e melhoras todos com imagens e audios de explicações vamos organizar as tarefas
+
+---
+
+## Claude — tarefas organizadas a partir das respostas acima (2026-09-06)
+
+Lendo as respostas: "resumo pra colar no chat" = a feature que já existe hoje no fim de
+cada tópico (`buildSummary()` em `topico.html.j2` — o bloco com checkpoints/avaliação +
+botão "Copiar resumo", exemplo colado acima é real, do Tópico 1). Dark/white = tema do
+**renderizador do tópico** (`topico.html.j2`), não do `emaus-web` inteiro.
+
+### Trilha A — Curso de Obreiro (curso 8)
+- A1. Tema dark/light no render do tópico (toggle, provavelmente igual ao padrão de
+  `localStorage` que o modo Corrido/Slide já usa).
+- A2. Padrão de imagem passa a ser **colorido, livre de estilo fixo** (não precisa ser
+  aquarela) — pode ser fotográfico ou ilustrado, época de Jesus ou tempo atual, o que
+  fizer mais sentido por tópico. Sempre **bastante imagem**, sem cortar conteúdo por
+  causa disso (mantém o fluxo já decidido: completo.html rico primeiro, imagem depois).
+- A3. Áudio de leitura em **todos** os tópicos do curso — já existe (TTS por slide,
+  Web Speech API) mas precisa confirmar que está ativo/funcionando em T1, T2, T3.
+- A4. Vídeo — **adiado pra próxima fase**, sem ação agora.
+- A5. Revisar T1, T2, T3 já criados e completar com imagens (no novo padrão A2) e áudio.
+- A6. Gerar T4 (Função no Corpo de Cristo) e T5 (Integração) — pendência já registrada.
+
+### Trilha B — Curso de Inglês (curso 9)
+- B1. Reestruturar a aula da música "My Way": dividir por partes (não a aula inteira de
+  uma vez), estudando o vocabulário de cada parte com áudio palavra-por-palavra + frases
+  de exemplo de uso, e só avançar pra próxima parte depois de dominar a atual — ritmo
+  adequado a nível básico de inglês.
+- B2. Mesma exigência de imagens/áudio de explicação (compartilha objetivo com A5, mas
+  aplicado ao curso de inglês).
+
+**Pergunta em aberto pro Atila**: por qual trilha (A ou B) começar, e dentro dela por qual
+item.

@@ -95,6 +95,7 @@ def render_topico(content: dict, theme_id: str = "vidro-fume") -> str:
 
     question_order = montar_question_order(content)
     open_total = sum(1 for q in question_order if q["tipo"] == "open")
+    cores_dark = tema.get("coresDark")
 
     template = _env.get_template("topico.html.j2")
     return template.render(
@@ -102,6 +103,7 @@ def render_topico(content: dict, theme_id: str = "vidro-fume") -> str:
         tema=tema,
         question_order_json=json.dumps(question_order, ensure_ascii=False),
         open_total=open_total,
+        cores_dark_json=json.dumps(cores_dark, ensure_ascii=False) if cores_dark else None,
     )
 
 
