@@ -1,3 +1,32 @@
+# ============================================================
+# Repo = SÓ o código do NIA + Emaús (backend, frontend, emaus-web,
+# scripts, docs, infra). Conteúdo de curso, estudos pessoais,
+# rascunhos e binários ficam fora do git (continuam no disco local).
+# ============================================================
+/curso de obreiro/
+/estudo-emaus/
+/estudo-ingles/
+/meu-estudo/
+/imagem/
+/propostas das ias/
+/anotação para IA.md
+/EXPLICAÇÃO DAS TABELAS.txt
+/json do curso.txt
+/*.docx
+/PLANO_*.md
+/PROMPT_UX_ALUNO.md
+
+# Rascunhos/experimentos soltos em backend/ (o _seed_emaus_users.py fica)
+backend/_aplicar_*.py
+backend/_conteudo_*.json
+backend/_gerar_*.py
+backend/_montar_*.py
+backend/_narracoes_*.json
+backend/_test_*.py
+backend/_topico*_ingles*.json
+backend/_tts_*.wav
+backend/requirements_old.txt
+
 # Environment Variables
 .env
 .env.*
