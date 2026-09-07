@@ -892,6 +892,8 @@ function speakCurrentSlide() {
   utter.lang = 'pt-BR';
   utter.rate = speedLevels[speedIdx];
   utter.onend = function () { stopSpeech(); };
+  utter.onerror = function () { stopSpeech(); };
+  window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utter);
   speaking = true;
   document.getElementById('audioBtn').classList.add('speaking');
