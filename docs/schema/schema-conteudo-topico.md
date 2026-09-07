@@ -71,8 +71,8 @@ Uma pergunta por slide na avaliação final (mesmo padrão de `Pergunta` do chec
 
 | tipo | campos | equivalente em Estudo IA |
 |---|---|---|
-| `paragrafo` | `texto` | `<p>` |
-| `box` | `variante` (`def`\|`analogy`\|`app`\|`error`\|`summary`\|`instr`), `label`, `texto` (prosa) **ou** `itens: [string]` (lista com marcadores — usa um dos dois, não os dois) | `.box-*` |
+| `paragrafo` | `texto`, opcionais `narracao`/`audio_url` (ver nota abaixo) | `<p>` |
+| `box` | `variante` (`def`\|`analogy`\|`app`\|`error`\|`summary`\|`instr`), `label`, `texto` (prosa) **ou** `itens: [string]` (lista com marcadores — usa um dos dois, não os dois), opcionais `narracao`/`audio_url` | `.box-*` |
 | `cols2` | `esquerda: {variante,label,texto}`, `direita: {...}` | `.cols2` (antes/depois, ✔/✕) |
 | `timeline` | `itens: [{numero,cor,titulo,descricao}]` | `.timeline` (ex: 3 fases de treino) |
 | `badges` | `itens: [string]` | `.badge-row` |
@@ -83,6 +83,14 @@ Uma pergunta por slide na avaliação final (mesmo padrão de `Pergunta` do chec
 | `audio_video` | `midia_tipo` (`youtube`\|`audio`), `url` (opcional — sem ela mostra placeholder; pra `youtube`, precisa ser o link de **embed**, ex. `https://www.youtube.com/embed/ID`, não o link normal de "watch"), `legenda`, `descricao` (usada só no placeholder) | `<iframe>`/`<audio>` |
 | `vocab` | `termo`, `classe_gramatical` (opcional), `traducao`, `exemplo_en` (opcional), `exemplo_pt` (opcional), `cuidado` (opcional — armadilha/falso cognato do português) | `.vocab-card` — card estruturado; vários seguidos tiling em 2 colunas automaticamente. **Prefira este bloco a `box variante="def"` pra vocabulário novo** — `box` é texto livre, `vocab` tem os campos certos e não vira parede de texto. |
 | `fluxo` | `passos: [{texto, decisao: bool}]` | `.fluxo-wrap` — sequência de passos ligados por seta, desenhada em HTML/CSS (não SVG). **Prefira este bloco a `diagrama`/`svg_raw` gerado por IA** — SVG cru escrito por um LLM tende a sair com coordenadas erradas e texto vazando das caixas (achado real, 2026-09-04); `fluxo` nunca estoura porque o texto quebra linha normalmente. `diagrama` continua existindo pra SVG desenhado à mão. |
+
+`narracao`/`audio_url` (opcionais, em `paragrafo` e `box`): `narracao` é o texto de uma
+explicação falada daquele bloco específico (tom de professor comentando, grounded só
+naquele bloco); `audio_url` é o arquivo de áudio (`.wav`) gerado a partir desse texto via
+`GeminiService.generate_audio()` — **áudio real gerado por IA, não a voz sintética do
+navegador**. Quando `audio_url` existe, o renderizador mostra um botão visível "🎧 Ouvir
+explicação" logo abaixo do bloco. Bloco sem esses campos não muda em nada (comportamento
+padrão preservado).
 
 `diagrama.svg_raw` existe porque hoje os diagramas ainda são desenhados à mão (ou por mim). Decisão em aberto pra uma fase futura: substituir por um `diagram_spec` estruturado (nós + arestas + posições) que o renderizador desenha sozinho, sem depender de SVG literal gerado por IA (isso tende a sair com coordenadas ruins se pedido cru pra um LLM). Por ora, a Fase 2 deve gerar `descricao` sempre, e `svg_raw` só quando disponível.
 

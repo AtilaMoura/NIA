@@ -1,3 +1,9 @@
+{% macro render_bloco_audio(bloco) -%}
+  {% if bloco.audio_url %}
+  <button type="button" class="bloco-audio" data-audio-url="{{ bloco.audio_url }}">🎧 Ouvir explicação</button>
+  {% endif %}
+{%- endmacro %}
+
 {% macro render_box(bloco) -%}
   <div class="box box-{{ bloco.variante }}">
     {% if bloco.label %}<div class="box-label">{{ bloco.label }}</div>{% endif %}
@@ -10,6 +16,7 @@
     {{ bloco.texto }}
     {% endif %}
   </div>
+  {{ render_bloco_audio(bloco) }}
 {%- endmacro %}
 
 {% macro render_diagrama(bloco) -%}
@@ -57,6 +64,7 @@
 {% macro render_bloco(bloco) -%}
   {% if bloco.tipo == 'paragrafo' %}
     <p>{{ bloco.texto }}</p>
+    {{ render_bloco_audio(bloco) }}
   {% elif bloco.tipo == 'box' %}
     {{ render_box(bloco) }}
   {% elif bloco.tipo == 'cols2' %}
@@ -350,6 +358,9 @@
   .vocab-listen-exemplo { width: 17px; height: 17px; font-size: 9px; vertical-align: middle; margin-left: 6px; }
   .vocab-listen-secao { font-family: var(--font-label); font-size: 10.5px; letter-spacing: .04em; color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: 999px; padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin: 0 0 14px; transition: border-color .15s ease, color .15s ease; }
   .vocab-listen-secao:hover { border-color: var(--accent); color: var(--accent); }
+  .bloco-audio { font-family: var(--font-label); font-size: 10.5px; letter-spacing: .04em; color: var(--accent); background: var(--accent-soft); border: 1px solid transparent; border-radius: 999px; padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin: 2px 0 14px; transition: border-color .15s ease, background .15s ease; }
+  .bloco-audio:hover { border-color: var(--accent); }
+  .bloco-audio.playing { background: var(--accent); color: var(--accent-text-on); }
   .vocab-cuidado { display: flex; gap: 7px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
   .vocab-cuidado span[aria-hidden] { flex: 0 0 auto; }
 
@@ -780,6 +791,27 @@ document.querySelectorAll('.vocab-listen-secao').forEach(function (btn) {
     proxima();
   });
 });
+
+(function () {
+  var audioAtual = null;
+  var btnAtual = null;
+  document.querySelectorAll('.bloco-audio').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btnAtual === btn && audioAtual && !audioAtual.paused) {
+        audioAtual.pause();
+        btn.classList.remove('playing');
+        return;
+      }
+      if (audioAtual) audioAtual.pause();
+      if (btnAtual) btnAtual.classList.remove('playing');
+      audioAtual = new Audio(btn.dataset.audioUrl);
+      btnAtual = btn;
+      btn.classList.add('playing');
+      audioAtual.onended = function () { btn.classList.remove('playing'); };
+      audioAtual.play().catch(function () { btn.classList.remove('playing'); });
+    });
+  });
+})();
 
 document.querySelectorAll('.register-btn').forEach(function (btn) {
   btn.addEventListener('click', function () {

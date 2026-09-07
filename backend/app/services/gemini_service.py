@@ -79,6 +79,57 @@ class GeminiService:
         except Exception as e:
             raise Exception(f"❌ Erro ao chamar Gemini: {str(e)}")
 
+    async def generate_audio(
+        self,
+        texto: str,
+        voice_name: str = "Kore",
+        tts_model: str = "gemini-2.5-flash-preview-tts",
+    ) -> bytes:
+        """
+        Gera áudio (voz natural, não TTS do navegador) a partir de um texto,
+        usando o modelo de TTS do Gemini (response_modalities=["AUDIO"]).
+
+        A API devolve PCM cru (24kHz, mono, 16-bit) em base64 — embrulha num
+        WAV válido via o módulo `wave` antes de devolver, pra poder salvar
+        direto num arquivo `.wav` e servir como estático.
+
+        Args:
+            texto: o que deve ser falado
+            voice_name: uma das vozes pré-definidas do Gemini (ex. "Kore")
+            tts_model: modelo de TTS (diferente do modelo de texto default)
+
+        Returns:
+            bytes: conteúdo de um arquivo .wav pronto pra salvar em disco
+        """
+        import io
+        import wave
+
+        try:
+            response = await self.client.aio.models.generate_content(
+                model=tts_model,
+                contents=texto,
+                config=types.GenerateContentConfig(
+                    response_modalities=["AUDIO"],
+                    speech_config=types.SpeechConfig(
+                        voice_config=types.VoiceConfig(
+                            prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice_name)
+                        )
+                    ),
+                ),
+            )
+            pcm_data = response.candidates[0].content.parts[0].inline_data.data
+
+            buffer = io.BytesIO()
+            with wave.open(buffer, "wb") as wav_file:
+                wav_file.setnchannels(1)
+                wav_file.setsampwidth(2)
+                wav_file.setframerate(24000)
+                wav_file.writeframes(pcm_data)
+            return buffer.getvalue()
+
+        except Exception as e:
+            raise Exception(f"❌ Erro ao gerar áudio no Gemini: {str(e)}")
+
     async def generate_json(
         self,
         prompt: str,
