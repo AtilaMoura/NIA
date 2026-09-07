@@ -1,4 +1,15 @@
 # ============================================================
+# Chaves e segredos — NUNCA commitar
+# ============================================================
+*.key
+*.pem
+*_rsa
+*_ed25519
+id_rsa*
+id_ed25519*
+ssh-key-*
+
+# ============================================================
 # Repo = SÓ o código do NIA + Emaús (backend, frontend, emaus-web,
 # scripts, docs, infra). Conteúdo de curso, estudos pessoais,
 # rascunhos e binários ficam fora do git (continuam no disco local).
