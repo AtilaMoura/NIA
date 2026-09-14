@@ -1,0 +1,55 @@
+# Build do backend agora usa a raiz do repo como contexto (precisa de
+# docs/schema/), mas só copia backend/app + backend/requirements.txt +
+# backend/_seed_emaus_users.py + docs/schema — tudo abaixo fica de fora.
+
+.git/
+.gitignore
+
+# Fronts (não fazem parte da imagem do backend)
+frontend/
+emaus-web/
+node_modules/
+**/node_modules/
+**/.next/
+**/.turbo/
+
+# Mídia e conteúdo — static/ é montado como volume em runtime, não copiado
+backend/static/
+imagem/
+scripts/
+
+# Python
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+backend/venv/
+backend/.venv/
+backend/env/
+backend/ENV/
+
+# Scratch/rascunhos do backend
+backend/_render_*.html
+backend/_test_*.py
+backend/requirements_old.txt
+backend/*.wav
+backend/_*.py
+backend/_*.json
+backend/_*.html
+
+# Segredos
+.env
+.env.*
+!.env.*.example
+
+# Documentação/planos que não precisam ir pra imagem
+DEPLOY_STATUS.md
+DEPLOY.md
+docs/schema/*.example.json
+
+# Editores
+.vscode/
+.idea/

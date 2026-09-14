@@ -34,8 +34,10 @@ services:
   # ---------- Backend (FastAPI) ----------
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
+      # Contexto na raiz do repo (não só ./backend) pra dar pro Dockerfile
+      # copiar também docs/schema/ — o renderizador precisa dele.
+      context: .
+      dockerfile: backend/Dockerfile.prod
     restart: unless-stopped
     depends_on:
       db:

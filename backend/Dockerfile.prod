@@ -14,16 +14,23 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends curl \
  && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install -r requirements.txt
 
-# Código da aplicação + estáticos + script de seed (rodado via `compose exec`).
-COPY app ./app
-COPY static ./static
-COPY _seed_emaus_users.py ./
+# Usuário sem privilégio (criado antes dos COPY --chown abaixo)
+RUN useradd -m -u 10001 nia
 
-# Usuário sem privilégio
-RUN useradd -m -u 10001 nia && chown -R nia:nia /app
+# Código da aplicação + script de seed (rodado via `compose exec`). static/
+# NÃO entra aqui — é montado como volume em runtime (ver docker-compose.backend.yml).
+COPY backend/app ./app
+COPY backend/_seed_emaus_users.py ./
+RUN mkdir -p ./static && chown -R nia:nia /app
+
+# Schema de temas do renderizador — fora de /app porque o código resolve o
+# caminho subindo 3 níveis a partir de app/renderer/ (renderer->app->backend->
+# raiz do repo), então precisa ficar em /docs/schema, não /app/docs/schema.
+COPY --chown=nia:nia docs/schema /docs/schema
+
 USER nia
 
 EXPOSE 8000
