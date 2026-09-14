@@ -1,5 +1,7 @@
 # Core FastAPI
-fastapi==0.104.1
+# fastapi 0.115+ pra ser compatível com anyio>=4.8 exigido pelo google-genai
+# (0.104.1 antigo travava anyio<4, gerando conflito de dependências no build)
+fastapi==0.115.6
 uvicorn[standard]==0.24.0
 python-dotenv==1.0.0
 pydantic==2.5.0
