@@ -321,6 +321,101 @@ gunzip -c ~/backups/niadb-2026-09-06.sql.gz | \
 
 ---
 
+## 10. Publicar um curso novo (depois do primeiro deploy)
+
+⚠️ **NÃO repita o dump/restore completo do banco que fizemos no primeiro deploy.**
+Aquilo substituiu o banco da VM inteiro pelo dump local — funcionou porque a VM
+ainda não tinha nada de real. Hoje o banco de produção já tem coisa que **não
+existe no banco local** (seu login `atilagmoura@gmail.com` como master, o login
+do Adriano como admin, e qualquer progresso real de aluno) — um restore
+completo de novo **apagaria tudo isso**. A partir de agora, só migre o curso
+específico que você criou, não o banco inteiro.
+
+### 10.1 Gerar o curso localmente
+Sem mudança — segue o processo normal de vocês (scripts de geração de
+conteúdo, pipeline de IA, etc.), tudo no banco local (`nia_db`, porta 5432).
+
+### 10.2 Exportar só o curso novo (não o banco todo)
+Descubra o `id` do curso novo (`SELECT id, title FROM courses ORDER BY id DESC LIMIT 5;`)
+e exporte só as linhas dele + dos módulos/aulas/tópicos ligados a ele:
+
+```bash
+# na sua máquina — troque COURSE_ID pelo id real
+COURSE_ID=10
+
+docker exec nia_db psql -U niauser -d niadb -c "\copy (SELECT * FROM courses WHERE id=$COURSE_ID) TO '/tmp/curso.csv' CSV HEADER"
+docker exec nia_db psql -U niauser -d niadb -c "\copy (SELECT * FROM modules WHERE course_id=$COURSE_ID) TO '/tmp/modules.csv' CSV HEADER"
+docker exec nia_db psql -U niauser -d niadb -c "\copy (SELECT * FROM lessons WHERE module_id IN (SELECT id FROM modules WHERE course_id=$COURSE_ID)) TO '/tmp/lessons.csv' CSV HEADER"
+docker exec nia_db psql -U niauser -d niadb -c "\copy (SELECT * FROM topicos WHERE lesson_id IN (SELECT id FROM lessons WHERE module_id IN (SELECT id FROM modules WHERE course_id=$COURSE_ID))) TO '/tmp/topicos.csv' CSV HEADER"
+
+for f in curso modules lessons topicos; do
+  docker cp nia_db:/tmp/$f.csv ./$f.csv
+done
+```
+
+### 10.3 Copiar pra VM 1 e importar
+```bash
+scp -i ssh-key-2026-09-07now.key curso.csv modules.csv lessons.csv topicos.csv \
+  ubuntu@163.176.70.148:~/
+
+ssh -i ssh-key-2026-09-07now.key ubuntu@163.176.70.148
+
+# na VM:
+cd ~/NIA
+for f in curso modules lessons topicos; do
+  sudo docker cp ~/$f.csv nia-backend-db-1:/tmp/$f.csv
+done
+
+TABLE=courses; sudo docker compose -f docker-compose.backend.yml exec -T db psql -U niauser -d niadb -c "\copy $TABLE FROM '/tmp/curso.csv' CSV HEADER"
+sudo docker compose -f docker-compose.backend.yml exec -T db psql -U niauser -d niadb -c "\copy modules FROM '/tmp/modules.csv' CSV HEADER"
+sudo docker compose -f docker-compose.backend.yml exec -T db psql -U niauser -d niadb -c "\copy lessons FROM '/tmp/lessons.csv' CSV HEADER"
+sudo docker compose -f docker-compose.backend.yml exec -T db psql -U niauser -d niadb -c "\copy topicos FROM '/tmp/topicos.csv' CSV HEADER"
+```
+
+> Se o curso já existir na VM (reimportando depois de editar), rode um `DELETE
+> FROM courses WHERE id=$COURSE_ID;` antes — o `ON DELETE CASCADE` das FKs
+> limpa módulos/aulas/tópicos junto, sem afetar usuários nem outros cursos.
+
+### 10.4 Copiar a mídia nova (imagens/áudio do curso)
+```bash
+# na sua máquina — só a pasta do curso novo, não a pasta static inteira
+scp -i ssh-key-2026-09-07now.key -r backend/static/course-images/curso$COURSE_ID \
+  ubuntu@163.176.70.148:~/NIA/backend/static/course-images/
+scp -i ssh-key-2026-09-07now.key -r backend/static/audio/curso$COURSE_ID \
+  ubuntu@163.176.70.148:~/NIA/backend/static/audio/
+
+ssh -i ssh-key-2026-09-07now.key ubuntu@163.176.70.148 \
+  "cd ~/NIA && sudo -E docker compose -f docker-compose.backend.yml restart backend"
+```
+(`static/` é volume montado — `restart` já basta, sem rebuild. Se as URLs de
+imagem no `content` do tópico ainda apontam pra `localhost`, rode o mesmo
+`UPDATE ... replace(content, 'http://localhost:8100', 'https://nia-api.duckdns.org')`
+que usamos no primeiro deploy, mas filtrando pelos tópicos do curso novo.)
+
+### 10.5 Capa do curso (se for aparecer no catálogo do Emaús)
+Capa de curso é arquivo em `emaus-web/public/capas/{slug}.jpg` — **não vem do
+banco**, é asset do próprio front, embutido no build. Gere com
+`python scripts/gerar_imagem_gemini.py` (estilo tinta+aquarela, ver os JSONs
+`scripts/capas_desenho_curso_*.json` de exemplo), converta pra `.jpg`, salve em
+`emaus-web/public/capas/`, **commite e dê `git push`** — sem isso a VM 2 nunca
+vai ter o arquivo. Se o curso for novo no catálogo, adicione a entrada em
+`emaus-web/app/_lib/catalogo.ts` (`slug`, `title`, etc.) também.
+
+### 10.6 Publicar e rebuildar o front
+```bash
+# publicar (na VM 1, ou local via https://nia-api.duckdns.org)
+TOKEN=$(curl -s -X POST https://nia-api.duckdns.org/auth/login \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"SEU_EMAIL\",\"password\":\"SUA_SENHA\"}" | python3 -c 'import sys,json;print(json.load(sys.stdin)["access_token"])')
+curl -s -X POST https://nia-api.duckdns.org/cursos/$COURSE_ID/publicar -H "Authorization: Bearer $TOKEN"
+
+# se mexeu no catalogo.ts (passo 10.5), rebuilda a VM 2:
+ssh -i ssh-key-2026-09-07now.key ubuntu@137.131.152.20 \
+  "cd ~/NIA && git pull && sudo -E docker compose -f docker-compose.emaus.yml up -d --build"
+```
+
+---
+
 ## Problemas comuns
 
 | Sintoma | Causa / solução |

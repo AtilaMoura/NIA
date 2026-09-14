@@ -1,17 +1,24 @@
 # Onde paramos — deploy NIA + Emaús na Oracle Cloud
 
-_Atualizado: 2026-09-15 00:05 (🟢 NO AR — backend + Emaús em produção com HTTPS)_
+_Atualizado: 2026-09-15 01:15 (🟢 NO AR E TESTADO — bugs pós-deploy corrigidos)_
 
 ## Resumo em 1 linha
-**Está no ar.** `https://nia-api.duckdns.org` (backend) e `https://caminho-emaus.duckdns.org`
-(Emaús) respondendo em produção, HTTPS automático, cursos 8 e 9 publicados, usuários do
-Emaús criados. O `A1.Flex` (VM maior) segue em retry automático via cron na VM 2, mas
-deixou de ser bloqueante — não precisa dele pra estar no ar.
+**Está no ar e funcionando de ponta a ponta**, testado no navegador de verdade: login,
+capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://nia-api.duckdns.org`
+(backend) e `https://caminho-emaus.duckdns.org` (Emaús) em produção com HTTPS. O `A1.Flex`
+(VM maior) segue em retry automático via cron na VM 2, não bloqueia nada.
 
 ## 🟢 URLs em produção
 - **API:** https://nia-api.duckdns.org
-- **Emaús:** https://caminho-emaus.duckdns.org (login: `master@emaus.local` / `emaus2026`,
-  e `admin1-3@emaus.local` / `professor1-5@emaus.local`, mesma senha)
+- **Emaús:** https://caminho-emaus.duckdns.org
+  - **Login real do Atila (master):** `atilagmoura@gmail.com` — conta reaproveitada do
+    antigo `master@emaus.local` (mesmo `id=2`, mantém histórico/aprovações)
+  - **Login real do Adriano (admin):** `adrianocomsandra501@gmail.com` — reaproveitou o
+    slot `admin1@emaus.local` (`id=3`)
+  - Sobrando ainda como teste: `admin2-3@emaus.local` / `professor1-5@emaus.local`,
+    senha `emaus2026`
+  - ⚠️ Senhas reais em texto puro não ficam neste arquivo nem no git — só na cabeça de
+    quem criou (perguntar ao Atila/Adriano se precisar)
 
 ## ✅ VMs ativas agora
 
@@ -144,12 +151,40 @@ console web (que era muito instável por browser automation):
 - Usuários do Emaús semeados (`_seed_emaus_users.py`) e **cursos 8 e 9 publicados** via API.
 - CORS testado e confirmado entre os dois domínios.
 
+## 🐛 Bugs encontrados testando no navegador de verdade (e corrigidos)
+
+Depois do deploy "funcionar" por `curl`, testar no navegador revelou 3 bugs reais que
+`curl` não pegava:
+
+1. **Fotos quebradas** — URLs de imagem salvas no banco como `http://localhost:8100/...`
+   (resquício do ambiente de dev local). Corrigido com `UPDATE ... replace(content,
+   'http://localhost:8100', 'https://nia-api.duckdns.org')` em `topicos`, `lessons`,
+   `courses`, `modules` (19 registros).
+2. **Capas de "Inglês" e "Engenharia de Agentes LLM" faltando** — capa de curso é
+   arquivo estático do front (`emaus-web/public/capas/{slug}.jpg`, **não vem do banco**),
+   embutido no build. `ingles.jpg` nunca tinha sido commitado; `engenharia-agentes-llm.jpg`
+   nunca existiu (curso 5 nunca teve capa desenhada) — gerada agora via
+   `scripts/gerar_imagem_gemini.py`. As duas commitadas e a VM 2 rebuildada.
+3. **Erro 500 ao abrir qualquer tópico** (`/topicos/{id}/render`) — o renderizador
+   (`backend/app/renderer/render.py`) espera `docs/schema/temas.json` num caminho
+   relativo à raiz do repo (`SCHEMA_DIR = 3 níveis acima de app/renderer/`), mas o
+   Dockerfile só copiava `backend/` — `docs/` nunca ia pra imagem. Fix: build context do
+   backend mudou de `./backend` pra raiz do repo (`.`), com `.dockerignore` novo na raiz
+   pra não mandar `frontend/`/`emaus-web/`/mídia no contexto. Aproveitou pra tirar o
+   `COPY static` morto (era só volume mesmo) do Dockerfile.
+
+Depois desses 3 fixes: login, capas, progresso, texto+imagem+áudio de tópico — tudo
+testado e confirmado funcionando no navegador via `claude-in-chrome`.
+
 ## ▶️ Próximos passos reais
 
-1. Testar o fluxo completo no navegador (login, trilha, quiz) — só foi validado por `curl`
+1. ~~Testar o fluxo completo no navegador~~ → feito, 3 bugs achados e corrigidos (ver acima)
 2. Backup automático do Postgres (cron + `pg_dump`, passo 9 do `DEPLOY.md`) — ainda não configurado na VM1
 3. Se quiser mais margem, seguir esperando o retry do A1 (ou upgrade PAYG)
 4. CI/CD: hoje não tem nada automatizado (sem `.github/workflows`, sem testes automatizados) — considerar depois
+5. **Publicar um curso novo:** ver seção **"10. Publicar um curso novo"** do `DEPLOY.md` —
+   ⚠️ NÃO é mais um `pg_restore` completo (isso apagaria os logins reais que já existem em
+   produção), é uma migração seletiva só das tabelas do curso novo
 
 ## Pendências não relacionadas ao deploy (do FASE 6, também pausadas)
 - Escolha do logo v3 (16 conceitos em `/dev/marca`) — usuário decide
