@@ -57,6 +57,10 @@ services:
       # Publicada só na rede privada da VCN (Security List/iptables cuidam
       # de barrar a internet) — é assim que a VM do Emaús chama a API.
       - "8000:8000"
+    volumes:
+      # Mídia (imagens/áudio) montada do host, não fica presa na imagem —
+      # atualizar é só `scp` + `restart`, sem rebuild. Ver DEPLOY.md.
+      - ./backend/static:/app/static
     networks: [internal]
 
   # ---------- Front do aluno "tech" (Next) — opcional ----------
