@@ -1,12 +1,17 @@
 # Onde paramos — deploy NIA + Emaús na Oracle Cloud
 
-_Atualizado: 2026-09-14 20:57 (OCI CLI configurada + 2ª VM criada + retry automático rodando na Oracle)_
+_Atualizado: 2026-09-15 00:05 (🟢 NO AR — backend + Emaús em produção com HTTPS)_
 
 ## Resumo em 1 linha
-**2 VMs `E2.1.Micro` no ar** (backend+DB numa, Emaús na outra) — sustentam a carga medida
-com folga. O `A1.Flex` (a VM maior, 1 OCPU/6GB ou 2 OCPU/12GB) segue em **retry automático
-rodando dentro da própria VM da Oracle** (cron a cada 7min), não mais dependente do PC local.
-Falta: capacidade do A1 liberar, `git push`, e rodar o `DEPLOY.md` de fato.
+**Está no ar.** `https://nia-api.duckdns.org` (backend) e `https://caminho-emaus.duckdns.org`
+(Emaús) respondendo em produção, HTTPS automático, cursos 8 e 9 publicados, usuários do
+Emaús criados. O `A1.Flex` (VM maior) segue em retry automático via cron na VM 2, mas
+deixou de ser bloqueante — não precisa dele pra estar no ar.
+
+## 🟢 URLs em produção
+- **API:** https://nia-api.duckdns.org
+- **Emaús:** https://caminho-emaus.duckdns.org (login: `master@emaus.local` / `emaus2026`,
+  e `admin1-3@emaus.local` / `professor1-5@emaus.local`, mesma senha)
 
 ## ✅ VMs ativas agora
 
@@ -114,18 +119,37 @@ console web (que era muito instável por browser automation):
 
 ---
 
-## ▶️ Próximos passos (na ordem)
+## ✅ Deploy feito em 2026-09-14/15 — o que rolou
 
-1. ~~Resolver a capacidade~~ → **retry automático rodando sozinho**, só aguardar (ou fazer upgrade PAYG pra acelerar)
-2. `git push` (os 19+ commits locais)
-3. Se repo for privado: criar Deploy Key na VM (ver seção "Repo privado" do `DEPLOY.md`)
-4. Adaptar o `docker-compose.prod.yml` pra topologia de **2 VMs separadas** (backend+db
-   numa, Emaús na outra, comunicação por IP privado da VCN) — o plano original assumia
-   tudo numa VM só
-5. Seguir o **`DEPLOY.md`** a partir do passo 2 (portas 80/443) em cada VM
-6. DuckDNS: subdomínios apontando pro IP público de cada VM
-7. `.env` em cada VM → `docker compose -f docker-compose.prod.yml up -d --build`
-8. `docker compose exec backend python _seed_emaus_users.py` + publicar cursos
+- **DuckDNS:** `nia-api` (VM1) e `caminho-emaus` (VM2) — IPs atualizados via API
+  (token da conta salvo só na conversa, não no repo). `nia` sozinho já estava ocupado
+  por outra conta.
+- **Security List da VCN** (via `oci` CLI, sem console): liberado 80/443 pro mundo, e
+  **8000 só pra rede privada `10.0.0.0/24`** (Emaús → backend, não exposto na internet).
+- **Docker + repo clonado** nas 2 VMs, `.env` de cada uma preenchido com segredos gerados
+  na hora (`openssl rand`).
+- **3 fixes de dependência no `backend/requirements.txt`** — o `fastapi==0.104.1` antigo
+  travava `anyio<4`, mas o `google-genai` novo exige mais recente. Corrigido em cadeia:
+  `fastapi` → 0.115.6, `httpx` → 0.28.1, `pydantic` → 2.12.5. Código já usava sintaxe
+  pydantic v2 atual, sem quebra.
+- **Fix: `backend/static/` virou volume montado** (`./backend/static:/app/static`) em vez
+  de só `COPY` no Dockerfile — sem isso, `scp` de mídia nova não tinha efeito sem rebuild
+  completo da imagem.
+- **VM 2 travou de verdade no primeiro build do Next.js** (1 OCPU/1GB sem swap — SSH
+  parou de responder por ~20min, precisou `RESET` via `oci` CLI). Corrigido com **2GB de
+  swap** (`/swapfile`) — build passou na segunda tentativa, mais lento mas estável.
+- **Banco de dados migrado**: `pg_dump` do Postgres local → `scp` → `pg_restore --clean
+  --if-exists` no Postgres da VM1 (sem apagar o banco, só recriando as tabelas — usuário
+  preferiu essa opção a um `dropdb`).
+- Usuários do Emaús semeados (`_seed_emaus_users.py`) e **cursos 8 e 9 publicados** via API.
+- CORS testado e confirmado entre os dois domínios.
+
+## ▶️ Próximos passos reais
+
+1. Testar o fluxo completo no navegador (login, trilha, quiz) — só foi validado por `curl`
+2. Backup automático do Postgres (cron + `pg_dump`, passo 9 do `DEPLOY.md`) — ainda não configurado na VM1
+3. Se quiser mais margem, seguir esperando o retry do A1 (ou upgrade PAYG)
+4. CI/CD: hoje não tem nada automatizado (sem `.github/workflows`, sem testes automatizados) — considerar depois
 
 ## Pendências não relacionadas ao deploy (do FASE 6, também pausadas)
 - Escolha do logo v3 (16 conceitos em `/dev/marca`) — usuário decide
