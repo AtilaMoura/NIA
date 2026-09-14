@@ -17,7 +17,8 @@ bcrypt==4.0.1
 python-multipart==0.0.6
 
 # HTTP Client para chamadas de API
-httpx==0.25.2
+# 0.28.1+ exigido pelo google-genai (0.25.2 antigo conflitava)
+httpx==0.28.1
 
 # IA - Google Gemini (migrado 2026-08-26: google-generativeai==0.3.2 está
 # descontinuado — repo virou "deprecated-generative-ai-python" — e dava 504
