@@ -39,6 +39,7 @@ backend/*.wav
 backend/_*.py
 backend/_*.json
 backend/_*.html
+!backend/_seed_emaus_users.py
 
 # Segredos
 .env
