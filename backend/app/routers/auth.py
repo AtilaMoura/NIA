@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
-from app.models.models import User
+from app.models.models import Topico, User
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.core.security import create_access_token, verify_password, hash_password, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.core.auth import get_current_user
-from app.schemas.auth import UserLogin, UserRegister, Token, UserMe
+from app.schemas.auth import TopicoTokenRequest, UserLogin, UserRegister, Token, UserMe
 from app.database import get_db
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -31,6 +31,29 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserMe)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.post("/topico-token", response_model=Token)
+def emitir_topico_token(
+    data: TopicoTokenRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Token de escopo curto pro <iframe> do render de tópico salvar respostas
+    (2026-09-09). NÃO é o token de sessão real — esse nunca sai do servidor
+    Next.js (ver emaus-web/app/_lib/sessao.ts: "nunca em JS do navegador").
+    Este aqui autoriza só 'salvar resposta deste usuário, neste tópico', por
+    2h — mesmo que vaze (fica visível na URL do iframe), o estrago é bem menor
+    que o token de sessão de 30 dias com acesso a tudo.
+    """
+    if not db.query(Topico).filter(Topico.id == data.topico_id).first():
+        raise HTTPException(404, "Tópico not found")
+
+    access_token = create_access_token(
+        {"sub": str(current_user.id), "topico_id": data.topico_id, "scope": "topico_respostas"},
+        expires_delta=timedelta(hours=2),
+    )
+    return Token(access_token=access_token)
 
 @router.post("/login", response_model=Token)
 def login(data: UserLogin, db: Session = Depends(get_db)):

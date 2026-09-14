@@ -1,0 +1,50 @@
+# ============================================================================
+# Emaús — stack de produção da VM 2.
+#
+#   docker compose -f docker-compose.emaus.yml up -d --build
+#
+# Variáveis: ver .env.emaus.example — copie pra .env (que NÃO vai pro git).
+# Passo a passo completo: DEPLOY.md
+#
+# NEXT_PUBLIC_API_URL / API_URL_INTERNAL apontam pra VM 1 (backend), pelo
+# IP PRIVADO da VCN — não passa pela internet pra chamar a API.
+# ============================================================================
+
+name: nia-emaus
+
+services:
+  emaus:
+    build:
+      context: ./emaus-web
+      dockerfile: Dockerfile.prod
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      API_URL_INTERNAL: ${API_URL_INTERNAL}
+    networks: [internal]
+
+  # ---------- Proxy reverso + HTTPS automático ----------
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [emaus]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_EMAUS: ${SITE_EMAUS}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile.emaus:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:

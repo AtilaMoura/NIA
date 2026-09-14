@@ -9,6 +9,8 @@ from app.models import models
 from app.routers import users, courses, modules, progress, lessons, pipeline, topicos
 from app.routers import auth
 from app.routers import topico_progress
+from app.routers import topico_respostas
+from app.routers import topico_anotacoes
 from app.routers import revisao
 from app.routers import governanca
 from app.routers import test_ai
@@ -38,6 +40,10 @@ def _ensure_colunas_extras(bind):
         # FASE 5b: governança de publicação por curso.
         "ALTER TABLE courses ADD COLUMN IF NOT EXISTS aprovacao_master_basta BOOLEAN NOT NULL DEFAULT FALSE",
         "ALTER TABLE courses ADD COLUMN IF NOT EXISTS aprovacao_exige_todos_tutores BOOLEAN NOT NULL DEFAULT FALSE",
+        # Identidade visual + capas geradas pelo ImagemAgent (2026-09-11).
+        "ALTER TABLE courses ADD COLUMN IF NOT EXISTS identidade_visual JSONB",
+        "ALTER TABLE courses ADD COLUMN IF NOT EXISTS cover_image_url VARCHAR(500)",
+        "ALTER TABLE modules ADD COLUMN IF NOT EXISTS cover_image_url VARCHAR(500)",
     ]
     with bind.begin() as conn:
         for s in stmts:
@@ -89,6 +95,8 @@ def create_app():
     app.include_router(lessons.router)
     app.include_router(topicos.router)
     app.include_router(topico_progress.router)
+    app.include_router(topico_respostas.router)
+    app.include_router(topico_anotacoes.router)
     app.include_router(revisao.router)
     app.include_router(governanca.router)
     app.include_router(pipeline.router)

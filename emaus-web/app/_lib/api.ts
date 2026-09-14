@@ -11,6 +11,7 @@ export type Course = {
   modules_count: number;
   duration_hours: number;
   ai_quality_score: number | null;
+  cover_image_url: string | null;
 };
 
 export type Module = {
@@ -20,6 +21,7 @@ export type Module = {
   title: string;
   description: string | null;
   lessons_count: number;
+  cover_image_url: string | null;
 };
 
 export type Lesson = {
@@ -108,6 +110,26 @@ export type Progress = {
   time_spent_minutes: number | null;
   last_accessed_at: string | null;
 };
+
+// ---- Anotação pessoal do aluno por slide (2026-09-10) ----
+export type Anotacao = {
+  id: number;
+  user_id: number;
+  topico_id: number;
+  slide_index: number;
+  texto: string;
+  updated_at: string | null;
+};
+
+// GET /topico-anotacoes/{id} aceita token de sessão real (é o caso aqui, chamado
+// server-side pro painel "Minhas anotações") OU o token de escopo curto do
+// <iframe> — ver get_topico_anotacao_user_id no backend.
+export function listAnotacoes(token: string | null | undefined, topicoId: number) {
+  if (!token) return Promise.resolve<Anotacao[]>([]);
+  return fetchJson<Anotacao[]>(`/topico-anotacoes/${topicoId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
 
 // ---- Revisão (FASE 5a) ----
 export type Reacao = "positivo" | "negativo";
@@ -208,7 +230,16 @@ export function getTopico(id: number) {
 
 export function topicoRenderUrl(
   id: number,
-  opts: { userId: number; theme?: string; contexto?: "revisao" },
+  opts: {
+    userId: number;
+    theme?: string;
+    contexto?: "revisao";
+    pdf?: boolean;
+    respostasToken?: string;
+    avaliacaoInicial?: AvaliacaoTutor | null;
+    concluido?: boolean;
+    temProximo?: boolean;
+  },
 ) {
   const params = new URLSearchParams({
     user_id: String(opts.userId),
@@ -218,12 +249,40 @@ export function topicoRenderUrl(
   // a fila de revisão depende de saber "qual slide está na tela" (postMessage
   // emaus:slide) pra sincronizar os comentários por slide.
   if (opts.contexto) params.set("contexto", opts.contexto);
+  // "pdf=1" faz aparecer o botão "📄 PDF" no topo do render (imprimir → salvar
+  // como PDF, texto corrido). Passado só pra quem revisa (professor/admin/master).
+  if (opts.pdf) params.set("pdf", "1");
+  // Token de escopo curto (getTopicoToken) — sem ele o render não salva resposta
+  // de exercício nenhuma (fica só no estado da página, como sempre foi).
+  if (opts.respostasToken) params.set("token", opts.respostasToken);
+  // Estado inicial da avaliação do tutor (2026-09-11) — reabrir um tópico já
+  // concluído já mostra o resultado no slide "Resultado", sem precisar clicar
+  // em "Fim" de novo. Só o essencial pro slide renderizar (não manda lacunas).
+  if (opts.concluido && opts.avaliacaoInicial) {
+    params.set("concluido", "1");
+    params.set("veredito", opts.avaliacaoInicial.veredito);
+    params.set("resumo", opts.avaliacaoInicial.resumo_diagnostico ?? "");
+    if (opts.temProximo) params.set("proximo", "1");
+  }
   return `${API_URL_PUBLICA}/topicos/${id}/render?${params.toString()}`;
 }
 
 // ---- Usuário / progresso ----
 export function getUser(id: number) {
   return fetchJson<UserPrefs>(`/users/${id}`);
+}
+
+// Token de ESCOPO CURTO (2h, só "salvar resposta deste usuário, neste tópico")
+// pro <iframe> do render — 2026-09-09. Chamado só server-side, com o token de
+// sessão de verdade (getToken() em _lib/sessao.ts, nunca vai pro cliente). O
+// token curto devolvido aqui é o único que entra na URL do iframe.
+export async function getTopicoToken(token: string, topicoId: number) {
+  const { access_token } = await fetchJson<{ access_token: string }>("/auth/topico-token", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ topico_id: topicoId }),
+  });
+  return access_token;
 }
 
 // GET /users/ exige login com papel master/admin/professor (área de revisão) —

@@ -5,11 +5,12 @@ import { LinkBotao } from "../../_ui/Botao";
 import { LogoSimbolo } from "../../_ui/Logo";
 import { AcoesTopico } from "./topico-ui";
 import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
-import { getSessao } from "../../_lib/sessao";
+import { getSessao, getToken } from "../../_lib/sessao";
 import { papelPodeRevisar } from "../../_lib/papel";
 import {
   getCourse,
   getTopico,
+  getTopicoToken,
   listLessons,
   listModules,
   listTopicos,
@@ -53,6 +54,18 @@ export default async function TopicoPage({
     listTopicos(topico.lesson_id),
     listTopicoProgress(sessao.id),
   ]);
+
+  // Token de escopo curto pro <iframe> salvar resposta de exercício (2026-09-09)
+  // e anotação por slide. Só busca se o tópico é mesmo exibível — sem isso o
+  // render funciona igual, só sem salvar (mesmo comportamento de antes desta
+  // função existir).
+  let respostasToken: string | null = null;
+  if (!emPreparacao) {
+    const tokenSessao = await getToken();
+    if (tokenSessao) {
+      respostasToken = await getTopicoToken(tokenSessao, topico.id).catch(() => null);
+    }
+  }
 
   const aula = lessons.find((l) => l.id === topico.lesson_id) ?? null;
   const modulo = aula ? modules.find((m) => m.id === aula.module_id) ?? null : null;
@@ -128,7 +141,18 @@ export default async function TopicoPage({
       {/* conteúdo do backend, confiável — sem sandbox pra não quebrar o JS de slides.
           allow="fullscreen" é o que faz o botão "Tela cheia" do render funcionar dentro do iframe. */}
       <iframe
-        src={topicoRenderUrl(topico.id, { userId: sessao.id, theme: tema })}
+        src={topicoRenderUrl(topico.id, {
+          userId: sessao.id,
+          theme: tema,
+          // botão "📄 PDF" no render só pra quem revisa (professor/admin/master)
+          pdf: papelPodeRevisar(sessao.role),
+          respostasToken: respostasToken ?? undefined,
+          // Reabrir um tópico já concluído mostra o resultado direto no slide
+          // "Resultado" do render, sem precisar clicar em "Fim" de novo.
+          concluido: estadoInicial === "concluido",
+          avaliacaoInicial: analiseInicial,
+          temProximo: proximo?.id != null,
+        })}
         title={topico.titulo}
         className="w-full flex-1 border-0"
         allow="fullscreen"
@@ -136,9 +160,9 @@ export default async function TopicoPage({
       />
       <AcoesTopico
         topicoId={topico.id}
+        cursoId={CURSO_ID}
         estadoInicial={estadoInicial}
         proximoTopicoId={proximo?.id ?? null}
-        analiseInicial={analiseInicial}
       />
     </div>
   );

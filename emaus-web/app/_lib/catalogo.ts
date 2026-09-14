@@ -38,6 +38,16 @@ export const CATALOGO: CursoCatalogo[] = [
     disponivel: true,
   },
   {
+    slug: "engenharia-agentes-llm",
+    titulo: "Engenharia de Agentes LLM",
+    subtitulo: "Estudo pessoal — do token ao agente de produção",
+    descricao:
+      "Como um LLM funciona por dentro (tokens, Transformers, embeddings, attention) até a arquitetura completa de um agente de vendas via WhatsApp para um Garden Center: Context Engineering, RAG, memória, tools, orchestrator, avaliação e sistemas multi-agente. Trabalhado tópico a tópico.",
+    tom: "pedra",
+    courseId: 5,
+    disponivel: true,
+  },
+  {
     slug: "formacao-novo-obreiro",
     titulo: "Formação Geral do Novo Obreiro Cristão",
     subtitulo: "O primeiro passo de quem começa a servir na igreja",

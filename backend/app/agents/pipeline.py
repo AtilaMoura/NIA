@@ -74,7 +74,7 @@ async def gerar_e_revisar_topico(
     # que a IA decidiu escrever dentro do JSON.
     conteudo = {**conteudo, "topico_id": topico_id, "aula": aula, "numero": numero}
 
-    perguntas = await quiz_agent.generate_perguntas(conteudo)
+    perguntas = await quiz_agent.generate_perguntas(conteudo, perfil=perfil)
     topico = montar_topico(conteudo, perguntas, proximo_topico_label=proximo_topico_label)
     revisao = await reviewer.revisar_topico(
         topico,

@@ -1,0 +1,18 @@
+# ============================================================================
+# Caddy — proxy reverso da VM 2 (Emaús).
+#
+# Ver .env: SITE_EMAUS. Se o subdomínio apontar pro IP da VM, o Caddy emite
+# certificado HTTPS do Let's Encrypt sozinho.
+#
+# Sem domínio ainda? Use DuckDNS (grátis) — passo a passo em DEPLOY.md.
+# ============================================================================
+
+{
+	email {$ACME_EMAIL}
+}
+
+# --- Emaús (Next 16) ---
+{$SITE_EMAUS} {
+	reverse_proxy emaus:3000
+	encode zstd gzip
+}

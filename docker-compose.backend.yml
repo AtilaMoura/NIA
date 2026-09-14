@@ -1,0 +1,104 @@
+# ============================================================================
+# NIA — stack de produção da VM 1 (backend + banco).
+#
+#   docker compose -f docker-compose.backend.yml up -d --build
+#
+# Variáveis: ver .env.backend.example — copie pra .env (que NÃO vai pro git).
+# Passo a passo completo: DEPLOY.md
+#
+# Esta VM expõe a porta 8000 do backend na rede PRIVADA da VCN (não na
+# internet) pra VM 2 (Emaús) conseguir chamar a API sem passar pelo domínio
+# público. Ver Security List / iptables no DEPLOY.md.
+# ============================================================================
+
+name: nia-backend
+
+services:
+  # ---------- Banco ----------
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+  # ---------- Backend (FastAPI) ----------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      SECRET_KEY: ${SECRET_KEY}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    ports:
+      # Publicada só na rede privada da VCN (Security List/iptables cuidam
+      # de barrar a internet) — é assim que a VM do Emaús chama a API.
+      - "8000:8000"
+    networks: [internal]
+
+  # ---------- Front do aluno "tech" (Next) — opcional ----------
+  # Se ainda não vai usar o front tech, comente este serviço inteiro e o
+  # bloco {$SITE_NIA} do Caddyfile.backend.
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      API_URL_INTERNAL: "http://backend:8000"
+    networks: [internal]
+
+  # ---------- Proxy reverso + HTTPS automático ----------
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [backend]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_API: ${SITE_API}
+      SITE_NIA: ${SITE_NIA:-}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile.backend:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:

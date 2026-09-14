@@ -1,0 +1,25 @@
+# ============================================================================
+# Caddy — proxy reverso da VM 1 (backend + front "tech" opcional).
+#
+# Ver .env: SITE_API / SITE_NIA. Se o subdomínio apontar pro IP da VM, o
+# Caddy emite certificado HTTPS do Let's Encrypt sozinho.
+#
+# Sem domínio ainda? Use DuckDNS (grátis) — passo a passo em DEPLOY.md.
+# ============================================================================
+
+{
+	email {$ACME_EMAIL}
+}
+
+# --- API (FastAPI) ---
+{$SITE_API} {
+	reverse_proxy backend:8000
+	encode zstd gzip
+}
+
+# --- Front do aluno "tech" (Next) — opcional ---
+# Comente este bloco se não subir o serviço `frontend`.
+{$SITE_NIA} {
+	reverse_proxy frontend:3000
+	encode zstd gzip
+}

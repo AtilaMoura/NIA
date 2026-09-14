@@ -47,6 +47,8 @@ backend/requirements_old.txt
 # ...mas os modelos versionados sim:
 !.env.prod.example
 !.env.example
+!.env.backend.example
+!.env.emaus.example
 
 # Frontend (Next.js)
 frontend/node_modules/

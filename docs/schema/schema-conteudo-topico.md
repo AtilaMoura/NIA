@@ -15,6 +15,8 @@ Princípio-guia: cada slide é uma sequência de **blocos** reaproveitáveis (o 
   "duracao_estimada_min": number,
   "roteiro": [string, ...],  // itens do roadmap na capa
   "badges_capa": [string, ...],
+  "imagem_capa": { "url": string, "alt": string } | null,  // opcional — imagem de fundo
+     // do slide "capa" (`.capa-imagem` em topico.html.j2); sem ela a capa fica só texto
   "slides": [ Slide, ... ]
 }
 ```
@@ -99,7 +101,7 @@ padrão preservado).
 ```
 {
   "id": string,
-  "tipo": "mc" | "tf" | "classify" | "associar" | "lacuna" | "open",
+  "tipo": "mc" | "tf" | "classify" | "associar" | "lacuna" | "open" | "ditado",
   "enunciado": string,
   "cenario": string | null,       // caixa itálica de contexto, ex: diálogo cliente/agente
 
@@ -133,7 +135,16 @@ padrão preservado).
      // resposta-modelo" que revela o texto DEPOIS que o aluno já escreveu a dele (não é
      // correção automática, é só uma resposta de referência pra comparar)
 
-  // comum a mc/tf/classify/associar/lacuna (correção objetiva)
+  // tipo == "ditado" (2026-09-09 — criado pro curso de Inglês: já que não dá pra praticar
+  // fala num renderer sem microfone, este é o substituto — ouvir com precisão e escrever
+  // a estrutura certa. Reaproveita a MESMA Web Speech API dos botões 🔊 de vocab, zero
+  // infra nova; "enunciado" fica tipo "Ouça a frase e escreva exatamente o que ouviu.")
+  "frase_audio": string,               // texto falado em voz alta (en-US) — NÃO aparece escrito antes de responder
+  "placeholder": string,
+  "respostas_aceitas": [string, ...],  // mesma correção do "lacuna" (case/acento insensível);
+     // inclua variações razoáveis (com/sem ponto final, com/sem contração)
+
+  // comum a mc/tf/classify/associar/lacuna/ditado (correção objetiva)
   "explicacao": string
 }
 ```

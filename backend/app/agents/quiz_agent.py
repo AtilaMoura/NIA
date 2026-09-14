@@ -14,6 +14,7 @@ PLANO_IMPLEMENTACAO_ESTUDO_IA.md — o agente único antigo repetia pergunta ent
 import json
 
 from .base_agent import BaseAgent
+from .perfis import PerfilDominio, PERFIL_TECH
 
 SCHEMA_PERGUNTAS = """
 Devolva APENAS um JSON válido (sem markdown), neste formato:
@@ -37,7 +38,7 @@ no conteúdo (uma lista de 1 a 2 perguntas cada). As chaves de "avaliacao" devem
 exatamente ef1..ef5, seguindo o "tipo" e o "testar" de cada item em "avaliacao_conceitos".
 
 REGRA CRÍTICA DE TIPO: cada "checkpoint_apos" no conteúdo já vem com um campo "tipo"
-(mc/tf/classify/associar/lacuna/open) — a pergunta que você escrever pra aquele gate_id TEM que usar
+(mc/tf/classify/associar/lacuna/open/ditado) — a pergunta que você escrever pra aquele gate_id TEM que usar
 EXATAMENTE esse tipo, não escolha livremente. Isso existe porque, sem essa trava, os
 checkpoints tendem a sair todos do mesmo tipo (geralmente todos "open") — já aconteceu
 numa geração real (ver Fase 2b no plano) e deixa a avaliação desbalanceada, com mais
@@ -57,6 +58,10 @@ de verdade: {"tipo": "mc", "id": ..., ...}). Um objeto Pergunta sem a chave "tip
 - "tipo":"lacuna": {tipo, id, enunciado, cenario:null, placeholder, respostas_aceitas:
   [string,...] (aceite variações razoáveis, ex: com/sem contração), explicacao}
 - "tipo":"open": {tipo, id, enunciado, cenario (string ou null — use pra cenários de checkpoint aplicado), placeholder, explicacao: null}
+- "tipo":"ditado": {tipo, id, enunciado ("Ouça a frase e escreva exatamente o que ouviu."),
+  cenario:null, frase_audio (a frase em inglês que será falada, NUNCA escrita no enunciado),
+  placeholder, respostas_aceitas:[string,...] (com/sem ponto final, com/sem contração),
+  explicacao}
 
 REGRA CRÍTICA: nenhum "enunciado" pode se repetir nem ser muito parecido com outro
 enunciado em NENHUM outro lugar deste mesmo JSON de saída — releia todas as perguntas
@@ -115,7 +120,12 @@ def _resumir_blocos_para_quiz(blocos: list) -> list:
 class QuizAgent(BaseAgent):
     """Gera as perguntas de um tópico a partir do conteúdo já escrito."""
 
-    async def generate_perguntas(self, conteudo: dict, max_tokens: int = 2800) -> dict:
+    async def generate_perguntas(
+        self,
+        conteudo: dict,
+        max_tokens: int = 2800,
+        perfil: PerfilDominio = PERFIL_TECH,
+    ) -> dict:
         conteudo_resumido = {
             "titulo": conteudo.get("titulo"),
             "slides": [
@@ -132,8 +142,16 @@ class QuizAgent(BaseAgent):
         }
 
         prompt = f"""
-Você é o especialista em avaliação pedagógica. Abaixo está o conteúdo JÁ ESCRITO de um
-tópico de estudo (não é seu trabalho editar o conteúdo, só escrever perguntas sobre ele).
+Você é o especialista em avaliação pedagógica do {perfil.contexto_curso}. Abaixo está o
+conteúdo JÁ ESCRITO de um tópico de estudo (não é seu trabalho editar o conteúdo, só
+escrever perguntas sobre ele).
+
+{perfil.fio_condutor}
+
+A regra acima vale também pra pergunta e gabarito: nunca escreva "correta_idx",
+"respostas_aceitas", "frase_audio" ou "explicacao" que contradiga ou invente algo que
+o fio condutor proíbe (ex: frase em inglês não-natural, citação bíblica que não vem do
+texto fornecido) — mesmo padrão exigido de quem escreveu o conteúdo original.
 
 CONTEÚDO DO TÓPICO:
 {json.dumps(conteudo_resumido, ensure_ascii=False, indent=2)}

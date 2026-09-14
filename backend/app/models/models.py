@@ -112,6 +112,13 @@ class Course(Base):
     # Estrutura IA
     structure = Column(JSONB, nullable=False)
 
+    # Identidade visual (2026-09-11) — paleta/estilo/mood reutilizados em toda
+    # imagem do curso, escrita pelo ImagemAgent. cover_image_url é preenchida à
+    # mão depois de rodar scripts/gerar_imagem_gemini.py (o agente só escreve o
+    # prompt, quem gera a imagem de verdade é o script existente).
+    identidade_visual = Column(JSONB)
+    cover_image_url = Column(String(500))
+
     # Status
     status = Column(String(50), default='draft')
     is_public = Column(Boolean, default=False)
@@ -184,6 +191,9 @@ class Module(Base):
     examples = Column(JSONB, default=[])
     exercises = Column(JSONB, default=[])
     resources = Column(JSONB, default={})
+
+    # Capa do módulo (2026-09-11) — mesmo fluxo de Course.cover_image_url.
+    cover_image_url = Column(String(500))
 
     # Revisão IA
     review_score = Column(DECIMAL(3, 1))
@@ -580,3 +590,77 @@ class CourseAprovacao(Base):
 
     def __repr__(self):
         return f"<CourseAprovacao(course_id={self.course_id}, user_id={self.user_id}, aprovado={self.aprovado})>"
+
+
+# ------------------------------------------------------------
+# 11b. MODEL: TOPICO_ANOTACAO (NOVA! — 2026-09-10)
+# ------------------------------------------------------------
+# Anotação PESSOAL do próprio aluno, por slide — diferente de TopicoComment
+# (ferramenta do revisor/professor, FASE 5a). 1 anotação editável por
+# (usuário, tópico, slide) — upsert, sem DELETE (padrão do projeto): esvaziar
+# o texto some da UI (a lista ignora anotação com texto vazio), a linha fica.
+
+class TopicoAnotacao(Base):
+    __tablename__ = "topico_anotacoes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+    slide_index = Column(Integer, nullable=False)
+
+    texto = Column(Text, nullable=False, default='')
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    user = relationship("User", backref="anotacoes_topico")
+    topico = relationship("Topico", backref="anotacoes")
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'topico_id', 'slide_index', name='uq_topico_anotacao_user_topico_slide'),
+    )
+
+    def __repr__(self):
+        return f"<TopicoAnotacao(topico_id={self.topico_id}, user_id={self.user_id}, slide_index={self.slide_index})>"
+
+
+# ------------------------------------------------------------
+# 11. MODEL: TOPICO_RESPOSTA (NOVA! — 2026-09-09)
+# ------------------------------------------------------------
+# Resposta do ALUNO a 1 exercício (checkpoint/avaliação) dentro do render do
+# tópico — hoje isso vivia só em JS na página e sumia ao recarregar. 1 linha
+# por (usuário, tópico, pergunta) — upsert, sem DELETE (padrão do projeto).
+# Granularidade por pergunta (não por gate/checkpoint inteiro) porque um
+# checkpoint 'classify'/'associar' tem vários itens com id próprio.
+
+class TopicoResposta(Base):
+    __tablename__ = "topico_respostas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    gate_id = Column(String(50), nullable=False)      # ex: 'ck1', 'ef3' — agrupa pro checkGate()
+    question_id = Column(String(50), nullable=False)  # ex: 'ck1_1', 'ef3_1_2' (item de classify)
+    tipo = Column(String(20), nullable=False)          # mc|tf|classify|associar|lacuna|open|ditado
+
+    resposta_dada = Column(JSONB, nullable=False)  # formato varia por tipo (índice, texto, bool...)
+    correta = Column(Boolean)                       # null pra 'open' (sem gabarito automático)
+    tentativas = Column(Integer, nullable=False, default=1)
+
+    respondido_em = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    user = relationship("User", backref="respostas_topico")
+    topico = relationship("Topico", backref="respostas")
+
+    __table_args__ = (
+        CheckConstraint(
+            "tipo IN ('mc', 'tf', 'classify', 'associar', 'lacuna', 'open', 'ditado')",
+            name='valid_topico_resposta_tipo',
+        ),
+        UniqueConstraint('user_id', 'topico_id', 'question_id', name='uq_topico_resposta_user_topico_question'),
+    )
+
+    def __repr__(self):
+        return f"<TopicoResposta(topico_id={self.topico_id}, user_id={self.user_id}, question_id='{self.question_id}', correta={self.correta})>"

@@ -83,7 +83,19 @@ export default async function CursoPage({
           </p>
         )}
         <header className="flex flex-col gap-3">
-          <h1 className="text-[1.7rem]">{curso.title}</h1>
+          {curso.cover_image_url ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={curso.cover_image_url}
+                alt={curso.title}
+                className="aspect-[16/9] w-full rounded-[var(--tm-radius-lg)] object-cover"
+              />
+              <h1 className="sr-only">{curso.title}</h1>
+            </>
+          ) : (
+            <h1 className="text-[1.7rem]">{curso.title}</h1>
+          )}
           {curso.description && (
             <p className="m-0 max-w-2xl text-[.92rem] text-[var(--tm-ink-muted)]">
               {curso.description}

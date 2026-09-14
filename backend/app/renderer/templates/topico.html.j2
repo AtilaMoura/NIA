@@ -154,6 +154,7 @@
         {%- elif p.tipo == 'associar' -%}Associação
         {%- elif p.tipo == 'lacuna' -%}Complete a lacuna
         {%- elif p.tipo == 'open' -%}Aplicação aberta
+        {%- elif p.tipo == 'ditado' -%}Ouça e escreva
         {%- endif -%}
       </span>
     </div>
@@ -173,7 +174,7 @@
       <button class="tf-btn" data-v="falso">Falso</button>
     </div>
     {% elif p.tipo == 'classify' or p.tipo == 'associar' %}
-    <div data-gate-group="{{ p.id }}">
+    <div data-gate-group="{{ p.id }}" data-tipo="{{ p.tipo }}">
       {% for item in p.itens %}
       <div class="classify-item gate-item" data-correct="{{ item.correta }}" data-qid="{{ item.id }}">
         <span class="classify-label">{{ item.texto }}</span>
@@ -197,6 +198,12 @@
     <button class="reveal-btn" data-target="{{ p.id }}-modelo">Ver resposta-modelo</button>
     <div class="explanation" data-exp="{{ p.id }}-modelo">{{ p.resposta_modelo }}</div>
     {% endif %}
+    {% elif p.tipo == 'ditado' %}
+    <div class="ditado-wrap gate-item" data-qid="{{ p.id }}" data-answers='{{ p.respostas_aceitas | tojson }}'>
+      <button type="button" class="vocab-listen ditado-play" data-say="{{ p.frase_audio }}" aria-label="Ouvir a frase" title="Ouvir a frase (pode repetir quantas vezes precisar)">🔊 Ouvir a frase</button>
+      <input type="text" class="lacuna-input ditado-input" placeholder="{{ p.placeholder or 'Escreva exatamente o que você ouviu' }}">
+      <button class="register-btn ditado-check-btn">Corrigir</button>
+    </div>
     {% endif %}
 
     {% if p.explicacao %}<div class="explanation" data-exp="{{ p.id }}">{{ p.explicacao }}</div>{% endif %}
@@ -356,6 +363,9 @@
   .vocab-exemplo-en { display: block; color: var(--text); font-style: italic; }
   .vocab-exemplo-pt { display: block; color: var(--text-dim); font-size: 12px; margin-top: 3px; }
   .vocab-listen-exemplo { width: 17px; height: 17px; font-size: 9px; vertical-align: middle; margin-left: 6px; }
+  .ditado-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 6px; }
+  .ditado-play { width: auto; height: auto; border-radius: 999px; padding: 9px 16px; font-size: 12.5px; font-family: var(--font-label); letter-spacing: .03em; gap: 7px; }
+  .ditado-input { width: 100%; }
   .vocab-listen-secao { font-family: var(--font-label); font-size: 10.5px; letter-spacing: .04em; color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: 999px; padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin: 0 0 14px; transition: border-color .15s ease, color .15s ease; }
   .vocab-listen-secao:hover { border-color: var(--accent); color: var(--accent); }
   .bloco-audio { font-family: var(--font-label); font-size: 10.5px; letter-spacing: .04em; color: var(--accent); background: var(--accent-soft); border: 1px solid transparent; border-radius: 999px; padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin: 2px 0 14px; transition: border-color .15s ease, background .15s ease; }
@@ -457,6 +467,41 @@
   .nav-speed:hover { border-color: var(--accent); }
   .nav-speed:active { transform: scale(.94); }
 
+  .anotacao-fab {
+    position: fixed; right: 16px; bottom: 84px; z-index: 70;
+    width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--surface);
+    background: var(--accent); color: var(--accent-text-on); font-size: 19px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.4);
+    transition: transform .12s ease, filter .15s ease;
+  }
+  .anotacao-fab:hover { filter: brightness(1.08); }
+  .anotacao-fab:active { transform: scale(.94); }
+  .anotacao-fab.tem-notas::after {
+    content: ''; position: absolute; top: 2px; right: 2px; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--bad); border: 1.5px solid var(--accent);
+  }
+  .anotacao-painel {
+    position: fixed; right: 16px; bottom: 138px; z-index: 70; width: min(340px, calc(100vw - 32px));
+    max-height: min(420px, calc(100vh - 220px)); display: flex; flex-direction: column;
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px rgba(0,0,0,.22); overflow: hidden;
+  }
+  .anotacao-painel[hidden] { display: none; }
+  .anotacao-painel-tabs { display: flex; border-bottom: 1px solid var(--border-soft); flex: 0 0 auto; }
+  .anotacao-tab { flex: 1; background: none; border: none; padding: 10px 8px; font-size: 12px; font-weight: 600; color: var(--text-dim); cursor: pointer; font-family: inherit; border-bottom: 2px solid transparent; }
+  .anotacao-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .anotacao-aba { padding: 12px; overflow-y: auto; }
+  .anotacao-texto { width: 100%; min-height: 90px; padding: 10px 12px; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--surface-2); color: var(--text); font-family: inherit; font-size: 13px; resize: vertical; box-sizing: border-box; }
+  .anotacao-salvar { display: inline-block; margin-top: 8px; padding: 8px 14px !important; font-size: 12.5px !important; }
+  .anotacao-status { margin-left: 10px; font-size: 12px; color: var(--text-dim); }
+  .anotacao-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .anotacao-lista-vazio { font-size: 12.5px; color: var(--text-dim); }
+  .anotacao-lista-item { text-align: left; width: 100%; background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 8px 10px; cursor: pointer; font-family: inherit; color: var(--text); }
+  .anotacao-lista-item:hover { border-color: var(--accent); }
+  .anotacao-lista-item-slide { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); font-weight: 700; }
+  .anotacao-lista-item-texto { font-size: 12.5px; margin-top: 2px; color: var(--text-muted); white-space: pre-wrap; }
+
   .summary-box textarea { min-height: 220px; font-family: 'SF Mono', 'Courier New', monospace; font-size: 11.5px; }
   .copy-btn { background: var(--accent); color: var(--accent-text-on); border: none; padding: 11px 18px; border-radius: var(--radius); font-weight: 700; cursor: pointer; font-size: 13px; margin-top: 6px; transition: transform .12s ease; font-family: inherit; }
   .copy-btn:hover { transform: translateY(-1px); }
@@ -464,6 +509,16 @@
   .stat-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border-soft); font-size: 14px; color: var(--text-muted); }
   .stat-row:last-child { border-bottom: none; }
   .stat-val { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+  .veredito-chip { display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .veredito-chip.bom { background: var(--accent-soft); color: var(--accent); }
+  .veredito-chip.aviso { background: color-mix(in srgb, var(--amber) 18%, transparent); color: var(--amber); }
+  #avaliacaoResultado p { margin: 0 0 12px; font-size: 14px; }
+  #avaliacaoAcoes { display: flex; flex-wrap: wrap; gap: 8px; }
+  #avaliacaoErro p { margin: 0 0 10px; color: var(--bad); font-size: 13.5px; }
+  #avaliacaoErro .register-btn, #avaliacaoErro .anotacao-toggle { margin-right: 8px; }
+  .anotacao-toggle { background: none; border: 1px solid var(--border-soft); color: var(--text-dim); padding: 8px 14px; border-radius: var(--radius); font-size: 12.5px; cursor: pointer; font-family: inherit; }
+  .anotacao-toggle:hover { border-color: var(--accent); color: var(--text); }
 
   svg { width: 100%; height: auto; display: block; }
 
@@ -496,14 +551,79 @@
   body.is-fullscreen .box { padding: 22px 26px; font-size: 16px; }
 
   {{ tema.extra_css | safe }}
+  /* ---------------------------------------------------------------------------
+     Impressão / "Baixar PDF" (texto corrido pro professor). Ativado pelo botão
+     #pdfBtn (só aparece com ?pdf=1 na URL, que o emaus-web passa pra quem revisa).
+     Força layout de artigo, troca pra paleta clara (tema escuro imprime péssimo)
+     e tira tudo que é interação (navegação, checkpoints, avaliação, áudio).
+  --------------------------------------------------------------------------- */
+  .print-header { display: none; }
+
+  @media print {
+    @page { margin: 18mm 15mm; }
+
+    :root {
+      --bg: #ffffff; --surface: #ffffff; --surface-2: #f4f2ee;
+      --border: #c9c4ba; --border-soft: #e3ded4;
+      --text: #1c1a17; --text-muted: #4d4a44; --text-dim: #6f6b63;
+      --accent: #8a5a1a; --accent-soft: #efe6d6; --accent-text-on: #ffffff;
+      --bad: #9a3b2c; --bad-soft: #f2e4e0;
+      --blue: #2f5566; --amber: #8a5a1a; --violet: #5a4a72;
+    }
+
+    html, body { background: #fff !important; color: #1c1a17 !important;
+      height: auto !important; overflow: visible !important; }
+
+    /* vira artigo: todos os slides visíveis, empilhados, sem animação */
+    .slides { height: auto !important; overflow: visible !important; padding: 0 !important; background: #fff !important; }
+    .slide { display: block !important; position: static !important; height: auto !important;
+      overflow: visible !important; opacity: 1 !important; transform: none !important;
+      animation: none !important; padding: 6px 0 14px !important; margin: 0 !important;
+      border-bottom: 1px solid #ddd; }
+    .slide:last-of-type { border-bottom: none; }
+    .slide-inner { max-width: none !important; }
+
+    /* fora: interação e navegação */
+    .topbar, .navbar, .progress-track, .section-label,
+    .gate-hint, .confidence, .badge-row, .anotacao-fab, .anotacao-painel,
+    .vocab-listen, .vocab-listen-exemplo, .vocab-listen-secao,
+    #pdfBtn, .modo-btn, .fullscreen-btn, .nav-audio,
+    .slide[data-tipo="checkpoint"],
+    .slide[data-tipo="avaliacao_intro"],
+    .slide[data-tipo="avaliacao_pergunta"],
+    .slide[data-tipo="resultado"],
+    .slide[data-tipo="capa"] .box-instr {
+      display: none !important;
+    }
+
+    .print-header { display: block !important; font-size: 9.5pt; color: #666;
+      border-bottom: 1px solid #bbb; padding-bottom: 6px; margin-bottom: 16px;
+      font-family: {{ tema.fontFamily }}; }
+
+    /* composição de imagem some (sticky não existe em papel) */
+    .conteudo-split, .conteudo-split.flip { display: block !important; }
+    .conteudo-figura { position: static !important; margin-top: 10px !important; }
+    img { max-width: 100% !important; max-height: 85mm !important; width: auto !important; height: auto !important; }
+
+    /* não quebrar blocos no meio */
+    .vocab-entry, .box, .cols2, figure, blockquote, .fluxo-lista li, .timeline .tl-item,
+    .roadmap-item { break-inside: avoid; page-break-inside: avoid; }
+    h1, h2, h3, .section-head, .section-h { break-after: avoid; page-break-after: avoid; }
+
+    a { color: inherit; text-decoration: none; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; text-shadow: none !important; }
+  }
 </style>
 </head>
 <body>
+
+<div class="print-header" aria-hidden="true">{{ content.titulo }} · Tópico {{ content.numero }}{% if content.aula %} · Aula {{ content.aula }}{% endif %}</div>
 
 <div class="topbar">
   <div class="topbar-row">
     <span class="topbar-title">📖 Tópico {{ content.numero }} · {{ content.titulo }}</span>
     <span class="topbar-right">
+      <button class="fullscreen-btn modo-btn" id="pdfBtn" title="Baixar PDF (texto corrido) — abre a caixa de impressão, escolha “Salvar como PDF”" hidden>📄 PDF</button>
       <button class="fullscreen-btn modo-btn" id="modoBtn" title="Alternar entre slide e corrido">☰ Corrido</button>
       {% if cores_dark_json %}
       <button class="fullscreen-btn modo-btn" id="temaBtn" title="Alternar entre claro e escuro">🌙 Escuro</button>
@@ -519,7 +639,7 @@
 <div class="slides" id="slides">
 {% set ns = namespace(secao_idx=0) %}
 {% for slide in content.slides %}
-  <div class="slide{% if loop.first %} active{% endif %}" data-section="{{ slide.secao }}"{% if slide.gate_id %} data-gate="{{ slide.gate_id }}"{% endif %}>
+  <div class="slide{% if loop.first %} active{% endif %}" data-section="{{ slide.secao }}" data-tipo="{{ slide.tipo }}"{% if slide.gate_id %} data-gate="{{ slide.gate_id }}"{% endif %}>
     <div class="slide-inner"{% if slide.narracao %} data-narracao='{{ slide.narracao | tojson }}'{% endif %}>
 
       {% if slide.tipo == 'capa' %}
@@ -601,14 +721,31 @@
           <div class="stat-row"><span>Respostas com alta confiança e erro</span><span class="stat-val" id="statFlags">0</span></div>
           <div class="stat-row"><span>Questões abertas registradas</span><span class="stat-val" id="statOpen">0 / {{ open_total }}</span></div>
         </div>
-        <div class="box box-instr">
+        <div class="box box-instr" id="instrPadraoBox">
           <div class="box-label">➡ Próximo passo</div>
           A correção automática não avalia as respostas abertas nem decide se você já domina o tópico — isso fica pra uma leitura de verdade, feita por mim no chat. Copie o resumo abaixo e cole na conversa com o Claude Code.
         </div>
-        <div class="box summary-box">
+        <div class="box summary-box" id="resumoPadraoBox">
           <div class="box-label">📄 Resumo para colar no chat</div>
           <textarea id="summaryText" readonly></textarea>
           <button class="copy-btn" id="copyBtn">Copiar resumo</button>
+        </div>
+        <div class="box box-instr" id="resumoEmbutidoBox" hidden>
+          <div id="avaliacaoPendente">
+            <div class="box-label">➡ Próximo passo</div>
+            Clique em <strong>“Fim”</strong>, embaixo, pra enviar sua avaliação.
+          </div>
+          <div id="avaliacaoCarregando" hidden>Avaliando seu estudo…</div>
+          <div id="avaliacaoErro" hidden>
+            <p id="avaliacaoErroMsg"></p>
+            <button type="button" class="register-btn" id="avaliacaoTentarDeNovo">Tentar de novo</button>
+            <button type="button" class="anotacao-toggle" id="avaliacaoConcluirMesmoAssim">Marcar como concluído mesmo assim</button>
+          </div>
+          <div id="avaliacaoResultado" hidden>
+            <div class="veredito-chip" id="veredictoChip"></div>
+            <p id="resumoDiagnostico"></p>
+            <div id="avaliacaoAcoes"></div>
+          </div>
         </div>
       {% endif %}
 
@@ -617,10 +754,26 @@
 {% endfor %}
 </div>
 
+<button type="button" class="anotacao-fab" id="anotacaoFab" title="Anotações" aria-label="Anotações">✍️</button>
+<div class="anotacao-painel" id="anotacaoPainel" hidden>
+  <div class="anotacao-painel-tabs">
+    <button type="button" class="anotacao-tab active" data-aba="anotar">Anotar este slide</button>
+    <button type="button" class="anotacao-tab" data-aba="ver">Minhas anotações</button>
+  </div>
+  <div class="anotacao-aba" data-aba-conteudo="anotar">
+    <textarea class="anotacao-texto" id="anotacaoTextoAtual" placeholder="Sua anotação sobre este slide..."></textarea>
+    <button type="button" class="anotacao-salvar register-btn" id="anotacaoSalvarBtn">Salvar anotação</button>
+    <span class="anotacao-status" id="anotacaoStatus"></span>
+  </div>
+  <div class="anotacao-aba" data-aba-conteudo="ver" hidden>
+    <ul class="anotacao-lista" id="anotacaoLista"></ul>
+  </div>
+</div>
+
 <div class="navbar">
   <button class="nav-btn nav-prev" id="prevBtn">◀</button>
   <button class="nav-audio" id="audioBtn" title="Ouvir este slide">🔊</button>
-  <button class="nav-speed" id="speedBtn" title="Velocidade da leitura">1x</button>
+  <button class="nav-speed" id="speedBtn" title="Velocidade do áudio (leitura do slide e 🔊 de vocabulário)">1x</button>
   <button class="nav-btn nav-next" id="nextBtn">Próximo ▶</button>
 </div>
 
@@ -632,11 +785,256 @@ const PROXIMO_TOPICO_LABEL = {{ (content.slides|selectattr("tipo","equalto","res
 const QUESTION_ORDER = {{ question_order_json | safe }};
 const OPEN_TOTAL = {{ open_total }};
 
+// Estado inicial da avaliação do tutor, passado pelo Emaús via querystring
+// (2026-09-11) — permite reabrir um tópico já concluído e ver o resultado
+// final direto no slide "Resultado", sem precisar clicar em "Fim" de novo.
+const AVALIACAO_INICIAL = (function () {
+  var p = new URLSearchParams(window.location.search);
+  return {
+    concluido: p.get('concluido') === '1',
+    veredito: p.get('veredito') || null,
+    resumo: p.get('resumo') || '',
+    temProximo: p.get('proximo') === '1',
+  };
+})();
+
 const state = {};
 function ensureQ(qid) {
   if (!state[qid]) state[qid] = { confidence: null, correct: null, text: null };
   return state[qid];
 }
+
+// Salvar/restaurar resposta por exercício (2026-09-09). Token de escopo curto
+// (?token=... na URL, emitido por POST /auth/topico-token — NÃO é o token de
+// sessão real, que nunca sai do servidor Next.js) + o Topico.id de verdade
+// (extraído do próprio path /topicos/{id}/render, já que TOPICO_ID acima é a
+// string de conteúdo, não a chave do banco). Desligado na tela de revisão
+// (?contexto=revisao) de propósito — testar exercício ali não deve sujar
+// progresso real do aluno.
+const RESPOSTAS_TOPICO_ID_DB = (function () {
+  var m = window.location.pathname.match(/\/topicos\/(\d+)\/render/);
+  return m ? parseInt(m[1], 10) : null;
+})();
+const RESPOSTAS_TOKEN = new URLSearchParams(window.location.search).get('token');
+const RESPOSTAS_CONTEXTO_REVISAO = new URLSearchParams(window.location.search).get('contexto') === 'revisao';
+const RESPOSTAS_ATIVO = !!(RESPOSTAS_TOPICO_ID_DB && RESPOSTAS_TOKEN) && !RESPOSTAS_CONTEXTO_REVISAO;
+
+function salvarRespostaRemota(qid, gateId, tipo, respostaDada, correta) {
+  if (!RESPOSTAS_ATIVO) return;
+  fetch(window.location.origin + '/topico-respostas/' + RESPOSTAS_TOPICO_ID_DB + '/' + encodeURIComponent(qid), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    body: JSON.stringify({ gate_id: gateId, tipo: tipo, resposta_dada: respostaDada, correta: correta }),
+  }).catch(function (e) { console.error('falha ao salvar resposta', qid, e); });
+}
+
+// Este render roda dentro de um <iframe> no Emaús (emaus-web/app/topico) ou
+// sozinho (aba própria, uso pessoal). Vários comportamentos abaixo (botão
+// "Fim" concluir, caixa de copiar resumo, anotação) mudam conforme isso.
+const EMBUTIDO = !!(window.parent && window.parent !== window);
+if (EMBUTIDO) {
+  var instrPadrao = document.getElementById('instrPadraoBox');
+  var resumoPadrao = document.getElementById('resumoPadraoBox');
+  var resumoEmbutido = document.getElementById('resumoEmbutidoBox');
+  if (instrPadrao) instrPadrao.hidden = true;
+  if (resumoPadrao) resumoPadrao.hidden = true;
+  if (resumoEmbutido) resumoEmbutido.hidden = false;
+}
+
+// Avaliação do tutor, renderizada como parte do próprio slide "Resultado"
+// (2026-09-11) — antes disso o veredito aparecia num painel fixo FORA do
+// <iframe>, no Emaús. O <iframe> não tem o token de sessão real (fica só no
+// servidor Next.js — ver docstring de topico_respostas.py), então quem
+// chama o Tutor continua sendo o pai; aqui só troca as caixas de estado e
+// devolve o resultado pra dentro do slide.
+var ultimoResumoEnviado = null;
+
+function mostrarEstadoAvaliacao(estado) {
+  ['avaliacaoPendente', 'avaliacaoCarregando', 'avaliacaoErro', 'avaliacaoResultado'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.hidden = (id !== estado);
+  });
+}
+
+function renderizarResultadoAvaliacao(veredito, resumo, temProximo) {
+  var dominado = veredito === 'dominado';
+  var chip = document.getElementById('veredictoChip');
+  chip.textContent = dominado ? '✓ Você passou' : 'Precisa reforçar antes de seguir';
+  chip.className = 'veredito-chip ' + (dominado ? 'bom' : 'aviso');
+  document.getElementById('resumoDiagnostico').textContent = resumo || '';
+
+  var acoes = document.getElementById('avaliacaoAcoes');
+  acoes.innerHTML = '';
+  if (dominado) {
+    var btnProximo = document.createElement('button');
+    btnProximo.type = 'button';
+    btnProximo.className = 'copy-btn';
+    btnProximo.textContent = temProximo ? 'Próximo tópico ▶' : 'Voltar ao curso';
+    btnProximo.addEventListener('click', function () {
+      try { window.parent.postMessage({ tipo: 'emaus:navegar', destino: temProximo ? 'proximo' : 'curso' }, '*'); } catch (e) {}
+    });
+    acoes.appendChild(btnProximo);
+  } else {
+    var btnRefazer = document.createElement('button');
+    btnRefazer.type = 'button';
+    btnRefazer.className = 'anotacao-toggle';
+    btnRefazer.textContent = 'Refazer o estudo';
+    btnRefazer.addEventListener('click', function () { window.location.reload(); });
+    acoes.appendChild(btnRefazer);
+  }
+  mostrarEstadoAvaliacao('avaliacaoResultado');
+}
+
+if (EMBUTIDO && AVALIACAO_INICIAL.concluido && AVALIACAO_INICIAL.veredito) {
+  renderizarResultadoAvaliacao(AVALIACAO_INICIAL.veredito, AVALIACAO_INICIAL.resumo, AVALIACAO_INICIAL.temProximo);
+}
+
+document.getElementById('avaliacaoTentarDeNovo') && document.getElementById('avaliacaoTentarDeNovo').addEventListener('click', function () {
+  if (!ultimoResumoEnviado) return;
+  mostrarEstadoAvaliacao('avaliacaoCarregando');
+  try { window.parent.postMessage({ tipo: 'emaus:concluir', texto: ultimoResumoEnviado }, '*'); } catch (e) {}
+});
+
+document.getElementById('avaliacaoConcluirMesmoAssim') && document.getElementById('avaliacaoConcluirMesmoAssim').addEventListener('click', function (e) {
+  try { window.parent.postMessage({ tipo: 'emaus:concluir-fallback' }, '*'); } catch (err) {}
+  e.target.disabled = true;
+  e.target.textContent = 'Marcado ✔';
+});
+
+// Anotação pessoal do aluno por slide (2026-09-10, virou botão flutuante em
+// 2026-09-11 — antes era um toggle por slide + painel fixo fora do <iframe>
+// no Emaús; agora tudo mora aqui dentro, um botão só). Mesmo token de escopo
+// curto das respostas de exercício (RESPOSTAS_TOKEN acima), endpoint
+// diferente (/topico-anotacoes). Some da tela de revisão do professor de
+// propósito — ali quem anota é o TopicoComment (FASE 5a), ferramenta
+// diferente desta.
+var anotacoesPorSlide = {};
+var anotacaoFab = document.getElementById('anotacaoFab');
+var anotacaoPainel = document.getElementById('anotacaoPainel');
+var anotacaoTextoAtual = document.getElementById('anotacaoTextoAtual');
+var anotacaoStatus = document.getElementById('anotacaoStatus');
+var anotacaoLista = document.getElementById('anotacaoLista');
+
+if (RESPOSTAS_CONTEXTO_REVISAO) {
+  anotacaoFab.hidden = true;
+} else {
+  function slideIndexAtual() { return current; }
+
+  function atualizarTextoAnotacaoAtual() {
+    anotacaoTextoAtual.value = anotacoesPorSlide[slideIndexAtual()] || '';
+    anotacaoStatus.textContent = '';
+  }
+
+  function atualizarFabIndicador() {
+    var temAlguma = Object.keys(anotacoesPorSlide).some(function (k) { return anotacoesPorSlide[k]; });
+    anotacaoFab.classList.toggle('tem-notas', temAlguma);
+  }
+
+  function renderizarListaAnotacoes() {
+    var indices = Object.keys(anotacoesPorSlide)
+      .map(function (k) { return parseInt(k, 10); })
+      .filter(function (i) { return anotacoesPorSlide[i]; })
+      .sort(function (a, b) { return a - b; });
+
+    if (!indices.length) {
+      anotacaoLista.innerHTML = '<li class="anotacao-lista-vazio">Nenhuma anotação ainda.</li>';
+      return;
+    }
+    anotacaoLista.innerHTML = '';
+    indices.forEach(function (idx) {
+      var li = document.createElement('li');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'anotacao-lista-item';
+      var rotuloSlide = document.createElement('div');
+      rotuloSlide.className = 'anotacao-lista-item-slide';
+      rotuloSlide.textContent = 'Slide ' + (idx + 1);
+      var textoEl = document.createElement('div');
+      textoEl.className = 'anotacao-lista-item-texto';
+      textoEl.textContent = anotacoesPorSlide[idx];
+      btn.appendChild(rotuloSlide);
+      btn.appendChild(textoEl);
+      btn.addEventListener('click', function () {
+        showSlide(idx);
+        trocarAbaAnotacao('anotar');
+      });
+      li.appendChild(btn);
+      anotacaoLista.appendChild(li);
+    });
+  }
+
+  function trocarAbaAnotacao(aba) {
+    document.querySelectorAll('.anotacao-tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.aba === aba);
+    });
+    document.querySelectorAll('.anotacao-aba').forEach(function (a) {
+      a.hidden = a.dataset.abaConteudo !== aba;
+    });
+    if (aba === 'anotar') atualizarTextoAnotacaoAtual();
+    else renderizarListaAnotacoes();
+  }
+
+  anotacaoFab.addEventListener('click', function () {
+    anotacaoPainel.hidden = !anotacaoPainel.hidden;
+    if (!anotacaoPainel.hidden) trocarAbaAnotacao('anotar');
+  });
+
+  document.querySelectorAll('.anotacao-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () { trocarAbaAnotacao(tab.dataset.aba); });
+  });
+
+  document.getElementById('anotacaoSalvarBtn').addEventListener('click', function () {
+    var idx = slideIndexAtual();
+    var texto = anotacaoTextoAtual.value.trim();
+    if (!RESPOSTAS_ATIVO) { anotacaoStatus.textContent = 'Faça login pra salvar.'; return; }
+    anotacaoStatus.textContent = 'Salvando…';
+    fetch(window.location.origin + '/topico-anotacoes/' + RESPOSTAS_TOPICO_ID_DB + '/' + idx, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+      body: JSON.stringify({ texto: texto }),
+    })
+      .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+      .then(function () {
+        anotacoesPorSlide[idx] = texto || null;
+        atualizarFabIndicador();
+        anotacaoStatus.textContent = 'Salvo ✔';
+        setTimeout(function () { anotacaoStatus.textContent = ''; }, 2000);
+      })
+      .catch(function (e) { anotacaoStatus.textContent = 'Erro ao salvar — tenta de novo.'; console.error('falha ao salvar anotação', e); });
+  });
+
+  if (RESPOSTAS_ATIVO) {
+    fetch(window.location.origin + '/topico-anotacoes/' + RESPOSTAS_TOPICO_ID_DB, {
+      headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (lista) {
+        lista.forEach(function (a) { if (a.texto) anotacoesPorSlide[a.slide_index] = a.texto; });
+        atualizarFabIndicador();
+      })
+      .catch(function (e) { console.error('falha ao carregar anotações', e); });
+  }
+}
+
+// Fila de revisão do professor manda ir pra um slide específico ao clicar
+// num comentário existente — reaproveitado aqui pro painel "Minhas
+// anotações" também. Além disso, é aqui que o pai (Emaús) devolve o
+// resultado da avaliação do tutor pro slide "Resultado" (ver
+// renderizarResultadoAvaliacao acima) — o <iframe> pediu com 'emaus:concluir',
+// o pai chamou a API (só ele tem o token de sessão real) e manda a resposta
+// de volta pra cá.
+window.addEventListener('message', function (e) {
+  var d = e.data;
+  if (!d) return;
+  if (d.tipo === 'emaus:ir-slide' && typeof d.indice === 'number') {
+    showSlide(d.indice);
+  } else if (d.tipo === 'emaus:avaliacao-resultado') {
+    renderizarResultadoAvaliacao(d.veredito, d.resumo_diagnostico, !!d.temProximo);
+  } else if (d.tipo === 'emaus:avaliacao-erro') {
+    document.getElementById('avaliacaoErroMsg').textContent = d.mensagem || 'Não deu pra falar com o tutor agora.';
+    mostrarEstadoAvaliacao('avaliacaoErro');
+  }
+});
 
 document.querySelectorAll('.confidence').forEach(function (box) {
   const qid = box.dataset.confidence;
@@ -666,6 +1064,7 @@ document.querySelectorAll('.opts').forEach(function (optsEl) {
       if (!isCorrect) btn.classList.add('incorrect');
       ensureQ(qid).correct = isCorrect;
       if (exp) exp.classList.add('show');
+      salvarRespostaRemota(qid, optsEl.closest('.slide').dataset.gate, 'mc', chosenIdx, isCorrect);
       checkGate(optsEl.closest('.slide'));
       updateStatsLive();
     });
@@ -689,6 +1088,7 @@ document.querySelectorAll('.tf-row').forEach(function (row) {
       if (!isCorrect) btn.classList.add('incorrect');
       ensureQ(qid).correct = isCorrect;
       if (exp) exp.classList.add('show');
+      salvarRespostaRemota(qid, row.closest('.slide').dataset.gate, 'tf', btn.dataset.v, isCorrect);
       checkGate(row.closest('.slide'));
       updateStatsLive();
     });
@@ -697,6 +1097,7 @@ document.querySelectorAll('.tf-row').forEach(function (row) {
 
 document.querySelectorAll('[data-gate-group]').forEach(function (group) {
   const groupId = group.dataset.gateGroup;
+  const groupTipo = group.dataset.tipo === 'associar' ? 'associar' : 'classify';
   group.querySelectorAll('.classify-item').forEach(function (item) {
     const qid = item.dataset.qid;
     const correctVal = item.dataset.correct;
@@ -716,6 +1117,7 @@ document.querySelectorAll('[data-gate-group]').forEach(function (group) {
           const exp = document.querySelector('[data-exp="' + groupId + '"]');
           if (exp) exp.classList.add('show');
         }
+        salvarRespostaRemota(qid, item.closest('.slide').dataset.gate, groupTipo, btn.dataset.v, isCorrect);
         checkGate(item.closest('.slide'));
         updateStatsLive();
       });
@@ -752,10 +1154,158 @@ document.querySelectorAll('.lacuna-wrap').forEach(function (wrap) {
     input.style.borderColor = isCorrect ? 'var(--accent)' : 'var(--bad)';
     ensureQ(qid).correct = isCorrect;
     if (exp) exp.classList.add('show');
+    salvarRespostaRemota(qid, wrap.closest('.slide').dataset.gate, 'lacuna', valor, isCorrect);
     checkGate(wrap.closest('.slide'));
     updateStatsLive();
   });
 });
+
+// Ditado: mesma correção por string do lacuna-wrap (normalizarResposta já definida acima);
+// o botão de tocar áudio (.ditado-play) usa a classe .vocab-listen, então já é pego pelo
+// listener de vocabulário mais abaixo — não precisa de handler de áudio separado aqui.
+document.querySelectorAll('.ditado-wrap').forEach(function (wrap) {
+  const qid = wrap.dataset.qid;
+  const aceitas = JSON.parse(wrap.dataset.answers || '[]').map(normalizarResposta);
+  const input = wrap.querySelector('.ditado-input');
+  const btn = wrap.querySelector('.ditado-check-btn');
+  const question = wrap.closest('.question');
+  const exp = question.querySelector('.explanation');
+  btn.addEventListener('click', function () {
+    if (wrap.dataset.answered) return;
+    const valor = input.value.trim();
+    if (!valor) { input.focus(); return; }
+    const isCorrect = aceitas.indexOf(normalizarResposta(valor)) !== -1;
+    wrap.dataset.answered = '1';
+    input.disabled = true;
+    btn.disabled = true;
+    btn.classList.add('done');
+    input.style.borderColor = isCorrect ? 'var(--accent)' : 'var(--bad)';
+    ensureQ(qid).correct = isCorrect;
+    salvarRespostaRemota(qid, wrap.closest('.slide').dataset.gate, 'ditado', valor, isCorrect);
+    if (exp) exp.classList.add('show');
+    checkGate(wrap.closest('.slide'));
+    updateStatsLive();
+  });
+});
+
+// Restaurar respostas salvas (2026-09-09) — reaplica o mesmo estado visual que
+// cada handler acima aplicaria, sem disparar salvarRespostaRemota() de novo
+// (senão viraria um loop de re-salvar o que acabou de ser lido).
+function restaurarMC(qid, escolhaSalva) {
+  const optsEl = document.querySelector('.opts[data-qid="' + qid + '"]');
+  if (!optsEl || optsEl.dataset.answered) return;
+  const correctIdx = parseInt(optsEl.dataset.correct, 10);
+  const buttons = optsEl.querySelectorAll('.opt-btn');
+  optsEl.dataset.answered = '1';
+  buttons.forEach(function (b) { b.disabled = true; });
+  if (buttons[correctIdx]) buttons[correctIdx].classList.add('correct');
+  if (escolhaSalva !== correctIdx && buttons[escolhaSalva]) buttons[escolhaSalva].classList.add('incorrect');
+  ensureQ(qid).correct = escolhaSalva === correctIdx;
+  const exp = optsEl.closest('.question').querySelector('.explanation');
+  if (exp) exp.classList.add('show');
+}
+function restaurarTF(qid, escolhaSalva) {
+  const row = document.querySelector('.tf-row[data-qid="' + qid + '"]');
+  if (!row || row.dataset.answered) return;
+  const correctVal = row.dataset.correctTf;
+  const buttons = row.querySelectorAll('.tf-btn');
+  row.dataset.answered = '1';
+  buttons.forEach(function (b) { b.disabled = true; });
+  const correctBtn = row.querySelector('[data-v="' + correctVal + '"]');
+  if (correctBtn) correctBtn.classList.add('correct');
+  if (escolhaSalva !== correctVal) {
+    const chosenBtn = row.querySelector('[data-v="' + escolhaSalva + '"]');
+    if (chosenBtn) chosenBtn.classList.add('incorrect');
+  }
+  ensureQ(qid).correct = escolhaSalva === correctVal;
+  const exp = row.closest('.question').querySelector('.explanation');
+  if (exp) exp.classList.add('show');
+}
+function restaurarClassify(qid, escolhaSalva) {
+  const item = document.querySelector('.classify-item[data-qid="' + qid + '"]');
+  if (!item || item.dataset.answered) return;
+  const correctVal = item.dataset.correct;
+  const buttons = item.querySelectorAll('.classify-btns button');
+  item.dataset.answered = '1';
+  buttons.forEach(function (b) { b.disabled = true; });
+  const correctBtn = item.querySelector('[data-v="' + correctVal + '"]');
+  if (correctBtn) correctBtn.classList.add('correct');
+  if (escolhaSalva !== correctVal) {
+    const chosenBtn = item.querySelector('[data-v="' + escolhaSalva + '"]');
+    if (chosenBtn) chosenBtn.classList.add('incorrect');
+  }
+  ensureQ(qid).correct = escolhaSalva === correctVal;
+  const group = item.closest('[data-gate-group]');
+  if (group) {
+    const allAnswered = group.querySelectorAll('.classify-item:not([data-answered])').length === 0;
+    if (allAnswered) {
+      const exp = document.querySelector('[data-exp="' + group.dataset.gateGroup + '"]');
+      if (exp) exp.classList.add('show');
+    }
+  }
+}
+function restaurarLacunaOuDitado(qid, valorSalvo, seletorWrap, seletorInput, seletorBtn) {
+  const wrap = document.querySelector(seletorWrap + '[data-qid="' + qid + '"]');
+  if (!wrap || wrap.dataset.answered) return;
+  const input = wrap.querySelector(seletorInput);
+  const btn = wrap.querySelector(seletorBtn);
+  const aceitas = JSON.parse(wrap.dataset.answers || '[]').map(normalizarResposta);
+  const isCorrect = aceitas.indexOf(normalizarResposta(valorSalvo)) !== -1;
+  wrap.dataset.answered = '1';
+  input.value = valorSalvo;
+  input.disabled = true;
+  btn.disabled = true;
+  btn.classList.add('done');
+  input.style.borderColor = isCorrect ? 'var(--accent)' : 'var(--bad)';
+  ensureQ(qid).correct = isCorrect;
+  const exp = wrap.closest('.question').querySelector('.explanation');
+  if (exp) exp.classList.add('show');
+}
+function restaurarOpen(qid, textoSalvo) {
+  const textarea = document.querySelector('textarea[data-open="' + qid + '"]');
+  const btn = document.querySelector('.register-btn[data-register="' + qid + '"]');
+  if (!textarea || !btn || btn.dataset.answered) return;
+  textarea.value = textoSalvo;
+  ensureQ(qid).text = textoSalvo;
+  btn.textContent = 'Registrado ✔ (clique de novo se editar)';
+  btn.classList.add('done');
+  btn.dataset.answered = '1';
+}
+
+if (RESPOSTAS_ATIVO) {
+  fetch(window.location.origin + '/topico-respostas/' + RESPOSTAS_TOPICO_ID_DB, {
+    headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+  })
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (respostas) {
+      respostas.forEach(function (r) {
+        switch (r.tipo) {
+          case 'mc': restaurarMC(r.question_id, r.resposta_dada); break;
+          case 'tf': restaurarTF(r.question_id, r.resposta_dada); break;
+          case 'classify':
+          case 'associar': restaurarClassify(r.question_id, r.resposta_dada); break;
+          case 'lacuna': restaurarLacunaOuDitado(r.question_id, r.resposta_dada, '.lacuna-wrap', '.lacuna-input', '.lacuna-check-btn'); break;
+          case 'ditado': restaurarLacunaOuDitado(r.question_id, r.resposta_dada, '.ditado-wrap', '.ditado-input', '.ditado-check-btn'); break;
+          case 'open': restaurarOpen(r.question_id, r.resposta_dada); break;
+        }
+      });
+      document.querySelectorAll('.slide[data-gate]').forEach(function (el) { checkGate(el); });
+      updateStatsLive();
+    })
+    .catch(function (e) { console.error('falha ao carregar respostas salvas', e); });
+}
+
+// Velocidade dos 🔊 de vocabulário: mesma preferência do botão de leitura
+// (#speedBtn / gcTtsSpeedIdx). Pronúncia de palavra isolada pede um pouco
+// mais devagar que a leitura corrida, então aplica um leve desconto.
+function taxaAudioVocab() {
+  try {
+    var lv = [0.65, 0.8, 1.0, 1.2, 1.4];
+    var idx = parseInt(localStorage.getItem('gcTtsSpeedIdx'), 10);
+    if (isNaN(idx) || idx < 0 || idx >= lv.length) idx = 2;
+    return Math.max(0.5, lv[idx] * 0.9);
+  } catch (e) { return 0.9; }
+}
 
 document.querySelectorAll('.vocab-listen').forEach(function (btn) {
   btn.addEventListener('click', function (e) {
@@ -764,6 +1314,7 @@ document.querySelectorAll('.vocab-listen').forEach(function (btn) {
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(btn.dataset.say);
     utter.lang = 'en-US';
+    utter.rate = taxaAudioVocab();
     window.speechSynthesis.speak(utter);
   });
 });
@@ -785,6 +1336,7 @@ document.querySelectorAll('.vocab-listen-secao').forEach(function (btn) {
       if (i >= fila.length) return;
       var utter = new SpeechSynthesisUtterance(fila[i]);
       utter.lang = 'en-US';
+      utter.rate = taxaAudioVocab();
       utter.onend = function () { i++; proxima(); };
       window.speechSynthesis.speak(utter);
     }
@@ -813,7 +1365,10 @@ document.querySelectorAll('.vocab-listen-secao').forEach(function (btn) {
   });
 })();
 
-document.querySelectorAll('.register-btn').forEach(function (btn) {
+// Seletor '[data-register]', não só '.register-btn' — essa classe também está
+// nos botões de lacuna/ditado (só pra herdar o CSS), que não têm data-register
+// e disparariam TypeError aqui (achado revisando este trecho, 2026-09-09).
+document.querySelectorAll('.register-btn[data-register]').forEach(function (btn) {
   btn.addEventListener('click', function () {
     const qid = btn.dataset.register;
     const textarea = document.querySelector('textarea[data-open="' + qid + '"]');
@@ -823,6 +1378,7 @@ document.querySelectorAll('.register-btn').forEach(function (btn) {
     btn.textContent = 'Registrado ✔ (clique de novo se editar)';
     btn.classList.add('done');
     btn.dataset.answered = '1';
+    salvarRespostaRemota(qid, btn.closest('.slide').dataset.gate, 'open', text, null);
     checkGate(btn.closest('.slide'));
     updateStatsLive();
   });
@@ -853,6 +1409,17 @@ function checkGate(slideEl) {
     if (hint) hint.classList.toggle('show', !allAnswered);
   }
   slideEl.dataset.unlocked = allAnswered ? '1' : '';
+  // Assim que TODOS os checkpoints/avaliações do tópico estão respondidos, já
+  // monta o resumo (e, se embutido no Emaús, entrega pro pai via postMessage) —
+  // sem depender do aluno clicar "Próximo" até o slide de resultado. Achado real
+  // (2026-09-10): aluno responde a última pergunta, clica "Enviar meu resumo" no
+  // painel do Emaús (que aparece embaixo) em vez de "Próximo ▶", e o resumo ainda
+  // não existia — o botão não fazia nada.
+  if (allAnswered) {
+    var gates = document.querySelectorAll('.slide[data-gate]');
+    var todosOk = Array.from(gates).every(function (g) { return g.dataset.unlocked; });
+    if (todosOk) buildSummary();
+  }
 }
 
 function showSlide(idx) {
@@ -868,6 +1435,14 @@ function showSlide(idx) {
   nextBtn.textContent = idx === slides.length - 1 ? 'Fim' : 'Próximo ▶';
   if (slideEl.dataset.gate) { checkGate(slideEl); } else { nextBtn.disabled = false; }
   if (idx === slides.length - 1) buildSummary();
+
+  // Painel de anotação flutuante: se estiver aberto na aba "Anotar este
+  // slide", troca o texto pro slide novo (a função só existe fora do
+  // contexto de revisão — ver bloco de anotação acima).
+  if (typeof atualizarTextoAnotacaoAtual === 'function' && anotacaoPainel && !anotacaoPainel.hidden) {
+    var abaAnotar = document.querySelector('.anotacao-tab[data-aba="anotar"]');
+    if (abaAnotar && abaAnotar.classList.contains('active')) atualizarTextoAnotacaoAtual();
+  }
 
   // Avisa o pai (front Emaús, área de revisão) qual slide está na tela — inócuo fora
   // de iframe. O aluno não usa isso; é o painel do professor que escuta.
@@ -885,7 +1460,22 @@ function showSlide(idx) {
 }
 
 document.getElementById('prevBtn').addEventListener('click', function () { if (current > 0) showSlide(current - 1); });
-document.getElementById('nextBtn').addEventListener('click', function () { if (current < slides.length - 1) showSlide(current + 1); });
+document.getElementById('nextBtn').addEventListener('click', function () {
+  if (current < slides.length - 1) { showSlide(current + 1); return; }
+  // Já está no slide "Resultado" (último) e clicou em "Fim" de novo — se
+  // embutido no Emaús, é ESTE clique que dispara o envio pro Tutor (achado
+  // real, 2026-09-10: tinha um botão "Enviar meu resumo" separado no painel
+  // do Emaús, o aluno não via porque já achava que tinha terminado ao
+  // responder a última pergunta). Fora de iframe (uso pessoal) não faz nada
+  // novo — o resumo pra copiar já está na tela.
+  if (!EMBUTIDO) return;
+  buildSummary();
+  ultimoResumoEnviado = document.getElementById('summaryText').value;
+  mostrarEstadoAvaliacao('avaliacaoCarregando');
+  try {
+    window.parent.postMessage({ tipo: 'emaus:concluir', texto: ultimoResumoEnviado }, '*');
+  } catch (e) {}
+});
 document.addEventListener('keydown', function (e) {
   if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
   if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
@@ -1036,6 +1626,21 @@ showSlide(0);
   var modoSalvo = 'slide';
   try { modoSalvo = localStorage.getItem('emausTopicoModo') || 'slide'; } catch (e) {}
   if (modoSalvo === 'corrido') aplicarModo('corrido');
+})();
+
+// Botão "📄 PDF" — só aparece com ?pdf=1 na URL (o emaus-web passa isso pro
+// iframe quando o usuário é professor/admin/master). O @media print já força o
+// layout de artigo em paleta clara, então aqui é só abrir a caixa de impressão.
+(function () {
+  var pdfBtn = document.getElementById('pdfBtn');
+  if (!pdfBtn) return;
+  var querPdf = new URLSearchParams(window.location.search).get('pdf') === '1';
+  if (!querPdf) { pdfBtn.hidden = true; return; }
+  pdfBtn.hidden = false;
+  pdfBtn.addEventListener('click', function () {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    window.print();
+  });
 })();
 
 {% if cores_dark_json %}
