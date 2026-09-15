@@ -1579,15 +1579,30 @@ document.getElementById('copyBtn') && document.getElementById('copyBtn').addEven
 });
 
 const fullscreenBtn = document.getElementById('fullscreenBtn');
+// iOS Safari não suporta a Fullscreen API padrão pra elementos genéricos (só
+// <video>) — requestFullscreen() nem existe ou rejeita a Promise. Nesses
+// casos caímos num "modo tela cheia" via CSS + postMessage pro Next.js pai
+// esconder a barra "Voltar ao curso" e o iframe ocupar a tela toda.
+let fallbackFullscreen = false;
+function avisarPai(ligado) {
+  try { window.parent.postMessage({ tipo: 'emaus:fullscreen-toggle', ligado: ligado }, '*'); } catch (e) {}
+}
 function syncFullscreenUI() {
-  const on = !!document.fullscreenElement;
+  const on = !!document.fullscreenElement || fallbackFullscreen;
   document.body.classList.toggle('is-fullscreen', on);
   fullscreenBtn.textContent = on ? '✕' : '⛶';
   fullscreenBtn.title = on ? 'Sair da tela cheia' : 'Tela cheia';
 }
 fullscreenBtn.addEventListener('click', function () {
-  if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(function () {}); }
-  else { document.exitFullscreen().catch(function () {}); }
+  if (document.fullscreenElement) { document.exitFullscreen().catch(function () {}); return; }
+  if (fallbackFullscreen) { fallbackFullscreen = false; syncFullscreenUI(); avisarPai(false); return; }
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(function () {
+      fallbackFullscreen = true; syncFullscreenUI(); avisarPai(true);
+    });
+  } else {
+    fallbackFullscreen = true; syncFullscreenUI(); avisarPai(true);
+  }
 });
 document.addEventListener('fullscreenchange', syncFullscreenUI);
 

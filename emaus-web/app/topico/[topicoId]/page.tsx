@@ -97,7 +97,9 @@ export default async function TopicoPage({
   const analiseInicial = progTopico?.tutor_analise?.ultima_avaliacao ?? null;
 
   const barraTopo = (
-    <div className="flex items-center gap-3 border-b border-[var(--tm-border)] bg-[var(--tm-bg)] px-[clamp(1rem,4vw,2rem)] py-2.5 text-[.82rem]">
+    <div
+      id="barra-topo-topico"
+      className="flex items-center gap-3 border-b border-[var(--tm-border)] bg-[var(--tm-bg)] px-[clamp(1rem,4vw,2rem)] py-2.5 text-[.82rem]">
       <Link
         href={`/curso/${CURSO_ID}`}
         className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-[var(--tm-accent)] hover:underline"

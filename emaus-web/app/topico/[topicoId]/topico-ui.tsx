@@ -82,6 +82,33 @@ export function AcoesTopico({
         } else {
           router.push(`/curso/${cursoId}`);
         }
+      } else if (d.tipo === "emaus:fullscreen-toggle" && typeof d.ligado === "boolean") {
+        // Fallback pra navegadores sem Fullscreen API pra elemento genérico
+        // (iOS Safari) — o render pediu via postMessage porque requestFullscreen()
+        // não existe/falhou lá dentro. Faz na marra: iframe cobre a viewport
+        // toda e a barra "Voltar ao curso" some, sem depender de permissão do
+        // navegador.
+        const iframe = document.querySelector("iframe");
+        const barra = document.getElementById("barra-topo-topico");
+        if (d.ligado) {
+          if (iframe) {
+            iframe.style.position = "fixed";
+            iframe.style.inset = "0";
+            iframe.style.width = "100vw";
+            iframe.style.height = "100dvh";
+            iframe.style.zIndex = "9999";
+          }
+          if (barra) barra.style.display = "none";
+        } else {
+          if (iframe) {
+            iframe.style.position = "";
+            iframe.style.inset = "";
+            iframe.style.width = "";
+            iframe.style.height = "";
+            iframe.style.zIndex = "";
+          }
+          if (barra) barra.style.display = "";
+        }
       }
     }
     window.addEventListener("message", aoReceber);
