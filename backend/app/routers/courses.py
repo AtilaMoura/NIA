@@ -5,24 +5,36 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 
 # ✅ IMPORTAR OS MODELS
-from app.models.models import Course, Module, Progress, Lesson  # ← ADICIONE Module!
+from app.models.models import Course, Module, Progress, Lesson, User  # ← ADICIONE Module!
 
 from app.schemas.courses import (
-    CourseGenerateRequest, 
+    CourseGenerateRequest,
     CourseStructureResponse,
     ModuleGenerateResponse
 )
 from app.agents.orchestrator import Orchestrator
+from app.core.auth import get_current_user
 from datetime import datetime
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
+
+# Escrita (CRUD + geração via IA, que tem custo real de API) exige admin/master —
+# leitura continua pública (ver topicos.py, mesmo padrão).
+PAPEIS_ADMIN = ("master", "admin")
+
+
+def _exigir_admin(user: User):
+    if user.role not in PAPEIS_ADMIN:
+        raise HTTPException(403, "Só master ou admin podem criar/editar/apagar/gerar cursos.")
+
 
 # ============================================
 # CRUD BÁSICO (mantém como está)
 # ============================================
 
 @router.post("/")
-def create_course(data: dict, db: Session = Depends(get_db)):
+def create_course(data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    _exigir_admin(current_user)
     course = Course(**data)
     db.add(course)
     db.commit()
@@ -41,7 +53,8 @@ def get_course(course_id: int, db: Session = Depends(get_db)):
     return course
 
 @router.put("/{course_id}")
-def update_course(course_id: int, data: dict, db: Session = Depends(get_db)):
+def update_course(course_id: int, data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    _exigir_admin(current_user)
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(404, "Course not found")
@@ -52,7 +65,8 @@ def update_course(course_id: int, data: dict, db: Session = Depends(get_db)):
     return course
 
 @router.delete("/{course_id}")
-def delete_course(course_id: int, db: Session = Depends(get_db)):
+def delete_course(course_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    _exigir_admin(current_user)
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(404, "Course not found")
@@ -69,11 +83,13 @@ def delete_course(course_id: int, db: Session = Depends(get_db)):
 async def generate_course_structure(
     data: CourseGenerateRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """
     FASE 1: Gera APENAS a estrutura do curso (títulos de módulos e lições)
     e salva as entidades Course, Module e Lesson no banco de dados.
     """
+    _exigir_admin(current_user)
     try:
         print("🔹 Iniciando geração da estrutura...")
         
@@ -200,11 +216,13 @@ async def generate_module_content(
     course_id: int,
     module_index: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """
     FASE 2: Gera o conteúdo detalhado para todas as lições de um módulo
     e atualiza a tabela Module.
     """
+    _exigir_admin(current_user)
     print(f"🔹 Iniciando FASE 2: Geração de conteúdo para Módulo {module_index} do Curso {course_id}")
     try:
         # 1. Encontra o Módulo e o Curso

@@ -7,8 +7,17 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.models import Lesson, User
 from app.renderer.render import render_topico, carregar_temas
+from app.core.auth import get_current_user
 
 router = APIRouter(prefix="/lessons", tags=["Lessons"])
+
+# Escrita exige admin/master — leitura continua pública (ver topicos.py, mesmo padrão).
+PAPEIS_ADMIN = ("master", "admin")
+
+
+def _exigir_admin(user: User):
+    if user.role not in PAPEIS_ADMIN:
+        raise HTTPException(403, "Só master ou admin podem criar/editar/apagar aulas.")
 
 
 # Listar todas as lições (Fase 3 do front usa isso pra montar a grade do aluno,
@@ -21,7 +30,8 @@ def list_lessons(db: Session = Depends(get_db)):
 
 # Criar lição (content é o JSON estruturado — ver docs/schema/ — guardado como texto)
 @router.post("/")
-def create_lesson(data: dict, db: Session = Depends(get_db)):
+def create_lesson(data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    _exigir_admin(current_user)
     if isinstance(data.get("content"), dict):
         data = {**data, "content": json.dumps(data["content"], ensure_ascii=False)}
     lesson = Lesson(**data)
@@ -76,7 +86,8 @@ def render_lesson(
 
 
 @router.put("/{lesson_id}")
-def update_lesson(lesson_id: int, data: dict, db: Session = Depends(get_db)):
+def update_lesson(lesson_id: int, data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    _exigir_admin(current_user)
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:
         raise HTTPException(404, "Lesson not found")
@@ -89,7 +100,8 @@ def update_lesson(lesson_id: int, data: dict, db: Session = Depends(get_db)):
 
 
 @router.delete("/{lesson_id}")
-def delete_lesson(lesson_id: int, db: Session = Depends(get_db)):
+def delete_lesson(lesson_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    _exigir_admin(current_user)
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:
         raise HTTPException(404, "Lesson not found")

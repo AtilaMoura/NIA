@@ -7,8 +7,20 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.models import Topico, Lesson, User
 from app.renderer.render import render_topico, carregar_temas
+from app.core.auth import get_current_user
 
 router = APIRouter(prefix="/topicos", tags=["Topicos"])
+
+# Escrita (criar/editar/apagar conteúdo) exige admin/master — leitura (GET, /render)
+# continua pública, é o que o site usa pros alunos. Achado real 2026-09-15: esses
+# endpoints ficaram sem nenhuma auth desde sempre, só notado depois do deploy público
+# (ver [[nia-infra-gotchas]]). Mesmo padrão de app/routers/governanca.py.
+PAPEIS_ADMIN = ("master", "admin")
+
+
+def _exigir_admin(user: User):
+    if user.role not in PAPEIS_ADMIN:
+        raise HTTPException(403, "Só master ou admin podem criar/editar/apagar tópicos.")
 
 
 # Nível novo (2026-08-26): Lesson passa a representar a AULA; cada aula pode
@@ -24,7 +36,8 @@ def list_topicos(lesson_id: int | None = Query(None), db: Session = Depends(get_
 
 
 @router.post("/")
-def create_topico(data: dict, db: Session = Depends(get_db)):
+def create_topico(data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    _exigir_admin(current_user)
     if isinstance(data.get("content"), dict):
         data = {**data, "content": json.dumps(data["content"], ensure_ascii=False)}
     topico = Topico(**data)
@@ -43,7 +56,8 @@ def get_topico(topico_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{topico_id}")
-def update_topico(topico_id: int, data: dict, db: Session = Depends(get_db)):
+def update_topico(topico_id: int, data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    _exigir_admin(current_user)
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
     if not topico:
         raise HTTPException(404, "Tópico not found")
@@ -56,7 +70,8 @@ def update_topico(topico_id: int, data: dict, db: Session = Depends(get_db)):
 
 
 @router.delete("/{topico_id}")
-def delete_topico(topico_id: int, db: Session = Depends(get_db)):
+def delete_topico(topico_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    _exigir_admin(current_user)
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
     if not topico:
         raise HTTPException(404, "Tópico not found")
