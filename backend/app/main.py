@@ -44,6 +44,18 @@ def _ensure_colunas_extras(bind):
         "ALTER TABLE courses ADD COLUMN IF NOT EXISTS identidade_visual JSONB",
         "ALTER TABLE courses ADD COLUMN IF NOT EXISTS cover_image_url VARCHAR(500)",
         "ALTER TABLE modules ADD COLUMN IF NOT EXISTS cover_image_url VARCHAR(500)",
+        # Slide exato onde o aluno parou + "rodada" de exercícios pra separar
+        # teste/preview de avaliação real (2026-09-15, ver POST
+        # /topico-progress/{id}/reiniciar).
+        "ALTER TABLE topico_progress ADD COLUMN IF NOT EXISTS ultimo_slide INTEGER",
+        "ALTER TABLE topico_progress ADD COLUMN IF NOT EXISTS rodada_atual INTEGER NOT NULL DEFAULT 1",
+        "ALTER TABLE topico_respostas ADD COLUMN IF NOT EXISTS rodada INTEGER NOT NULL DEFAULT 1",
+        "ALTER TABLE topico_respostas DROP CONSTRAINT IF EXISTS uq_topico_resposta_user_topico_question",
+        "DO $$ BEGIN "
+        "IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_topico_resposta_user_topico_question_rodada') THEN "
+        "ALTER TABLE topico_respostas ADD CONSTRAINT uq_topico_resposta_user_topico_question_rodada "
+        "UNIQUE (user_id, topico_id, question_id, rodada); "
+        "END IF; END $$;",
     ]
     with bind.begin() as conn:
         for s in stmts:

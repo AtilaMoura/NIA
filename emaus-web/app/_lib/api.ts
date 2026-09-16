@@ -98,6 +98,8 @@ export type TopicoProgress = {
   tutor_veredito: VeredictoTutor | null;
   tutor_analise: TutorAnalise | null;
   avaliado_em: string | null;
+  ultimo_slide: number | null;
+  rodada_atual: number;
 };
 
 // Progress é por MÓDULO (o de tópico é TopicoProgress). Só os campos que o Emaús lê.
@@ -370,6 +372,13 @@ export function salvarPreferencia(
 
 export function marcarProgresso(topicoId: number, status: StatusTopico) {
   return chamarMesmaOrigem<TopicoProgress>("/api/topico-progress", "PUT", { topicoId, status });
+}
+
+// Recomeçar o tópico (2026-09-15) — pro aluno que testou/espiou exercícios e
+// quer refazer valendo de verdade. Não apaga nada (ver POST
+// /topico-progress/{id}/reiniciar no backend); só abre uma rodada nova.
+export function reiniciarTopico(topicoId: number) {
+  return chamarMesmaOrigem<TopicoProgress>("/api/topico-progress/reiniciar", "POST", { topicoId });
 }
 
 // Devolve o TopicoProgress atualizado; a avaliação em si fica em

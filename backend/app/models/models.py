@@ -433,6 +433,14 @@ class TopicoProgress(Base):
     tutor_analise = Column(JSONB)                    # { ultima_avaliacao: {...}, historico: [...] }
     avaliado_em = Column(DateTime(timezone=True))    # última vez que o Tutor avaliou
 
+    ultimo_slide = Column(Integer)  # índice do slide onde o aluno parou (2026-09-15)
+
+    # "Rodada" de exercícios do tópico (2026-09-15) — separa avaliação real de
+    # tentativa de teste/preview. Reiniciar incrementa isto; TopicoResposta
+    # velho (rodada anterior) nunca é apagado, só some da tela por não ser mais
+    # a rodada corrente. Ver POST /topico-progress/{id}/reiniciar.
+    rodada_atual = Column(Integer, nullable=False, default=1)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -648,6 +656,11 @@ class TopicoResposta(Base):
     correta = Column(Boolean)                       # null pra 'open' (sem gabarito automático)
     tentativas = Column(Integer, nullable=False, default=1)
 
+    # Rodada do TopicoProgress.rodada_atual no momento em que foi respondida
+    # (2026-09-15) — reiniciar o tópico incrementa a rodada corrente e essa
+    # resposta antiga fica pra trás (nunca apagada, só não é mais a exibida).
+    rodada = Column(Integer, nullable=False, default=1)
+
     respondido_em = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -659,7 +672,10 @@ class TopicoResposta(Base):
             "tipo IN ('mc', 'tf', 'classify', 'associar', 'lacuna', 'open', 'ditado')",
             name='valid_topico_resposta_tipo',
         ),
-        UniqueConstraint('user_id', 'topico_id', 'question_id', name='uq_topico_resposta_user_topico_question'),
+        UniqueConstraint(
+            'user_id', 'topico_id', 'question_id', 'rodada',
+            name='uq_topico_resposta_user_topico_question_rodada',
+        ),
     )
 
     def __repr__(self):

@@ -828,6 +828,18 @@ function salvarRespostaRemota(qid, gateId, tipo, respostaDada, correta) {
   }).catch(function (e) { console.error('falha ao salvar resposta', qid, e); });
 }
 
+// Slide exato onde o aluno parou (2026-09-15) — mesmo token/mesma regra de
+// RESPOSTAS_ATIVO das respostas de exercício acima. Fire-and-forget: se falhar,
+// só não restaura o lugar certo na próxima abertura, nada quebra na hora.
+function salvarSlideRemoto(idx) {
+  if (!RESPOSTAS_ATIVO) return;
+  fetch(window.location.origin + '/topico-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    body: JSON.stringify({ indice: idx }),
+  }).catch(function (e) { console.error('falha ao salvar slide atual', e); });
+}
+
 // Este render roda dentro de um <iframe> no Emaús (emaus-web/app/topico) ou
 // sozinho (aba própria, uso pessoal). Vários comportamentos abaixo (botão
 // "Fim" concluir, caixa de copiar resumo, anotação) mudam conforme isso.
@@ -1457,6 +1469,8 @@ function showSlide(idx) {
       }, '*');
     }
   } catch (e) {}
+
+  salvarSlideRemoto(idx);
 }
 
 document.getElementById('prevBtn').addEventListener('click', function () { if (current > 0) showSlide(current - 1); });
@@ -1606,7 +1620,25 @@ fullscreenBtn.addEventListener('click', function () {
 });
 document.addEventListener('fullscreenchange', syncFullscreenUI);
 
-showSlide(0);
+// Abre no slide onde o aluno parou (2026-09-15), não sempre no 0 — mesma regra
+// de RESPOSTAS_ATIVO (revisão/uso avulso sempre abre no início, como antes).
+function abrirSlideInicial() {
+  if (!RESPOSTAS_ATIVO) { showSlide(0); return; }
+  fetch(window.location.origin + '/topico-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
+    headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+  })
+    .then(function (r) { return r.ok ? r.json() : {}; })
+    .then(function (d) {
+      var idx = d && typeof d.ultimo_slide === 'number' ? d.ultimo_slide : 0;
+      if (idx < 0 || idx >= slides.length) idx = 0;
+      showSlide(idx);
+    })
+    .catch(function (e) {
+      console.error('falha ao carregar slide salvo', e);
+      showSlide(0);
+    });
+}
+abrirSlideInicial();
 
 // Modo Corrido / Slide — a fila de revisão do professor (/revisao/topico/[id])
 // abre este render com ?contexto=revisao na URL do iframe porque depende de

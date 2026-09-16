@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { LinkBotao } from "../../_ui/Botao";
 import { LogoSimbolo } from "../../_ui/Logo";
 import { AcoesTopico } from "./topico-ui";
+import { ReiniciarTopicoBotao } from "./reiniciar-botao";
 import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getSessao, getToken } from "../../_lib/sessao";
 import { papelPodeRevisar } from "../../_lib/papel";
@@ -114,6 +115,7 @@ export default async function TopicoPage({
           </span>
         )}
       </span>
+      {!emPreparacao && <ReiniciarTopicoBotao topicoId={topico.id} />}
       <Link href="/inicio" aria-label="Emaús — início" className="shrink-0">
         <LogoSimbolo size={28} className="opacity-80" />
       </Link>

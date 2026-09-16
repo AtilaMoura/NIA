@@ -32,6 +32,16 @@ class TopicoProgressOut(BaseModel):
     tutor_veredito: str | None = None
     tutor_analise: dict | None = None
     avaliado_em: datetime | None = None
+    ultimo_slide: int | None = None
+    rodada_atual: int
 
     class Config:
         from_attributes = True
+
+
+class TopicoProgressSlideUpsert(BaseModel):
+    indice: int
+
+
+class TopicoProgressSlideOut(BaseModel):
+    ultimo_slide: int | None = None

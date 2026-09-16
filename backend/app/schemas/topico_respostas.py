@@ -25,6 +25,7 @@ class TopicoRespostaOut(BaseModel):
     resposta_dada: Any
     correta: bool | None = None
     tentativas: int
+    rodada: int
     respondido_em: datetime | None = None
     updated_at: datetime | None = None
 

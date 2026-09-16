@@ -11,8 +11,13 @@ from sqlalchemy.sql import func
 
 from app.database import get_db
 from app.models.models import Topico, TopicoProgress, User
-from app.core.auth import get_current_user
-from app.schemas.topico_progress import TopicoProgressOut, TopicoProgressUpsert
+from app.core.auth import get_current_user, get_topico_resposta_user_id
+from app.schemas.topico_progress import (
+    TopicoProgressOut,
+    TopicoProgressSlideOut,
+    TopicoProgressSlideUpsert,
+    TopicoProgressUpsert,
+)
 
 router = APIRouter(prefix="/topico-progress", tags=["Topico Progress"])
 
@@ -88,5 +93,102 @@ def upsert_topico_progress(
         _aplicar_status(registro)
         db.commit()
 
+    db.refresh(registro)
+    return registro
+
+
+@router.get("/{topico_id}/slide", response_model=TopicoProgressSlideOut)
+def obter_slide_atual(
+    topico_id: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_topico_resposta_user_id),
+):
+    """Pro <iframe> restaurar o slide exato onde o aluno parou (2026-09-15) —
+    reaproveita o MESMO token de escopo curto das respostas de exercício (é a
+    mesma fronteira de confiança: só este usuário, só este tópico)."""
+    registro = (
+        db.query(TopicoProgress)
+        .filter(TopicoProgress.user_id == user_id, TopicoProgress.topico_id == topico_id)
+        .first()
+    )
+    return TopicoProgressSlideOut(ultimo_slide=registro.ultimo_slide if registro else None)
+
+
+@router.put("/{topico_id}/slide", response_model=TopicoProgressSlideOut)
+def salvar_slide_atual(
+    topico_id: int,
+    data: TopicoProgressSlideUpsert,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_topico_resposta_user_id),
+):
+    if not db.query(Topico).filter(Topico.id == topico_id).first():
+        raise HTTPException(404, "Tópico not found")
+
+    def _buscar():
+        return (
+            db.query(TopicoProgress)
+            .filter(TopicoProgress.user_id == user_id, TopicoProgress.topico_id == topico_id)
+            .first()
+        )
+
+    registro = _buscar()
+    if not registro:
+        registro = TopicoProgress(user_id=user_id, topico_id=topico_id, status="nao_iniciado")
+        db.add(registro)
+        registro.ultimo_slide = data.indice
+        try:
+            db.commit()
+        except IntegrityError:
+            # mesma corrida do upsert de status acima.
+            db.rollback()
+            registro = _buscar()
+            if not registro:
+                raise
+            registro.ultimo_slide = data.indice
+            db.commit()
+    else:
+        registro.ultimo_slide = data.indice
+        db.commit()
+
+    db.refresh(registro)
+    return TopicoProgressSlideOut(ultimo_slide=registro.ultimo_slide)
+
+
+@router.post("/{topico_id}/reiniciar", response_model=TopicoProgressOut)
+def reiniciar_topico(
+    topico_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Recomeçar tópico (2026-09-15) — o aluno testou/espiou os exercícios (ex:
+    respondeu qualquer coisa só pra ver o conteúdo) e quer refazer valendo de
+    verdade. NÃO apaga nada: só incrementa `rodada_atual`, o que faz
+    GET/PUT /topico-respostas passarem a ignorar as respostas antigas (ficam no
+    banco, soft, só saem de vista por não serem mais a rodada corrente — ver
+    docstring de topico_respostas.py). `iniciado_em`/`concluido_em` não são
+    limpos (mesmo princípio do upsert de status acima: nunca apaga histórico).
+    """
+    if not db.query(Topico).filter(Topico.id == topico_id).first():
+        raise HTTPException(404, "Tópico not found")
+
+    registro = (
+        db.query(TopicoProgress)
+        .filter(TopicoProgress.user_id == current_user.id, TopicoProgress.topico_id == topico_id)
+        .first()
+    )
+    if not registro:
+        registro = TopicoProgress(
+            user_id=current_user.id,
+            topico_id=topico_id,
+            status="em_andamento",
+            iniciado_em=func.now(),
+            rodada_atual=1,
+        )
+        db.add(registro)
+    else:
+        registro.rodada_atual = (registro.rodada_atual or 1) + 1
+        registro.status = "em_andamento"
+        registro.ultimo_slide = None
+    db.commit()
     db.refresh(registro)
     return registro
