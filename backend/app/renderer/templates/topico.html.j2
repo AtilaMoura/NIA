@@ -61,6 +61,15 @@
   </ol>
 {%- endmacro %}
 
+{% macro render_prompt_externo(bloco) -%}
+  <div class="box box-instr prompt-externo">
+    {% if bloco.titulo %}<div class="box-label">{{ bloco.titulo }}</div>{% endif %}
+    <div class="prompt-texto">{{ bloco.texto }}</div>
+    <button type="button" class="copy-btn prompt-copy-btn">📋 Copiar prompt</button>
+    {% if bloco.nota %}<p class="prompt-nota">{{ bloco.nota }}</p>{% endif %}
+  </div>
+{%- endmacro %}
+
 {% macro render_bloco(bloco) -%}
   {% if bloco.tipo == 'paragrafo' %}
     <p>{{ bloco.texto }}</p>
@@ -103,6 +112,8 @@
     {{ render_vocab(bloco) }}
   {% elif bloco.tipo == 'fluxo' %}
     {{ render_fluxo(bloco) }}
+  {% elif bloco.tipo == 'prompt_externo' %}
+    {{ render_prompt_externo(bloco) }}
   {% elif bloco.tipo == 'diagrama' %}
     {{ render_diagrama(bloco) }}
   {% elif bloco.tipo == 'imagem_sugerida' %}
@@ -327,6 +338,8 @@
   .box-error { border-left: 2px solid var(--bad); } .box-error .box-label { color: var(--bad); }
   .box-summary { border-left: 2px solid var(--violet); } .box-summary .box-label { color: var(--violet); }
   .box-instr { border-left: 2px solid var(--blue); font-size: 13.5px; } .box-instr .box-label { color: var(--blue); }
+  .prompt-texto { white-space: pre-line; font-family: var(--font-label); font-size: 12.5px; background: rgba(0,0,0,.12); padding: 10px 12px; border-radius: 6px; margin: 8px 0; }
+  .prompt-nota { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
   .capa-imagem { width: 100%; max-height: 320px; object-fit: cover; border-radius: var(--radius-lg); border: 1px solid var(--border-soft); margin: 14px 0 18px; display: block; }
 
   .quote-block { font-family: var(--font-display); font-style: italic; font-size: 16px; color: var(--text-muted); border-left: 2px solid var(--border); padding: 4px 0 4px 14px; margin: 18px 0; font-weight: 300; }
@@ -1589,6 +1602,18 @@ document.getElementById('copyBtn') && document.getElementById('copyBtn').addEven
     btn.textContent = 'Copiado! ✔';
     btn.classList.add('copied');
     setTimeout(function () { btn.textContent = 'Copiar resumo'; btn.classList.remove('copied'); }, 2000);
+  });
+});
+
+document.querySelectorAll('.prompt-copy-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const texto = btn.closest('.prompt-externo').querySelector('.prompt-texto').textContent;
+    navigator.clipboard.writeText(texto).then(function () {
+      const original = btn.textContent;
+      btn.textContent = 'Copiado! ✔';
+      btn.classList.add('copied');
+      setTimeout(function () { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
+    });
   });
 });
 
