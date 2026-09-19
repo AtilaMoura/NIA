@@ -1158,7 +1158,11 @@ document.querySelectorAll('.reveal-btn').forEach(function (btn) {
 });
 
 function normalizarResposta(s) {
-  return (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  // Teclado ABNT (e afins) às vezes solta acento agudo/crase soltos (´/`) no
+  // lugar do apóstrofo reto — "don´t" nunca batia com "don't" mesmo sendo a
+  // mesma resposta (achado real, 2026-09-17). Trata ´ ` ' ' como o mesmo
+  // apóstrofo antes de comparar.
+  return (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[´`''']/g, "'");
 }
 document.querySelectorAll('.lacuna-wrap').forEach(function (wrap) {
   const qid = wrap.dataset.qid;
