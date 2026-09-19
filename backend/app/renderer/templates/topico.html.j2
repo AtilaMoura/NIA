@@ -515,6 +515,17 @@
   .anotacao-lista-item-slide { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); font-weight: 700; }
   .anotacao-lista-item-texto { font-size: 12.5px; margin-top: 2px; color: var(--text-muted); white-space: pre-wrap; }
 
+  .duvida-fab { right: 70px; background: var(--blue); }
+  .duvida-painel { right: 70px; }
+  .duvida-resposta { margin-top: 10px; padding: 10px 12px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border-soft); font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
+  .duvida-resposta[hidden] { display: none; }
+
+  .reforco-ia { margin: 10px 0 18px; }
+  .reforco-loading { font-size: 13px; color: var(--text-muted); padding: 10px 0; }
+  .reforco-correcao { background: var(--accent-soft); border-left: 2px solid var(--accent); border-radius: var(--radius); padding: 12px 14px; font-size: 13.5px; line-height: 1.6; margin-bottom: 10px; }
+  .reforco-correcao-label { font-family: var(--font-label); font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .reforco-pergunta { border: 1px dashed var(--border); border-radius: var(--radius-lg); padding: 14px; }
+
   .summary-box textarea { min-height: 220px; font-family: 'SF Mono', 'Courier New', monospace; font-size: 11.5px; }
   .copy-btn { background: var(--accent); color: var(--accent-text-on); border: none; padding: 11px 18px; border-radius: var(--radius); font-weight: 700; cursor: pointer; font-size: 13px; margin-top: 6px; transition: transform .12s ease; font-family: inherit; }
   .copy-btn:hover { transform: translateY(-1px); }
@@ -783,6 +794,16 @@
   </div>
 </div>
 
+<button type="button" class="anotacao-fab duvida-fab" id="duvidaFab" title="Tirar dúvida com a IA" aria-label="Tirar dúvida com a IA">❓</button>
+<div class="anotacao-painel duvida-painel" id="duvidaPainel" hidden>
+  <div class="anotacao-aba">
+    <textarea class="anotacao-texto" id="duvidaTexto" placeholder="O que você não entendeu neste slide?"></textarea>
+    <button type="button" class="anotacao-salvar register-btn" id="duvidaPerguntarBtn">Perguntar</button>
+    <span class="anotacao-status" id="duvidaStatus"></span>
+    <div class="duvida-resposta" id="duvidaResposta" hidden></div>
+  </div>
+</div>
+
 <div class="navbar">
   <button class="nav-btn nav-prev" id="prevBtn">◀</button>
   <button class="nav-audio" id="audioBtn" title="Ouvir este slide">🔊</button>
@@ -839,6 +860,12 @@ function salvarRespostaRemota(qid, gateId, tipo, respostaDada, correta) {
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
     body: JSON.stringify({ gate_id: gateId, tipo: tipo, resposta_dada: respostaDada, correta: correta }),
   }).catch(function (e) { console.error('falha ao salvar resposta', qid, e); });
+
+  // Tutor ao vivo (2026-09-19) — só dispara em erro objetivo (correta===false,
+  // nunca null — "open" não tem gabarito). Ver dispararCorrecaoIA().
+  if (correta === false) {
+    dispararCorrecaoIA(qid, respostaDada);
+  }
 }
 
 // Slide exato onde o aluno parou (2026-09-15) — mesmo token/mesma regra de
@@ -1039,6 +1066,215 @@ if (RESPOSTAS_CONTEXTO_REVISAO) {
       })
       .catch(function (e) { console.error('falha ao carregar anotações', e); });
   }
+}
+
+// Tirar dúvida ao vivo (2026-09-19) — separado de anotação de propósito
+// (pedido do Atila): aqui o aluno PERGUNTA e a IA RESPONDE na hora, salvo em
+// TopicoDuvida, não em TopicoAnotacao. Só existe pra Tópico (não Avaliação —
+// /topico-tutor não tem equivalente pra prova ainda) e só fora da revisão.
+var duvidaFab = document.getElementById('duvidaFab');
+var duvidaPainel = document.getElementById('duvidaPainel');
+var duvidaTexto = document.getElementById('duvidaTexto');
+var duvidaStatus = document.getElementById('duvidaStatus');
+var duvidaResposta = document.getElementById('duvidaResposta');
+var duvidaPerguntarBtn = document.getElementById('duvidaPerguntarBtn');
+
+if (RESPOSTAS_CONTEXTO_REVISAO) {
+  duvidaFab.hidden = true;
+} else {
+  duvidaFab.addEventListener('click', function () {
+    duvidaPainel.hidden = !duvidaPainel.hidden;
+  });
+
+  duvidaPerguntarBtn.addEventListener('click', function () {
+    var pergunta = duvidaTexto.value.trim();
+    if (!pergunta) return;
+    if (!RESPOSTAS_ATIVO) { duvidaStatus.textContent = 'Faça login pra tirar dúvida.'; return; }
+    duvidaPerguntarBtn.disabled = true;
+    duvidaStatus.textContent = 'Pensando…';
+    duvidaResposta.hidden = true;
+    fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/duvida', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+      body: JSON.stringify({ slide_index: current, pergunta_aluno: pergunta }),
+    })
+      .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+      .then(function (data) {
+        duvidaStatus.textContent = '';
+        duvidaResposta.textContent = tirarMarkdown(data.resposta_ia);
+        duvidaResposta.hidden = false;
+      })
+      .catch(function (e) {
+        duvidaStatus.textContent = 'Não deu pra responder agora — tenta de novo.';
+        console.error('falha ao tirar dúvida', e);
+      })
+      .finally(function () { duvidaPerguntarBtn.disabled = false; });
+  });
+}
+
+// Correção ao vivo por IA (2026-09-19) — quando o aluno erra um checkpoint,
+// gera correção personalizada + 1 pergunta de reforço na hora (mesmo
+// conceito, exemplo novo), inserida logo abaixo da pergunta errada. Ver
+// memória do projeto [[nia-correcao-ia-avaliacoes]]. Só pra Tópico (mesma
+// razão do tira-dúvida acima) e nunca pra tipo "open" (sem gabarito
+// objetivo, não faz sentido "corrigir").
+function escapeHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+function escapeAttr(s) {
+  return escapeHtml(s).replace(/"/g, '&quot;');
+}
+// A IA às vezes devolve **negrito** mesmo pedindo "sem markdown" no prompt —
+// tira os marcadores na exibição em vez de confiar 100% na instrução.
+function tirarMarkdown(s) {
+  return (s || '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+}
+
+function montarPerguntaReforcoHTML(p) {
+  var tipoLabel = { mc: 'Múltipla escolha', tf: 'Verdadeiro / Falso', lacuna: 'Complete a lacuna', ditado: 'Ouça e escreva' }[p.tipo] || '';
+  var html = '<div class="question reforco-pergunta" data-qid="' + escapeAttr(p.id) + '">';
+  html += '<div class="q-meta"><span class="q-type">' + tipoLabel + '</span></div>';
+  if (p.cenario) html += '<div class="q-scenario">' + escapeHtml(p.cenario) + '</div>';
+  html += '<div class="q-text">' + escapeHtml(p.enunciado) + '</div>';
+
+  if (p.tipo === 'mc') {
+    html += '<div class="opts" data-correct="' + p.correta_idx + '">';
+    (p.opcoes || []).forEach(function (opcao, i) {
+      html += '<button type="button" class="opt-btn" data-i="' + i + '">' + escapeHtml(opcao) + '</button>';
+    });
+    html += '</div>';
+  } else if (p.tipo === 'tf') {
+    html += '<div class="tf-row" data-correct-tf="' + (p.correta_bool ? 'verdadeiro' : 'falso') + '">';
+    html += '<button type="button" class="tf-btn" data-v="verdadeiro">Verdadeiro</button>';
+    html += '<button type="button" class="tf-btn" data-v="falso">Falso</button></div>';
+  } else if (p.tipo === 'lacuna') {
+    html += '<div class="lacuna-wrap" data-answers="' + escapeAttr(JSON.stringify(p.respostas_aceitas || [])) + '">';
+    html += '<input type="text" class="lacuna-input" placeholder="' + escapeAttr(p.placeholder || 'Digite sua resposta') + '">';
+    html += '<button type="button" class="register-btn lacuna-check-btn">Corrigir</button></div>';
+  } else if (p.tipo === 'ditado') {
+    html += '<div class="ditado-wrap" data-answers="' + escapeAttr(JSON.stringify(p.respostas_aceitas || [])) + '">';
+    html += '<button type="button" class="vocab-listen ditado-play" data-say="' + escapeAttr(p.frase_audio) + '">🔊 Ouvir a frase</button>';
+    html += '<input type="text" class="lacuna-input ditado-input" placeholder="' + escapeAttr(p.placeholder || 'Escreva exatamente o que você ouviu') + '">';
+    html += '<button type="button" class="register-btn ditado-check-btn">Corrigir</button></div>';
+  }
+  if (p.explicacao) html += '<div class="explanation" data-exp="' + escapeAttr(p.id) + '"></div>';
+  html += '</div>';
+  return html;
+}
+
+function enviarRespostaReforco(reforcoId, respostaDada, correta) {
+  if (!RESPOSTAS_ATIVO) return;
+  fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/reforco/' + reforcoId, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    body: JSON.stringify({ resposta_dada: respostaDada, correta: correta }),
+  }).catch(function (e) { console.error('falha ao salvar resposta de reforço', e); });
+}
+
+function wireReforcoPergunta(container, p, reforcoId) {
+  var exp = container.querySelector('.explanation');
+  if (exp && p.explicacao) exp.textContent = p.explicacao;
+
+  if (p.tipo === 'mc') {
+    var opts = container.querySelector('.opts');
+    var correctIdx = parseInt(opts.dataset.correct, 10);
+    opts.querySelectorAll('.opt-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (opts.dataset.answered) return;
+        opts.dataset.answered = '1';
+        var isCorrect = parseInt(btn.dataset.i, 10) === correctIdx;
+        opts.querySelectorAll('.opt-btn').forEach(function (b, i) {
+          b.classList.add(i === correctIdx ? 'correct' : (b === btn ? 'incorrect' : ''));
+        });
+        if (exp) exp.classList.add('show');
+        enviarRespostaReforco(reforcoId, parseInt(btn.dataset.i, 10), isCorrect);
+      });
+    });
+  } else if (p.tipo === 'tf') {
+    var row = container.querySelector('.tf-row');
+    var correctVal = row.dataset.correctTf;
+    row.querySelectorAll('.tf-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (row.dataset.answered) return;
+        row.dataset.answered = '1';
+        var isCorrect = btn.dataset.v === correctVal;
+        if (!isCorrect) btn.classList.add('incorrect');
+        if (exp) exp.classList.add('show');
+        enviarRespostaReforco(reforcoId, btn.dataset.v, isCorrect);
+      });
+    });
+  } else if (p.tipo === 'lacuna' || p.tipo === 'ditado') {
+    var wrapClass = p.tipo === 'lacuna' ? '.lacuna-wrap' : '.ditado-wrap';
+    var wrap = container.querySelector(wrapClass);
+    var aceitas = JSON.parse(wrap.dataset.answers || '[]').map(normalizarResposta);
+    var input = wrap.querySelector('input');
+    var btn = wrap.querySelector('.register-btn');
+    var playBtn = wrap.querySelector('.ditado-play');
+    if (playBtn) {
+      playBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        var utter = new SpeechSynthesisUtterance(playBtn.dataset.say);
+        utter.lang = 'en-US';
+        utter.rate = taxaAudioVocab();
+        window.speechSynthesis.speak(utter);
+      });
+    }
+    btn.addEventListener('click', function () {
+      if (wrap.dataset.answered) return;
+      wrap.dataset.answered = '1';
+      var valor = input.value.trim();
+      var isCorrect = aceitas.indexOf(normalizarResposta(valor)) !== -1;
+      input.disabled = true;
+      btn.disabled = true;
+      input.style.borderColor = isCorrect ? 'var(--accent)' : 'var(--bad)';
+      if (exp) exp.classList.add('show');
+      enviarRespostaReforco(reforcoId, valor, isCorrect);
+    });
+  }
+}
+
+function dispararCorrecaoIA(qid, respostaDada) {
+  var questionEl = document.querySelector('.question[data-qid="' + qid + '"]');
+  if (!questionEl) return;
+  if (questionEl.nextElementSibling && questionEl.nextElementSibling.classList.contains('reforco-ia')) return;
+
+  var wrapper = document.createElement('div');
+  wrapper.className = 'reforco-ia';
+  var loading = document.createElement('div');
+  loading.className = 'reforco-loading';
+  loading.textContent = '🤖 Analisando sua resposta…';
+  wrapper.appendChild(loading);
+  questionEl.insertAdjacentElement('afterend', wrapper);
+
+  fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/corrigir', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    body: JSON.stringify({ question_id: qid, resposta_dada: respostaDada }),
+  })
+    .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+    .then(function (data) {
+      wrapper.innerHTML = '';
+      if (data.correcao_personalizada) {
+        var correcaoEl = document.createElement('div');
+        correcaoEl.className = 'reforco-correcao';
+        correcaoEl.innerHTML = '<div class="reforco-correcao-label">🤖 Correção</div>' + escapeHtml(tirarMarkdown(data.correcao_personalizada));
+        wrapper.appendChild(correcaoEl);
+      }
+      if (data.pergunta_reforco && data.reforco_id) {
+        var perguntaDiv = document.createElement('div');
+        perguntaDiv.innerHTML = montarPerguntaReforcoHTML(data.pergunta_reforco);
+        wrapper.appendChild(perguntaDiv.firstElementChild);
+        wireReforcoPergunta(wrapper.querySelector('.reforco-pergunta'), data.pergunta_reforco, data.reforco_id);
+      }
+    })
+    .catch(function (e) {
+      wrapper.innerHTML = '';
+      console.error('falha ao corrigir com IA', e);
+    });
 }
 
 // Fila de revisão do professor manda ir pra um slide específico ao clicar

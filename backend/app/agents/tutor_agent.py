@@ -12,6 +12,8 @@ cola, no formato que o template já gera). Isso poupa o front de ter que parsear
 placar/flags antes de mandar pro agente; a IA lê o texto igual leria no chat.
 """
 
+import json
+
 from .base_agent import BaseAgent
 from .perfis import PerfilDominio, PERFIL_TECH
 
@@ -50,6 +52,27 @@ REGRAS DE TOM (aplicar sempre):
   erro específico do aluno (não um erro genérico inventado).
 """.strip()
 
+SCHEMA_CORRECAO = """
+Devolva APENAS um JSON válido (sem markdown), neste formato:
+
+{
+  "correcao_personalizada": "explicação curta (2-4 frases) do erro ESPECÍFICO que o aluno cometeu — não repita a 'explicacao' da pergunta original com as mesmas palavras, use um ângulo ou exemplo diferente, apoiado no que ele de fato respondeu",
+  "pergunta_reforco": Pergunta
+}
+
+"pergunta_reforco" é um objeto Pergunta NOVO — mesmo "tipo" da pergunta original, mesmo
+conceito, mas com enunciado/exemplo DIFERENTE (nunca repita o enunciado original). Um dos
+formatos abaixo (o campo "tipo" é obrigatório dentro do objeto):
+- "tipo":"mc": {tipo, id, enunciado, cenario:null, opcoes:[string,string,string,string], correta_idx, explicacao}
+- "tipo":"tf": {tipo, id, enunciado, cenario:null, correta_bool, explicacao}
+- "tipo":"lacuna": {tipo, id, enunciado, cenario:null, placeholder, respostas_aceitas:[string,...] (aceite variações razoáveis), explicacao}
+- "tipo":"open": {tipo, id, enunciado, cenario:null, placeholder, explicacao:null}
+- "tipo":"ditado": {tipo, id, enunciado ("Ouça a frase e escreva exatamente o que ouviu."), cenario:null, frase_audio (a frase, NUNCA escrita no enunciado), placeholder, respostas_aceitas:[string,...], explicacao}
+
+O "id" da pergunta_reforco deve ser o id da pergunta original com sufixo "_reforco" (ex:
+pergunta original "ck3_1" -> pergunta_reforco "ck3_1_reforco").
+""".strip()
+
 
 class TutorAgent(BaseAgent):
     """Avalia o resumo estruturado que um aluno cola ao final de um tópico."""
@@ -78,3 +101,70 @@ RESUMO COLADO PELO ALUNO:
 {SCHEMA_AVALIACAO}
 """
         return await self.run_json_com_retry(prompt)
+
+    async def corrigir_exercicio(
+        self,
+        pergunta: dict,
+        resposta_dada,
+        contexto_topico: str = "",
+        perfil: PerfilDominio = PERFIL_TECH,
+    ) -> dict:
+        """Tutor ao vivo (2026-09-19) — dispara só quando o aluno ERRA um
+        exercício dentro do render (não no fim do tópico, como avaliar_resumo).
+        Gera, na MESMA chamada pequena: (1) uma correção personalizada pro erro
+        específico (nunca repete o "explicacao" estático com as mesmas
+        palavras) e (2) uma pergunta NOVA, mesmo conceito, exemplo diferente,
+        pro aluno tentar de novo antes de seguir. Ver [[nia-correcao-ia-
+        avaliacoes]] na memória do projeto pro desenho completo — deliberadamente
+        por pergunta, nunca o tópico/prova inteiro numa chamada (teto de
+        tokens/minuto do Groq + achado de que ele "esquece" item em respostas
+        com muitos objetos)."""
+        prompt = f"""
+Você é o tutor pedagógico do {perfil.contexto_curso}. Um aluno ERROU o exercício abaixo,
+dentro do próprio material de estudo (não é avaliação final, é feedback na hora).
+
+{perfil.fio_condutor}
+
+{"CONTEXTO (tópico/aula em que isso está inserido): " + contexto_topico if contexto_topico else ""}
+
+PERGUNTA ORIGINAL (JSON):
+{json.dumps(pergunta, ensure_ascii=False, indent=2)}
+
+RESPOSTA QUE O ALUNO DEU:
+{json.dumps(resposta_dada, ensure_ascii=False)}
+
+{SCHEMA_CORRECAO}
+"""
+        return await self.run_json_com_retry(prompt, max_tokens=1500)
+
+    async def responder_duvida(
+        self,
+        pergunta_aluno: str,
+        contexto_slide: str = "",
+        contexto_topico: str = "",
+        perfil: PerfilDominio = PERFIL_TECH,
+    ) -> str:
+        """Tira-dúvida ao vivo (2026-09-19) — o aluno pergunta algo específico
+        sobre o ponto em que está (slide/exercício) e recebe resposta em texto
+        direto, sem JSON, sem gerar pergunta nova (isso é só do
+        corrigir_exercicio). Chamada pequena e separada de propósito — não
+        acumula o contexto de outras dúvidas na mesma janela de token."""
+        prompt = f"""
+Você é o tutor pedagógico do {perfil.contexto_curso}, tirando uma dúvida de um aluno AO
+VIVO, no meio do estudo (não é avaliação, é uma pergunta direta dele).
+
+{perfil.fio_condutor}
+
+{"CONTEXTO (tópico/aula): " + contexto_topico if contexto_topico else ""}
+
+{"O QUE ESTÁ NA TELA AGORA (o trecho do material que o aluno está vendo quando perguntou): " + contexto_slide if contexto_slide else ""}
+
+PERGUNTA DO ALUNO:
+{pergunta_aluno}
+
+Responda direto, em português, curto (2-4 frases) e específico pro que ele perguntou —
+sem repetir o material da tela palavra por palavra, sem "boa pergunta!" nem elogio vazio.
+Se a pergunta sair do assunto deste material, diga isso e redirecione pro que está sendo
+estudado. Devolva só o texto da resposta, sem markdown, sem JSON.
+"""
+        return await self.service.generate(prompt, temperature=0.4, max_tokens=500)

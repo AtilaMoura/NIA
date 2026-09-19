@@ -680,3 +680,66 @@ class TopicoResposta(Base):
 
     def __repr__(self):
         return f"<TopicoResposta(topico_id={self.topico_id}, user_id={self.user_id}, question_id='{self.question_id}', correta={self.correta})>"
+
+
+# ------------------------------------------------------------
+# 11b. MODEL: TOPICO_DUVIDA (NOVA! — 2026-09-19)
+# ------------------------------------------------------------
+# Pergunta que o aluno tira ao vivo, dentro do render do tópico, sobre um
+# ponto específico (slide ou pergunta de exercício) — separada de propósito
+# de TopicoAnotacao (anotação é o aluno anotando algo por conta própria;
+# aqui é o aluno perguntando e a IA respondendo na hora). Ver
+# [[nia-correcao-ia-avaliacoes]] na memória do projeto pro desenho completo.
+
+class TopicoDuvida(Base):
+    __tablename__ = "topico_duvidas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+    slide_index = Column(Integer, nullable=False)
+    question_id = Column(String(50))  # opcional — se a dúvida foi tirada em cima de um exercício específico
+
+    pergunta_aluno = Column(Text, nullable=False)
+    resposta_ia = Column(Text, nullable=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", backref="duvidas_topico")
+    topico = relationship("Topico", backref="duvidas")
+
+    def __repr__(self):
+        return f"<TopicoDuvida(topico_id={self.topico_id}, user_id={self.user_id}, slide_index={self.slide_index})>"
+
+
+# ------------------------------------------------------------
+# 11c. MODEL: TOPICO_REFORCO (NOVA! — 2026-09-19)
+# ------------------------------------------------------------
+# Pergunta NOVA gerada pela IA quando o aluno erra um exercício — mesmo
+# schema de "Pergunta" (docs/schema/schema-conteudo-topico.md), guardado como
+# JSONB porque o tipo (mc/tf/lacuna/etc.) varia. 1 linha por tentativa de
+# reforço, nunca sobrescreve — permite reforço em cadeia (errou nova, gera
+# outra) e dá material pro mapeamento de "onde o aluno mais errou" depois.
+
+class TopicoReforco(Base):
+    __tablename__ = "topico_reforcos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+    question_id_origem = Column(String(50), nullable=False)  # a pergunta original que o aluno errou
+
+    correcao_personalizada = Column(Text, nullable=False)
+    pergunta_gerada = Column(JSONB, nullable=False)  # mesmo schema de "Pergunta"
+
+    resposta_dada = Column(JSONB)
+    correta = Column(Boolean)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    respondido_em = Column(DateTime(timezone=True))
+
+    user = relationship("User", backref="reforcos_topico")
+    topico = relationship("Topico", backref="reforcos")
+
+    def __repr__(self):
+        return f"<TopicoReforco(topico_id={self.topico_id}, user_id={self.user_id}, question_id_origem='{self.question_id_origem}', correta={self.correta})>"

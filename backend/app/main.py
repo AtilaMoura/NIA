@@ -11,6 +11,7 @@ from app.routers import auth
 from app.routers import topico_progress
 from app.routers import topico_respostas
 from app.routers import topico_anotacoes
+from app.routers import topico_tutor
 from app.routers import revisao
 from app.routers import governanca
 from app.routers import test_ai
@@ -109,6 +110,7 @@ def create_app():
     app.include_router(topico_progress.router)
     app.include_router(topico_respostas.router)
     app.include_router(topico_anotacoes.router)
+    app.include_router(topico_tutor.router)
     app.include_router(revisao.router)
     app.include_router(governanca.router)
     app.include_router(pipeline.router)
