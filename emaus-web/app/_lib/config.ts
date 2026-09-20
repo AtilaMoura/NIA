@@ -1,13 +1,13 @@
 // Config do Emaús. Front puro cliente da API do NIA.
 
 // Escopo de catálogo — cursos navegáveis no Emaús hoje. Hardcoded até existir
-// Tenant no NIA. Nome ficou de teologia (curso 8), mas os cursos 9 (Inglês) e 5
-// (Engenharia de Agentes LLM) são estudos PESSOAIS do Atila, incluídos aqui
-// provisoriamente — sem Tenant/liberação por perfil ainda, não dá pra isolar
-// catálogo por audiência de verdade. Quando a regra de liberação por perfil
-// existir, os dois estudos pessoais saem daqui e viram "pessoal", não catálogo
-// público. Ver PLANO_CURSO_IA_EMAUS.md.
-export const TEOLOGIA_COURSE_IDS = [8, 9, 5] as const;
+// Tenant no NIA. Nome ficou de teologia (curso 8), mas os cursos 9 (Inglês), 5
+// (Engenharia de Agentes LLM) e 11 (Redes e Câmeras) são estudos PESSOAIS do
+// Atila, incluídos aqui provisoriamente — sem Tenant/liberação por perfil
+// ainda, não dá pra isolar catálogo por audiência de verdade. Quando a regra
+// de liberação por perfil existir, os estudos pessoais saem daqui e viram
+// "pessoal", não catálogo público. Ver PLANO_CURSO_IA_EMAUS.md.
+export const TEOLOGIA_COURSE_IDS = [8, 9, 5, 11] as const;
 
 // Tema do render de slides do backend (GET /topicos/{id}/render?theme=...).
 // Default do sistema; cursos com identidade visual própria entram no mapa abaixo
