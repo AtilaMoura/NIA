@@ -58,6 +58,16 @@ export const CATALOGO: CursoCatalogo[] = [
     disponivel: true,
   },
   {
+    slug: "redes-cameras",
+    titulo: "Redes e Câmeras — Do IP ao Streaming",
+    subtitulo: "Estudo pessoal — de endereçamento IP a media server em produção",
+    descricao:
+      "Redes aplicadas a sistemas de câmera IP/CFTV: endereçamento, NAT, port forwarding, VPN e P2P, protocolos de vídeo (RTSP/RTMP/HLS/WebRTC), ONVIF, media servers, nuvens de câmera, armazenamento e segurança de streams — cada tópico ancorado num exemplo real de monitoramento.",
+    tom: "indigo",
+    courseId: 11,
+    disponivel: true,
+  },
+  {
     slug: "panorama-da-biblia",
     titulo: "Panorama da Bíblia",
     subtitulo: "A história que une os 66 livros",
