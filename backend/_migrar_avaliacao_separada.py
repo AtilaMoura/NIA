@@ -137,6 +137,13 @@ def main() -> None:
                     .all()
                 )
 
+                # IMPORTANTE (achado rodando --apply contra produção pela 1ª vez,
+                # 2026-09-21): TopicoResposta já tem seu PRÓPRIO 'rodada' (o aluno
+                # pode ter usado "recomeçar tópico" antes desta migração existir —
+                # aconteceu de verdade com o Topico 10 em produção: 2 rodadas de
+                # resposta pros mesmos question_id). Preservar r.rodada tal como
+                # está evita colidir na unique constraint (user,avaliacao,question,
+                # rodada) — nunca hardcodar rodada=1 aqui.
                 if dry_run:
                     print(f"    -> {len(respostas_ef)} TopicoResposta 'ef*' seriam copiadas para AvaliacaoResposta")
                 else:
@@ -150,7 +157,7 @@ def main() -> None:
                             resposta_dada=r.resposta_dada,
                             correta=r.correta,
                             tentativas=r.tentativas,
-                            rodada=1,
+                            rodada=r.rodada,
                             respondido_em=r.respondido_em,
                             updated_at=r.updated_at,
                         )
@@ -169,13 +176,19 @@ def main() -> None:
                     status_novo = "concluido" if tp.status == "concluido" else "em_andamento"
 
                     if dry_run:
-                        print(f"    -> AvaliacaoProgress para user_id={tp.user_id} com status='{status_novo}'")
+                        print(
+                            f"    -> AvaliacaoProgress para user_id={tp.user_id} "
+                            f"com status='{status_novo}', rodada_atual={tp.rodada_atual}"
+                        )
                     else:
                         ap = AvaliacaoProgress(
                             user_id=tp.user_id,
                             avaliacao_id=nova_avaliacao.id,
                             status=status_novo,
-                            rodada_atual=1,
+                            # Mesma rodada corrente do tópico (não sempre 1) — mantém
+                            # coerência com as respostas que acabaram de ser copiadas
+                            # com o rodada original de cada uma (ver comentário acima).
+                            rodada_atual=tp.rodada_atual,
                         )
                         if status_novo == "concluido":
                             ap.tutor_veredito = tp.tutor_veredito
