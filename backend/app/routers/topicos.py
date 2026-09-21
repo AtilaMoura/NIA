@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.models import Topico, Lesson, User
+from app.models.models import Avaliacao, Topico, Lesson, User
 from app.renderer.render import render_topico, carregar_temas
 from app.core.auth import get_current_user
 
@@ -27,12 +27,30 @@ def _exigir_admin(user: User):
 # ter vários Tópicos, cada um com seu próprio conteúdo/geração/revisão —
 # mesmo padrão de CRUD+render que já existia em lessons.py, um nível abaixo.
 
+def _com_avaliacao_id(topicos: list[Topico], db: Session) -> list[Topico]:
+    """Anexa 'avaliacao_id' (não é coluna do model — atributo solto, o FastAPI
+    serializa do jeito que for) em cada Topico, só quando existe uma Avaliacao
+    vinculada E aprovada (2026-09-16 — front usa isso pra mostrar/travar o link
+    'Prova deste tópico' na árvore do curso)."""
+    ids = [t.id for t in topicos]
+    aprovadas = (
+        db.query(Avaliacao.topico_id, Avaliacao.id)
+        .filter(Avaliacao.topico_id.in_(ids), Avaliacao.is_approved.is_(True))
+        .all()
+    )
+    mapa = dict(aprovadas)
+    for t in topicos:
+        t.avaliacao_id = mapa.get(t.id)
+    return topicos
+
+
 @router.get("/")
 def list_topicos(lesson_id: int | None = Query(None), db: Session = Depends(get_db)):
     query = db.query(Topico)
     if lesson_id is not None:
         query = query.filter(Topico.lesson_id == lesson_id)
-    return query.order_by(Topico.lesson_id, Topico.topico_index).all()
+    topicos = query.order_by(Topico.lesson_id, Topico.topico_index).all()
+    return _com_avaliacao_id(topicos, db)
 
 
 @router.post("/")
@@ -52,7 +70,7 @@ def get_topico(topico_id: int, db: Session = Depends(get_db)):
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
     if not topico:
         raise HTTPException(404, "Tópico not found")
-    return topico
+    return _com_avaliacao_id([topico], db)[0]
 
 
 @router.put("/{topico_id}")

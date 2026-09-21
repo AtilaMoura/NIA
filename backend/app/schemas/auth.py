@@ -17,6 +17,10 @@ class TopicoTokenRequest(BaseModel):
     topico_id: int
 
 
+class AvaliacaoTokenRequest(BaseModel):
+    avaliacao_id: int
+
+
 class UserMe(BaseModel):
     id: int
     name: str | None = None

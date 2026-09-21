@@ -840,30 +840,39 @@ function ensureQ(qid) {
 
 // Salvar/restaurar resposta por exercício (2026-09-09). Token de escopo curto
 // (?token=... na URL, emitido por POST /auth/topico-token — NÃO é o token de
-// sessão real, que nunca sai do servidor Next.js) + o Topico.id de verdade
-// (extraído do próprio path /topicos/{id}/render, já que TOPICO_ID acima é a
-// string de conteúdo, não a chave do banco). Desligado na tela de revisão
+// sessão real, que nunca sai do servidor Next.js) + o id de verdade do
+// recurso (extraído do próprio path). Desligado na tela de revisão
 // (?contexto=revisao) de propósito — testar exercício ali não deve sujar
 // progresso real do aluno.
-const RESPOSTAS_TOPICO_ID_DB = (function () {
-  var m = window.location.pathname.match(/\/topicos\/(\d+)\/render/);
-  return m ? parseInt(m[1], 10) : null;
+//
+// Reaproveitado pro render da PROVA (2026-09-16, GET /avaliacoes/{id}/render)
+// — mesmo template, mesmo JS: o path decide se os endpoints chamados são os
+// de tópico (/topico-respostas, /topico-progress) ou os de avaliação
+// (/avaliacao-respostas, /avaliacao-progress). RESPOSTAS_TOPICO_ID_DB guarda
+// o id do recurso certo em cada caso (Topico.id OU Avaliacao.id).
+const RESPOSTAS_ROTA = (function () {
+  var m = window.location.pathname.match(/\/(topicos|avaliacoes)\/(\d+)\/render/);
+  if (!m) return { prefixo: null, id: null };
+  return { prefixo: m[1] === 'avaliacoes' ? 'avaliacao' : 'topico', id: parseInt(m[2], 10) };
 })();
+const RESPOSTAS_TOPICO_ID_DB = RESPOSTAS_ROTA.id;
+const RESPOSTAS_PREFIXO = RESPOSTAS_ROTA.prefixo;
 const RESPOSTAS_TOKEN = new URLSearchParams(window.location.search).get('token');
 const RESPOSTAS_CONTEXTO_REVISAO = new URLSearchParams(window.location.search).get('contexto') === 'revisao';
 const RESPOSTAS_ATIVO = !!(RESPOSTAS_TOPICO_ID_DB && RESPOSTAS_TOKEN) && !RESPOSTAS_CONTEXTO_REVISAO;
 
 function salvarRespostaRemota(qid, gateId, tipo, respostaDada, correta) {
   if (!RESPOSTAS_ATIVO) return;
-  fetch(window.location.origin + '/topico-respostas/' + RESPOSTAS_TOPICO_ID_DB + '/' + encodeURIComponent(qid), {
+  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-respostas/' + RESPOSTAS_TOPICO_ID_DB + '/' + encodeURIComponent(qid), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
     body: JSON.stringify({ gate_id: gateId, tipo: tipo, resposta_dada: respostaDada, correta: correta }),
   }).catch(function (e) { console.error('falha ao salvar resposta', qid, e); });
 
   // Tutor ao vivo (2026-09-19) — só dispara em erro objetivo (correta===false,
-  // nunca null — "open" não tem gabarito). Ver dispararCorrecaoIA().
-  if (correta === false) {
+  // nunca null — "open" não tem gabarito) e só pra Tópico (não Avaliação,
+  // /topico-tutor ainda não existe pra prova). Ver dispararCorrecaoIA().
+  if (correta === false && RESPOSTAS_PREFIXO === 'topico') {
     dispararCorrecaoIA(qid, respostaDada);
   }
 }
@@ -873,7 +882,7 @@ function salvarRespostaRemota(qid, gateId, tipo, respostaDada, correta) {
 // só não restaura o lugar certo na próxima abertura, nada quebra na hora.
 function salvarSlideRemoto(idx) {
   if (!RESPOSTAS_ATIVO) return;
-  fetch(window.location.origin + '/topico-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
+  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
     body: JSON.stringify({ indice: idx }),
@@ -967,7 +976,10 @@ var anotacaoTextoAtual = document.getElementById('anotacaoTextoAtual');
 var anotacaoStatus = document.getElementById('anotacaoStatus');
 var anotacaoLista = document.getElementById('anotacaoLista');
 
-if (RESPOSTAS_CONTEXTO_REVISAO) {
+// Anotação não existe pra Avaliacao (fora de escopo, 2026-09-16) — some
+// também nesse contexto, não só na revisão, pra não chamar /topico-anotacoes
+// com um id que na verdade é de Avaliacao.
+if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO === 'avaliacao') {
   anotacaoFab.hidden = true;
 } else {
   function slideIndexAtual() { return current; }
@@ -1079,7 +1091,7 @@ var duvidaStatus = document.getElementById('duvidaStatus');
 var duvidaResposta = document.getElementById('duvidaResposta');
 var duvidaPerguntarBtn = document.getElementById('duvidaPerguntarBtn');
 
-if (RESPOSTAS_CONTEXTO_REVISAO) {
+if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
   duvidaFab.hidden = true;
 } else {
   duvidaFab.addEventListener('click', function () {
@@ -1538,7 +1550,7 @@ function restaurarOpen(qid, textoSalvo) {
 }
 
 if (RESPOSTAS_ATIVO) {
-  fetch(window.location.origin + '/topico-respostas/' + RESPOSTAS_TOPICO_ID_DB, {
+  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-respostas/' + RESPOSTAS_TOPICO_ID_DB, {
     headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
   })
     .then(function (r) { return r.ok ? r.json() : []; })
@@ -1889,7 +1901,7 @@ document.addEventListener('fullscreenchange', syncFullscreenUI);
 // de RESPOSTAS_ATIVO (revisão/uso avulso sempre abre no início, como antes).
 function abrirSlideInicial() {
   if (!RESPOSTAS_ATIVO) { showSlide(0); return; }
-  fetch(window.location.origin + '/topico-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
+  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
     headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
   })
     .then(function (r) { return r.ok ? r.json() : {}; })

@@ -10,6 +10,9 @@ from app.routers import users, courses, modules, progress, lessons, pipeline, to
 from app.routers import auth
 from app.routers import topico_progress
 from app.routers import topico_respostas
+from app.routers import avaliacao_progress
+from app.routers import avaliacao_respostas
+from app.routers import avaliacoes
 from app.routers import topico_anotacoes
 from app.routers import topico_tutor
 from app.routers import revisao
@@ -109,6 +112,9 @@ def create_app():
     app.include_router(topicos.router)
     app.include_router(topico_progress.router)
     app.include_router(topico_respostas.router)
+    app.include_router(avaliacao_progress.router)
+    app.include_router(avaliacao_respostas.router)
+    app.include_router(avaliacoes.router)
     app.include_router(topico_anotacoes.router)
     app.include_router(topico_tutor.router)
     app.include_router(revisao.router)

@@ -53,6 +53,33 @@ def get_topico_resposta_user_id(
     return int(user_id)
 
 
+def get_avaliacao_resposta_user_id(
+    avaliacao_id: int = Path(...),
+    token: str = Depends(oauth2_scheme),
+) -> int:
+    """Valida o token de ESCOPO CURTO emitido por POST /auth/avaliacao-token
+    — usado pelo <iframe> do render de avaliação pra salvar/ler respostas de
+    exercício. Exige as claims 'scope'=='avaliacao_respostas' e 'avaliacao_id'
+    batendo com a avaliação da URL — um token vazado só autoriza essa avaliação
+    específica, não vira um jeito de acessar outros endpoints como se fosse
+    sessão real.
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado.")
+
+    if payload.get("scope") != "avaliacao_respostas":
+        raise HTTPException(status_code=403, detail="Token não tem escopo pra isto.")
+    if payload.get("avaliacao_id") != avaliacao_id:
+        raise HTTPException(status_code=403, detail="Token não é pra esta avaliação.")
+
+    user_id = payload.get("sub")
+    if user_id is None:
+        raise HTTPException(status_code=401, detail="Token inválido.")
+    return int(user_id)
+
+
 def get_topico_anotacao_user_id(
     topico_id: int = Path(...),
     token: str = Depends(oauth2_scheme),

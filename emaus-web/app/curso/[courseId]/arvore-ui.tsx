@@ -11,11 +11,13 @@ function LinhaTopico({
   titulo,
   referencia,
   estado,
+  avaliacaoId,
 }: {
   id: number;
   titulo: string;
   referencia: string | null;
   estado: ModuloNo["aulas"][number]["topicos"][number]["estado"];
+  avaliacaoId: number | null;
 }) {
   const conteudo = (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -32,13 +34,38 @@ function LinhaTopico({
       </div>
     );
   }
+
+  // Prova travada até concluir o conteúdo (2026-09-19, decisão confirmada —
+  // ver PLANO_AVALIACAO_SEPARADA.md, seção "Gating CONFIRMADO"): o backend já
+  // recusa (403) se tentarem entrar direto sem concluir, isso aqui é só a UI.
+  const linhaProva = avaliacaoId != null && (
+    estado === "concluido" ? (
+      <Link
+        href={`/topico/${id}/prova`}
+        className="block px-4 pb-2.5 pl-11 text-[.78rem] font-semibold text-[var(--tm-accent)] hover:underline"
+      >
+        📝 Prova deste tópico
+      </Link>
+    ) : (
+      <p
+        className="m-0 px-4 pb-2.5 pl-11 text-[.78rem] text-[var(--tm-ink-muted)]"
+        title="A prova libera depois que você concluir o tópico"
+      >
+        📝 Prova — disponível ao concluir o tópico
+      </p>
+    )
+  );
+
   return (
-    <Link
-      href={`/topico/${id}`}
-      className="block px-4 py-3 transition-colors hover:bg-[var(--tm-surface-2)]"
-    >
-      {conteudo}
-    </Link>
+    <div>
+      <Link
+        href={`/topico/${id}`}
+        className="block px-4 py-3 transition-colors hover:bg-[var(--tm-surface-2)]"
+      >
+        {conteudo}
+      </Link>
+      {linhaProva}
+    </div>
   );
 }
 
@@ -95,6 +122,7 @@ function Modulo({ modulo, aberto }: { modulo: ModuloNo; aberto: boolean }) {
                       titulo={t.titulo}
                       referencia={t.referencia_biblica}
                       estado={t.estado}
+                      avaliacaoId={t.avaliacaoId}
                     />
                   ))}
                 </div>

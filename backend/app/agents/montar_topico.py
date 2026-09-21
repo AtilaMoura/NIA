@@ -34,10 +34,8 @@ def montar_topico(conteudo: dict, perguntas: dict, proximo_topico_label: str) ->
         gate_id: [_inferir_tipo_pergunta(p) for p in lista]
         for gate_id, lista in perguntas.get("checkpoints", {}).items()
     }
-    avaliacao = {
-        gate_id: _inferir_tipo_pergunta(p)
-        for gate_id, p in perguntas.get("avaliacao", {}).items()
-    }
+    # perguntas.get("avaliacao") não é mais usado aqui — virou montar_avaliacao()
+    # (2026-09-16, a prova saiu do Topico.content pra entidade própria).
 
     slides = [{"tipo": "capa", **_sem_chave(conteudo["slides"][0], "tipo")}]
 
@@ -70,33 +68,6 @@ def montar_topico(conteudo: dict, perguntas: dict, proximo_topico_label: str) ->
     )
 
     slides.append({
-        "tipo": "avaliacao_intro",
-        "secao": "Avaliação Final",
-        "titulo": "Avaliação Final",
-        "subtitulo": "5 questões — algumas juntam mais de um conceito. Duas são abertas.",
-        "instrucoes_box": {
-            "label": "📋 Antes de começar",
-            "texto": (
-                "A correção objetiva já aparece na hora. Mas a avaliação final de "
-                "verdade — com feedback honesto e a decisão de seguir ou reforçar — "
-                "acontece quando você levar o resumo desta tela pro chat com o Claude."
-            ),
-        },
-    })
-
-    for concept in conteudo.get("avaliacao_conceitos", []):
-        gate_id = concept["gate_id"]
-        pergunta = avaliacao.get(gate_id)
-        if not pergunta:
-            continue
-        slides.append({
-            "tipo": "avaliacao_pergunta",
-            "secao": "Avaliação Final",
-            "gate_id": gate_id,
-            "pergunta": pergunta,
-        })
-
-    slides.append({
         "tipo": "resultado",
         "secao": "Resultado",
         "titulo": "Resultado desta sessão",
@@ -110,7 +81,7 @@ def montar_topico(conteudo: dict, perguntas: dict, proximo_topico_label: str) ->
     badges_capa = [
         f"⏱ ~{duracao} min",
         "🔊 áudio com controle de velocidade",
-        f"✍️ {total_checkpoints} checkpoints + avaliação final",
+        f"✍️ {total_checkpoints} checkpoints",
     ]
 
     resultado = {
@@ -129,6 +100,41 @@ def montar_topico(conteudo: dict, perguntas: dict, proximo_topico_label: str) ->
     if conteudo.get("imagem_capa"):
         resultado["imagem_capa"] = conteudo["imagem_capa"]
     return resultado
+
+
+def montar_avaliacao(conteudo: dict, perguntas: dict) -> dict:
+    """Monta a avaliação final como entidade separada (não mais slides dentro do tópico).
+    Reaproveita a mesma lógica que antes vivia dentro de montar_topico().
+    """
+    avaliacao_dict = {
+        gate_id: _inferir_tipo_pergunta(p)
+        for gate_id, p in perguntas.get("avaliacao", {}).items()
+    }
+
+    perguntas_lista = []
+    for concept in conteudo.get("avaliacao_conceitos", []):
+        gate_id = concept["gate_id"]
+        pergunta = avaliacao_dict.get(gate_id)
+        if not pergunta:
+            continue
+        perguntas_lista.append(pergunta)
+
+    return {
+        "intro": {
+            "titulo": "Avaliação Final",
+            "subtitulo": "5 questões — algumas juntam mais de um conceito. Duas são abertas.",
+            "instrucoes_box": {
+                "label": "📋 Antes de começar",
+                "texto": (
+                    "A correção objetiva já aparece na hora. Mas a avaliação final de "
+                    "verdade — com feedback honesto e a decisão de seguir ou reforçar — "
+                    "acontece quando você levar o resumo desta tela pro chat com o Claude."
+                ),
+            },
+        },
+        "perguntas": perguntas_lista,
+        "resultado": {"titulo": "Resultado da prova", "proximo_topico_label": "Voltar ao tópico"},
+    }
 
 
 def _sem_chave(d: dict, *chaves: str) -> dict:

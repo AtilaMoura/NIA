@@ -45,6 +45,9 @@ export type Topico = {
   generated_by: string | null;
   reviewed_by: string | null;
   estimated_read_time_minutes: number | null;
+  // id da Avaliacao (prova) vinculada, só quando existe E está aprovada
+  // (2026-09-19 — backend anexa isso em GET /topicos, não é coluna real do Topico).
+  avaliacao_id: number | null;
 };
 
 export type FontSize = "sm" | "md" | "lg";
@@ -92,6 +95,22 @@ export type TopicoProgress = {
   id: number;
   user_id: number;
   topico_id: number;
+  status: StatusTopico;
+  iniciado_em: string | null;
+  concluido_em: string | null;
+  tutor_veredito: VeredictoTutor | null;
+  tutor_analise: TutorAnalise | null;
+  avaliado_em: string | null;
+  ultimo_slide: number | null;
+  rodada_atual: number;
+};
+
+// Progresso da PROVA (Avaliacao) — mesmos campos de TopicoProgress, trocando
+// topico_id por avaliacao_id (2026-09-19, ver PLANO_AVALIACAO_SEPARADA.md).
+export type AvaliacaoProgress = {
+  id: number;
+  user_id: number;
+  avaliacao_id: number;
   status: StatusTopico;
   iniciado_em: string | null;
   concluido_em: string | null;
@@ -269,6 +288,32 @@ export function topicoRenderUrl(
   return `${API_URL_PUBLICA}/topicos/${id}/render?${params.toString()}`;
 }
 
+// URL de render da PROVA (Avaliacao) — mesmo padrão de topicoRenderUrl, sem
+// tema por curso (a prova herda o tema do próprio backend, "vidro-fume" por
+// padrão) nem PDF (não faz sentido pra prova nesta 1ª versão).
+export function avaliacaoRenderUrl(
+  id: number,
+  opts: {
+    userId: number;
+    theme?: string;
+    respostasToken?: string;
+    avaliacaoInicial?: AvaliacaoTutor | null;
+    concluido?: boolean;
+  },
+) {
+  const params = new URLSearchParams({
+    user_id: String(opts.userId),
+    theme: opts.theme ?? THEME_TOPICO,
+  });
+  if (opts.respostasToken) params.set("token", opts.respostasToken);
+  if (opts.concluido && opts.avaliacaoInicial) {
+    params.set("concluido", "1");
+    params.set("veredito", opts.avaliacaoInicial.veredito);
+    params.set("resumo", opts.avaliacaoInicial.resumo_diagnostico ?? "");
+  }
+  return `${API_URL_PUBLICA}/avaliacoes/${id}/render?${params.toString()}`;
+}
+
 // ---- Usuário / progresso ----
 export function getUser(id: number) {
   return fetchJson<UserPrefs>(`/users/${id}`);
@@ -283,6 +328,18 @@ export async function getTopicoToken(token: string, topicoId: number) {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify({ topico_id: topicoId }),
+  });
+  return access_token;
+}
+
+// Token de ESCOPO CURTO pro <iframe> do render da PROVA salvar resposta —
+// mesmo padrão de getTopicoToken, endpoint diferente (backend valida o
+// GATING aqui: só emite se o tópico vinculado estiver concluído).
+export async function getAvaliacaoToken(token: string, avaliacaoId: number) {
+  const { access_token } = await fetchJson<{ access_token: string }>("/auth/avaliacao-token", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ avaliacao_id: avaliacaoId }),
   });
   return access_token;
 }
@@ -307,6 +364,11 @@ export function listProgress() {
 // ---- Progresso por tópico (FASE 2) ----
 export function listTopicoProgress(userId: number) {
   return fetchJson<TopicoProgress[]>(`/topico-progress/?user_id=${userId}`);
+}
+
+// ---- Progresso da prova (2026-09-19) ----
+export function listAvaliacaoProgress(userId: number) {
+  return fetchJson<AvaliacaoProgress[]>(`/avaliacao-progress/?user_id=${userId}`);
 }
 
 // PUT /topico-progress/{id} também exige login e valida user_id contra o token —
@@ -385,6 +447,21 @@ export function reiniciarTopico(topicoId: number) {
 // `.tutor_analise.ultima_avaliacao`, o novo status em `.status`.
 export function enviarAvaliacaoTutor(topicoId: number, resumoTexto: string) {
   return chamarMesmaOrigem<TopicoProgress>("/api/tutor", "POST", { topicoId, resumoTexto });
+}
+
+// ---- Escritas da prova (2026-09-19) — mesmo padrão de proxy autenticado ----
+export function marcarProgressoAvaliacao(avaliacaoId: number, status: StatusTopico) {
+  return chamarMesmaOrigem<AvaliacaoProgress>("/api/avaliacao-progress", "PUT", { avaliacaoId, status });
+}
+
+// Recomeçar a prova — mesmo princípio do reiniciarTopico (nunca apaga nada,
+// só abre uma rodada nova em AvaliacaoResposta/AvaliacaoProgress).
+export function reiniciarAvaliacao(avaliacaoId: number) {
+  return chamarMesmaOrigem<AvaliacaoProgress>("/api/avaliacao-progress/reiniciar", "POST", { avaliacaoId });
+}
+
+export function enviarAvaliacaoTutorProva(avaliacaoId: number, resumoTexto: string) {
+  return chamarMesmaOrigem<AvaliacaoProgress>("/api/avaliacao-tutor", "POST", { avaliacaoId, resumoTexto });
 }
 
 // ---- Escritas da área de revisão (FASE 5a) — mesmo padrão de proxy autenticado ----

@@ -24,6 +24,9 @@ export type TopicoNo = {
   iniciado_em: string | null;
   concluido_em: string | null;
   tutor_veredito: VeredictoTutor | null;
+  // id da Avaliacao (prova) vinculada, só quando aprovada — null = sem prova
+  // pra este tópico (2026-09-19). A prova só libera quando estado==="concluido".
+  avaliacaoId: number | null;
   // preenchidos só na linhaDoTempo (contexto pra exibir fora da árvore)
   moduloTitulo?: string;
   aulaTitulo?: string;
@@ -131,6 +134,7 @@ export async function montarArvore(
             iniciado_em: prog?.iniciado_em ?? null,
             concluido_em: prog?.concluido_em ?? null,
             tutor_veredito: prog?.tutor_veredito ?? null,
+            avaliacaoId: t.avaliacao_id,
           };
         });
         return { id: l.id, titulo: l.title, lesson_index: l.lesson_index, topicos: topicosNo };

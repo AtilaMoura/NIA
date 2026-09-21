@@ -17,7 +17,7 @@ Duas funções:
 from .estrutura_agent import EstruturaAgent
 from .specialists.ia_agent import ContentAgent
 from .quiz_agent import QuizAgent
-from .montar_topico import montar_topico
+from .montar_topico import montar_topico, montar_avaliacao
 from .reviewer_agent import ReviewerAgent
 from .perfis import PerfilDominio, PERFIL_TECH
 
@@ -76,6 +76,7 @@ async def gerar_e_revisar_topico(
 
     perguntas = await quiz_agent.generate_perguntas(conteudo, perfil=perfil)
     topico = montar_topico(conteudo, perguntas, proximo_topico_label=proximo_topico_label)
+    avaliacao = montar_avaliacao(conteudo, perguntas)
     revisao = await reviewer.revisar_topico(
         topico,
         contexto_topicos_anteriores=contexto_topicos_anteriores,
@@ -83,4 +84,4 @@ async def gerar_e_revisar_topico(
         perfil=perfil,
     )
 
-    return {"topico": topico, "revisao": revisao}
+    return {"topico": topico, "avaliacao": avaliacao, "revisao": revisao}

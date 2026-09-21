@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
-from app.models.models import Topico, User
+from app.models.models import Topico, Avaliacao, TopicoProgress, User
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.core.security import create_access_token, verify_password, hash_password, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.core.auth import get_current_user
-from app.schemas.auth import TopicoTokenRequest, UserLogin, UserRegister, Token, UserMe
+from app.schemas.auth import TopicoTokenRequest, AvaliacaoTokenRequest, UserLogin, UserRegister, Token, UserMe
 from app.database import get_db
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -54,6 +54,44 @@ def emitir_topico_token(
         expires_delta=timedelta(hours=2),
     )
     return Token(access_token=access_token)
+
+
+@router.post("/avaliacao-token", response_model=Token)
+def emitir_avaliacao_token(
+    data: AvaliacaoTokenRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Token de escopo curto pro <iframe> do render de avaliação salvar respostas
+    (2026-09-16). Mesmo padrão de /auth/topico-token, mas com GATING:
+    só emite se o tópico vinculado à avaliação tiver TopicoProgress.status ==
+    'concluido' pra este usuário.
+    """
+    avaliacao = db.query(Avaliacao).filter(Avaliacao.id == data.avaliacao_id).first()
+    if not avaliacao:
+        raise HTTPException(404, "Avaliação not found")
+
+    # GATING: verifica se o usuário concluiu o conteúdo do tópico
+    topico_progress = (
+        db.query(TopicoProgress)
+        .filter(
+            TopicoProgress.user_id == current_user.id,
+            TopicoProgress.topico_id == avaliacao.topico_id,
+            TopicoProgress.status == "concluido",
+        )
+        .first()
+    )
+    if not topico_progress:
+        raise HTTPException(
+            403, "Termine o conteúdo do tópico antes de fazer a prova."
+        )
+
+    access_token = create_access_token(
+        {"sub": str(current_user.id), "avaliacao_id": data.avaliacao_id, "scope": "avaliacao_respostas"},
+        expires_delta=timedelta(hours=2),
+    )
+    return Token(access_token=access_token)
+
 
 @router.post("/login", response_model=Token)
 def login(data: UserLogin, db: Session = Depends(get_db)):

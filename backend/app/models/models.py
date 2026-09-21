@@ -743,3 +743,126 @@ class TopicoReforco(Base):
 
     def __repr__(self):
         return f"<TopicoReforco(topico_id={self.topico_id}, user_id={self.user_id}, question_id_origem='{self.question_id_origem}', correta={self.correta})>"
+
+
+# ------------------------------------------------------------
+# 12. MODEL: AVALIACAO (NOVA! — 2026-09-16)
+# ------------------------------------------------------------
+# Prova final do tópico, separada do Topico.content (que antes carregava os
+# slides avaliacao_intro/avaliacao_pergunta/resultado junto com o conteúdo).
+# Vínculo 1:1 com o Tópico (topico_id único). Ver PLANO_AVALIACAO_SEPARADA.md.
+
+class Avaliacao(Base):
+    __tablename__ = "avaliacoes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, unique=True, index=True)
+
+    # { intro: {...}, perguntas: [Pergunta, ...], resultado: {...} } — mesmo
+    # formato dos slides avaliacao_intro/avaliacao_pergunta/resultado de antes,
+    # só que fora do Topico.content (ver schema-conteudo-topico.md).
+    conteudo = Column(JSONB, nullable=False)
+
+    is_approved = Column(Boolean, nullable=False, default=False)  # mesmo fluxo de revisão do Topico
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    topico = relationship("Topico", backref="avaliacao")
+
+    def __repr__(self):
+        return f"<Avaliacao(id={self.id}, topico_id={self.topico_id}, is_approved={self.is_approved})>"
+
+
+# ------------------------------------------------------------
+# 13. MODEL: AVALIACAO_PROGRESS (NOVA! — 2026-09-16)
+# ------------------------------------------------------------
+# Mesmos campos de TopicoProgress, trocando topico_id por avaliacao_id — a
+# prova tem seu próprio progresso/rodada, independente do conteúdo.
+
+class AvaliacaoProgress(Base):
+    __tablename__ = "avaliacao_progress"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    avaliacao_id = Column(Integer, ForeignKey('avaliacoes.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    status = Column(String(20), nullable=False, default='nao_iniciado')
+
+    iniciado_em = Column(DateTime(timezone=True))    # 1ª vez que virou 'em_andamento'
+    concluido_em = Column(DateTime(timezone=True))   # quando virou 'concluido' (não é limpo depois)
+    time_spent_s = Column(Integer, default=0)        # reservado (mesmo padrão do TopicoProgress)
+
+    tutor_veredito = Column(String(10))              # 'dominado' | 'reforco' | None
+    tutor_analise = Column(JSONB)                    # { ultima_avaliacao: {...}, historico: [...] }
+    avaliado_em = Column(DateTime(timezone=True))    # última vez que o Tutor avaliou
+
+    ultimo_slide = Column(Integer)  # índice do slide da prova onde o aluno parou
+
+    # "Rodada" da prova — mesmo mecanismo de reset sem apagar do TopicoProgress
+    # (ver POST /topico-progress/{id}/reiniciar); a prova ganha o equivalente
+    # próprio em POST /avaliacao-progress/{id}/reiniciar.
+    rodada_atual = Column(Integer, nullable=False, default=1)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    user = relationship("User", backref="avaliacao_progress")
+    avaliacao = relationship("Avaliacao", backref="progresso")
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('nao_iniciado', 'em_andamento', 'concluido')",
+            name='valid_avaliacao_progress_status',
+        ),
+        CheckConstraint('time_spent_s >= 0', name='valid_avaliacao_time_spent'),
+        UniqueConstraint('user_id', 'avaliacao_id', name='uq_avaliacao_progress_user_avaliacao'),
+    )
+
+    def __repr__(self):
+        return f"<AvaliacaoProgress(id={self.id}, user_id={self.user_id}, avaliacao_id={self.avaliacao_id}, status='{self.status}')>"
+
+
+# ------------------------------------------------------------
+# 14. MODEL: AVALIACAO_RESPOSTA (NOVA! — 2026-09-16)
+# ------------------------------------------------------------
+# Mesmos campos de TopicoResposta, trocando topico_id por avaliacao_id.
+
+class AvaliacaoResposta(Base):
+    __tablename__ = "avaliacao_respostas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    avaliacao_id = Column(Integer, ForeignKey('avaliacoes.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    gate_id = Column(String(50), nullable=False)      # ex: 'ef3' — agrupa pro checkGate()
+    question_id = Column(String(50), nullable=False)  # ex: 'ef3_1_2' (item de classify)
+    tipo = Column(String(20), nullable=False)          # mc|tf|classify|associar|lacuna|open|ditado
+
+    resposta_dada = Column(JSONB, nullable=False)  # formato varia por tipo (índice, texto, bool...)
+    correta = Column(Boolean)                       # null pra 'open' (sem gabarito automático)
+    tentativas = Column(Integer, nullable=False, default=1)
+
+    # Rodada do AvaliacaoProgress.rodada_atual no momento em que foi respondida
+    # — mesmo mecanismo do TopicoResposta.rodada.
+    rodada = Column(Integer, nullable=False, default=1)
+
+    respondido_em = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    user = relationship("User", backref="respostas_avaliacao")
+    avaliacao = relationship("Avaliacao", backref="respostas")
+
+    __table_args__ = (
+        CheckConstraint(
+            "tipo IN ('mc', 'tf', 'classify', 'associar', 'lacuna', 'open', 'ditado')",
+            name='valid_avaliacao_resposta_tipo',
+        ),
+        UniqueConstraint(
+            'user_id', 'avaliacao_id', 'question_id', 'rodada',
+            name='uq_avaliacao_resposta_user_avaliacao_question_rodada',
+        ),
+    )
+
+    def __repr__(self):
+        return f"<AvaliacaoResposta(avaliacao_id={self.avaliacao_id}, user_id={self.user_id}, question_id='{self.question_id}', correta={self.correta})>"
