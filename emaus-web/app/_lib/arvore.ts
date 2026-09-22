@@ -44,6 +44,7 @@ export type ModuloNo = {
   titulo: string;
   descricao: string | null;
   module_index: number;
+  cover_image_url: string | null;
   aulas: AulaNo[];
 };
 
@@ -144,6 +145,7 @@ export async function montarArvore(
       titulo: m.title,
       descricao: m.description,
       module_index: m.module_index,
+      cover_image_url: m.cover_image_url,
       aulas,
     };
   });

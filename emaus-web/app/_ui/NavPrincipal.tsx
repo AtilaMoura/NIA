@@ -33,9 +33,9 @@ export function NavPrincipal({
             href={i.href}
             aria-current={ativo ? "page" : undefined}
             className={
-              "transition-colors " +
+              "rounded-full px-3 py-1.5 transition-colors " +
               (ativo
-                ? "font-semibold text-[var(--tm-accent)]"
+                ? "bg-[var(--tm-surface-2)] font-semibold text-[var(--tm-ink)]"
                 : "text-[var(--tm-ink-muted)] hover:text-[var(--tm-accent)]")
             }
           >

@@ -4,12 +4,17 @@
 
 export type TomCurso = "trigo" | "oliveira" | "vinho" | "indigo" | "terracota" | "pedra" | "latao";
 
+// Categoria fixa de 2 valores (2026-09-21) — só pra separar as prateleiras da home
+// (/inicio). Não é uma taxonomia N:N de verdade, é metadado do catálogo hardcoded.
+export type CategoriaCurso = "Formação bíblica" | "Estudos pessoais";
+
 export type CursoCatalogo = {
   slug: string;
   titulo: string;
   subtitulo: string;
   descricao: string;
   tom: TomCurso;
+  categoria: CategoriaCurso;
   /** courseId real no NIA — só quando `disponivel` */
   courseId?: number;
   disponivel: boolean;
@@ -34,6 +39,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Ciclos de 30 dias combinando música, vídeos de conversação e inglês para ler e escrever prompts técnicos — conteúdo gerado e revisado tópico a tópico.",
     tom: "latao",
+    categoria: "Estudos pessoais",
     courseId: 9,
     disponivel: true,
   },
@@ -44,6 +50,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Como um LLM funciona por dentro (tokens, Transformers, embeddings, attention) até a arquitetura completa de um agente de vendas via WhatsApp para um Garden Center: Context Engineering, RAG, memória, tools, orchestrator, avaliação e sistemas multi-agente. Trabalhado tópico a tópico.",
     tom: "pedra",
+    categoria: "Estudos pessoais",
     courseId: 5,
     disponivel: true,
   },
@@ -54,6 +61,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Fundamento bíblico, doutrina básica, caráter e ética, disciplinas espirituais e as áreas práticas de serviço na igreja.",
     tom: "trigo",
+    categoria: "Formação bíblica",
     courseId: 8,
     disponivel: true,
   },
@@ -64,6 +72,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Redes aplicadas a sistemas de câmera IP/CFTV: endereçamento, NAT, port forwarding, VPN e P2P, protocolos de vídeo (RTSP/RTMP/HLS/WebRTC), ONVIF, media servers, nuvens de câmera, armazenamento e segurança de streams — cada tópico ancorado num exemplo real de monitoramento.",
     tom: "indigo",
+    categoria: "Estudos pessoais",
     courseId: 11,
     disponivel: true,
   },
@@ -74,6 +83,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Uma visão de conjunto das Escrituras — criação, queda, redenção e restauração — para nunca mais se perder entre um livro e outro.",
     tom: "indigo",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -83,6 +93,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Contexto, gênero literário e a regra de ouro da interpretação: aprender a ouvir o texto antes de aplicá-lo.",
     tom: "oliveira",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -92,6 +103,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Um estudo capítulo a capítulo do Evangelho que mais se demora em quem Jesus é e no que significa crer nele.",
     tom: "vinho",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -101,6 +113,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Pecado, graça, fé, justificação e vida no Espírito — a exposição mais completa do evangelho no Novo Testamento.",
     tom: "terracota",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -110,6 +123,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Lei, história, poesia e profetas: como as promessas de Deus atravessam séculos e apontam para Cristo.",
     tom: "pedra",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -119,6 +133,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Oração pessoal, intercessão e o Pai Nosso como modelo — construir um hábito que sustenta a caminhada.",
     tom: "oliveira",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -128,6 +143,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Autoridade da Bíblia, a Trindade, a obra de Cristo, salvação pela graça e a igreja — sem jargão, com base no texto.",
     tom: "indigo",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -137,6 +153,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Batismo, comunhão, leitura da Bíblia e as primeiras decisões de uma vida seguindo Jesus.",
     tom: "trigo",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -146,6 +163,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Alegria, medo, arrependimento, gratidão e lamento: aprender a orar com as palavras que Deus mesmo inspirou.",
     tom: "vinho",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -155,6 +173,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "Verdade, respeito, justiça e pureza — coerência entre a vida pública e a privada, no trabalho e em casa.",
     tom: "terracota",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
   {
@@ -164,6 +183,7 @@ export const CATALOGO: CursoCatalogo[] = [
     descricao:
       "A Grande Comissão, o testemunho pessoal e como compartilhar o evangelho no cotidiano, sem fórmula pronta.",
     tom: "pedra",
+    categoria: "Formação bíblica",
     disponivel: false,
   },
 ];

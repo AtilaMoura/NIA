@@ -4,7 +4,9 @@
 
 import { papelPodeRevisar, type Papel } from "./papel";
 
-export type ItemNav = { href: string; rotulo: string };
+// "icone" é opcional (emoji) — só o menu mobile usa hoje (redesign 2026-09-21, ver
+// PLANO_REDESIGN_EMAUS.md Fase 5); a barra desktop ignora o campo.
+export type ItemNav = { href: string; rotulo: string; icone?: string };
 
 // Onde o logo leva: sempre o mesmo destino (não muda por página).
 export function hrefMarca(logado: boolean): string {
@@ -14,32 +16,32 @@ export function hrefMarca(logado: boolean): string {
 // Barra principal — mesma ordem sempre.
 export function navPrincipal(papel: Papel | null | undefined): ItemNav[] {
   const base: ItemNav[] = [
-    { href: "/inicio", rotulo: "Início" },
-    { href: "/#cursos", rotulo: "Cursos" },
-    { href: "/progresso", rotulo: "Meu progresso" },
+    { href: "/inicio", rotulo: "Início", icone: "🏠" },
+    { href: "/#cursos", rotulo: "Cursos", icone: "📚" },
+    { href: "/progresso", rotulo: "Meu progresso", icone: "📈" },
   ];
   if (papel && papelPodeRevisar(papel)) {
-    base.push({ href: "/revisao", rotulo: "Revisão" });
+    base.push({ href: "/revisao", rotulo: "Revisão", icone: "🗂️" });
   }
   return base;
 }
 
 // Nav pra quem está deslogado (na landing).
 export const NAV_DESLOGADO: ItemNav[] = [
-  { href: "/#cursos", rotulo: "Cursos" },
-  { href: "/#como-funciona", rotulo: "Como funciona" },
+  { href: "/#cursos", rotulo: "Cursos", icone: "📚" },
+  { href: "/#como-funciona", rotulo: "Como funciona", icone: "💡" },
 ];
 
 // Sub-nav da área de revisão (2ª linha, só dentro de /revisao/*).
 export const NAV_REVISAO: ItemNav[] = [
-  { href: "/revisao", rotulo: "Fila de revisão" },
-  { href: "/revisao/alunos", rotulo: "Alunos" },
+  { href: "/revisao", rotulo: "Fila de revisão", icone: "🗂️" },
+  { href: "/revisao/alunos", rotulo: "Alunos", icone: "🧑‍🎓" },
 ];
 
 // Itens do menu do avatar (Sair é tratado à parte).
 export const ITENS_AVATAR: ItemNav[] = [
-  { href: "/perfil", rotulo: "Perfil" },
-  { href: "/preferencias", rotulo: "Preferências" },
+  { href: "/perfil", rotulo: "Perfil", icone: "👤" },
+  { href: "/preferencias", rotulo: "Preferências", icone: "⚙️" },
 ];
 
 // Qual item da barra está "ativo" pra uma dada rota.
