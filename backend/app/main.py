@@ -17,7 +17,6 @@ from app.routers import topico_anotacoes
 from app.routers import topico_tutor
 from app.routers import revisao
 from app.routers import governanca
-from app.routers import test_ai
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
@@ -120,7 +119,11 @@ def create_app():
     app.include_router(revisao.router)
     app.include_router(governanca.router)
     app.include_router(pipeline.router)
-    app.include_router(test_ai.router)
+    # test_ai.router NÃO é registrado em produção (achado de segurança 2026-09-23:
+    # endpoints públicos sem autenticação, aceitando prompt livre — deixavam
+    # qualquer um na internet gastar a cota paga de GROQ_API_KEY/GEMINI_API_KEY).
+    # O arquivo continua em app/routers/test_ai.py pra reativar manualmente em
+    # dev local se precisar testar os services de IA direto.
 
     @app.get("/")
     def root():
