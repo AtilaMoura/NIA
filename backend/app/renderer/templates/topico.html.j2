@@ -497,7 +497,11 @@
   .anotacao-painel {
     position: fixed; right: 16px; bottom: 138px; z-index: 70; width: min(340px, calc(100vw - 32px));
     max-height: min(420px, calc(100vh - 220px)); display: flex; flex-direction: column;
-    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
+    /* --surface é translúcido em temas "vidro" (ex: vidro-fume, 3.5% de branco)
+       — sozinho deixava o texto do slide vazar por trás do painel. --bg por
+       baixo garante painel opaco em qualquer tema. */
+    background: linear-gradient(var(--surface), var(--surface)), var(--bg);
+    border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
     box-shadow: 0 10px 30px rgba(0,0,0,.22); overflow: hidden;
   }
   .anotacao-painel[hidden] { display: none; }
@@ -517,8 +521,25 @@
 
   .duvida-fab { right: 70px; background: var(--blue); }
   .duvida-painel { right: 70px; }
-  .duvida-resposta { margin-top: 10px; padding: 10px 12px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border-soft); font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
-  .duvida-resposta[hidden] { display: none; }
+  /* Chat de dúvidas (2026-09-23) — conteúdo com classe própria, NÃO
+     .anotacao-aba: o JS da anotação esconde toda .anotacao-aba que não seja a
+     aba ativa dele, e isso deixava este painel vazio (bug real). */
+  .duvida-painel { max-height: min(520px, calc(100vh - 180px)); }
+  .duvida-cabecalho { padding: 10px 12px; border-bottom: 1px solid var(--border-soft); font-size: 12px; font-weight: 600; color: var(--text-dim); flex: 0 0 auto; }
+  .duvida-mensagens { flex: 1 1 auto; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+  .duvida-vazio { font-size: 12.5px; color: var(--text-dim); }
+  .duvida-vazio[hidden] { display: none; }
+  .duvida-msg { max-width: 88%; padding: 8px 11px; border-radius: var(--radius); font-size: 13px; line-height: 1.55; white-space: pre-wrap; word-wrap: break-word; }
+  .duvida-msg-aluno { align-self: flex-end; background: var(--accent-soft); color: var(--text); }
+  .duvida-msg-ia { align-self: flex-start; background: var(--surface-2); border: 1px solid var(--border-soft); color: var(--text); }
+  .duvida-msg-slide { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); font-weight: 700; margin-bottom: 2px; }
+  .duvida-salvar-nota { display: block; margin-top: 6px; background: none; border: none; padding: 0; font-family: inherit; font-size: 11.5px; font-weight: 600; color: var(--accent); cursor: pointer; }
+  .duvida-salvar-nota:disabled { color: var(--text-dim); cursor: default; }
+  .duvida-rodape { flex: 0 0 auto; border-top: 1px solid var(--border-soft); padding: 10px 12px; }
+  .duvida-rodape .anotacao-texto { min-height: 60px; }
+  .duvida-rodape-linha { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
+  .duvida-rodape-linha .anotacao-salvar { margin-top: 0; }
+  .duvida-contador { font-size: 11px; color: var(--text-dim); }
 
   .reforco-ia { margin: 10px 0 18px; }
   .reforco-loading { font-size: 13px; color: var(--text-muted); padding: 10px 0; }
@@ -796,11 +817,17 @@
 
 <button type="button" class="anotacao-fab duvida-fab" id="duvidaFab" title="Tirar dúvida com a IA" aria-label="Tirar dúvida com a IA">❓</button>
 <div class="anotacao-painel duvida-painel" id="duvidaPainel" hidden>
-  <div class="anotacao-aba">
-    <textarea class="anotacao-texto" id="duvidaTexto" placeholder="O que você não entendeu neste slide?"></textarea>
-    <button type="button" class="anotacao-salvar register-btn" id="duvidaPerguntarBtn">Perguntar</button>
-    <span class="anotacao-status" id="duvidaStatus"></span>
-    <div class="duvida-resposta" id="duvidaResposta" hidden></div>
+  <div class="duvida-cabecalho">Tire sua dúvida com a IA</div>
+  <div class="duvida-mensagens" id="duvidaMensagens">
+    <div class="duvida-vazio" id="duvidaVazio">Pergunte o que não ficou claro — a IA conhece o tópico todo e foca no slide que você está vendo.</div>
+  </div>
+  <div class="duvida-rodape">
+    <textarea class="anotacao-texto" id="duvidaTexto" maxlength="500" placeholder="Escreva sua dúvida… (Enter envia, Shift+Enter pula linha)"></textarea>
+    <div class="duvida-rodape-linha">
+      <span class="duvida-contador" id="duvidaContador">0/500</span>
+      <span class="anotacao-status" id="duvidaStatus"></span>
+      <button type="button" class="anotacao-salvar register-btn" id="duvidaPerguntarBtn">Enviar</button>
+    </div>
   </div>
 </div>
 
@@ -829,6 +856,7 @@ const AVALIACAO_INICIAL = (function () {
     veredito: p.get('veredito') || null,
     resumo: p.get('resumo') || '',
     temProximo: p.get('proximo') === '1',
+    temAvaliacao: p.get('avaliacao') === '1',
   };
 })();
 
@@ -915,22 +943,61 @@ function mostrarEstadoAvaliacao(estado) {
     var el = document.getElementById(id);
     if (el) el.hidden = (id !== estado);
   });
+  // Achado real (2026-09-22): o painel de estado fica abaixo da caixa
+  // "Pontuação objetiva" no slide "Resultado" — em telas curtas (mobile
+  // principalmente) ele nasce fora da área visível, sem scroll automático.
+  // O aluno clicava "Fim" e parecia que nada tinha acontecido (na real tinha
+  // sido concluído por baixo dos panos). Traz o painel pra tela sempre que
+  // o estado muda.
+  var box = document.getElementById('resumoEmbutidoBox');
+  if (box) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Feedback imediato no próprio botão "Fim" — sem isso o único indício de
+  // que o clique fez algo era esse painel fora da tela (ver acima).
+  var nextBtnEl = document.getElementById('nextBtn');
+  if (nextBtnEl && EMBUTIDO) {
+    if (estado === 'avaliacaoCarregando') {
+      nextBtnEl.disabled = true;
+      nextBtnEl.textContent = 'Avaliando…';
+    } else {
+      nextBtnEl.disabled = false;
+      nextBtnEl.textContent = 'Fim';
+    }
+  }
 }
 
-function renderizarResultadoAvaliacao(veredito, resumo, temProximo) {
+function renderizarResultadoAvaliacao(veredito, resumo, temProximo, temAvaliacao) {
   var dominado = veredito === 'dominado';
   var chip = document.getElementById('veredictoChip');
   chip.textContent = dominado ? '✓ Você passou' : 'Precisa reforçar antes de seguir';
   chip.className = 'veredito-chip ' + (dominado ? 'bom' : 'aviso');
   document.getElementById('resumoDiagnostico').textContent = resumo || '';
 
+  // Rótulo do "voltar" muda no contexto da Prova: ela sempre devolve pro
+  // Tópico de origem (ver AcoesProva em prova-ui.tsx), nunca pro curso —
+  // "Voltar ao curso" enganava o aluno sobre pra onde o botão ia.
+  var labelVoltar = RESPOSTAS_PREFIXO === 'avaliacao' ? 'Voltar ao tópico' : 'Voltar ao curso';
+
   var acoes = document.getElementById('avaliacaoAcoes');
   acoes.innerHTML = '';
   if (dominado) {
+    // Prova recém-destravada (gating libera quando o Tópico fica concluído) —
+    // oferece o caminho pra ela antes do "Próximo tópico". A Prova não conta
+    // pro % do curso, então não trava quem quiser pular.
+    if (temAvaliacao) {
+      var btnProva = document.createElement('button');
+      btnProva.type = 'button';
+      btnProva.className = 'copy-btn';
+      btnProva.textContent = 'Fazer a prova ▶';
+      btnProva.addEventListener('click', function () {
+        try { window.parent.postMessage({ tipo: 'emaus:navegar', destino: 'prova' }, '*'); } catch (e) {}
+      });
+      acoes.appendChild(btnProva);
+    }
     var btnProximo = document.createElement('button');
     btnProximo.type = 'button';
-    btnProximo.className = 'copy-btn';
-    btnProximo.textContent = temProximo ? 'Próximo tópico ▶' : 'Voltar ao curso';
+    btnProximo.className = temAvaliacao ? 'anotacao-toggle' : 'copy-btn';
+    btnProximo.textContent = temProximo ? 'Próximo tópico ▶' : labelVoltar;
     btnProximo.addEventListener('click', function () {
       try { window.parent.postMessage({ tipo: 'emaus:navegar', destino: temProximo ? 'proximo' : 'curso' }, '*'); } catch (e) {}
     });
@@ -947,7 +1014,7 @@ function renderizarResultadoAvaliacao(veredito, resumo, temProximo) {
 }
 
 if (EMBUTIDO && AVALIACAO_INICIAL.concluido && AVALIACAO_INICIAL.veredito) {
-  renderizarResultadoAvaliacao(AVALIACAO_INICIAL.veredito, AVALIACAO_INICIAL.resumo, AVALIACAO_INICIAL.temProximo);
+  renderizarResultadoAvaliacao(AVALIACAO_INICIAL.veredito, AVALIACAO_INICIAL.resumo, AVALIACAO_INICIAL.temProximo, AVALIACAO_INICIAL.temAvaliacao);
 }
 
 document.getElementById('avaliacaoTentarDeNovo') && document.getElementById('avaliacaoTentarDeNovo').addEventListener('click', function () {
@@ -1031,7 +1098,9 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO === 'avaliacao') {
     document.querySelectorAll('.anotacao-tab').forEach(function (t) {
       t.classList.toggle('active', t.dataset.aba === aba);
     });
-    document.querySelectorAll('.anotacao-aba').forEach(function (a) {
+    // Escopo no próprio painel — antes pegava qualquer .anotacao-aba da
+    // página e escondia junto o conteúdo do painel de dúvida.
+    anotacaoPainel.querySelectorAll('.anotacao-aba').forEach(function (a) {
       a.hidden = a.dataset.abaConteudo !== aba;
     });
     if (aba === 'anotar') atualizarTextoAnotacaoAtual();
@@ -1040,6 +1109,9 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO === 'avaliacao') {
 
   anotacaoFab.addEventListener('click', function () {
     anotacaoPainel.hidden = !anotacaoPainel.hidden;
+    // Um painel por vez — os dois ocupam o mesmo canto da tela.
+    var painelDuvida = document.getElementById('duvidaPainel');
+    if (!anotacaoPainel.hidden && painelDuvida) painelDuvida.hidden = true;
     if (!anotacaoPainel.hidden) trocarAbaAnotacao('anotar');
   });
 
@@ -1080,48 +1152,163 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO === 'avaliacao') {
   }
 }
 
-// Tirar dúvida ao vivo (2026-09-19) — separado de anotação de propósito
-// (pedido do Atila): aqui o aluno PERGUNTA e a IA RESPONDE na hora, salvo em
-// TopicoDuvida, não em TopicoAnotacao. Só existe pra Tópico (não Avaliação —
-// /topico-tutor não tem equivalente pra prova ainda) e só fora da revisão.
+// Tirar dúvida ao vivo (2026-09-19, virou chat em 2026-09-23) — separado de
+// anotação de propósito (pedido do Atila): aqui o aluno CONVERSA com a IA,
+// salvo em TopicoDuvida, não em TopicoAnotacao. A "memória" do chat é montada
+// no backend a partir do banco (o front só manda a mensagem nova). Cada
+// resposta pode virar anotação do slide onde a dúvida foi feita (acrescenta,
+// nunca sobrescreve). Só existe pra Tópico (não Avaliação — /topico-tutor não
+// tem equivalente pra prova ainda) e só fora da revisão.
 var duvidaFab = document.getElementById('duvidaFab');
 var duvidaPainel = document.getElementById('duvidaPainel');
 var duvidaTexto = document.getElementById('duvidaTexto');
 var duvidaStatus = document.getElementById('duvidaStatus');
-var duvidaResposta = document.getElementById('duvidaResposta');
+var duvidaMensagens = document.getElementById('duvidaMensagens');
+var duvidaVazio = document.getElementById('duvidaVazio');
+var duvidaContador = document.getElementById('duvidaContador');
 var duvidaPerguntarBtn = document.getElementById('duvidaPerguntarBtn');
+var DUVIDA_MAX = 500;
 
 if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
   duvidaFab.hidden = true;
 } else {
+  function rolarChatProFim() { duvidaMensagens.scrollTop = duvidaMensagens.scrollHeight; }
+
+  // Acrescenta a troca ao fim da anotação do slide (mesmo endpoint do ✍️).
+  function salvarDuvidaComoAnotacao(slideIdx, pergunta, resposta, btn) {
+    if (!RESPOSTAS_ATIVO) { btn.textContent = 'Faça login pra salvar'; return; }
+    var atual = anotacoesPorSlide[slideIdx] || '';
+    var trecho = '❓ ' + pergunta + '\n💬 ' + resposta;
+    var novo = atual ? atual + '\n\n' + trecho : trecho;
+    btn.disabled = true;
+    btn.textContent = 'Salvando…';
+    fetch(window.location.origin + '/topico-anotacoes/' + RESPOSTAS_TOPICO_ID_DB + '/' + slideIdx, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+      body: JSON.stringify({ texto: novo }),
+    })
+      .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+      .then(function () {
+        anotacoesPorSlide[slideIdx] = novo;
+        if (typeof atualizarFabIndicador === 'function') atualizarFabIndicador();
+        // Painel ✍️ aberto no mesmo slide: mostra o texto novo na hora.
+        if (typeof atualizarTextoAnotacaoAtual === 'function' && !anotacaoPainel.hidden && current === slideIdx) {
+          atualizarTextoAnotacaoAtual();
+        }
+        btn.textContent = '✔ Salvo nas anotações do slide ' + (slideIdx + 1);
+      })
+      .catch(function (e) {
+        btn.disabled = false;
+        btn.textContent = 'Erro ao salvar — tentar de novo';
+        console.error('falha ao salvar dúvida como anotação', e);
+      });
+  }
+
+  function adicionarMensagem(autor, texto, slideIdx, perguntaOrigem) {
+    duvidaVazio.hidden = true;
+    var el = document.createElement('div');
+    el.className = 'duvida-msg ' + (autor === 'aluno' ? 'duvida-msg-aluno' : 'duvida-msg-ia');
+    if (autor === 'aluno' && typeof slideIdx === 'number') {
+      var rotulo = document.createElement('span');
+      rotulo.className = 'duvida-msg-slide';
+      rotulo.textContent = 'Slide ' + (slideIdx + 1);
+      el.appendChild(rotulo);
+    }
+    el.appendChild(document.createTextNode(texto));
+    if (autor === 'ia' && perguntaOrigem) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'duvida-salvar-nota';
+      btn.textContent = '📌 Salvar como anotação';
+      btn.addEventListener('click', function () { salvarDuvidaComoAnotacao(slideIdx, perguntaOrigem, texto, btn); });
+      el.appendChild(btn);
+    }
+    duvidaMensagens.appendChild(el);
+    rolarChatProFim();
+    return el;
+  }
+
+  var conversaCarregada = false;
+  function carregarConversa() {
+    if (conversaCarregada || !RESPOSTAS_ATIVO) return;
+    conversaCarregada = true;
+    fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/duvidas', {
+      headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (lista) {
+        // Conversa antiga entra ANTES de qualquer mensagem já digitada agora.
+        var primeiraAtual = duvidaVazio.nextSibling;
+        lista.forEach(function (d) {
+          var bolhaAluno = adicionarMensagem('aluno', d.pergunta_aluno, d.slide_index);
+          var bolhaIa = adicionarMensagem('ia', tirarMarkdown(d.resposta_ia), d.slide_index, d.pergunta_aluno);
+          if (primeiraAtual) {
+            duvidaMensagens.insertBefore(bolhaAluno, primeiraAtual);
+            duvidaMensagens.insertBefore(bolhaIa, primeiraAtual);
+          }
+        });
+        rolarChatProFim();
+      })
+      .catch(function (e) { conversaCarregada = false; console.error('falha ao carregar conversa', e); });
+  }
+
   duvidaFab.addEventListener('click', function () {
     duvidaPainel.hidden = !duvidaPainel.hidden;
+    if (!duvidaPainel.hidden) {
+      anotacaoPainel.hidden = true; // um painel por vez (mesmo canto da tela)
+      carregarConversa();
+      rolarChatProFim();
+      duvidaTexto.focus();
+    }
   });
 
-  duvidaPerguntarBtn.addEventListener('click', function () {
+  duvidaTexto.addEventListener('input', function () {
+    duvidaContador.textContent = duvidaTexto.value.length + '/' + DUVIDA_MAX;
+  });
+
+  duvidaTexto.addEventListener('keydown', function (e) {
+    // Enter envia, Shift+Enter pula linha. stopPropagation: as setas usadas
+    // pra editar o texto não podem trocar de slide (keydown global).
+    e.stopPropagation();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      enviarDuvida();
+    }
+  });
+
+  function enviarDuvida() {
     var pergunta = duvidaTexto.value.trim();
-    if (!pergunta) return;
+    if (!pergunta || duvidaPerguntarBtn.disabled) return;
     if (!RESPOSTAS_ATIVO) { duvidaStatus.textContent = 'Faça login pra tirar dúvida.'; return; }
+    pergunta = pergunta.slice(0, DUVIDA_MAX);
+    var slideIdx = current;
+    adicionarMensagem('aluno', pergunta, slideIdx);
+    duvidaTexto.value = '';
+    duvidaContador.textContent = '0/' + DUVIDA_MAX;
     duvidaPerguntarBtn.disabled = true;
-    duvidaStatus.textContent = 'Pensando…';
-    duvidaResposta.hidden = true;
+    var pensando = adicionarMensagem('ia', 'Pensando…');
     fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/duvida', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
-      body: JSON.stringify({ slide_index: current, pergunta_aluno: pergunta }),
+      body: JSON.stringify({ slide_index: slideIdx, pergunta_aluno: pergunta }),
     })
       .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
       .then(function (data) {
-        duvidaStatus.textContent = '';
-        duvidaResposta.textContent = tirarMarkdown(data.resposta_ia);
-        duvidaResposta.hidden = false;
+        pensando.remove();
+        adicionarMensagem('ia', tirarMarkdown(data.resposta_ia), slideIdx, pergunta);
       })
       .catch(function (e) {
-        duvidaStatus.textContent = 'Não deu pra responder agora — tenta de novo.';
+        pensando.textContent = String(e.message).indexOf('503') >= 0
+          ? 'O tutor está sobrecarregado agora — tenta de novo em alguns minutos.'
+          : 'Não deu pra responder agora — tenta de novo.';
+        duvidaTexto.value = pergunta;
+        duvidaContador.textContent = pergunta.length + '/' + DUVIDA_MAX;
         console.error('falha ao tirar dúvida', e);
       })
       .finally(function () { duvidaPerguntarBtn.disabled = false; });
-  });
+  }
+
+  duvidaPerguntarBtn.addEventListener('click', enviarDuvida);
 }
 
 // Correção ao vivo por IA (2026-09-19) — quando o aluno erra um checkpoint,
@@ -1302,7 +1489,7 @@ window.addEventListener('message', function (e) {
   if (d.tipo === 'emaus:ir-slide' && typeof d.indice === 'number') {
     showSlide(d.indice);
   } else if (d.tipo === 'emaus:avaliacao-resultado') {
-    renderizarResultadoAvaliacao(d.veredito, d.resumo_diagnostico, !!d.temProximo);
+    renderizarResultadoAvaliacao(d.veredito, d.resumo_diagnostico, !!d.temProximo, !!d.temAvaliacao);
   } else if (d.tipo === 'emaus:avaliacao-erro') {
     document.getElementById('avaliacaoErroMsg').textContent = d.mensagem || 'Não deu pra falar com o tutor agora.';
     mostrarEstadoAvaliacao('avaliacaoErro');

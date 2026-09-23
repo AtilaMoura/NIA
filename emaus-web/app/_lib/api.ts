@@ -260,6 +260,7 @@ export function topicoRenderUrl(
     avaliacaoInicial?: AvaliacaoTutor | null;
     concluido?: boolean;
     temProximo?: boolean;
+    avaliacaoId?: number | null;
   },
 ) {
   const params = new URLSearchParams({
@@ -276,6 +277,10 @@ export function topicoRenderUrl(
   // Token de escopo curto (getTopicoToken) — sem ele o render não salva resposta
   // de exercício nenhuma (fica só no estado da página, como sempre foi).
   if (opts.respostasToken) params.set("token", opts.respostasToken);
+  // Avisa o render que este Tópico tem Prova separada (2026-09-22) — o slide
+  // "Resultado" usa isso pra oferecer o botão "Fazer a prova" quando o aluno
+  // domina o conteúdo, além de "Próximo tópico".
+  if (opts.avaliacaoId != null) params.set("avaliacao", "1");
   // Estado inicial da avaliação do tutor (2026-09-11) — reabrir um tópico já
   // concluído já mostra o resultado no slide "Resultado", sem precisar clicar
   // em "Fim" de novo. Só o essencial pro slide renderizar (não manda lacunas).

@@ -17,11 +17,13 @@ export function AcoesTopico({
   cursoId,
   estadoInicial,
   proximoTopicoId,
+  avaliacaoId,
 }: {
   topicoId: number;
   cursoId: number;
   estadoInicial: StatusTopico;
   proximoTopicoId: number | null;
+  avaliacaoId: number | null;
 }) {
   const router = useRouter();
 
@@ -48,6 +50,7 @@ export function AcoesTopico({
           veredito: avaliacao?.veredito ?? null,
           resumo_diagnostico: avaliacao?.resumo_diagnostico ?? "",
           temProximo: proximoTopicoId != null,
+          temAvaliacao: avaliacaoId != null,
         });
         router.refresh();
       } catch (e) {
@@ -61,7 +64,7 @@ export function AcoesTopico({
         console.error("falha ao avaliar tópico", e);
       }
     },
-    [topicoId, proximoTopicoId, postParaIframe, router],
+    [topicoId, proximoTopicoId, avaliacaoId, postParaIframe, router],
   );
 
   useEffect(() => {
@@ -77,7 +80,9 @@ export function AcoesTopico({
           .then(() => router.refresh())
           .catch((e) => console.error("falha ao concluir tópico (fallback)", e));
       } else if (d.tipo === "emaus:navegar") {
-        if (d.destino === "proximo" && proximoTopicoId != null) {
+        if (d.destino === "prova" && avaliacaoId != null) {
+          router.push(`/topico/${topicoId}/prova`);
+        } else if (d.destino === "proximo" && proximoTopicoId != null) {
           router.push(`/topico/${proximoTopicoId}`);
         } else {
           router.push(`/curso/${cursoId}`);
@@ -113,7 +118,7 @@ export function AcoesTopico({
     }
     window.addEventListener("message", aoReceber);
     return () => window.removeEventListener("message", aoReceber);
-  }, [enviarResumo, proximoTopicoId, router, topicoId, cursoId]);
+  }, [enviarResumo, proximoTopicoId, avaliacaoId, router, topicoId, cursoId]);
 
   return null;
 }

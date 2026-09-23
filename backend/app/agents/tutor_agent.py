@@ -143,28 +143,47 @@ RESPOSTA QUE O ALUNO DEU:
         contexto_slide: str = "",
         contexto_topico: str = "",
         perfil: PerfilDominio = PERFIL_TECH,
+        material_topico: str = "",
+        numero_slide: int | None = None,
+        historico: list[tuple[str, str]] | None = None,
     ) -> str:
-        """Tira-dúvida ao vivo (2026-09-19) — o aluno pergunta algo específico
-        sobre o ponto em que está (slide/exercício) e recebe resposta em texto
-        direto, sem JSON, sem gerar pergunta nova (isso é só do
-        corrigir_exercicio). Chamada pequena e separada de propósito — não
-        acumula o contexto de outras dúvidas na mesma janela de token."""
+        """Tira-dúvida ao vivo em formato de chat (2026-09-19, virou conversa em
+        2026-09-23) — o aluno pergunta sobre o ponto em que está e recebe
+        resposta em texto direto, sem JSON, sem gerar pergunta nova (isso é só
+        do corrigir_exercicio).
+
+        material_topico = texto do tópico inteiro (já cortado no teto de token
+        por contexto_topico.py); contexto_slide = o slide na tela, que tem
+        prioridade. historico = últimas trocas (pergunta, resposta) do aluno
+        neste tópico, da mais antiga pra mais nova — é o que dá "memória" ao
+        chat sem o front mandar nada (histórico sempre vem do banco)."""
+        conversa = ""
+        if historico:
+            conversa = "\n\n".join(f"ALUNO: {p}\nTUTOR: {r}" for p, r in historico)
+
+        slide_rotulo = f" (slide {numero_slide})" if numero_slide else ""
         prompt = f"""
-Você é o tutor pedagógico do {perfil.contexto_curso}, tirando uma dúvida de um aluno AO
-VIVO, no meio do estudo (não é avaliação, é uma pergunta direta dele).
+Você é o tutor pedagógico do {perfil.contexto_curso}, conversando com um aluno AO VIVO,
+no meio do estudo (não é avaliação, é um chat de dúvidas).
 
 {perfil.fio_condutor}
 
-{"CONTEXTO (tópico/aula): " + contexto_topico if contexto_topico else ""}
+{"TÓPICO: " + contexto_topico if contexto_topico else ""}
 
-{"O QUE ESTÁ NA TELA AGORA (o trecho do material que o aluno está vendo quando perguntou): " + contexto_slide if contexto_slide else ""}
+{"MATERIAL DO TÓPICO (referência — use pra ligar a dúvida a outras partes do conteúdo):" + chr(10) + material_topico if material_topico else ""}
 
-PERGUNTA DO ALUNO:
+{"FOCO — O QUE ESTÁ NA TELA AGORA" + slide_rotulo + " (a dúvida quase sempre é sobre isto; priorize este trecho):" + chr(10) + contexto_slide if contexto_slide else ""}
+
+{"CONVERSA ATÉ AQUI (mais antiga primeiro):" + chr(10) + conversa if conversa else ""}
+
+NOVA MENSAGEM DO ALUNO:
 {pergunta_aluno}
 
-Responda direto, em português, curto (2-4 frases) e específico pro que ele perguntou —
-sem repetir o material da tela palavra por palavra, sem "boa pergunta!" nem elogio vazio.
+Responda em português, direto e específico pro que ele perguntou — no máximo 2 parágrafos
+curtos. Leve em conta a conversa acima (ele pode estar continuando uma dúvida anterior).
+Sem repetir o material da tela palavra por palavra, sem "boa pergunta!" nem elogio vazio.
 Se a pergunta sair do assunto deste material, diga isso e redirecione pro que está sendo
-estudado. Devolva só o texto da resposta, sem markdown, sem JSON.
+estudado. Não entregue a resposta de exercício (checkpoint) que ainda está na tela —
+ajude o aluno a raciocinar. Devolva só o texto da resposta, sem markdown, sem JSON.
 """
-        return await self.service.generate(prompt, temperature=0.4, max_tokens=500)
+        return await self.service.generate(prompt, temperature=0.4, max_tokens=800)

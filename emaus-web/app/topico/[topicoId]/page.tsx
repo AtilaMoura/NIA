@@ -156,6 +156,7 @@ export default async function TopicoPage({
           concluido: estadoInicial === "concluido",
           avaliacaoInicial: analiseInicial,
           temProximo: proximo?.id != null,
+          avaliacaoId: topico.avaliacao_id,
         })}
         title={topico.titulo}
         className="w-full flex-1 border-0"
@@ -167,6 +168,7 @@ export default async function TopicoPage({
         cursoId={CURSO_ID}
         estadoInicial={estadoInicial}
         proximoTopicoId={proximo?.id ?? null}
+        avaliacaoId={topico.avaliacao_id}
       />
     </div>
   );

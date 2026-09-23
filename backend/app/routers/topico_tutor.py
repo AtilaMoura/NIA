@@ -6,9 +6,11 @@ durante o estudo — separado de anotação (TopicoAnotacao). Autenticado com o
 MESMO token de escopo curto de /topico-respostas (já valida user+topico).
 
 Ver memória do projeto [[nia-correcao-ia-avaliacoes]] pro desenho completo.
-Deliberadamente por pergunta/dúvida — nunca o tópico inteiro numa chamada
-(teto de tokens/minuto do Groq + achado de que ele "esquece" item quando
-pede muitos objetos numa resposta só).
+Deliberadamente por pergunta/dúvida — nunca pede vários objetos numa chamada
+(achado de que o Groq "esquece" item quando pede muitos numa resposta só).
+O chat de dúvidas (2026-09-23) manda o texto do tópico como referência, mas
+cortado num teto fixo (ver agents/contexto_topico.py) por causa do limite de
+tokens/minuto do Groq.
 """
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -20,15 +22,21 @@ from app.models.models import Topico, TopicoDuvida, TopicoReforco
 from app.schemas.topico_tutor import (
     CorrigirRequest,
     CorrigirResponse,
+    DuvidaItem,
     DuvidaRequest,
     DuvidaResponse,
     ResponderReforcoRequest,
 )
 from app.agents.tutor_agent import TutorAgent
 from app.agents.perfis import resolver_perfil
-from app.routers.pipeline import _perfil_do_curso, _service
+from app.agents.contexto_topico import carregar_content, montar_contexto_duvida
+from app.routers.pipeline import _perfil_do_curso, _rate_limited, _service
 
 router = APIRouter(prefix="/topico-tutor", tags=["Topico Tutor"])
+
+# Quantas trocas anteriores do chat de dúvidas entram no prompt (teto de token
+# do Groq — o histórico completo continua no banco e aparece na tela).
+HISTORICO_DUVIDAS_NO_PROMPT = 6
 
 
 def _buscar_pergunta(topico: Topico, question_id: str) -> dict | None:
@@ -137,24 +145,35 @@ async def tirar_duvida(
     if not topico:
         raise HTTPException(404, "Tópico not found")
 
-    import json as _json
-    content = topico.content if isinstance(topico.content, dict) else _json.loads(topico.content)
-    slides = content.get("slides", [])
-    contexto_slide = ""
-    if 0 <= data.slide_index < len(slides):
-        slide = slides[data.slide_index]
-        contexto_slide = _json.dumps(
-            {"secao": slide.get("secao"), "titulo_secao": slide.get("titulo_secao"), "blocos": slide.get("blocos")},
-            ensure_ascii=False,
-        )[:2000]  # corta — não precisa do slide inteiro pra responder uma dúvida pontual
+    # Chat (2026-09-23): tópico inteiro como referência + slide atual em foco
+    # (ver contexto_topico.py pro teto de tamanho).
+    material_topico, contexto_slide = montar_contexto_duvida(carregar_content(topico), data.slide_index)
+
+    # Memória da conversa sempre vem do banco — nunca do front.
+    anteriores = (
+        db.query(TopicoDuvida)
+        .filter(TopicoDuvida.user_id == user_id, TopicoDuvida.topico_id == topico_id)
+        .order_by(TopicoDuvida.created_at.desc(), TopicoDuvida.id.desc())
+        .limit(HISTORICO_DUVIDAS_NO_PROMPT)
+        .all()
+    )
+    historico = [(d.pergunta_aluno, d.resposta_ia) for d in reversed(anteriores)]
 
     perfil_id = _perfil_do_curso(db, topico)
-    resposta_texto = await TutorAgent(_service("groq")).responder_duvida(
-        data.pergunta_aluno,
-        contexto_slide=contexto_slide,
-        contexto_topico=topico.titulo,
-        perfil=resolver_perfil(perfil_id),
-    )
+    try:
+        resposta_texto = await TutorAgent(_service("groq")).responder_duvida(
+            data.pergunta_aluno,
+            contexto_slide=contexto_slide,
+            contexto_topico=topico.titulo,
+            perfil=resolver_perfil(perfil_id),
+            material_topico=material_topico,
+            numero_slide=data.slide_index + 1,
+            historico=historico,
+        )
+    except Exception as e:
+        if _rate_limited(e):
+            raise HTTPException(503, "O tutor está sobrecarregado agora. Tente de novo em alguns minutos.")
+        raise HTTPException(500, f"Erro ao responder dúvida: {str(e)}")
 
     duvida = TopicoDuvida(
         user_id=user_id,
@@ -169,3 +188,19 @@ async def tirar_duvida(
     db.refresh(duvida)
 
     return duvida
+
+
+@router.get("/{topico_id}/duvidas", response_model=list[DuvidaItem])
+def listar_duvidas(
+    topico_id: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_topico_resposta_user_id),
+):
+    """Conversa do chat de dúvidas deste aluno neste tópico, da mais antiga pra
+    mais nova — o painel remonta a conversa ao reabrir o tópico."""
+    return (
+        db.query(TopicoDuvida)
+        .filter(TopicoDuvida.user_id == user_id, TopicoDuvida.topico_id == topico_id)
+        .order_by(TopicoDuvida.created_at.asc(), TopicoDuvida.id.asc())
+        .all()
+    )

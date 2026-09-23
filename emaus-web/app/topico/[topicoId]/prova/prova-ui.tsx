@@ -43,7 +43,11 @@ export function AcoesProva({
           resumo_diagnostico: avaliacao?.resumo_diagnostico ?? "",
           temProximo: false,
         });
-        router.refresh();
+        // SEM router.refresh() aqui (achado 2026-09-23): o refresh gera um token
+        // de resposta novo na página → muda o src do <iframe> → ele recarrega e
+        // o resultado some (com veredito "reforco" voltava pro "Clique em Fim").
+        // A prova não mostra nada que dependa do status fora do <iframe>; ao
+        // voltar pro tópico (router.push) os dados já vêm frescos do servidor.
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         postParaIframe({
@@ -55,7 +59,7 @@ export function AcoesProva({
         console.error("falha ao avaliar prova", e);
       }
     },
-    [avaliacaoId, postParaIframe, router],
+    [avaliacaoId, postParaIframe],
   );
 
   useEffect(() => {
@@ -67,8 +71,8 @@ export function AcoesProva({
       } else if (d.tipo === "emaus:concluir-fallback") {
         // Plano B — só usado se a avaliação falhar de verdade (tutor
         // sobrecarregado / sem cota), botão que aparece dentro do slide.
+        // Mesmo motivo do enviarResumo: sem refresh, senão o <iframe> recarrega.
         marcarProgressoAvaliacao(avaliacaoId, "concluido")
-          .then(() => router.refresh())
           .catch((e) => console.error("falha ao concluir prova (fallback)", e));
       } else if (d.tipo === "emaus:navegar") {
         // Prova não tem "próximo" — SEMPRE volta pro tópico de origem.
