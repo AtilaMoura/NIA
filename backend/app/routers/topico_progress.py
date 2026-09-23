@@ -23,7 +23,15 @@ router = APIRouter(prefix="/topico-progress", tags=["Topico Progress"])
 
 
 @router.get("/", response_model=list[TopicoProgressOut])
-def list_topico_progress(user_id: int = Query(...), db: Session = Depends(get_db)):
+def list_topico_progress(
+    user_id: int = Query(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    # Achado de segurança 2026-09-23: ficava aberto, qualquer um lia progresso e
+    # diagnóstico do Tutor de qualquer aluno só trocando o user_id na URL.
+    if current_user.id != user_id and current_user.role not in ("master", "admin", "professor"):
+        raise HTTPException(403, "Sem permissão pra ver o progresso deste usuário.")
     return (
         db.query(TopicoProgress)
         .filter(TopicoProgress.user_id == user_id)

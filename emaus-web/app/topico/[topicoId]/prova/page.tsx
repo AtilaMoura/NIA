@@ -51,17 +51,18 @@ export default async function ProvaPage({
   // GATING: tópico não tem prova vinculada
   if (topico.avaliacao_id === null) notFound();
 
+  const tokenSessao = await getToken();
+
   const [lessons, modules, irmaos, progressoTopicos, progressoAvaliacoes] = await Promise.all([
     listLessons(),
     listModules(),
     listTopicos(topico.lesson_id),
-    listTopicoProgress(sessao.id),
-    listAvaliacaoProgress(sessao.id),
+    listTopicoProgress(sessao.id, tokenSessao),
+    listAvaliacaoProgress(sessao.id, tokenSessao),
   ]);
 
   // Token de escopo curto pro <iframe> salvar resposta da prova (2026-09-19)
   let respostasToken: string | null = null;
-  const tokenSessao = await getToken();
   if (tokenSessao) {
     respostasToken = await getAvaliacaoToken(tokenSessao, topico.avaliacao_id).catch(() => null);
   }

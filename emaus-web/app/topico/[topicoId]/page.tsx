@@ -48,12 +48,13 @@ export default async function TopicoPage({
   if (!topico) notFound();
 
   const emPreparacao = !topico.content || !topico.is_approved;
+  const tokenSessao = await getToken();
 
   const [lessons, modules, irmaos, progresso] = await Promise.all([
     listLessons(),
     listModules(),
     listTopicos(topico.lesson_id),
-    listTopicoProgress(sessao.id),
+    listTopicoProgress(sessao.id, tokenSessao),
   ]);
 
   // Token de escopo curto pro <iframe> salvar resposta de exercício (2026-09-09)
@@ -61,11 +62,8 @@ export default async function TopicoPage({
   // render funciona igual, só sem salvar (mesmo comportamento de antes desta
   // função existir).
   let respostasToken: string | null = null;
-  if (!emPreparacao) {
-    const tokenSessao = await getToken();
-    if (tokenSessao) {
-      respostasToken = await getTopicoToken(tokenSessao, topico.id).catch(() => null);
-    }
+  if (!emPreparacao && tokenSessao) {
+    respostasToken = await getTopicoToken(tokenSessao, topico.id).catch(() => null);
   }
 
   const aula = lessons.find((l) => l.id === topico.lesson_id) ?? null;

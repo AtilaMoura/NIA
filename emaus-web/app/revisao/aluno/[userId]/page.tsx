@@ -6,7 +6,7 @@ import { BarraProgresso } from "../../../_ui/BarraProgresso";
 import { Rodape } from "../../../_ui/Rodape";
 import { LinhaDoTempoTopicos } from "../../../_ui/LinhaDoTempoTopicos";
 import { TEOLOGIA_COURSE_IDS } from "../../../_lib/config";
-import { getSessao } from "../../../_lib/sessao";
+import { getSessao, getToken } from "../../../_lib/sessao";
 import { papelPodeRevisar } from "../../../_lib/papel";
 import { getUser } from "../../../_lib/api";
 import { montarArvore } from "../../../_lib/arvore";
@@ -19,7 +19,8 @@ export async function generateMetadata({
   params: Promise<{ userId: string }>;
 }): Promise<Metadata> {
   const { userId } = await params;
-  const aluno = await getUser(Number(userId)).catch(() => null);
+  const token = await getToken();
+  const aluno = await getUser(Number(userId), token).catch(() => null);
   return { title: aluno ? `Progresso: ${aluno.name}` : "Progresso do aluno" };
 }
 
@@ -35,11 +36,12 @@ export default async function RevisaoAlunoPage({
   const sessao = await getSessao();
   if (!sessao) redirect(`/entrar?next=/revisao/aluno/${userId}`);
   if (!papelPodeRevisar(sessao.role)) redirect("/inicio");
+  const token = await getToken();
 
-  const aluno = await getUser(userId).catch(() => null);
+  const aluno = await getUser(userId, token).catch(() => null);
   if (!aluno) notFound();
 
-  const arvore = await montarArvore(CURSO_ID, userId);
+  const arvore = await montarArvore(CURSO_ID, userId, token);
   const { curso, resumo, linhaDoTempo } = arvore;
 
   return (

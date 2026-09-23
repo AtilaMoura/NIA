@@ -47,10 +47,18 @@ def get_users(db: Session = Depends(get_db), current_user: User = Depends(get_cu
     return [_sem_senha(u) for u in db.query(User).all()]
 
 
-# Buscar usuário por ID — leitura segue aberta (usada por toda página do Emaús sem
-# repassar token ainda; ver nota de segurança 2026-09-04). Nunca devolve password_hash.
+# Buscar usuário por ID — exige login (achado de segurança 2026-09-23: ficava aberto,
+# qualquer um enumerava user_id e lia nome/email/pontos de qualquer conta). Só o próprio
+# dono ou papel administrativo/professor pode ver o perfil de outro. Nunca devolve
+# password_hash.
 @router.get("/{user_id}")
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if current_user.id != user_id and current_user.role not in (*_PAPEIS_ADMIN, "professor"):
+        raise HTTPException(403, "Sem permissão pra ver este usuário.")
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(404, "User not found")

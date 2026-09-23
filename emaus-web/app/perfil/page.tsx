@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 import { TEOLOGIA_COURSE_IDS } from "../_lib/config";
 import { getUser } from "../_lib/api";
 import { montarArvore } from "../_lib/arvore";
-import { getSessao } from "../_lib/sessao";
+import { getSessao, getToken } from "../_lib/sessao";
 import { INFO_PAPEL } from "../_lib/papel";
 import { EditarNome } from "./perfil-ui";
 
@@ -20,10 +20,11 @@ export const metadata: Metadata = { title: "Seu perfil" };
 export default async function PerfilPage() {
   const sessao = await getSessao();
   if (!sessao) redirect("/entrar?next=/perfil");
+  const token = await getToken();
 
   const [arvore, usuario] = await Promise.all([
-    montarArvore(CURSO_ID, sessao.id),
-    getUser(sessao.id).catch(() => null),
+    montarArvore(CURSO_ID, sessao.id, token),
+    getUser(sessao.id, token).catch(() => null),
   ]);
   const { curso, resumo, proximoTopico } = arvore;
   const nome = usuario?.name ?? "Aluno";

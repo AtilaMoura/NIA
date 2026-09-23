@@ -25,7 +25,7 @@ export default async function RevisaoAlunosPage() {
 
   const comProgresso = await Promise.all(
     alunos.map(async (a) => {
-      const arvore = await montarArvore(CURSO_ID, a.id).catch(() => null);
+      const arvore = await montarArvore(CURSO_ID, a.id, token).catch(() => null);
       return { ...a, resumo: arvore?.resumo ?? null };
     }),
   );

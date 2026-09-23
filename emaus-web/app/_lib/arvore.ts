@@ -62,13 +62,14 @@ export type ArvoreCurso = {
 export async function montarArvore(
   courseId: number,
   userId: number = ALUNO_USER_ID,
+  token?: string | null,
 ): Promise<ArvoreCurso> {
   const [curso, modules, lessons, topicos, progresso, progressModulos] = await Promise.all([
     getCourse(courseId),
     listModules(),
     listLessons(),
     listTopicos(),
-    listTopicoProgress(userId),
+    listTopicoProgress(userId, token),
     listProgress().catch(() => []),
   ]);
 

@@ -9,7 +9,7 @@ import { CATALOGO, caminhoCapa, type CategoriaCurso } from "../_lib/catalogo";
 import { capaExiste } from "../_lib/capas";
 import { getUser, listCourses } from "../_lib/api";
 import { montarArvore, type ArvoreCurso } from "../_lib/arvore";
-import { getSessao } from "../_lib/sessao";
+import { getSessao, getToken } from "../_lib/sessao";
 import { papelPodeRevisar } from "../_lib/papel";
 
 export const metadata: Metadata = { title: "Meu estudo" };
@@ -21,14 +21,15 @@ export const metadata: Metadata = { title: "Meu estudo" };
 export default async function InicioPage() {
   const sessao = await getSessao();
   if (!sessao) redirect("/entrar?next=/inicio");
+  const token = await getToken();
 
-  const [usuario] = await Promise.all([getUser(sessao.id).catch(() => null)]);
+  const [usuario] = await Promise.all([getUser(sessao.id, token).catch(() => null)]);
 
   const disponiveisParaAluno = CATALOGO.filter((c) => c.disponivel && c.courseId != null);
 
   const arvores = await Promise.all(
     disponiveisParaAluno.map((c) =>
-      montarArvore(c.courseId!, sessao.id).catch((): ArvoreCurso | null => null),
+      montarArvore(c.courseId!, sessao.id, token).catch((): ArvoreCurso | null => null),
     ),
   );
 

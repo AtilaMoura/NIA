@@ -320,8 +320,12 @@ export function avaliacaoRenderUrl(
 }
 
 // ---- Usuário / progresso ----
-export function getUser(id: number) {
-  return fetchJson<UserPrefs>(`/users/${id}`);
+// GET /users/{id} exige login desde 2026-09-23 (achado de segurança: ficava aberto,
+// qualquer um enumerava user_id e lia dado pessoal de qualquer conta). `token` vem de
+// getToken() (_lib/sessao.ts, server-only) — sem ele, devolve null em vez de tentar.
+export function getUser(id: number, token: string | null | undefined) {
+  if (!token) return Promise.resolve<UserPrefs | null>(null);
+  return fetchJson<UserPrefs>(`/users/${id}`, comAuth(token));
 }
 
 // Token de ESCOPO CURTO (2h, só "salvar resposta deste usuário, neste tópico")
@@ -367,13 +371,18 @@ export function listProgress() {
 }
 
 // ---- Progresso por tópico (FASE 2) ----
-export function listTopicoProgress(userId: number) {
-  return fetchJson<TopicoProgress[]>(`/topico-progress/?user_id=${userId}`);
+// GET /topico-progress/ exige login desde 2026-09-23 (mesmo achado de segurança do
+// getUser acima). Sem token, devolve lista vazia em vez de tentar.
+export function listTopicoProgress(userId: number, token: string | null | undefined) {
+  if (!token) return Promise.resolve<TopicoProgress[]>([]);
+  return fetchJson<TopicoProgress[]>(`/topico-progress/?user_id=${userId}`, comAuth(token));
 }
 
 // ---- Progresso da prova (2026-09-19) ----
-export function listAvaliacaoProgress(userId: number) {
-  return fetchJson<AvaliacaoProgress[]>(`/avaliacao-progress/?user_id=${userId}`);
+// GET /avaliacao-progress/ exige login desde 2026-09-23, mesmo padrão acima.
+export function listAvaliacaoProgress(userId: number, token: string | null | undefined) {
+  if (!token) return Promise.resolve<AvaliacaoProgress[]>([]);
+  return fetchJson<AvaliacaoProgress[]>(`/avaliacao-progress/?user_id=${userId}`, comAuth(token));
 }
 
 // PUT /topico-progress/{id} também exige login e valida user_id contra o token —

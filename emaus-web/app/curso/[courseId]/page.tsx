@@ -8,7 +8,7 @@ import { LinkBotao } from "../../_ui/Botao";
 import { TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getCourse, getUser } from "../../_lib/api";
 import { montarArvore } from "../../_lib/arvore";
-import { getSessao } from "../../_lib/sessao";
+import { getSessao, getToken } from "../../_lib/sessao";
 import { papelPodeRevisar } from "../../_lib/papel";
 import { ArvoreCursoUI } from "./arvore-ui";
 
@@ -35,10 +35,11 @@ export default async function CursoPage({
 
   const sessao = await getSessao();
   if (!sessao) redirect(`/entrar?next=/curso/${courseId}`);
+  const token = await getToken();
 
   const [arvore, usuario] = await Promise.all([
-    montarArvore(courseId, sessao.id),
-    getUser(sessao.id).catch(() => null),
+    montarArvore(courseId, sessao.id, token),
+    getUser(sessao.id, token).catch(() => null),
   ]);
   const { curso, modulos, resumo, proximoTopico } = arvore;
 

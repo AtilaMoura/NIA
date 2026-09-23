@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { CabecalhoApp } from "../_ui/CabecalhoApp";
 import { Rodape } from "../_ui/Rodape";
 import { getUser, type FontSize } from "../_lib/api";
-import { getSessao } from "../_lib/sessao";
+import { getSessao, getToken } from "../_lib/sessao";
 import { Preferencias } from "./preferencias-ui";
 
 export const metadata: Metadata = { title: "Preferências" };
@@ -13,9 +13,10 @@ export const metadata: Metadata = { title: "Preferências" };
 export default async function PreferenciasPage() {
   const sessao = await getSessao();
   if (!sessao) redirect("/entrar?next=/preferencias");
+  const token = await getToken();
 
   const [usuario, jar] = await Promise.all([
-    getUser(sessao.id).catch(() => null),
+    getUser(sessao.id, token).catch(() => null),
     cookies(),
   ]);
 

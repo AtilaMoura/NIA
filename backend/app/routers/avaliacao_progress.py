@@ -49,7 +49,15 @@ def _verificar_gating_avaliacao(db: Session, user_id: int, avaliacao_id: int) ->
 
 
 @router.get("/", response_model=list[AvaliacaoProgressOut])
-def list_avaliacao_progress(user_id: int = Query(...), db: Session = Depends(get_db)):
+def list_avaliacao_progress(
+    user_id: int = Query(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    # Achado de segurança 2026-09-23: ficava aberto, qualquer um lia resultado de
+    # prova de qualquer aluno só trocando o user_id na URL.
+    if current_user.id != user_id and current_user.role not in ("master", "admin", "professor"):
+        raise HTTPException(403, "Sem permissão pra ver o progresso deste usuário.")
     return (
         db.query(AvaliacaoProgress)
         .filter(AvaliacaoProgress.user_id == user_id)
