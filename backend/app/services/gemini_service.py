@@ -25,17 +25,16 @@ class GeminiService:
     Service para chamar a API do Google Gemini (SDK novo, google-genai).
     """
 
-    def __init__(self, model_name: str = "gemini-flash-latest", timeout_ms: int = 90_000):
+    def __init__(self, model_name: str = "gemini-2.5-flash", timeout_ms: int = 90_000):
         """
         Inicializa o service do Gemini
 
         Args:
-            model_name: Modelo a usar. Default trocado de "gemini-2.5-flash" pro
-                alias "gemini-flash-latest" em 2026-09-14: o 2.5-flash vinha
-                derrubando gerações longas com 503/504 recorrente (visto nos
-                Tópicos 4 e 5 do curso de obreiro); o alias aponta sempre pro
-                flash atual recomendado pela Google, evitando reescrever isso
-                de novo quando o modelo por trás mudar.
+            model_name: Modelo a usar. Voltou pra "gemini-2.5-flash" em
+                2026-09-23 (era "gemini-flash-latest" desde 2026-09-14, trocado
+                por causa de 503/504 recorrente em gerações longas nos Tópicos
+                4/5 do curso de obreiro). Testar de novo antes de usar em
+                produção — se o 503/504 voltar, reverter pro alias.
             timeout_ms: Timeout por requisição (o SDK antigo travava sem
                 limite nenhum — esse aqui é explícito, mesmo que o SDK novo
                 também tenha bugs conhecidos de timeout não 100% respeitado)
