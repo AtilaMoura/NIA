@@ -52,7 +52,11 @@ export function AcoesTopico({
           temProximo: proximoTopicoId != null,
           temAvaliacao: avaliacaoId != null,
         });
-        router.refresh();
+        // SEM router.refresh() (achado real 2026-09-23, Tópico 19 em produção):
+        // o refresh gera token de resposta novo → muda o src do <iframe> → ele
+        // recarrega e o resultado some (com "reforco" voltava pro "Clique em
+        // Fim"). Mesmo bug/correção da prova (prova-ui.tsx). Próximo tópico,
+        // prova e árvore do curso já carregam frescos no router.push.
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         postParaIframe({
@@ -64,7 +68,7 @@ export function AcoesTopico({
         console.error("falha ao avaliar tópico", e);
       }
     },
-    [topicoId, proximoTopicoId, avaliacaoId, postParaIframe, router],
+    [topicoId, proximoTopicoId, avaliacaoId, postParaIframe],
   );
 
   useEffect(() => {
@@ -76,8 +80,8 @@ export function AcoesTopico({
       } else if (d.tipo === "emaus:concluir-fallback") {
         // Plano B — só usado se a avaliação falhar de verdade (tutor
         // sobrecarregado / sem cota), botão que aparece dentro do slide.
+        // Mesmo motivo do enviarResumo: sem refresh, senão o <iframe> recarrega.
         marcarProgresso(topicoId, "concluido")
-          .then(() => router.refresh())
           .catch((e) => console.error("falha ao concluir tópico (fallback)", e));
       } else if (d.tipo === "emaus:navegar") {
         if (d.destino === "prova" && avaliacaoId != null) {

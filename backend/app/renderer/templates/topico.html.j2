@@ -540,6 +540,8 @@
   .duvida-rodape-linha { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
   .duvida-rodape-linha .anotacao-salvar { margin-top: 0; }
   .duvida-contador { font-size: 11px; color: var(--text-dim); }
+  .duvida-rodape-esq { display: flex; align-items: center; gap: 8px; }
+  .duvida-tamanho { font-family: inherit; font-size: 11px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 3px 6px; cursor: pointer; }
 
   .reforco-ia { margin: 10px 0 18px; }
   .reforco-loading { font-size: 13px; color: var(--text-muted); padding: 10px 0; }
@@ -824,7 +826,14 @@
   <div class="duvida-rodape">
     <textarea class="anotacao-texto" id="duvidaTexto" maxlength="500" placeholder="Escreva sua dúvida… (Enter envia, Shift+Enter pula linha)"></textarea>
     <div class="duvida-rodape-linha">
-      <span class="duvida-contador" id="duvidaContador">0/500</span>
+      <span class="duvida-rodape-esq">
+        <span class="duvida-contador" id="duvidaContador">0/500</span>
+        <select class="duvida-tamanho" id="duvidaTamanho" title="Tamanho da resposta da IA" aria-label="Tamanho da resposta da IA">
+          <option value="resumida">Resumida</option>
+          <option value="media">Média</option>
+          <option value="longa">Longa</option>
+        </select>
+      </span>
       <span class="anotacao-status" id="duvidaStatus"></span>
       <button type="button" class="anotacao-salvar register-btn" id="duvidaPerguntarBtn">Enviar</button>
     </div>
@@ -1009,6 +1018,16 @@ function renderizarResultadoAvaliacao(veredito, resumo, temProximo, temAvaliacao
     btnRefazer.textContent = 'Refazer o estudo';
     btnRefazer.addEventListener('click', function () { window.location.reload(); });
     acoes.appendChild(btnRefazer);
+    // Saída mesmo com reforço (pedido do Atila, 2026-09-23) — o aluno pode
+    // querer rever outro ponto do curso antes de refazer este.
+    var btnVoltarReforco = document.createElement('button');
+    btnVoltarReforco.type = 'button';
+    btnVoltarReforco.className = 'anotacao-toggle';
+    btnVoltarReforco.textContent = labelVoltar;
+    btnVoltarReforco.addEventListener('click', function () {
+      try { window.parent.postMessage({ tipo: 'emaus:navegar', destino: 'curso' }, '*'); } catch (e) {}
+    });
+    acoes.appendChild(btnVoltarReforco);
   }
   mostrarEstadoAvaliacao('avaliacaoResultado');
 }
@@ -1168,6 +1187,17 @@ var duvidaVazio = document.getElementById('duvidaVazio');
 var duvidaContador = document.getElementById('duvidaContador');
 var duvidaPerguntarBtn = document.getElementById('duvidaPerguntarBtn');
 var DUVIDA_MAX = 500;
+var duvidaTamanho = document.getElementById('duvidaTamanho');
+// Tamanho da resposta (2026-09-23) — padrão "media" (decisão do Atila); a
+// última escolha fica lembrada no navegador do aluno.
+(function () {
+  var salvo = null;
+  try { salvo = localStorage.getItem('emausDuvidaTamanho'); } catch (e) {}
+  duvidaTamanho.value = (salvo === 'resumida' || salvo === 'media' || salvo === 'longa') ? salvo : 'media';
+  duvidaTamanho.addEventListener('change', function () {
+    try { localStorage.setItem('emausDuvidaTamanho', duvidaTamanho.value); } catch (e) {}
+  });
+})();
 
 if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
   duvidaFab.hidden = true;
@@ -1290,7 +1320,7 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
     fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/duvida', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
-      body: JSON.stringify({ slide_index: slideIdx, pergunta_aluno: pergunta }),
+      body: JSON.stringify({ slide_index: slideIdx, pergunta_aluno: pergunta, tamanho: duvidaTamanho.value }),
     })
       .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
       .then(function (data) {

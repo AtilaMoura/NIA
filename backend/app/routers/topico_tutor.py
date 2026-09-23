@@ -169,6 +169,7 @@ async def tirar_duvida(
             material_topico=material_topico,
             numero_slide=data.slide_index + 1,
             historico=historico,
+            tamanho=data.tamanho,
         )
     except Exception as e:
         if _rate_limited(e):

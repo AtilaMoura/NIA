@@ -1,7 +1,7 @@
 # Schemas do tutor ao vivo por tópico (2026-09-19).
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -29,6 +29,9 @@ class DuvidaRequest(BaseModel):
     # Limite de 500 caracteres (decisão do Atila, 2026-09-23) — também trava o
     # tamanho do prompt, que tem teto de token por requisição no Groq.
     pergunta_aluno: str = Field(min_length=1, max_length=500)
+    # Tamanho da resposta escolhido no seletor do chat (2026-09-23). Sem o
+    # campo vale "longa" — comportamento de antes do seletor existir.
+    tamanho: Literal["resumida", "media", "longa"] = "longa"
 
 
 class DuvidaResponse(BaseModel):

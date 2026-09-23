@@ -17,6 +17,13 @@ import json
 from .base_agent import BaseAgent
 from .perfis import PerfilDominio, PERFIL_TECH
 
+# Tamanho da resposta do chat de dúvidas: (instrução no prompt, max_tokens).
+TAMANHOS_RESPOSTA_DUVIDA = {
+    "resumida": ("1 a 2 frases, só o essencial — nada de exemplo nem contexto extra.", 500),
+    "media": ("um parágrafo curto, de 3 a 4 frases.", 650),
+    "longa": ("no máximo 2 parágrafos curtos, pode trazer um exemplo.", 800),
+}
+
 SCHEMA_AVALIACAO = """
 Devolva APENAS um JSON válido (sem markdown), neste formato:
 
@@ -146,6 +153,7 @@ RESPOSTA QUE O ALUNO DEU:
         material_topico: str = "",
         numero_slide: int | None = None,
         historico: list[tuple[str, str]] | None = None,
+        tamanho: str = "longa",
     ) -> str:
         """Tira-dúvida ao vivo em formato de chat (2026-09-19, virou conversa em
         2026-09-23) — o aluno pergunta sobre o ponto em que está e recebe
@@ -157,6 +165,14 @@ RESPOSTA QUE O ALUNO DEU:
         prioridade. historico = últimas trocas (pergunta, resposta) do aluno
         neste tópico, da mais antiga pra mais nova — é o que dá "memória" ao
         chat sem o front mandar nada (histórico sempre vem do banco)."""
+        # Tamanho controlado principalmente pelo prompt: o gpt-oss do Groq gasta
+        # parte do max_tokens "pensando" antes de responder — teto apertado
+        # demais devolve resposta cortada/vazia. Por isso o max_tokens só cai
+        # um pouco e sempre com folga.
+        instrucao_tamanho, max_tokens = TAMANHOS_RESPOSTA_DUVIDA.get(
+            tamanho, TAMANHOS_RESPOSTA_DUVIDA["longa"]
+        )
+
         conversa = ""
         if historico:
             conversa = "\n\n".join(f"ALUNO: {p}\nTUTOR: {r}" for p, r in historico)
@@ -179,11 +195,12 @@ no meio do estudo (não é avaliação, é um chat de dúvidas).
 NOVA MENSAGEM DO ALUNO:
 {pergunta_aluno}
 
-Responda em português, direto e específico pro que ele perguntou — no máximo 2 parágrafos
-curtos. Leve em conta a conversa acima (ele pode estar continuando uma dúvida anterior).
+Responda em português, direto e específico pro que ele perguntou.
+TAMANHO DA RESPOSTA (escolha do aluno, respeite): {instrucao_tamanho}
+Leve em conta a conversa acima (ele pode estar continuando uma dúvida anterior).
 Sem repetir o material da tela palavra por palavra, sem "boa pergunta!" nem elogio vazio.
 Se a pergunta sair do assunto deste material, diga isso e redirecione pro que está sendo
 estudado. Não entregue a resposta de exercício (checkpoint) que ainda está na tela —
 ajude o aluno a raciocinar. Devolva só o texto da resposta, sem markdown, sem JSON.
 """
-        return await self.service.generate(prompt, temperature=0.4, max_tokens=800)
+        return await self.service.generate(prompt, temperature=0.4, max_tokens=max_tokens)

@@ -15,8 +15,11 @@ capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://
     antigo `master@emaus.local` (mesmo `id=2`, mantém histórico/aprovações)
   - **Login real do Adriano (admin):** `adrianocomsandra501@gmail.com` — reaproveitou o
     slot `admin1@emaus.local` (`id=3`)
-  - Sobrando ainda como teste: `admin2-3@emaus.local` / `professor1-5@emaus.local`,
-    senha `emaus2026`
+  - Contas de teste `admin2-3@emaus.local` / `professor1-5@emaus.local`
+    **desativadas em 2026-09-23** (senha rotacionada pra valor aleatório descartado —
+    achado de segurança: a senha antiga estava em texto puro neste arquivo, que é
+    público no GitHub. Reativar por aqui se precisar de novo, nunca reescrever a senha
+    em texto puro aqui).
   - ⚠️ Senhas reais em texto puro não ficam neste arquivo nem no git — só na cabeça de
     quem criou (perguntar ao Atila/Adriano se precisar)
 
