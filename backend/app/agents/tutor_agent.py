@@ -126,6 +126,32 @@ RESUMO COLADO PELO ALUNO:
 """
         return await self.run_json_com_retry(prompt, max_tokens=2500)
 
+    async def verificar_resposta_aberta(self, aberta: dict, perfil: PerfilDominio = PERFIL_TECH) -> dict:
+        """2ª checagem, focada, de uma lacuna "real" em resposta aberta — ver
+        agents/revisao_avaliacao.py. Pergunta de sim/não com o gabarito na
+        frente: bem mais estável que o julgamento geral do avaliar_resumo."""
+        prompt = f"""
+Você confere a correção de uma resposta aberta de um aluno do {perfil.contexto_curso}.
+
+PERGUNTA: {aberta["enunciado"]}
+{"CENÁRIO: " + aberta["cenario"] if aberta["cenario"] else ""}
+
+RESPOSTA ESPERADA (definida no próprio material do curso — é o gabarito):
+{aberta["esperado"]}
+
+RESPOSTA DO ALUNO:
+{aberta["resposta"]}
+
+A resposta do aluno CONTRADIZ a resposta esperada? Contradizer = afirmar algo que o gabarito
+diz ser falso. NÃO é contradição: dizer a mesma ideia com outras palavras, ser mais curta,
+menos completa, informal ou com erro de digitação. Compare ponto a ponto com o gabarito,
+não com a sua opinião.
+
+Devolva APENAS um JSON válido (sem markdown):
+{{"contradiz": true|false, "trecho_contraditorio": "frase exata do aluno que contradiz o gabarito (vazio se contradiz=false)", "explicacao": "1 frase, em português, dirigida ao aluno, dizendo o que ele acertou ou errou em relação ao material"}}
+"""
+        return await self.run_json_com_retry(prompt, max_tokens=1500)
+
     async def corrigir_exercicio(
         self,
         pergunta: dict,

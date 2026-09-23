@@ -21,11 +21,12 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.models import Course, Module, Lesson, Topico, Avaliacao, AvaliacaoProgress, Progress, TopicoProgress, User
+from app.models.models import Course, Module, Lesson, Topico, Avaliacao, AvaliacaoProgress, AvaliacaoResposta, Progress, TopicoProgress, TopicoResposta, User
 from app.core.auth import get_current_user
 from app.agents.pipeline import gerar_estrutura_curso, gerar_e_revisar_topico
 from app.agents.tutor_agent import TutorAgent
 from app.agents.contexto_topico import carregar_content, montar_contexto_duvida, montar_gabarito_abertas
+from app.agents.revisao_avaliacao import montar_abertas_do_aluno, revisar_lacunas_abertas
 from app.agents.perfis import resolver_perfil
 from app.schemas.topico_progress import AvaliarTopicoRequest, TopicoProgressOut
 from app.schemas.avaliacao_progress import AvaliacaoProgressOut
@@ -605,16 +606,35 @@ async def avaliar_resumo_topico(
     )
 
     content_topico = carregar_content(topico)
-    perfil_id = _perfil_do_curso(db, topico)
+    perfil = resolver_perfil(_perfil_do_curso(db, topico))
+    agente = TutorAgent(_service(data.modelo))
+
+    # Respostas abertas da rodada atual (do banco, não do texto do resumo) —
+    # usadas na 2ª checagem de lacuna (ver agents/revisao_avaliacao.py).
+    rodada = registro.rodada_atual if registro else 1
+    respostas_abertas = {
+        r.question_id: str(r.resposta_dada)
+        for r in db.query(TopicoResposta).filter(
+            TopicoResposta.user_id == data.user_id,
+            TopicoResposta.topico_id == topico_id,
+            TopicoResposta.rodada == rodada,
+            TopicoResposta.tipo == "open",
+        )
+    }
 
     try:
-        resultado = await TutorAgent(_service(data.modelo)).avaliar_resumo(
+        resultado = await agente.avaliar_resumo(
             data.resumo_texto,
             contexto_topico=contexto,
             historico_reforcos=historico_txt,
-            perfil=resolver_perfil(perfil_id),
+            perfil=perfil,
             material_topico=_material_para_avaliacao(content_topico),
             gabarito_abertas=montar_gabarito_abertas(content_topico.get("slides", [])),
+        )
+        resultado = await revisar_lacunas_abertas(
+            agente, resultado,
+            montar_abertas_do_aluno(content_topico.get("slides", []), respostas_abertas),
+            perfil,
         )
     except Exception as e:
         if _rate_limited(e):
@@ -731,16 +751,31 @@ async def avaliar_resumo_avaliacao(
     if avaliacao.topico and avaliacao.topico.content:
         material_txt = _material_para_avaliacao(carregar_content(avaliacao.topico))
 
-    perfil_id = _perfil_do_curso(db, avaliacao.topico) if avaliacao.topico else "tech"
+    perfil = resolver_perfil(_perfil_do_curso(db, avaliacao.topico) if avaliacao.topico else "tech")
+    agente = TutorAgent(_service(data.modelo))
+
+    rodada = registro.rodada_atual if registro else 1
+    respostas_abertas = {
+        r.question_id: str(r.resposta_dada)
+        for r in db.query(AvaliacaoResposta).filter(
+            AvaliacaoResposta.user_id == data.user_id,
+            AvaliacaoResposta.avaliacao_id == avaliacao_id,
+            AvaliacaoResposta.rodada == rodada,
+            AvaliacaoResposta.tipo == "open",
+        )
+    }
 
     try:
-        resultado = await TutorAgent(_service(data.modelo)).avaliar_resumo(
+        resultado = await agente.avaliar_resumo(
             data.resumo_texto,
             contexto_topico=contexto,
             historico_reforcos=historico_txt,
-            perfil=resolver_perfil(perfil_id),
+            perfil=perfil,
             material_topico=material_txt,
             gabarito_abertas=montar_gabarito_abertas(slides_prova),
+        )
+        resultado = await revisar_lacunas_abertas(
+            agente, resultado, montar_abertas_do_aluno(slides_prova, respostas_abertas), perfil,
         )
     except Exception as e:
         if _rate_limited(e):
