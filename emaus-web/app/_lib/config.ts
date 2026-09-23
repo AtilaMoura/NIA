@@ -7,7 +7,8 @@
 // ainda, não dá pra isolar catálogo por audiência de verdade. Quando a regra
 // de liberação por perfil existir, os estudos pessoais saem daqui e viram
 // "pessoal", não catálogo público. Ver PLANO_CURSO_IA_EMAUS.md.
-export const TEOLOGIA_COURSE_IDS = [8, 9, 5, 11] as const;
+// Curso 12 = parte II do curso de obreiro (8 virou a parte I em 2026-09-22).
+export const TEOLOGIA_COURSE_IDS = [8, 12, 9, 5, 11] as const;
 
 // Tema do render de slides do backend (GET /topicos/{id}/render?theme=...).
 // Default do sistema; cursos com identidade visual própria entram no mapa abaixo

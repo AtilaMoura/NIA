@@ -56,13 +56,25 @@ export const CATALOGO: CursoCatalogo[] = [
   },
   {
     slug: "formacao-novo-obreiro",
-    titulo: "Formação Geral do Novo Obreiro Cristão",
-    subtitulo: "O primeiro passo de quem começa a servir na igreja",
+    titulo: "Formação do Obreiro: Do Chamado ao Serviço I",
+    subtitulo: "Firmados na Palavra",
     descricao:
-      "Fundamento bíblico, doutrina básica, caráter e ética, disciplinas espirituais e as áreas práticas de serviço na igreja.",
+      "O chamado do obreiro, a Bíblia como autoridade e como lê-la, a doutrina básica da fé cristã e as disciplinas espirituais que sustentam quem serve.",
     tom: "trigo",
     categoria: "Formação bíblica",
     courseId: 8,
+    disponivel: true,
+  },
+  // Curso 8 dividido em I e II (2026-09-22) — o II continua de onde o I para.
+  {
+    slug: "formacao-obreiro-servico",
+    titulo: "Formação do Obreiro: Do Chamado ao Serviço II",
+    subtitulo: "Enviados para Servir",
+    descricao:
+      "Caráter e ética, vida pessoal e familiar, as áreas práticas de serviço na igreja e um plano pessoal de serviço com mentoria e crescimento contínuo.",
+    tom: "oliveira",
+    categoria: "Formação bíblica",
+    courseId: 12,
     disponivel: true,
   },
   {
