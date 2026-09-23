@@ -90,7 +90,14 @@ class TutorAgent(BaseAgent):
         contexto_topico: str = "",
         historico_reforcos: str = "",
         perfil: PerfilDominio = PERFIL_TECH,
+        material_topico: str = "",
+        gabarito_abertas: str = "",
     ) -> dict:
+        """material_topico/gabarito_abertas (2026-09-23): o material do curso é
+        o gabarito — sem ele a IA julgava pela opinião dela e chegou a reprovar
+        resposta que repetia o próprio material. max_tokens=2500 (antes 6000
+        reservados): a resposta é um JSON pequeno, e o teto de 8000 tokens por
+        requisição do Groq soma prompt + reserva — sobrava ~2000 pro prompt."""
         prompt = f"""
 Você é o tutor pedagógico do {perfil.contexto_curso}. Um aluno acabou de terminar um
 tópico e colou o resumo estruturado das respostas dele. Avalie como um especialista
@@ -100,14 +107,24 @@ faria manualmente — sem puxar saco.
 
 {"CONTEXTO DO TÓPICO (o que era esperado que o aluno dominasse): " + contexto_topico if contexto_topico else ""}
 
-{"HISTÓRICO DE REFORÇOS ANTERIORES DESTE ALUNO NESTE CURSO (pra notar se um erro já corrigido antes voltou a aparecer — isso é sempre lacuna 'real'): " + historico_reforcos if historico_reforcos else ""}
+{"MATERIAL DO TÓPICO (é o GABARITO — o que o curso ensina; resumo abaixo): " + chr(10) + material_topico if material_topico else ""}
+
+{"RESPOSTA ESPERADA DAS PERGUNTAS ABERTAS (definida no próprio material):" + chr(10) + gabarito_abertas if gabarito_abertas else ""}
+
+REGRA DE GABARITO (obrigatória): julgue as respostas abertas COMPARANDO com o material e
+com a resposta esperada acima — nunca com a sua opinião. Resposta que diz a mesma coisa que
+o material (mesmo com outras palavras, ou menos completa) NÃO é lacuna "real"; no máximo
+"superficial" se faltar algo que a pergunta pediu explicitamente (ex: citar os exemplos).
+Só é lacuna "real" o que CONTRADIZ o material.
+
+{"REFORÇOS DE RODADAS DE ESTUDO ANTERIORES (o aluno recomeçou o tópico depois deles). Só conta como erro que voltou se a resposta ATUAL repetir o mesmo erro, conferido contra o material: " + historico_reforcos if historico_reforcos else ""}
 
 RESUMO COLADO PELO ALUNO:
 {resumo_texto}
 
 {SCHEMA_AVALIACAO}
 """
-        return await self.run_json_com_retry(prompt)
+        return await self.run_json_com_retry(prompt, max_tokens=2500)
 
     async def corrigir_exercicio(
         self,

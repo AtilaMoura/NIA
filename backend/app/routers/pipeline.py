@@ -25,6 +25,7 @@ from app.models.models import Course, Module, Lesson, Topico, Avaliacao, Avaliac
 from app.core.auth import get_current_user
 from app.agents.pipeline import gerar_estrutura_curso, gerar_e_revisar_topico
 from app.agents.tutor_agent import TutorAgent
+from app.agents.contexto_topico import carregar_content, montar_contexto_duvida, montar_gabarito_abertas
 from app.agents.perfis import resolver_perfil
 from app.schemas.topico_progress import AvaliarTopicoRequest, TopicoProgressOut
 from app.schemas.avaliacao_progress import AvaliacaoProgressOut
@@ -531,6 +532,35 @@ def _rate_limited(err: Exception) -> bool:
     return "429" in msg or "rate_limit" in msg or "rate limit" in msg
 
 
+# Teto do texto do tópico que vai junto na avaliação (menor que o do chat:
+# o prompt de avaliação já tem schema + resumo + gabarito).
+TETO_MATERIAL_AVALIACAO = 5000
+
+
+def _historico_rodadas_anteriores(tutor_analise: dict | None, rodada_atual: int | None) -> str:
+    """Só reforços de rodadas de estudo ANTERIORES (o aluno clicou em recomeçar).
+
+    Achado real (2026-09-23, Tópico 19): cada clique em "Fim" na mesma rodada
+    entrava como "reforço anterior", e o prompt tratava erro repetido como
+    lacuna real — uma avaliação errada virava prova pra próxima (ciclo). Itens
+    antigos sem "rodada" gravada ficam de fora (não dá pra saber a origem)."""
+    if not tutor_analise:
+        return ""
+    atual = rodada_atual or 1
+    return "\n".join(
+        f"- {h.get('veredito')}: {h.get('resumo_diagnostico')}"
+        for h in tutor_analise.get("historico", [])
+        if isinstance(h.get("rodada"), int) and h["rodada"] < atual
+    )
+
+
+def _material_para_avaliacao(content_topico: dict) -> str:
+    slides = content_topico.get("slides", [])
+    # Prioriza o fim do tópico (slide de resumo + checkpoints finais).
+    material, _ = montar_contexto_duvida(content_topico, len(slides) - 1, teto_topico=TETO_MATERIAL_AVALIACAO)
+    return material
+
+
 @router.post("/topicos/{topico_id}/avaliar", response_model=TopicoProgressOut)
 async def avaliar_resumo_topico(
     topico_id: int,
@@ -569,13 +599,12 @@ async def avaliar_resumo_topico(
         .first()
     )
 
-    historico_txt = ""
-    if registro and registro.tutor_analise and registro.tutor_analise.get("historico"):
-        historico_txt = "\n".join(
-            f"- {h.get('veredito')}: {h.get('resumo_diagnostico')}"
-            for h in registro.tutor_analise["historico"]
-        )
+    historico_txt = _historico_rodadas_anteriores(
+        registro.tutor_analise if registro else None,
+        registro.rodada_atual if registro else 1,
+    )
 
+    content_topico = carregar_content(topico)
     perfil_id = _perfil_do_curso(db, topico)
 
     try:
@@ -584,6 +613,8 @@ async def avaliar_resumo_topico(
             contexto_topico=contexto,
             historico_reforcos=historico_txt,
             perfil=resolver_perfil(perfil_id),
+            material_topico=_material_para_avaliacao(content_topico),
+            gabarito_abertas=montar_gabarito_abertas(content_topico.get("slides", [])),
         )
     except Exception as e:
         if _rate_limited(e):
@@ -604,6 +635,8 @@ async def avaliar_resumo_topico(
         {
             "veredito": resultado.get("veredito"),
             "resumo_diagnostico": resultado.get("resumo_diagnostico"),
+            # rodada de estudo em que saiu — ver _historico_rodadas_anteriores
+            "rodada": registro.rodada_atual or 1,
         }
     )
     registro.tutor_veredito = resultado.get("veredito")
@@ -684,12 +717,19 @@ async def avaliar_resumo_avaliacao(
         .first()
     )
 
-    historico_txt = ""
-    if registro and registro.tutor_analise and registro.tutor_analise.get("historico"):
-        historico_txt = "\n".join(
-            f"- {h.get('veredito')}: {h.get('resumo_diagnostico')}"
-            for h in registro.tutor_analise["historico"]
-        )
+    historico_txt = _historico_rodadas_anteriores(
+        registro.tutor_analise if registro else None,
+        registro.rodada_atual if registro else 1,
+    )
+
+    # Gabarito = perguntas da própria prova; material = conteúdo do tópico pai.
+    slides_prova = [
+        {"tipo": "avaliacao_pergunta", "secao": "Avaliação Final", "pergunta": p}
+        for p in (avaliacao.conteudo or {}).get("perguntas", [])
+    ]
+    material_txt = ""
+    if avaliacao.topico and avaliacao.topico.content:
+        material_txt = _material_para_avaliacao(carregar_content(avaliacao.topico))
 
     perfil_id = _perfil_do_curso(db, avaliacao.topico) if avaliacao.topico else "tech"
 
@@ -699,6 +739,8 @@ async def avaliar_resumo_avaliacao(
             contexto_topico=contexto,
             historico_reforcos=historico_txt,
             perfil=resolver_perfil(perfil_id),
+            material_topico=material_txt,
+            gabarito_abertas=montar_gabarito_abertas(slides_prova),
         )
     except Exception as e:
         if _rate_limited(e):
@@ -719,6 +761,8 @@ async def avaliar_resumo_avaliacao(
         {
             "veredito": resultado.get("veredito"),
             "resumo_diagnostico": resultado.get("resumo_diagnostico"),
+            # rodada de estudo em que saiu — ver _historico_rodadas_anteriores
+            "rodada": registro.rodada_atual or 1,
         }
     )
     registro.tutor_veredito = resultado.get("veredito")
