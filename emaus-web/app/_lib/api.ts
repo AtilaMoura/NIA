@@ -261,6 +261,7 @@ export function topicoRenderUrl(
     concluido?: boolean;
     temProximo?: boolean;
     avaliacaoId?: number | null;
+    slide?: number;
   },
 ) {
   const params = new URLSearchParams({
@@ -281,6 +282,8 @@ export function topicoRenderUrl(
   // "Resultado" usa isso pra oferecer o botão "Fazer a prova" quando o aluno
   // domina o conteúdo, além de "Próximo tópico".
   if (opts.avaliacaoId != null) params.set("avaliacao", "1");
+  // Abre direto nesse slide (1-based) em vez do último onde o aluno parou.
+  if (opts.slide) params.set("slide", String(opts.slide));
   // Estado inicial da avaliação do tutor (2026-09-11) — reabrir um tópico já
   // concluído já mostra o resultado no slide "Resultado", sem precisar clicar
   // em "Fim" de novo. Só o essencial pro slide renderizar (não manda lacunas).

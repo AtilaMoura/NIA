@@ -488,6 +488,9 @@
     box-shadow: 0 2px 6px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.4);
     transition: transform .12s ease, filter .15s ease;
   }
+  /* display:flex acima atropelava o atributo hidden — os botões ✍️/❓
+     apareciam na prova e na revisão do professor, onde o JS os esconde. */
+  .anotacao-fab[hidden] { display: none; }
   .anotacao-fab:hover { filter: brightness(1.08); }
   .anotacao-fab:active { transform: scale(.94); }
   .anotacao-fab.tem-notas::after {
@@ -561,6 +564,49 @@
   .veredito-chip.bom { background: var(--accent-soft); color: var(--accent); }
   .veredito-chip.aviso { background: color-mix(in srgb, var(--amber) 18%, transparent); color: var(--amber); }
   #avaliacaoResultado p { margin: 0 0 12px; font-size: 14px; }
+
+  /* Revisão personalizada do fim do tópico/prova (2026-09-23) — anel de
+     nota + cartões do que revisar + pontos-chave do tópico. */
+  #avaliacaoResultado { white-space: normal; }
+  .rev-topo { display: flex; align-items: center; gap: 16px; margin-bottom: 6px; }
+  .rev-topo-texto { flex: 1; min-width: 0; }
+  .rev-topo-texto p { margin: 0 !important; color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+  .rev-anel { --pct: 0; --cor: var(--accent); flex: 0 0 auto; width: 78px; height: 78px; border-radius: 50%;
+    background: conic-gradient(var(--cor) calc(var(--pct) * 1%), var(--border-soft) 0);
+    display: grid; place-items: center; }
+  .rev-anel[hidden] { display: none; }
+  .rev-anel.rev-anel-aviso { --cor: var(--amber); }
+  .rev-anel-miolo { width: 62px; height: 62px; border-radius: 50%; background: var(--bg); display: grid; place-items: center; text-align: center; line-height: 1.05; }
+  .rev-nota { font-size: 21px; font-weight: 800; color: var(--text); font-family: var(--font-display); }
+  .rev-total { font-size: 10.5px; color: var(--text-dim); letter-spacing: .03em; }
+  .rev-secao { margin-top: 20px; }
+  .rev-secao-titulo { font-family: var(--font-label); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+  .rev-secao-sub { margin: 0 0 12px !important; font-size: 13px !important; color: var(--text-muted); }
+  .rev-card { border: 1px solid var(--border-soft); border-left: 3px solid var(--bad); border-radius: var(--radius); background: var(--surface-2); padding: 14px 15px; margin-bottom: 12px; }
+  .rev-card.rev-parcial { border-left-color: var(--amber); }
+  .rev-card-topo { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .rev-num { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 11.5px; font-weight: 700; background: var(--bad-soft); color: var(--bad); }
+  .rev-parcial .rev-num { background: color-mix(in srgb, var(--amber) 18%, transparent); color: var(--amber); }
+  .rev-tag { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--bad); }
+  .rev-parcial .rev-tag { color: var(--amber); }
+  .rev-pergunta { font-weight: 600; font-size: 14.5px; line-height: 1.45; color: var(--text); margin-bottom: 10px; }
+  .rev-rotulo { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 3px; }
+  .rev-sua { border-radius: var(--radius); padding: 9px 11px; background: var(--surface); border: 1px dashed var(--border); margin-bottom: 8px; }
+  .rev-sua .rev-rotulo { color: var(--text-dim); }
+  .rev-sua-texto { font-size: 13px; color: var(--text-muted); font-style: italic; white-space: pre-line; }
+  .rev-certo { border-radius: var(--radius); padding: 10px 12px; background: var(--accent-soft); margin-bottom: 8px; font-size: 14px; line-height: 1.55; color: var(--text); white-space: pre-line; }
+  .rev-certo .rev-rotulo { color: var(--accent); }
+  .rev-explicacao { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px; }
+  .rev-exemplo { display: flex; gap: 8px; font-size: 13px; line-height: 1.5; color: var(--text); margin-bottom: 6px; }
+  .rev-link { background: none; border: none; padding: 4px 0 0; font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--accent); cursor: pointer; }
+  .rev-link:hover { text-decoration: underline; }
+  .rev-pontos { list-style: none; margin: 0; padding: 0; counter-reset: ponto; }
+  .rev-ponto { position: relative; padding: 12px 14px 12px 50px; border: 1px solid var(--border-soft); border-radius: var(--radius); background: var(--surface-2); margin-bottom: 10px; counter-increment: ponto; }
+  .rev-ponto::before { content: counter(ponto); position: absolute; left: 14px; top: 12px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--accent-soft); color: var(--accent); }
+  .rev-ponto-titulo { font-weight: 700; font-size: 14px; margin-bottom: 3px; color: var(--text); }
+  .rev-ponto-texto { font-size: 13.5px; line-height: 1.55; color: var(--text-muted); margin-bottom: 6px; }
+  .rev-tudo-certo { text-align: center; padding: 14px; font-size: 14px; color: var(--accent); font-weight: 600; }
+  #avaliacaoAcoes { margin-top: 16px; }
   #avaliacaoAcoes { display: flex; flex-wrap: wrap; gap: 8px; }
   #avaliacaoErro p { margin: 0 0 10px; color: var(--bad); font-size: 13.5px; }
   #avaliacaoErro .register-btn, #avaliacaoErro .anotacao-toggle { margin-right: 8px; }
@@ -789,8 +835,16 @@
             <button type="button" class="anotacao-toggle" id="avaliacaoConcluirMesmoAssim">Marcar como concluído mesmo assim</button>
           </div>
           <div id="avaliacaoResultado" hidden>
-            <div class="veredito-chip" id="veredictoChip"></div>
-            <p id="resumoDiagnostico"></p>
+            <div class="rev-topo">
+              <div class="rev-anel" id="revAnel" hidden>
+                <div class="rev-anel-miolo"><div><div class="rev-nota" id="revNota"></div><div class="rev-total" id="revTotal"></div></div></div>
+              </div>
+              <div class="rev-topo-texto">
+                <div class="veredito-chip" id="veredictoChip"></div>
+                <p id="resumoDiagnostico"></p>
+              </div>
+            </div>
+            <div id="revisaoConteudo"></div>
             <div id="avaliacaoAcoes"></div>
           </div>
         </div>
@@ -959,12 +1013,16 @@ function mostrarEstadoAvaliacao(estado) {
   // sido concluído por baixo dos panos). Traz o painel pra tela sempre que
   // o estado muda.
   var box = document.getElementById('resumoEmbutidoBox');
-  if (box) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   // Feedback imediato no próprio botão "Fim" — sem isso o único indício de
   // que o clique fez algo era esse painel fora da tela (ver acima).
   var nextBtnEl = document.getElementById('nextBtn');
-  if (nextBtnEl && EMBUTIDO) {
+  // current/slides são let/const declarados mais abaixo no script — acessar
+  // antes da declaração lança erro até com typeof (zona morta temporal).
+  var noUltimoSlide = false;
+  try { noUltimoSlide = current === slides.length - 1; } catch (e) {}
+  if (nextBtnEl && EMBUTIDO && noUltimoSlide) {
     if (estado === 'avaliacaoCarregando') {
       nextBtnEl.disabled = true;
       nextBtnEl.textContent = 'Avaliando…';
@@ -1032,9 +1090,187 @@ function renderizarResultadoAvaliacao(veredito, resumo, temProximo, temAvaliacao
   mostrarEstadoAvaliacao('avaliacaoResultado');
 }
 
-if (EMBUTIDO && AVALIACAO_INICIAL.concluido && AVALIACAO_INICIAL.veredito) {
-  renderizarResultadoAvaliacao(AVALIACAO_INICIAL.veredito, AVALIACAO_INICIAL.resumo, AVALIACAO_INICIAL.temProximo, AVALIACAO_INICIAL.temAvaliacao);
+// Revisão personalizada (2026-09-23, pedido do Atila) — no lugar do
+// "precisa reforçar" seco: nota, um cartão por questão errada/parcial (sua
+// resposta × ponto certo × exemplo × slide pra reler) e, se não passou na
+// prova, os pontos-chave do tópico inteiro. Os dados vêm do backend
+// (ultima_avaliacao montada em agents/revisao_avaliacao.py), lidos pela rota
+// /{topico|avaliacao}-progress/{id}/resultado com o token de escopo curto.
+var ROTULO_CLASSIFICACAO = { errada: 'Errou', parcial: 'Acertou em parte' };
+
+function criarEl(tag, classe, texto) {
+  var e = document.createElement(tag);
+  if (classe) e.className = classe;
+  if (texto != null) e.textContent = texto;
+  return e;
 }
+
+function botaoReverSlide(n) {
+  var b = criarEl('button', 'rev-link', '📖 Rever no slide ' + n + ' ›');
+  b.type = 'button';
+  b.addEventListener('click', function () {
+    if (RESPOSTAS_PREFIXO === 'avaliacao') {
+      // O slide é do TÓPICO, não da prova — o pai abre o tópico nele.
+      try { window.parent.postMessage({ tipo: 'emaus:navegar', destino: 'topico-slide', slide: n }, '*'); } catch (e) {}
+    } else if (n - 1 < slides.length) {
+      showSlide(n - 1);
+    }
+  });
+  return b;
+}
+
+function blocoExemplo(texto) {
+  var ex = criarEl('div', 'rev-exemplo');
+  ex.appendChild(criarEl('span', null, '💡'));
+  ex.appendChild(criarEl('span', null, texto));
+  return ex;
+}
+
+function cartaoRevisao(item, idx) {
+  var c = criarEl('div', 'rev-card rev-' + item.classificacao);
+  var topo = criarEl('div', 'rev-card-topo');
+  topo.appendChild(criarEl('span', 'rev-num', String(idx + 1)));
+  topo.appendChild(criarEl('span', 'rev-tag', ROTULO_CLASSIFICACAO[item.classificacao] || ''));
+  c.appendChild(topo);
+  c.appendChild(criarEl('div', 'rev-pergunta', item.enunciado));
+  if (item.sua_resposta) {
+    var sua = criarEl('div', 'rev-sua');
+    sua.appendChild(criarEl('div', 'rev-rotulo', 'Você respondeu'));
+    sua.appendChild(criarEl('div', 'rev-sua-texto', item.sua_resposta));
+    c.appendChild(sua);
+  }
+  if (item.resposta_certa) {
+    var certo = criarEl('div', 'rev-certo');
+    certo.appendChild(criarEl('div', 'rev-rotulo', '✔ O ponto certo'));
+    certo.appendChild(criarEl('div', null, item.resposta_certa));
+    c.appendChild(certo);
+  }
+  if (item.explicacao) c.appendChild(criarEl('div', 'rev-explicacao', item.explicacao));
+  if (item.exemplo) c.appendChild(blocoExemplo(item.exemplo));
+  if (item.slide) c.appendChild(botaoReverSlide(item.slide));
+  return c;
+}
+
+function blocoRevisaoCompleta(rev) {
+  var secao = criarEl('div', 'rev-secao');
+  secao.appendChild(criarEl('div', 'rev-secao-titulo', '📚 Revisão do tópico'));
+  secao.appendChild(criarEl('p', 'rev-secao-sub', 'Os pontos-chave pra reler antes de refazer a prova.'));
+  var lista = criarEl('ol', 'rev-pontos');
+  rev.pontos.forEach(function (p) {
+    var li = criarEl('li', 'rev-ponto');
+    li.appendChild(criarEl('div', 'rev-ponto-titulo', p.titulo));
+    li.appendChild(criarEl('div', 'rev-ponto-texto', p.texto));
+    if (p.exemplo) li.appendChild(blocoExemplo(p.exemplo));
+    if (p.slide) li.appendChild(botaoReverSlide(p.slide));
+    lista.appendChild(li);
+  });
+  secao.appendChild(lista);
+  return secao;
+}
+
+function montarAcoesRevisao(modoProva, aprovado, temProximo, temAvaliacao) {
+  var acoes = document.getElementById('avaliacaoAcoes');
+  acoes.innerHTML = '';
+  var labelVoltar = RESPOSTAS_PREFIXO === 'avaliacao' ? 'Voltar ao tópico' : 'Voltar ao curso';
+  function botao(texto, primario, aoClicar) {
+    var b = criarEl('button', primario ? 'copy-btn' : 'anotacao-toggle', texto);
+    b.type = 'button';
+    b.addEventListener('click', aoClicar);
+    acoes.appendChild(b);
+  }
+  function navegar(destino) {
+    return function () { try { window.parent.postMessage({ tipo: 'emaus:navegar', destino: destino }, '*'); } catch (e) {} };
+  }
+  if (modoProva && !aprovado) {
+    // O backend já abriu uma rodada nova: recarregar traz a prova limpa.
+    // ?slide=1 força começar do início (senão abre no último slide salvo).
+    botao('Refazer a prova ▶', true, function () {
+      var u = new URL(window.location.href);
+      u.searchParams.set('slide', '1');
+      window.location.replace(u.toString());
+    });
+    botao(labelVoltar, false, navegar('curso'));
+    return;
+  }
+  var temBotaoProva = !modoProva && temAvaliacao;
+  if (temBotaoProva) botao('Fazer a prova ▶', true, navegar('prova'));
+  botao(temProximo ? 'Próximo tópico ▶' : labelVoltar, !temBotaoProva, navegar(temProximo ? 'proximo' : 'curso'));
+}
+
+function renderizarRevisao(a, temProximo, temAvaliacao) {
+  var modoProva = a.modo === 'prova';
+  var aprovado = a.aprovado !== false;
+  var pendentes = (a.itens || []).filter(function (i) { return i.classificacao !== 'certa'; });
+
+  var anel = document.getElementById('revAnel');
+  anel.hidden = false;
+  anel.style.setProperty('--pct', a.total ? Math.round(a.nota / a.total * 100) : 0);
+  anel.classList.toggle('rev-anel-aviso', !aprovado);
+  document.getElementById('revNota').textContent = String(a.nota).replace('.', ',');
+  document.getElementById('revTotal').textContent = 'de ' + a.total;
+
+  var chip = document.getElementById('veredictoChip');
+  if (modoProva) {
+    chip.textContent = aprovado ? '✓ Aprovado' : '↻ Refazer a prova';
+  } else {
+    chip.textContent = pendentes.length ? '✓ Tópico concluído' : '✓ Tudo certo';
+  }
+  chip.className = 'veredito-chip ' + (aprovado ? 'bom' : 'aviso');
+  document.getElementById('resumoDiagnostico').textContent = a.resumo_diagnostico || '';
+
+  var conteudo = document.getElementById('revisaoConteudo');
+  conteudo.innerHTML = '';
+  if (pendentes.length) {
+    var secao = criarEl('div', 'rev-secao');
+    secao.appendChild(criarEl('div', 'rev-secao-titulo', '🔎 O que revisar'));
+    pendentes.forEach(function (item, idx) { secao.appendChild(cartaoRevisao(item, idx)); });
+    conteudo.appendChild(secao);
+  } else {
+    conteudo.appendChild(criarEl('div', 'rev-tudo-certo', 'Nenhum ponto pra revisar — mandou bem! 🎉'));
+  }
+  if (a.revisao_completa && a.revisao_completa.pontos && a.revisao_completa.pontos.length) {
+    conteudo.appendChild(blocoRevisaoCompleta(a.revisao_completa));
+  }
+
+  // O anel já mostra a nota — a caixa de pontuação automática vira ruído.
+  var stats = document.getElementById('statsBox');
+  if (stats) stats.hidden = true;
+  montarAcoesRevisao(modoProva, aprovado, temProximo, temAvaliacao);
+  mostrarEstadoAvaliacao('avaliacaoResultado');
+}
+
+// soSeConcluido: na abertura só mostra resultado de tópico/prova concluído
+// (prova reprovada já foi reiniciada — abre limpa pra refazer).
+function carregarResultado(temProximo, temAvaliacao, soSeConcluido, seNaoTiver) {
+  if (!RESPOSTAS_ATIVO) { if (seNaoTiver) seNaoTiver(); return; }
+  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/resultado', {
+    headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+  })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      var a = d && d.analise;
+      if (a && a.itens && (!soSeConcluido || d.status === 'concluido')) {
+        renderizarRevisao(a, temProximo, temAvaliacao);
+      } else if (seNaoTiver) {
+        seNaoTiver();
+      }
+    })
+    .catch(function (e) {
+      console.error('falha ao carregar resultado', e);
+      if (seNaoTiver) seNaoTiver();
+    });
+}
+
+// Abertura: resultado novo (com revisão) se houver; senão o simples de antes,
+// pra análises antigas gravadas antes da revisão existir.
+if (EMBUTIDO) {
+  carregarResultado(AVALIACAO_INICIAL.temProximo, AVALIACAO_INICIAL.temAvaliacao, true, function () {
+    if (AVALIACAO_INICIAL.concluido && AVALIACAO_INICIAL.veredito) {
+      renderizarResultadoAvaliacao(AVALIACAO_INICIAL.veredito, AVALIACAO_INICIAL.resumo, AVALIACAO_INICIAL.temProximo, AVALIACAO_INICIAL.temAvaliacao);
+    }
+  });
+}
+
 
 document.getElementById('avaliacaoTentarDeNovo') && document.getElementById('avaliacaoTentarDeNovo').addEventListener('click', function () {
   if (!ultimoResumoEnviado) return;
@@ -1519,7 +1755,11 @@ window.addEventListener('message', function (e) {
   if (d.tipo === 'emaus:ir-slide' && typeof d.indice === 'number') {
     showSlide(d.indice);
   } else if (d.tipo === 'emaus:avaliacao-resultado') {
-    renderizarResultadoAvaliacao(d.veredito, d.resumo_diagnostico, !!d.temProximo, !!d.temAvaliacao);
+    // O pai só manda veredito/resumo — a revisão completa (cartões) vem da
+    // rota /resultado; se falhar, cai no resultado simples de antes.
+    carregarResultado(!!d.temProximo, !!d.temAvaliacao, false, function () {
+      renderizarResultadoAvaliacao(d.veredito, d.resumo_diagnostico, !!d.temProximo, !!d.temAvaliacao);
+    });
   } else if (d.tipo === 'emaus:avaliacao-erro') {
     document.getElementById('avaliacaoErroMsg').textContent = d.mensagem || 'Não deu pra falar com o tutor agora.';
     mostrarEstadoAvaliacao('avaliacaoErro');
@@ -2117,6 +2357,8 @@ document.addEventListener('fullscreenchange', syncFullscreenUI);
 // Abre no slide onde o aluno parou (2026-09-15), não sempre no 0 — mesma regra
 // de RESPOSTAS_ATIVO (revisão/uso avulso sempre abre no início, como antes).
 function abrirSlideInicial() {
+  var slidePedido = parseInt(new URLSearchParams(window.location.search).get('slide'), 10);
+  if (slidePedido >= 1 && slidePedido <= slides.length) { showSlide(slidePedido - 1); return; }
   if (!RESPOSTAS_ATIVO) { showSlide(0); return; }
   fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
     headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },

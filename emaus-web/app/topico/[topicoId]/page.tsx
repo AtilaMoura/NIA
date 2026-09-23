@@ -34,10 +34,15 @@ export async function generateMetadata({
 
 export default async function TopicoPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ topicoId: string }>;
+  searchParams: Promise<{ slide?: string }>;
 }) {
   const { topicoId: raw } = await params;
+  // ?slide=N (1-based) — vem do "📖 Rever no slide N" da revisão da prova
+  // (2026-09-23): abre o tópico direto no slide pra reler.
+  const slidePedido = Number((await searchParams).slide);
   const topicoId = Number(raw);
   if (!Number.isInteger(topicoId)) notFound();
 
@@ -155,6 +160,7 @@ export default async function TopicoPage({
           avaliacaoInicial: analiseInicial,
           temProximo: proximo?.id != null,
           avaliacaoId: topico.avaliacao_id,
+          slide: Number.isInteger(slidePedido) && slidePedido > 0 ? slidePedido : undefined,
         })}
         title={topico.titulo}
         className="w-full flex-1 border-0"

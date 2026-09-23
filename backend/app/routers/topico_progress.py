@@ -13,6 +13,7 @@ from app.database import get_db
 from app.models.models import Topico, TopicoProgress, User
 from app.core.auth import get_current_user, get_topico_resposta_user_id
 from app.schemas.topico_progress import (
+    ResultadoAvaliacaoOut,
     TopicoProgressOut,
     TopicoProgressSlideOut,
     TopicoProgressSlideUpsert,
@@ -120,6 +121,26 @@ def obter_slide_atual(
         .first()
     )
     return TopicoProgressSlideOut(ultimo_slide=registro.ultimo_slide if registro else None)
+
+
+@router.get("/{topico_id}/resultado", response_model=ResultadoAvaliacaoOut)
+def obter_resultado(
+    topico_id: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_topico_resposta_user_id),
+):
+    """Revisão personalizada do fim do tópico, pro <iframe> remontar o slide
+    "Resultado" ao reabrir (mesmo token de escopo curto das respostas)."""
+    registro = (
+        db.query(TopicoProgress)
+        .filter(TopicoProgress.user_id == user_id, TopicoProgress.topico_id == topico_id)
+        .first()
+    )
+    if not registro:
+        return ResultadoAvaliacaoOut(status="nao_iniciado")
+    return ResultadoAvaliacaoOut(
+        status=registro.status, analise=(registro.tutor_analise or {}).get("ultima_avaliacao")
+    )
 
 
 @router.put("/{topico_id}/slide", response_model=TopicoProgressSlideOut)

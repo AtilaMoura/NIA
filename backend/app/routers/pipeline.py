@@ -21,12 +21,15 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.models import Course, Module, Lesson, Topico, Avaliacao, AvaliacaoProgress, AvaliacaoResposta, Progress, TopicoProgress, TopicoResposta, User
+from app.models.models import (
+    AlunoDificuldade, Avaliacao, AvaliacaoProgress, AvaliacaoResposta, Course, Lesson, Module,
+    Progress, RevisaoTopico, Topico, TopicoProgress, TopicoResposta, User,
+)
 from app.core.auth import get_current_user
 from app.agents.pipeline import gerar_estrutura_curso, gerar_e_revisar_topico
 from app.agents.tutor_agent import TutorAgent
-from app.agents.contexto_topico import carregar_content, montar_contexto_duvida, montar_gabarito_abertas
-from app.agents.revisao_avaliacao import montar_abertas_do_aluno, revisar_lacunas_abertas
+from app.agents.contexto_topico import carregar_content, montar_contexto_duvida
+from app.agents.revisao_avaliacao import NOTA_MINIMA_PROVA, corrigir_e_revisar, dificuldades_do_resultado
 from app.agents.perfis import resolver_perfil
 from app.schemas.topico_progress import AvaliarTopicoRequest, TopicoProgressOut
 from app.schemas.avaliacao_progress import AvaliacaoProgressOut
@@ -533,33 +536,88 @@ def _rate_limited(err: Exception) -> bool:
     return "429" in msg or "rate_limit" in msg or "rate limit" in msg
 
 
-# Teto do texto do tópico que vai junto na avaliação (menor que o do chat:
-# o prompt de avaliação já tem schema + resumo + gabarito).
+# Teto do texto do tópico (numerado por "[Slide N]") que vai na correção —
+# o prompt ainda leva as perguntas + gabaritos, e o teto de ~8000 tokens/min
+# do Groq é da conta inteira.
 TETO_MATERIAL_AVALIACAO = 5000
+# "Revisão de tudo" é gerada uma vez por tópico — pode levar mais material.
+TETO_MATERIAL_REVISAO_COMPLETA = 8000
 
 
-def _historico_rodadas_anteriores(tutor_analise: dict | None, rodada_atual: int | None) -> str:
-    """Só reforços de rodadas de estudo ANTERIORES (o aluno clicou em recomeçar).
-
-    Achado real (2026-09-23, Tópico 19): cada clique em "Fim" na mesma rodada
-    entrava como "reforço anterior", e o prompt tratava erro repetido como
-    lacuna real — uma avaliação errada virava prova pra próxima (ciclo). Itens
-    antigos sem "rodada" gravada ficam de fora (não dá pra saber a origem)."""
-    if not tutor_analise:
-        return ""
-    atual = rodada_atual or 1
-    return "\n".join(
-        f"- {h.get('veredito')}: {h.get('resumo_diagnostico')}"
-        for h in tutor_analise.get("historico", [])
-        if isinstance(h.get("rodada"), int) and h["rodada"] < atual
-    )
-
-
-def _material_para_avaliacao(content_topico: dict) -> str:
+def _material_para_avaliacao(content_topico: dict, teto: int = TETO_MATERIAL_AVALIACAO) -> str:
     slides = content_topico.get("slides", [])
     # Prioriza o fim do tópico (slide de resumo + checkpoints finais).
-    material, _ = montar_contexto_duvida(content_topico, len(slides) - 1, teto_topico=TETO_MATERIAL_AVALIACAO)
+    material, _ = montar_contexto_duvida(content_topico, len(slides) - 1, teto_topico=teto)
     return material
+
+
+def _formatar_nota(nota: float) -> str:
+    return f"{nota:g}".replace(".", ",")
+
+
+def _diagnostico(modo: str, aprovado: bool, nota: float, total: int, n_revisar: int) -> str:
+    placar = f"{_formatar_nota(nota)} de {total}"
+    if modo == "prova" and not aprovado:
+        minimo = _formatar_nota(NOTA_MINIMA_PROVA * total)
+        return f"Você fez {placar} — precisa de {minimo} pra passar. Releia a revisão e refaça a prova."
+    if not n_revisar:
+        return f"Você fez {placar}. Acertou tudo!"
+    if modo == "prova":
+        return f"Você fez {placar} e passou. Revise {'o ponto' if n_revisar == 1 else 'os pontos'} abaixo antes de seguir."
+    return f"Você fez {placar}. Revise {'o ponto' if n_revisar == 1 else 'os pontos'} abaixo antes da prova."
+
+
+def _salvar_dificuldades(db: Session, user_id: int, topico_id: int, avaliacao_id: int | None,
+                         origem: str, itens: list[dict], rodada: int) -> None:
+    """Histórico do que o aluno errou/acertou parcialmente — só acrescenta."""
+    for item in dificuldades_do_resultado(itens):
+        db.add(AlunoDificuldade(
+            user_id=user_id, topico_id=topico_id, avaliacao_id=avaliacao_id, origem=origem,
+            question_id=item["id"], conceito=item["enunciado"] or item["id"],
+            resposta_aluno=item.get("sua_resposta"), classificacao=item["classificacao"], rodada=rodada,
+        ))
+
+
+async def _revisao_completa_do_topico(db: Session, agente: TutorAgent, topico: Topico,
+                                      content_topico: dict, perfil) -> dict | None:
+    """Pontos-chave do tópico inteiro — gerado UMA vez e guardado em
+    RevisaoTopico. Se a IA falhar, a prova segue sem essa parte (os cartões
+    do que o aluno errou continuam aparecendo)."""
+    cache = db.query(RevisaoTopico).filter(RevisaoTopico.topico_id == topico.id).first()
+    if cache:
+        return cache.conteudo
+    try:
+        conteudo = await agente.gerar_revisao_topico(
+            topico.titulo, _material_para_avaliacao(content_topico, TETO_MATERIAL_REVISAO_COMPLETA), perfil=perfil,
+        )
+    except Exception as e:
+        print(f"⚠️ revisão completa do tópico {topico.id} falhou: {e}")
+        return None
+    if not conteudo.get("pontos"):
+        return None
+    db.add(RevisaoTopico(topico_id=topico.id, conteudo=conteudo, gerado_por="groq"))
+    return conteudo
+
+
+def _registrar_analise(registro, analise: dict, agora: datetime) -> None:
+    historico = list((registro.tutor_analise or {}).get("historico", []))
+    historico.append({
+        "veredito": analise["veredito"],
+        "resumo_diagnostico": analise["resumo_diagnostico"],
+        "rodada": analise["rodada"],
+        "nota": analise["nota"],
+        "total": analise["total"],
+    })
+    registro.tutor_veredito = analise["veredito"]
+    registro.tutor_analise = {"ultima_avaliacao": analise, "historico": historico}
+    registro.avaliado_em = agora
+
+
+def _erro_de_correcao(e: Exception) -> HTTPException:
+    if _rate_limited(e):
+        return HTTPException(503, "O tutor está sobrecarregado agora. Tente de novo em alguns minutos.")
+    print(f"⚠️ correção falhou: {e}")
+    return HTTPException(503, "Não deu pra corrigir agora. Tente de novo em instantes.")
 
 
 @router.post("/topicos/{topico_id}/avaliar", response_model=TopicoProgressOut)
@@ -569,12 +627,13 @@ async def avaliar_resumo_topico(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Análogo por TÓPICO do POST /pipeline/licoes/{id}/avaliar: o aluno cola o
-    '=== RESUMO ===' que o render monta no fim do tópico e o Tutor decide
-    dominado/reforço. Grava em TopicoProgress (não em Progress) e NÃO dispara
-    gamificação — o Emaús é sem pontos/selos/streak."""
-    # Mesma trava de identidade do /topico-progress: ninguém envia avaliação "como"
-    # outra pessoa (achado de segurança 2026-09-04).
+    """Fim do TÓPICO (reescrito 2026-09-23): corrige pergunta por pergunta
+    (ver agents/revisao_avaliacao.py) e devolve a revisão personalizada do que
+    o aluno errou. Não trava: o tópico fica concluído e a prova é liberada — a
+    prova é que decide se ele passa (decisão do Atila). Grava em
+    TopicoProgress e NÃO dispara gamificação (Emaús é sem pontos/selos).
+    O resumo_texto do request não é mais usado (respostas vêm do banco)."""
+    # Mesma trava de identidade do /topico-progress (achado de segurança 2026-09-04).
     if data.user_id != current_user.id:
         raise HTTPException(403, "Só é possível avaliar o próprio progresso.")
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
@@ -583,97 +642,58 @@ async def avaliar_resumo_topico(
     if not topico.content or not topico.is_approved:
         raise HTTPException(400, "Este tópico ainda não está disponível para avaliação.")
 
-    lesson = db.query(Lesson).filter(Lesson.id == topico.lesson_id).first()
-    module = db.query(Module).filter(Module.id == lesson.module_id).first() if lesson else None
-    contexto = topico.titulo
-    if lesson:
-        contexto += f" — aula '{lesson.title}'"
-    if module:
-        contexto += f", módulo {module.module_index}"
-
     registro = (
         db.query(TopicoProgress)
-        .filter(
-            TopicoProgress.user_id == data.user_id,
-            TopicoProgress.topico_id == topico_id,
-        )
+        .filter(TopicoProgress.user_id == data.user_id, TopicoProgress.topico_id == topico_id)
         .first()
     )
-
-    historico_txt = _historico_rodadas_anteriores(
-        registro.tutor_analise if registro else None,
-        registro.rodada_atual if registro else 1,
-    )
-
+    rodada = registro.rodada_atual if registro else 1
     content_topico = carregar_content(topico)
     perfil = resolver_perfil(_perfil_do_curso(db, topico))
     agente = TutorAgent(_service(data.modelo))
 
-    # Respostas abertas da rodada atual (do banco, não do texto do resumo) —
-    # usadas na 2ª checagem de lacuna (ver agents/revisao_avaliacao.py).
-    rodada = registro.rodada_atual if registro else 1
-    respostas_abertas = {
-        r.question_id: str(r.resposta_dada)
+    respostas = {
+        r.question_id: {"resposta": r.resposta_dada, "correta": r.correta}
         for r in db.query(TopicoResposta).filter(
             TopicoResposta.user_id == data.user_id,
             TopicoResposta.topico_id == topico_id,
             TopicoResposta.rodada == rodada,
-            TopicoResposta.tipo == "open",
         )
     }
 
     try:
-        resultado = await agente.avaliar_resumo(
-            data.resumo_texto,
-            contexto_topico=contexto,
-            historico_reforcos=historico_txt,
-            perfil=perfil,
-            material_topico=_material_para_avaliacao(content_topico),
-            gabarito_abertas=montar_gabarito_abertas(content_topico.get("slides", [])),
-        )
-        resultado = await revisar_lacunas_abertas(
-            agente, resultado,
-            montar_abertas_do_aluno(content_topico.get("slides", []), respostas_abertas),
-            perfil,
+        correcao = await corrigir_e_revisar(
+            agente, content_topico.get("slides", []), respostas, _material_para_avaliacao(content_topico), perfil,
         )
     except Exception as e:
-        if _rate_limited(e):
-            raise HTTPException(
-                503, "O tutor está sobrecarregado agora. Tente de novo em alguns minutos."
-            )
-        raise HTTPException(500, f"Erro ao avaliar resumo do tópico: {str(e)}")
+        raise _erro_de_correcao(e)
+
+    n_revisar = len(dificuldades_do_resultado(correcao["itens"]))
+    analise = {
+        "modo": "topico",
+        "aprovado": True,
+        "veredito": "dominado",
+        "nota": correcao["nota"],
+        "total": correcao["total"],
+        "certas": correcao["certas"],
+        "itens": correcao["itens"],
+        "revisao_completa": None,
+        "rodada": rodada,
+        "resumo_diagnostico": _diagnostico("topico", True, correcao["nota"], correcao["total"], n_revisar),
+    }
 
     agora = datetime.now(timezone.utc)
     if not registro:
-        registro = TopicoProgress(
-            user_id=data.user_id, topico_id=topico_id, status="em_andamento"
-        )
+        registro = TopicoProgress(user_id=data.user_id, topico_id=topico_id, status="em_andamento")
         db.add(registro)
 
-    historico = (registro.tutor_analise or {}).get("historico", [])
-    historico.append(
-        {
-            "veredito": resultado.get("veredito"),
-            "resumo_diagnostico": resultado.get("resumo_diagnostico"),
-            # rodada de estudo em que saiu — ver _historico_rodadas_anteriores
-            "rodada": registro.rodada_atual or 1,
-        }
-    )
-    registro.tutor_veredito = resultado.get("veredito")
-    registro.tutor_analise = {"ultima_avaliacao": resultado, "historico": historico}
-    registro.avaliado_em = agora
-
-    if resultado.get("veredito") == "dominado":
-        registro.status = "concluido"
-        if registro.iniciado_em is None:
-            registro.iniciado_em = agora
-        if registro.concluido_em is None:
-            registro.concluido_em = agora
-    elif registro.status != "concluido":
-        # reforço: mantém em andamento (não regride um tópico já concluído antes)
-        registro.status = "em_andamento"
-        if registro.iniciado_em is None:
-            registro.iniciado_em = agora
+    _salvar_dificuldades(db, data.user_id, topico_id, None, "topico", correcao["itens"], rodada)
+    _registrar_analise(registro, analise, agora)
+    registro.status = "concluido"
+    if registro.iniciado_em is None:
+        registro.iniciado_em = agora
+    if registro.concluido_em is None:
+        registro.concluido_em = agora
 
     db.commit()
     db.refresh(registro)
@@ -687,12 +707,14 @@ async def avaliar_resumo_avaliacao(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Análogo por AVALIAÇÃO do POST /pipeline/topicos/{id}/avaliar: o aluno cola o
-    '=== RESUMO ===' que o render monta no fim da avaliação e o Tutor decide
-    dominado/reforço. Grava em AvaliacaoProgress.
+    """Fim da PROVA (reescrito 2026-09-23). Cada pergunta vale 1 (parcial 0,5);
+    passa com >= 60% (3 de 5):
+    - passou: prova concluída + revisão do que errou/acertou em parte;
+    - não passou: revisão do que errou + "revisão de tudo" do tópico, a
+      dificuldade fica no histórico (AlunoDificuldade) e a prova é reiniciada
+      (rodada nova — respostas antigas ficam no banco, só saem de vista).
 
-    GATING: só permite se o tópico vinculado à avaliação tiver
-    TopicoProgress.status == 'concluido' pra este usuário.
+    GATING: só permite se o tópico vinculado tiver TopicoProgress concluído.
     """
     # Mesma trava de identidade: ninguém envia avaliação "como" outra pessoa.
     if data.user_id != current_user.id:
@@ -704,8 +726,7 @@ async def avaliar_resumo_avaliacao(
     if not avaliacao.conteudo or not avaliacao.is_approved:
         raise HTTPException(400, "Esta avaliação ainda não está disponível para avaliação.")
 
-    # GATING: verifica se o usuário concluiu o conteúdo do tópico
-    topico_progress = (
+    topico_concluido = (
         db.query(TopicoProgress)
         .filter(
             TopicoProgress.user_id == current_user.id,
@@ -714,106 +735,79 @@ async def avaliar_resumo_avaliacao(
         )
         .first()
     )
-    if not topico_progress:
-        raise HTTPException(
-            403, "Termine o conteúdo do tópico antes de fazer a prova."
-        )
-
-    lesson = db.query(Lesson).filter(Lesson.id == avaliacao.topico.lesson_id).first() if avaliacao.topico else None
-    module = db.query(Module).filter(Module.id == lesson.module_id).first() if lesson else None
-    contexto = avaliacao.topico.titulo if avaliacao.topico else "Avaliação"
-    if lesson:
-        contexto += f" — aula '{lesson.title}'"
-    if module:
-        contexto += f", módulo {module.module_index}"
-    contexto += " (Prova)"
+    if not topico_concluido:
+        raise HTTPException(403, "Termine o conteúdo do tópico antes de fazer a prova.")
 
     registro = (
         db.query(AvaliacaoProgress)
-        .filter(
-            AvaliacaoProgress.user_id == data.user_id,
-            AvaliacaoProgress.avaliacao_id == avaliacao_id,
-        )
+        .filter(AvaliacaoProgress.user_id == data.user_id, AvaliacaoProgress.avaliacao_id == avaliacao_id)
         .first()
     )
+    rodada = registro.rodada_atual if registro else 1
+    topico = avaliacao.topico
+    content_topico = carregar_content(topico) if topico and topico.content else {"slides": []}
+    perfil = resolver_perfil(_perfil_do_curso(db, topico) if topico else "tech")
+    agente = TutorAgent(_service(data.modelo))
 
-    historico_txt = _historico_rodadas_anteriores(
-        registro.tutor_analise if registro else None,
-        registro.rodada_atual if registro else 1,
-    )
-
-    # Gabarito = perguntas da própria prova; material = conteúdo do tópico pai.
+    # Mesmo formato de slide que o render da prova monta (routers/avaliacoes.py).
     slides_prova = [
         {"tipo": "avaliacao_pergunta", "secao": "Avaliação Final", "pergunta": p}
         for p in (avaliacao.conteudo or {}).get("perguntas", [])
     ]
-    material_txt = ""
-    if avaliacao.topico and avaliacao.topico.content:
-        material_txt = _material_para_avaliacao(carregar_content(avaliacao.topico))
-
-    perfil = resolver_perfil(_perfil_do_curso(db, avaliacao.topico) if avaliacao.topico else "tech")
-    agente = TutorAgent(_service(data.modelo))
-
-    rodada = registro.rodada_atual if registro else 1
-    respostas_abertas = {
-        r.question_id: str(r.resposta_dada)
+    respostas = {
+        r.question_id: {"resposta": r.resposta_dada, "correta": r.correta}
         for r in db.query(AvaliacaoResposta).filter(
             AvaliacaoResposta.user_id == data.user_id,
             AvaliacaoResposta.avaliacao_id == avaliacao_id,
             AvaliacaoResposta.rodada == rodada,
-            AvaliacaoResposta.tipo == "open",
         )
     }
 
     try:
-        resultado = await agente.avaliar_resumo(
-            data.resumo_texto,
-            contexto_topico=contexto,
-            historico_reforcos=historico_txt,
-            perfil=perfil,
-            material_topico=material_txt,
-            gabarito_abertas=montar_gabarito_abertas(slides_prova),
-        )
-        resultado = await revisar_lacunas_abertas(
-            agente, resultado, montar_abertas_do_aluno(slides_prova, respostas_abertas), perfil,
+        correcao = await corrigir_e_revisar(
+            agente, slides_prova, respostas, _material_para_avaliacao(content_topico), perfil,
         )
     except Exception as e:
-        if _rate_limited(e):
-            raise HTTPException(
-                503, "O tutor está sobrecarregado agora. Tente de novo em alguns minutos."
-            )
-        raise HTTPException(500, f"Erro ao avaliar resumo da avaliação: {str(e)}")
+        raise _erro_de_correcao(e)
+
+    aprovado = correcao["nota"] >= NOTA_MINIMA_PROVA * correcao["total"]
+    revisao_completa = None
+    if not aprovado and topico:
+        revisao_completa = await _revisao_completa_do_topico(db, agente, topico, content_topico, perfil)
+
+    n_revisar = len(dificuldades_do_resultado(correcao["itens"]))
+    analise = {
+        "modo": "prova",
+        "aprovado": aprovado,
+        "veredito": "dominado" if aprovado else "reforco",
+        "nota": correcao["nota"],
+        "total": correcao["total"],
+        "certas": correcao["certas"],
+        "itens": correcao["itens"],
+        "revisao_completa": revisao_completa,
+        "rodada": rodada,
+        "resumo_diagnostico": _diagnostico("prova", aprovado, correcao["nota"], correcao["total"], n_revisar),
+    }
 
     agora = datetime.now(timezone.utc)
     if not registro:
-        registro = AvaliacaoProgress(
-            user_id=data.user_id, avaliacao_id=avaliacao_id, status="em_andamento"
-        )
+        registro = AvaliacaoProgress(user_id=data.user_id, avaliacao_id=avaliacao_id, status="em_andamento")
         db.add(registro)
 
-    historico = (registro.tutor_analise or {}).get("historico", [])
-    historico.append(
-        {
-            "veredito": resultado.get("veredito"),
-            "resumo_diagnostico": resultado.get("resumo_diagnostico"),
-            # rodada de estudo em que saiu — ver _historico_rodadas_anteriores
-            "rodada": registro.rodada_atual or 1,
-        }
-    )
-    registro.tutor_veredito = resultado.get("veredito")
-    registro.tutor_analise = {"ultima_avaliacao": resultado, "historico": historico}
-    registro.avaliado_em = agora
-
-    if resultado.get("veredito") == "dominado":
+    _salvar_dificuldades(db, data.user_id, avaliacao.topico_id, avaliacao_id, "prova", correcao["itens"], rodada)
+    _registrar_analise(registro, analise, agora)
+    if registro.iniciado_em is None:
+        registro.iniciado_em = agora
+    if aprovado:
         registro.status = "concluido"
-        if registro.iniciado_em is None:
-            registro.iniciado_em = agora
         if registro.concluido_em is None:
             registro.concluido_em = agora
-    elif registro.status != "concluido":
+    else:
+        # Reinicia a prova pra ele refazer — mesmo mecanismo do POST
+        # /avaliacao-progress/{id}/reiniciar (nada é apagado).
+        registro.rodada_atual = rodada + 1
         registro.status = "em_andamento"
-        if registro.iniciado_em is None:
-            registro.iniciado_em = agora
+        registro.ultimo_slide = None
 
     db.commit()
     db.refresh(registro)

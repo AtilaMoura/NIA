@@ -45,3 +45,11 @@ class TopicoProgressSlideUpsert(BaseModel):
 
 class TopicoProgressSlideOut(BaseModel):
     ultimo_slide: int | None = None
+
+
+class ResultadoAvaliacaoOut(BaseModel):
+    """Última correção (revisão personalizada) pro <iframe> remontar o slide
+    "Resultado" ao reabrir o tópico/prova (2026-09-23). Lido com o token de
+    escopo curto do render — não expõe nada além do próprio aluno/recurso."""
+    status: str
+    analise: dict | None = None

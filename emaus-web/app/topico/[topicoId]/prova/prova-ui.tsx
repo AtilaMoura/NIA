@@ -75,8 +75,13 @@ export function AcoesProva({
         marcarProgressoAvaliacao(avaliacaoId, "concluido")
           .catch((e) => console.error("falha ao concluir prova (fallback)", e));
       } else if (d.tipo === "emaus:navegar") {
-        // Prova não tem "próximo" — SEMPRE volta pro tópico de origem.
-        router.push(`/topico/${topicoId}`);
+        // Prova não tem "próximo" — SEMPRE volta pro tópico de origem. Da
+        // revisão ("📖 Rever no slide N") volta já no slide certo.
+        if (d.destino === "topico-slide" && Number.isInteger(d.slide) && d.slide > 0) {
+          router.push(`/topico/${topicoId}?slide=${d.slide}`);
+        } else {
+          router.push(`/topico/${topicoId}`);
+        }
       } else if (d.tipo === "emaus:fullscreen-toggle" && typeof d.ligado === "boolean") {
         // Fallback pra navegadores sem Fullscreen API pra elemento genérico
         // (iOS Safari) — o render pediu via postMessage porque requestFullscreen()

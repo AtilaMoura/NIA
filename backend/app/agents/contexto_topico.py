@@ -77,34 +77,3 @@ def montar_contexto_duvida(content: dict, slide_index: int, teto_topico: int = T
         total += len(bloco)
     texto_topico = "\n\n".join(b for _, b in sorted(escolhidos))
     return texto_topico, slide_foco
-
-
-def montar_gabarito_abertas(slides: list[dict]) -> str:
-    """Resposta esperada de cada pergunta ABERTA, com o MESMO rótulo que o
-    resumo do aluno usa (render.montar_question_order) — pra IA que avalia o
-    fim do tópico/prova comparar com o material, não com o "achismo" dela.
-
-    Achado real (2026-09-23, Tópico 19): sem isso o tutor marcou como erro
-    conceitual uma resposta que repetia quase literalmente o material
-    ("IDs atribuídos por frequência/ordem de descoberta")."""
-    from app.renderer.render import _label_pergunta
-
-    linhas: list[str] = []
-    for slide in slides:
-        if slide.get("tipo") == "checkpoint":
-            perguntas = slide.get("perguntas", [])
-        elif slide.get("tipo") == "avaliacao_pergunta":
-            perguntas = [slide.get("pergunta") or {}]
-        else:
-            continue
-        for p in perguntas:
-            if p.get("tipo") != "open":
-                continue
-            item = f"- {_label_pergunta(slide.get('secao', ''), p.get('enunciado', ''))}"
-            if p.get("cenario"):
-                item += f"\n  Cenário: {p['cenario']}"
-            esperado = p.get("resposta_modelo") or p.get("explicacao")
-            if esperado:
-                item += f"\n  Resposta esperada (do próprio material): {esperado}"
-            linhas.append(item)
-    return "\n".join(linhas)

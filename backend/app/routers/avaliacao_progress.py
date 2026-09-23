@@ -15,6 +15,7 @@ from sqlalchemy.sql import func
 from app.database import get_db
 from app.models.models import Avaliacao, AvaliacaoProgress, Topico, TopicoProgress, User
 from app.core.auth import get_current_user, get_avaliacao_resposta_user_id
+from app.schemas.topico_progress import ResultadoAvaliacaoOut
 from app.schemas.avaliacao_progress import (
     AvaliacaoProgressOut,
     AvaliacaoProgressSlideOut,
@@ -144,6 +145,26 @@ def obter_slide_atual(
         .first()
     )
     return AvaliacaoProgressSlideOut(ultimo_slide=registro.ultimo_slide if registro else None)
+
+
+@router.get("/{avaliacao_id}/resultado", response_model=ResultadoAvaliacaoOut)
+def obter_resultado(
+    avaliacao_id: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_avaliacao_resposta_user_id),
+):
+    """Revisão personalizada da prova, pro <iframe> remontar o slide
+    "Resultado" ao reabrir (mesmo token de escopo curto das respostas)."""
+    registro = (
+        db.query(AvaliacaoProgress)
+        .filter(AvaliacaoProgress.user_id == user_id, AvaliacaoProgress.avaliacao_id == avaliacao_id)
+        .first()
+    )
+    if not registro:
+        return ResultadoAvaliacaoOut(status="nao_iniciado")
+    return ResultadoAvaliacaoOut(
+        status=registro.status, analise=(registro.tutor_analise or {}).get("ultima_avaliacao")
+    )
 
 
 @router.put("/{avaliacao_id}/slide", response_model=AvaliacaoProgressSlideOut)

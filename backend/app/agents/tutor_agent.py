@@ -126,31 +126,93 @@ RESUMO COLADO PELO ALUNO:
 """
         return await self.run_json_com_retry(prompt, max_tokens=2500)
 
-    async def verificar_resposta_aberta(self, aberta: dict, perfil: PerfilDominio = PERFIL_TECH) -> dict:
-        """2ª checagem, focada, de uma lacuna "real" em resposta aberta — ver
-        agents/revisao_avaliacao.py. Pergunta de sim/não com o gabarito na
-        frente: bem mais estável que o julgamento geral do avaliar_resumo."""
+    # ---- Revisão personalizada do fim do tópico/prova (2026-09-23) ----
+    # Até duas chamadas pequenas por correção (teto de ~8000 tokens/min do
+    # Groq + julgamento geral do gpt-oss não é estável — ver
+    # agents/revisao_avaliacao.py). O material vai com "[Slide N]" pra IA
+    # apontar onde o aluno deve reler.
+
+    async def corrigir_abertas(self, abertas: list[dict], material: str, perfil: PerfilDominio = PERFIL_TECH) -> dict:
+        """Classifica as respostas abertas (certa/parcial/errada) contra o
+        gabarito de CADA uma e já devolve o conteúdo do cartão de revisão.
+        Todas numa chamada só (costuma ser 1-2 abertas): o teto de ~8000
+        tokens/minuto do Groq é da conta inteira, não por chamada."""
+        blocos = []
+        for a in abertas:
+            esperado = a.get("esperado") or "(sem resposta escrita — use o MATERIAL como gabarito)"
+            blocos.append(
+                f'### id "{a["id"]}"\nPERGUNTA: {a["enunciado"]}\n'
+                + (f'CENÁRIO: {a["cenario"]}\n' if a.get("cenario") else "")
+                + f"RESPOSTA ESPERADA (gabarito do material): {esperado}\n"
+                + f"RESPOSTA DO ALUNO: {a['resposta']}"
+            )
+        perguntas = "\n\n".join(blocos)
         prompt = f"""
-Você confere a correção de uma resposta aberta de um aluno do {perfil.contexto_curso}.
+Você corrige respostas abertas de um aluno do {perfil.contexto_curso} e prepara, pra cada
+uma, um cartão curto de revisão pra ele reler.
 
-PERGUNTA: {aberta["enunciado"]}
-{"CENÁRIO: " + aberta["cenario"] if aberta["cenario"] else ""}
+MATERIAL DO TÓPICO (numerado por slide):
+{material}
 
-RESPOSTA ESPERADA (definida no próprio material do curso — é o gabarito):
-{aberta["esperado"]}
+PERGUNTAS E RESPOSTAS:
+{perguntas}
 
-RESPOSTA DO ALUNO:
-{aberta["resposta"]}
+CLASSIFICAÇÃO (compare com o gabarito/material de cada pergunta, nunca com a sua opinião):
+- "certa": responde o que foi pedido, sem contradizer o material (outras palavras e forma curta valem).
+- "parcial": ideia central certa, mas faltou algo que a pergunta pediu explicitamente, ou
+  mistura um conceito de forma imprecisa.
+- "errada": contradiz o material, ou não responde o que foi pedido.
 
-A resposta do aluno CONTRADIZ a resposta esperada? Contradizer = afirmar algo que o gabarito
-diz ser falso. NÃO é contradição: dizer a mesma ideia com outras palavras, ser mais curta,
-menos completa, informal ou com erro de digitação. Compare ponto a ponto com o gabarito,
-não com a sua opinião.
+Devolva APENAS um JSON válido (sem markdown), com UM item por pergunta, mesmo id:
+{{"itens": [{{"id": "...",
+  "classificacao": "certa"|"parcial"|"errada",
+  "ponto_certo": "a resposta correta em 1-2 frases, clara e direta (é o que o aluno vai ler)",
+  "o_que_faltou": "1 frase dirigida ao aluno: o que faltou ou ficou impreciso na resposta DELE (vazio se certa)",
+  "exemplo": "1 exemplo concreto e curto que deixa o conceito claro",
+  "slide": número do slide do material onde isso é explicado (inteiro, ou null)}}]}}
+"""
+        return await self.run_json_com_retry(prompt, max_tokens=2200)
+
+    async def enriquecer_objetivas(self, itens: list[dict], material: str, perfil: PerfilDominio = PERFIL_TECH) -> dict:
+        """Pra questões OBJETIVAS erradas: a resposta certa já vem do gabarito
+        (não é a IA que decide) — aqui ela só escreve exemplo + aponta o slide."""
+        lista = "\n".join(
+            f'- id "{i["id"]}": {i["enunciado"]} | resposta certa: {i["resposta_certa"]} | aluno marcou: {i["sua_resposta"]}'
+            for i in itens
+        )
+        prompt = f"""
+Um aluno do {perfil.contexto_curso} errou as questões objetivas abaixo. A resposta certa já
+está definida (não questione). Pra cada uma, escreva uma explicação curta de POR QUE a certa
+é a certa, um exemplo concreto, e o slide do material onde reler.
+
+MATERIAL DO TÓPICO (numerado por slide):
+{material}
+
+QUESTÕES ERRADAS:
+{lista}
 
 Devolva APENAS um JSON válido (sem markdown):
-{{"contradiz": true|false, "trecho_contraditorio": "frase exata do aluno que contradiz o gabarito (vazio se contradiz=false)", "explicacao": "1 frase, em português, dirigida ao aluno, dizendo o que ele acertou ou errou em relação ao material"}}
+{{"itens": [{{"id": "...", "explicacao": "1-2 frases", "exemplo": "1 frase", "slide": número ou null}}]}}
 """
-        return await self.run_json_com_retry(prompt, max_tokens=1500)
+        return await self.run_json_com_retry(prompt, max_tokens=2000)
+
+    async def gerar_revisao_topico(self, titulo: str, material: str, perfil: PerfilDominio = PERFIL_TECH) -> dict:
+        """"Revisão de tudo" do tópico — gerada uma vez e guardada em
+        RevisaoTopico (não por aluno)."""
+        prompt = f"""
+Você prepara a REVISÃO do tópico "{titulo}" do {perfil.contexto_curso}, pra um aluno que não
+passou na prova e vai reler antes de tentar de novo. Tem que ser objetiva e clara: só o
+essencial, sem enrolação, fiel ao material (não invente nada fora dele).
+
+{perfil.fio_condutor}
+
+MATERIAL DO TÓPICO (numerado por slide):
+{material}
+
+Monte de 4 a 6 pontos-chave, na ordem do material. Devolva APENAS um JSON válido (sem markdown):
+{{"pontos": [{{"titulo": "até 8 palavras", "texto": "2-3 frases diretas", "exemplo": "1 exemplo concreto curto", "slide": número do slide ou null}}]}}
+"""
+        return await self.run_json_com_retry(prompt, max_tokens=2500)
 
     async def corrigir_exercicio(
         self,

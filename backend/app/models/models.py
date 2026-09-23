@@ -866,3 +866,60 @@ class AvaliacaoResposta(Base):
 
     def __repr__(self):
         return f"<AvaliacaoResposta(avaliacao_id={self.avaliacao_id}, user_id={self.user_id}, question_id='{self.question_id}', correta={self.correta})>"
+
+
+# ------------------------------------------------------------
+# MODEL: ALUNO_DIFICULDADE (NOVA! — 2026-09-23)
+# ------------------------------------------------------------
+# Histórico do que o aluno errou/acertou parcialmente no fim do tópico e na
+# prova — base pro "reforço focado" (ver memória [[nia-correcao-ia-avaliacoes]]).
+# Só acrescenta linha, nunca atualiza nem apaga: cada tentativa fica registrada.
+
+class AlunoDificuldade(Base):
+    __tablename__ = "aluno_dificuldades"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+    avaliacao_id = Column(Integer, ForeignKey('avaliacoes.id', ondelete='CASCADE'), index=True)  # null = fim do tópico
+
+    origem = Column(String(10), nullable=False)          # 'topico' | 'prova'
+    question_id = Column(String(50), nullable=False)
+    conceito = Column(Text, nullable=False)              # enunciado/tema da pergunta
+    resposta_aluno = Column(Text)
+    classificacao = Column(String(10), nullable=False)   # 'errada' | 'parcial'
+    rodada = Column(Integer, nullable=False, default=1)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", backref="dificuldades")
+
+    __table_args__ = (
+        CheckConstraint("origem IN ('topico', 'prova')", name='valid_aluno_dificuldade_origem'),
+        CheckConstraint("classificacao IN ('errada', 'parcial')", name='valid_aluno_dificuldade_classificacao'),
+    )
+
+    def __repr__(self):
+        return f"<AlunoDificuldade(user_id={self.user_id}, topico_id={self.topico_id}, question_id='{self.question_id}')>"
+
+
+# ------------------------------------------------------------
+# MODEL: REVISAO_TOPICO (NOVA! — 2026-09-23)
+# ------------------------------------------------------------
+# "Revisão de tudo" que aparece quando o aluno não passa na prova — gerada
+# pela IA UMA vez por tópico a partir do material e reaproveitada (não gasta
+# cota do Groq a cada tentativa). Apagar a linha força gerar de novo (ex:
+# depois de editar o conteúdo do tópico).
+
+class RevisaoTopico(Base):
+    __tablename__ = "revisao_topicos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, unique=True, index=True)
+    conteudo = Column(JSONB, nullable=False)   # {"pontos": [{titulo, texto, exemplo, slide}]}
+    gerado_por = Column(String(100))
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    def __repr__(self):
+        return f"<RevisaoTopico(topico_id={self.topico_id})>"
