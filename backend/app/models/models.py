@@ -923,3 +923,30 @@ class RevisaoTopico(Base):
 
     def __repr__(self):
         return f"<RevisaoTopico(topico_id={self.topico_id})>"
+
+
+# ------------------------------------------------------------
+# MODEL: ALUNO_TERMO (NOVA! — 2026-09-24)
+# ------------------------------------------------------------
+# Palavras/termos que o aluno NÃO soube e que causaram erro (ex.: inglês
+# "Sunday" = domingo), extraídos pela IA na revisão do fim do tópico/prova.
+# Alimenta a prática de vocabulário (Fase B). Só acrescenta.
+
+class AlunoTermo(Base):
+    __tablename__ = "aluno_termos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+    avaliacao_id = Column(Integer, ForeignKey('avaliacoes.id', ondelete='CASCADE'), index=True)  # null = fim do tópico
+
+    termo = Column(String(200), nullable=False)       # no idioma estudado
+    significado = Column(String(300), nullable=False)  # em português
+    exemplo = Column(Text)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", backref="termos_estudo")
+
+    def __repr__(self):
+        return f"<AlunoTermo(user_id={self.user_id}, termo='{self.termo}')>"

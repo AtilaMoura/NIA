@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { enviarAvaliacaoTutor, marcarProgresso, type StatusTopico } from "../../_lib/api";
+import { enviarAvaliacaoTutor, marcarProgresso, reiniciarTopico, type StatusTopico } from "../../_lib/api";
 
 // Ponte de mensagens entre o <iframe> do render (topico.html.j2) e o Next.js —
 // sem UI própria (2026-09-11: antes tinha um painel de resultado + lista de
@@ -77,6 +77,20 @@ export function AcoesTopico({
       if (!d || typeof d !== "object") return;
       if (d.tipo === "emaus:concluir" && typeof d.texto === "string") {
         enviarResumo(d.texto);
+      } else if (d.tipo === "emaus:refazer-topico") {
+        // "↻ Refazer os exercícios" da revisão (2026-09-24): rodada nova (nada
+        // apagado) e recarrega o <iframe> do início, sem os parâmetros de
+        // "já concluído" — senão ele remontaria o resultado antigo.
+        reiniciarTopico(topicoId)
+          .then(() => {
+            const iframe = document.querySelector("iframe");
+            if (!iframe) return;
+            const u = new URL(iframe.src);
+            ["concluido", "veredito", "resumo", "proximo"].forEach((k) => u.searchParams.delete(k));
+            u.searchParams.set("slide", "1");
+            iframe.src = u.toString();
+          })
+          .catch((e) => console.error("falha ao refazer tópico", e));
       } else if (d.tipo === "emaus:concluir-fallback") {
         // Plano B — só usado se a avaliação falhar de verdade (tutor
         // sobrecarregado / sem cota), botão que aparece dentro do slide.

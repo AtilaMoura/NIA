@@ -140,10 +140,12 @@ RESUMO COLADO PELO ALUNO:
         blocos = []
         for a in abertas:
             esperado = a.get("esperado") or "(sem resposta escrita — use o MATERIAL como gabarito)"
+            tipo = "FRASE (exercício de escrever/traduzir/ditado)" if a.get("tipo") == "frase" else "ABERTA"
             blocos.append(
-                f'### id "{a["id"]}"\nPERGUNTA: {a["enunciado"]}\n'
+                f'### id "{a["id"]}" — {tipo}\nPERGUNTA: {a["enunciado"]}\n'
                 + (f'CENÁRIO: {a["cenario"]}\n' if a.get("cenario") else "")
                 + f"RESPOSTA ESPERADA (gabarito do material): {esperado}\n"
+                + (f"OUTRAS FORMAS ACEITAS: {' | '.join(a['aceitas'])}\n" if a.get("aceitas") else "")
                 + f"RESPOSTA DO ALUNO: {a['resposta']}"
             )
         perguntas = "\n\n".join(blocos)
@@ -163,38 +165,57 @@ CLASSIFICAÇÃO (compare com o gabarito/material de cada pergunta, nunca com a s
   mistura um conceito de forma imprecisa.
 - "errada": contradiz o material, ou não responde o que foi pedido.
 
+Pra perguntas do tipo FRASE, julgue a FRASE INTEIRA (não só um trecho):
+- "certa": frase correta com o mesmo sentido do gabarito — variações válidas contam. Erro SÓ
+  de grafia/maiúscula/pontuação/apóstrofo também é "certa": aponte em "o_que_faltou" no
+  formato "Atenção à grafia: X" (ex.: "Atenção à grafia: Brazil, com z").
+- "parcial": a regra principal do exercício está certa, mas tem 1 erro pequeno em outra parte
+  (ex.: esqueceu o -s da 3ª pessoa), ou num ditado escreveu a maior parte certa.
+- "errada": errou a regra principal que o exercício cobra, ou a frase ficou incompleta/sem sentido.
+
 Devolva APENAS um JSON válido (sem markdown), com UM item por pergunta, mesmo id:
 {{"itens": [{{"id": "...",
   "classificacao": "certa"|"parcial"|"errada",
-  "ponto_certo": "a resposta correta em 1-2 frases, clara e direta (é o que o aluno vai ler)",
+  "ponto_certo": "a resposta correta em 1-2 frases, clara e direta, com maiúsculas e pontuação corretas (é o que o aluno vai ler)",
   "o_que_faltou": "1 frase dirigida ao aluno: o que faltou ou ficou impreciso na resposta DELE (vazio se certa)",
-  "exemplo": "1 exemplo concreto e curto que deixa o conceito claro",
+  "exemplo": "1 exemplo NOVO e curto, DIFERENTE da resposta certa, usando a mesma regra",
   "slide": número do slide do material onde isso é explicado (inteiro, ou null)}}]}}
 """
         return await self.run_json_com_retry(prompt, max_tokens=2200)
 
-    async def enriquecer_objetivas(self, itens: list[dict], material: str, perfil: PerfilDominio = PERFIL_TECH) -> dict:
-        """Pra questões OBJETIVAS erradas: a resposta certa já vem do gabarito
-        (não é a IA que decide) — aqui ela só escreve exemplo + aponta o slide."""
+    async def organizar_revisao(self, pendentes: list[dict], material: str, perfil: PerfilDominio = PERFIL_TECH) -> dict:
+        """Revisão das dificuldades AGRUPADA POR ASSUNTO (pedido do Atila,
+        2026-09-24: "organiza o conteúdo que o aluno teve dificuldade"), as
+        palavras/termos que ele não sabia, e exemplo+slide de cada questão. A
+        resposta certa de cada questão já vem definida — a IA não decide
+        gabarito aqui."""
         lista = "\n".join(
-            f'- id "{i["id"]}": {i["enunciado"]} | resposta certa: {i["resposta_certa"]} | aluno marcou: {i["sua_resposta"]}'
-            for i in itens
+            f'- id "{i["id"]}" ({i["classificacao"]}): {i["enunciado"]} | aluno: {i["sua_resposta"]} | certo: {i["resposta_certa"]}'
+            for i in pendentes
         )
         prompt = f"""
-Um aluno do {perfil.contexto_curso} errou as questões objetivas abaixo. A resposta certa já
-está definida (não questione). Pra cada uma, escreva uma explicação curta de POR QUE a certa
-é a certa, um exemplo concreto, e o slide do material onde reler.
+Um aluno do {perfil.contexto_curso} errou (ou acertou em parte) as questões abaixo. Monte uma
+REVISÃO curta e clara das dificuldades DELE, agrupada por ASSUNTO (não questão por questão),
+fiel ao material. A resposta certa de cada questão já está definida — não questione.
 
 MATERIAL DO TÓPICO (numerado por slide):
 {material}
 
-QUESTÕES ERRADAS:
+QUESTÕES COM DIFICULDADE:
 {lista}
 
 Devolva APENAS um JSON válido (sem markdown):
-{{"itens": [{{"id": "...", "explicacao": "1-2 frases", "exemplo": "1 frase", "slide": número ou null}}]}}
+{{"blocos": [{{"titulo": "até 6 palavras", "regra": "1-2 frases com a regra/ideia central, dirigidas ao aluno",
+   "exemplos": ["2 ou 3 exemplos NOVOS e curtos (não repita as respostas das questões)"],
+   "questoes": ["ids das questões deste assunto"]}}],
+ "termos": [{{"termo": "palavra/expressão que o aluno NÃO soube e que causou erro (no idioma estudado)",
+   "significado": "tradução/significado curto em português", "exemplo": "frase curta usando o termo"}}],
+ "itens": [{{"id": "...", "slide": número do slide onde reler (ou null), "exemplo": "frase NOVA, diferente da resposta certa"}}]}}
+Regras: de 1 a 4 blocos (junte erros da mesma regra no mesmo bloco); "termos" só com
+palavras que de fato faltaram ao aluno (lista vazia se não houver); um item em "itens" pra
+cada questão da lista.
 """
-        return await self.run_json_com_retry(prompt, max_tokens=2000)
+        return await self.run_json_com_retry(prompt, max_tokens=2500)
 
     async def gerar_revisao_topico(self, titulo: str, material: str, perfil: PerfilDominio = PERFIL_TECH) -> dict:
         """"Revisão de tudo" do tópico — gerada uma vez e guardada em

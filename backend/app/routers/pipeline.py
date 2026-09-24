@@ -22,7 +22,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.models import (
-    AlunoDificuldade, Avaliacao, AvaliacaoProgress, AvaliacaoResposta, Course, Lesson, Module,
+    AlunoDificuldade, AlunoTermo, Avaliacao, AvaliacaoProgress, AvaliacaoResposta, Course, Lesson, Module,
     Progress, RevisaoTopico, Topico, TopicoProgress, TopicoResposta, User,
 )
 from app.core.auth import get_current_user
@@ -539,7 +539,7 @@ def _rate_limited(err: Exception) -> bool:
 # Teto do texto do tópico (numerado por "[Slide N]") que vai na correção —
 # o prompt ainda leva as perguntas + gabaritos, e o teto de ~8000 tokens/min
 # do Groq é da conta inteira.
-TETO_MATERIAL_AVALIACAO = 5000
+TETO_MATERIAL_AVALIACAO = 4000
 # "Revisão de tudo" é gerada uma vez por tópico — pode levar mais material.
 TETO_MATERIAL_REVISAO_COMPLETA = 8000
 
@@ -575,6 +575,16 @@ def _salvar_dificuldades(db: Session, user_id: int, topico_id: int, avaliacao_id
             user_id=user_id, topico_id=topico_id, avaliacao_id=avaliacao_id, origem=origem,
             question_id=item["id"], conceito=item["enunciado"] or item["id"],
             resposta_aluno=item.get("sua_resposta"), classificacao=item["classificacao"], rodada=rodada,
+        ))
+
+
+def _salvar_termos(db: Session, user_id: int, topico_id: int, avaliacao_id: int | None,
+                   revisao: dict | None) -> None:
+    """Palavras/termos que o aluno não soube (base da prática de vocabulário)."""
+    for t in (revisao or {}).get("termos", []):
+        db.add(AlunoTermo(
+            user_id=user_id, topico_id=topico_id, avaliacao_id=avaliacao_id,
+            termo=str(t["termo"])[:200], significado=str(t["significado"])[:300], exemplo=t.get("exemplo"),
         ))
 
 
@@ -677,6 +687,7 @@ async def avaliar_resumo_topico(
         "total": correcao["total"],
         "certas": correcao["certas"],
         "itens": correcao["itens"],
+        "revisao_dificuldades": correcao["revisao_dificuldades"],
         "revisao_completa": None,
         "rodada": rodada,
         "resumo_diagnostico": _diagnostico("topico", True, correcao["nota"], correcao["total"], n_revisar),
@@ -688,6 +699,7 @@ async def avaliar_resumo_topico(
         db.add(registro)
 
     _salvar_dificuldades(db, data.user_id, topico_id, None, "topico", correcao["itens"], rodada)
+    _salvar_termos(db, data.user_id, topico_id, None, correcao["revisao_dificuldades"])
     _registrar_analise(registro, analise, agora)
     registro.status = "concluido"
     if registro.iniciado_em is None:
@@ -784,6 +796,7 @@ async def avaliar_resumo_avaliacao(
         "total": correcao["total"],
         "certas": correcao["certas"],
         "itens": correcao["itens"],
+        "revisao_dificuldades": correcao["revisao_dificuldades"],
         "revisao_completa": revisao_completa,
         "rodada": rodada,
         "resumo_diagnostico": _diagnostico("prova", aprovado, correcao["nota"], correcao["total"], n_revisar),
@@ -795,6 +808,7 @@ async def avaliar_resumo_avaliacao(
         db.add(registro)
 
     _salvar_dificuldades(db, data.user_id, avaliacao.topico_id, avaliacao_id, "prova", correcao["itens"], rodada)
+    _salvar_termos(db, data.user_id, avaliacao.topico_id, avaliacao_id, correcao["revisao_dificuldades"])
     _registrar_analise(registro, analise, agora)
     if registro.iniciado_em is None:
         registro.iniciado_em = agora

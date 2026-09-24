@@ -605,6 +605,26 @@
   .rev-ponto::before { content: counter(ponto); position: absolute; left: 14px; top: 12px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--accent-soft); color: var(--accent); }
   .rev-ponto-titulo { font-weight: 700; font-size: 14px; margin-bottom: 3px; color: var(--text); }
   .rev-ponto-texto { font-size: 13.5px; line-height: 1.55; color: var(--text-muted); margin-bottom: 6px; }
+  .rev-bloco { border: 1px solid var(--border-soft); border-radius: var(--radius); background: var(--surface-2); padding: 14px 15px; margin-bottom: 12px; }
+  .rev-bloco-titulo { font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 8px; }
+  .rev-bloco-regra { border-radius: var(--radius); padding: 10px 12px; background: var(--accent-soft); font-size: 14px; line-height: 1.55; color: var(--text); margin-bottom: 10px; }
+  .rev-bloco-exemplos { list-style: none; margin: 0; padding: 0; }
+  .rev-bloco-exemplos li { position: relative; padding: 4px 0 4px 22px; font-size: 13.5px; line-height: 1.5; color: var(--text); }
+  .rev-bloco-exemplos li::before { content: '✓'; position: absolute; left: 2px; color: var(--accent); font-weight: 700; }
+  .rev-termos { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  @media (min-width: 560px) { .rev-termos { grid-template-columns: 1fr 1fr; } }
+  .rev-termo { border: 1px solid var(--border-soft); border-radius: var(--radius); background: var(--surface-2); padding: 10px 12px; }
+  .rev-termo-topo { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .rev-termo-palavra { font-weight: 800; font-size: 15.5px; color: var(--accent); }
+  .rev-termo-sig { font-size: 13.5px; color: var(--text-muted); }
+  .rev-termo-ex { font-size: 12.5px; color: var(--text-dim); font-style: italic; margin-top: 3px; }
+  .rev-avisos { list-style: none; margin: 0; padding: 0; }
+  .rev-avisos li { font-size: 13.5px; line-height: 1.5; padding: 6px 0; border-bottom: 1px solid var(--border-soft); color: var(--text); }
+  .rev-avisos li:last-child { border-bottom: none; }
+  .rev-detalhes > summary { cursor: pointer; list-style: none; font-family: var(--font-label); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); padding: 6px 0; }
+  .rev-detalhes > summary::-webkit-details-marker { display: none; }
+  .rev-detalhes > summary::before { content: '▸ '; }
+  .rev-detalhes[open] > summary::before { content: '▾ '; }
   .rev-tudo-certo { text-align: center; padding: 14px; font-size: 14px; color: var(--accent); font-weight: 600; }
   #avaliacaoAcoes { margin-top: 16px; }
   #avaliacaoAcoes { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1168,7 +1188,50 @@ function blocoRevisaoCompleta(rev) {
   return secao;
 }
 
-function montarAcoesRevisao(modoProva, aprovado, temProximo, temAvaliacao) {
+function blocoRevisaoOrganizada(rev) {
+  var secao = criarEl('div', 'rev-secao');
+  secao.appendChild(criarEl('div', 'rev-secao-titulo', '📘 Revise o que você errou'));
+  rev.blocos.forEach(function (b) {
+    var el = criarEl('div', 'rev-bloco');
+    el.appendChild(criarEl('div', 'rev-bloco-titulo', b.titulo));
+    el.appendChild(criarEl('div', 'rev-bloco-regra', b.regra));
+    if (b.exemplos && b.exemplos.length) {
+      var ul = criarEl('ul', 'rev-bloco-exemplos');
+      b.exemplos.forEach(function (ex) { ul.appendChild(criarEl('li', null, ex)); });
+      el.appendChild(ul);
+    }
+    secao.appendChild(el);
+  });
+  return secao;
+}
+
+function blocoTermos(termos) {
+  var secao = criarEl('div', 'rev-secao');
+  secao.appendChild(criarEl('div', 'rev-secao-titulo', '🗣️ Palavras pra aprender'));
+  var grade = criarEl('div', 'rev-termos');
+  termos.forEach(function (t) {
+    var el = criarEl('div', 'rev-termo');
+    var topo = criarEl('div', 'rev-termo-topo');
+    topo.appendChild(criarEl('span', 'rev-termo-palavra', t.termo));
+    topo.appendChild(criarEl('span', 'rev-termo-sig', t.significado));
+    el.appendChild(topo);
+    if (t.exemplo) el.appendChild(criarEl('div', 'rev-termo-ex', t.exemplo));
+    grade.appendChild(el);
+  });
+  secao.appendChild(grade);
+  return secao;
+}
+
+function blocoAvisos(itens) {
+  var secao = criarEl('div', 'rev-secao');
+  secao.appendChild(criarEl('div', 'rev-secao-titulo', '✏️ Certo, mas atenção'));
+  var ul = criarEl('ul', 'rev-avisos');
+  itens.forEach(function (i) { ul.appendChild(criarEl('li', null, i.aviso)); });
+  secao.appendChild(ul);
+  return secao;
+}
+
+function montarAcoesRevisao(modoProva, aprovado, temProximo, temAvaliacao, refazerTopico) {
   var acoes = document.getElementById('avaliacaoAcoes');
   acoes.innerHTML = '';
   var labelVoltar = RESPOSTAS_PREFIXO === 'avaliacao' ? 'Voltar ao tópico' : 'Voltar ao curso';
@@ -1192,9 +1255,16 @@ function montarAcoesRevisao(modoProva, aprovado, temProximo, temAvaliacao) {
     botao(labelVoltar, false, navegar('curso'));
     return;
   }
+  // Tópico: "Refazer os exercícios" (rodada nova, nada apagado) — vira o
+  // botão principal quando a nota ficou abaixo de 60% (pedido do Atila).
+  function refazer() {
+    try { window.parent.postMessage({ tipo: 'emaus:refazer-topico' }, '*'); } catch (e) {}
+  }
+  if (refazerTopico === 'principal') botao('↻ Refazer os exercícios', true, refazer);
   var temBotaoProva = !modoProva && temAvaliacao;
-  if (temBotaoProva) botao('Fazer a prova ▶', true, navegar('prova'));
-  botao(temProximo ? 'Próximo tópico ▶' : labelVoltar, !temBotaoProva, navegar(temProximo ? 'proximo' : 'curso'));
+  if (temBotaoProva) botao('Fazer a prova ▶', refazerTopico !== 'principal', navegar('prova'));
+  botao(temProximo ? 'Próximo tópico ▶' : labelVoltar, !temBotaoProva && refazerTopico !== 'principal', navegar(temProximo ? 'proximo' : 'curso'));
+  if (refazerTopico === 'secundario') botao('↻ Refazer os exercícios', false, refazer);
 }
 
 function renderizarRevisao(a, temProximo, temAvaliacao) {
@@ -1220,11 +1290,26 @@ function renderizarRevisao(a, temProximo, temAvaliacao) {
 
   var conteudo = document.getElementById('revisaoConteudo');
   conteudo.innerHTML = '';
+  var org = a.revisao_dificuldades;
+  var temOrganizada = !!(org && org.blocos && org.blocos.length);
+  if (temOrganizada) conteudo.appendChild(blocoRevisaoOrganizada(org));
+  if (org && org.termos && org.termos.length) conteudo.appendChild(blocoTermos(org.termos));
+  var avisos = (a.itens || []).filter(function (i) { return i.classificacao === 'certa' && i.aviso; });
+  if (avisos.length) conteudo.appendChild(blocoAvisos(avisos));
   if (pendentes.length) {
-    var secao = criarEl('div', 'rev-secao');
-    secao.appendChild(criarEl('div', 'rev-secao-titulo', '🔎 O que revisar'));
-    pendentes.forEach(function (item, idx) { secao.appendChild(cartaoRevisao(item, idx)); });
-    conteudo.appendChild(secao);
+    // Com a revisão por assunto, o questão por questão fica recolhido.
+    var alvoCartoes = conteudo;
+    if (temOrganizada) {
+      alvoCartoes = criarEl('details', 'rev-secao rev-detalhes');
+      alvoCartoes.appendChild(criarEl('summary', null, '🔎 Ver questão por questão (' + pendentes.length + ')'));
+      conteudo.appendChild(alvoCartoes);
+    } else {
+      var secao = criarEl('div', 'rev-secao');
+      secao.appendChild(criarEl('div', 'rev-secao-titulo', '🔎 O que revisar'));
+      conteudo.appendChild(secao);
+      alvoCartoes = secao;
+    }
+    pendentes.forEach(function (item, idx) { alvoCartoes.appendChild(cartaoRevisao(item, idx)); });
   } else {
     conteudo.appendChild(criarEl('div', 'rev-tudo-certo', 'Nenhum ponto pra revisar — mandou bem! 🎉'));
   }
@@ -1235,7 +1320,11 @@ function renderizarRevisao(a, temProximo, temAvaliacao) {
   // O anel já mostra a nota — a caixa de pontuação automática vira ruído.
   var stats = document.getElementById('statsBox');
   if (stats) stats.hidden = true;
-  montarAcoesRevisao(modoProva, aprovado, temProximo, temAvaliacao);
+  var refazerTopico = null;
+  if (!modoProva && pendentes.length) {
+    refazerTopico = (a.total && a.nota / a.total < 0.6) ? 'principal' : 'secundario';
+  }
+  montarAcoesRevisao(modoProva, aprovado, temProximo, temAvaliacao, refazerTopico);
   mostrarEstadoAvaliacao('avaliacaoResultado');
 }
 
@@ -1863,11 +1952,19 @@ document.querySelectorAll('.reveal-btn').forEach(function (btn) {
 });
 
 function normalizarResposta(s) {
-  // Teclado ABNT (e afins) às vezes solta acento agudo/crase soltos (´/`) no
-  // lugar do apóstrofo reto — "don´t" nunca batia com "don't" mesmo sendo a
-  // mesma resposta (achado real, 2026-09-17). Trata ´ ` ' ' como o mesmo
-  // apóstrofo antes de comparar.
-  return (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[´`''']/g, "'");
+  // Teclado de celular/ABNT solta apóstrofo e aspas "tipográficos" (’ ‘ ´ ` “ ”)
+  // no lugar do reto — "don’t" nunca batia com "don't". ATENÇÃO: a classe abaixo
+  // tem os caracteres tipográficos REAIS (U+2018 U+2019 U+201A U+201B U+2032
+  // U+00B4 U+0060 e U+201C U+201D U+201E U+2033). Uma versão anterior tinha
+  // virado ' comum ao ser gravada e a regra nunca funcionou (achado real
+  // 2026-09-24) — ao editar, confira os códigos. Pontuação e espaços extras
+  // não contam (mesma regra do backend, agents/revisao_avaliacao.py).
+  return (s || '').trim().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[‘’‚‛′´`]/g, "'")
+    .replace(/[“”„″]/g, '"')
+    .replace(/[.,!?;:"]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
 }
 document.querySelectorAll('.lacuna-wrap').forEach(function (wrap) {
   const qid = wrap.dataset.qid;
