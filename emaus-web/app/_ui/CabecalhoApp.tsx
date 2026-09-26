@@ -4,6 +4,7 @@ import { MenuUsuario } from "./MenuUsuario";
 import { MenuMobile } from "./MenuMobile";
 import { NavPrincipal } from "./NavPrincipal";
 import { Logo } from "./Logo";
+import { LinkBotao } from "./Botao";
 import type { Papel } from "../_lib/papel";
 import { hrefMarca } from "../_lib/nav";
 
@@ -29,20 +30,27 @@ export function CabecalhoApp({
         <NavPrincipal papel={papel} logado={logado} />
 
         <div className="ml-auto flex items-center gap-2">
-          <AlternarTema />
+          {/* Visitante no celular: sem botão de tema, senão Entrar + Criar conta não cabem em 360px */}
+          <span className={logado ? "contents" : "hidden sm:contents"}>
+            <AlternarTema />
+          </span>
           {logado ? (
             <span className="hidden sm:block">
               <MenuUsuario nome={nomeUsuario!} papel={papel ?? null} />
             </span>
           ) : (
-            <Link
-              href="/entrar"
-              className="hidden rounded-[var(--tm-radius-pill)] border border-[var(--tm-border)] px-3.5 py-1.5 text-[.82rem] font-semibold hover:border-[var(--tm-accent)] hover:text-[var(--tm-accent)] sm:inline-block"
-            >
-              Entrar
-            </Link>
+            // Visitante: Entrar + Criar conta visíveis em qualquer largura (sem
+            // menu hambúrguer — a página de visitante é curta, não precisa).
+            <>
+              <LinkBotao href="/entrar" variante="fantasma" tamanho="sm">
+                Entrar
+              </LinkBotao>
+              <LinkBotao href="/criar-conta" tamanho="sm">
+                Criar conta
+              </LinkBotao>
+            </>
           )}
-          <MenuMobile nome={nomeUsuario} papel={papel ?? null} />
+          {logado && <MenuMobile nome={nomeUsuario} papel={papel ?? null} />}
         </div>
       </div>
     </header>

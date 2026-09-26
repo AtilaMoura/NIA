@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 import type { Papel } from "../_lib/papel";
-import { navPrincipal, NAV_DESLOGADO } from "../_lib/nav";
+import { navPrincipal } from "../_lib/nav";
 
 // Rodapé único — mesmos links da barra principal (cientes do papel). `versiculo`
 // destaca a citação de Lc 24.32 (usado na landing).
@@ -14,7 +14,31 @@ export function Rodape({
   logado?: boolean;
   versiculo?: boolean;
 } = {}) {
-  const itens = logado ? navPrincipal(papel) : NAV_DESLOGADO;
+  // Visitante (página de visitante, 2026-09-26): rodapé compacto numa linha só —
+  // logo + assinatura à esquerda, Entrar/Criar conta à direita. Sem margem no
+  // topo porque a página já termina numa faixa de fechamento.
+  if (!logado) {
+    return (
+      <footer className="border-t border-[var(--tm-border)] bg-[var(--tm-bg)]">
+        <div className="mx-auto flex max-w-[var(--tm-maxw)] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-[clamp(1rem,4vw,2rem)] py-5">
+          <div className="flex items-center gap-3">
+            <Logo size={22} />
+            <span className="text-[.78rem] text-[var(--tm-ink-muted)]">· plataforma de formação bíblica</span>
+          </div>
+          <nav className="flex items-center gap-5 text-[.85rem] text-[var(--tm-ink-muted)]">
+            <Link href="/entrar" className="hover:text-[var(--tm-accent)]">
+              Entrar
+            </Link>
+            <Link href="/criar-conta" className="hover:text-[var(--tm-accent)]">
+              Criar conta
+            </Link>
+          </nav>
+        </div>
+      </footer>
+    );
+  }
+
+  const itens = navPrincipal(papel);
 
   return (
     <footer className="mt-16 border-t border-[var(--tm-border)] bg-[var(--tm-bg)]">
@@ -38,11 +62,6 @@ export function Rodape({
                 {i.rotulo}
               </Link>
             ))}
-            {!logado && (
-              <Link href="/entrar" className="hover:text-[var(--tm-accent)]">
-                Entrar
-              </Link>
-            )}
           </nav>
         </div>
         <p className="m-0 border-t border-[var(--tm-border)] pt-6 text-[.72rem] text-[var(--tm-ink-muted)]">

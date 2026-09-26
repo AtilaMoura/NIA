@@ -51,6 +51,12 @@
   --tm-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
+/* Logo: mostra só a versão do tema ativo (E preto no claro, E creme no escuro).
+   Fora de @layer de propósito, pra vencer utilitários de display do Tailwind. */
+.logo-tema-escuro { display: none; }
+[data-tm-theme="dark"] .logo-tema-claro { display: none; }
+[data-tm-theme="dark"] .logo-tema-escuro { display: block; }
+
 [data-tm-fontsize="sm"] { --tm-fs: 15px; }
 [data-tm-fontsize="md"] { --tm-fs: 17px; }
 [data-tm-fontsize="lg"] { --tm-fs: 19px; }

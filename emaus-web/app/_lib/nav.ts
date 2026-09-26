@@ -13,11 +13,11 @@ export function hrefMarca(logado: boolean): string {
   return logado ? "/inicio" : "/";
 }
 
-// Barra principal — mesma ordem sempre.
+// Barra principal — mesma ordem sempre. Sem "Cursos" (2026-09-26): logado, "/"
+// redireciona pra /inicio, que já é a vitrine de cursos do aluno.
 export function navPrincipal(papel: Papel | null | undefined): ItemNav[] {
   const base: ItemNav[] = [
     { href: "/inicio", rotulo: "Início", icone: "🏠" },
-    { href: "/#cursos", rotulo: "Cursos", icone: "📚" },
     { href: "/progresso", rotulo: "Meu progresso", icone: "📈" },
   ];
   if (papel && papelPodeRevisar(papel)) {
@@ -46,6 +46,9 @@ export const ITENS_AVATAR: ItemNav[] = [
 
 // Qual item da barra está "ativo" pra uma dada rota.
 export function itemAtivo(pathname: string, href: string): boolean {
+  // Âncoras da página de visitante (/#cursos, /#como-funciona) nunca ficam
+  // "ativas" — senão as duas acendem juntas em "/".
+  if (href.includes("#")) return false;
   const alvo = href.split("#")[0].replace(/\/$/, "") || "/";
   if (alvo === "/inicio") return pathname === "/inicio";
   if (alvo === "/") return pathname === "/" || pathname.startsWith("/curso");

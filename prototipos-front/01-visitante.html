@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: página de visitante</title>
+<!--
+  Protótipo 01 — página de visitante (quem chega sem login em "/").
+  Objetivo: curta e direta (~3 telas no celular), apresentar a plataforma,
+  3 cursos em destaque, nada de estudos pessoais, CTA principal = criar conta.
+  Tokens e fontes copiados de emaus-web/app/globals.css pra ficar fiel ao projeto.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px;
+    --tm-radius-lg: 20px;
+    --tm-radius-pill: 999px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-shadow: 0 1px 2px rgba(43,36,28,.06), 0 8px 24px rgba(43,36,28,.06);
+    --tm-maxw: 1100px;
+    --tm-bg: #faf6ee;
+    --tm-surface: #ffffff;
+    --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c;
+    --tm-ink-muted: #6b5f4f;
+    --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b;
+    --tm-accent-2: #b8763a;
+    --tm-gold: #b8923e;
+    --tm-verse-bg: #fbf3e0;
+    --tm-verse-border: #c9a24a;
+    --gutter: clamp(1rem, 4vw, 2rem);
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610;
+    --tm-surface: #241d15;
+    --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6;
+    --tm-ink-muted: #b0a184;
+    --tm-border: #3c3327;
+    --tm-accent: #d79b5b;
+    --tm-accent-2: #e3ac6a;
+    --tm-gold: #dcb87a;
+    --tm-verse-bg: #2a2114;
+    --tm-verse-border: #7a5f2e;
+    --tm-shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--tm-bg);
+    color: var(--tm-ink);
+    font-family: var(--tm-font-body);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  .wrap { max-width: var(--tm-maxw); margin: 0 auto; padding: 0 var(--gutter); }
+  .muted { color: var(--tm-ink-muted); }
+
+  /* ---------- Botões ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+    font-weight: 600; font-size: .95rem; white-space: nowrap;
+    padding: .75rem 1.4rem; border-radius: var(--tm-radius-pill);
+    background: var(--tm-accent); color: var(--tm-bg);
+    transition: background-color .15s, transform .15s;
+  }
+  .btn:hover { background: var(--tm-accent-2); }
+  .btn:active { transform: translateY(1px); }
+  .btn-sm { padding: .5rem 1rem; font-size: .88rem; }
+  .btn-ghost { background: transparent; color: var(--tm-ink); border: 1px solid var(--tm-border); }
+  .btn-ghost:hover { background: var(--tm-surface-2); }
+  .link { color: var(--tm-accent); font-weight: 600; font-size: .92rem; }
+  .link:hover { text-decoration: underline; }
+
+  /* ---------- Topo ---------- */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--tm-bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--tm-border);
+  }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 1rem; }
+  .logo { display: inline-flex; align-items: center; gap: .5rem; color: var(--tm-accent); }
+  .logo span { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.15rem; color: var(--tm-ink); }
+  .topo-acoes { display: flex; align-items: center; gap: .5rem; }
+  .tema {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--tm-border); background: transparent; color: var(--tm-ink-muted);
+    cursor: pointer; font-size: .95rem;
+  }
+
+  /* ---------- Abertura ---------- */
+  .heroi { background: var(--tm-surface-2); border-bottom: 1px solid var(--tm-border); }
+  .heroi .wrap {
+    display: grid; gap: 1.25rem; align-items: center;
+    padding-top: clamp(1.25rem, 4vw, 2.75rem); padding-bottom: clamp(1.5rem, 4vw, 2.75rem);
+  }
+  .sobretitulo { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .18em; color: var(--tm-accent); margin-bottom: .5rem; }
+  .heroi h1 { font-size: clamp(1.8rem, 4.4vw, 2.6rem); line-height: 1.1; }
+  .heroi .sub { margin-top: .7rem; font-size: 1rem; max-width: 32rem; }
+  .heroi .acoes { margin-top: 1.2rem; display: flex; flex-wrap: wrap; align-items: center; gap: .7rem 1.2rem; }
+  .heroi .nota { margin-top: .7rem; font-size: .8rem; }
+  .heroi-img {
+    border-radius: var(--tm-radius-lg); overflow: hidden;
+    border: 1px solid var(--tm-border); box-shadow: var(--tm-shadow);
+    aspect-ratio: 4 / 3;
+  }
+  .heroi-img img { width: 100%; height: 100%; object-fit: cover; }
+  /* Tablet e desktop: texto + imagem lado a lado; imagem em 4:3 e com teto de altura
+     pra abertura não ocupar a tela toda */
+  @media (min-width: 700px) {
+    .heroi .wrap { grid-template-columns: 1.3fr .7fr; gap: 2rem; }
+    .heroi-img { max-height: 300px; }
+  }
+  @media (min-width: 900px) {
+    .heroi .wrap { grid-template-columns: 1.25fr .75fr; gap: 3rem; }
+  }
+  /* No celular a imagem vira uma faixa bem baixa em cima do texto */
+  @media (max-width: 699px) {
+    .heroi-img { aspect-ratio: 21 / 9; order: -1; border-radius: var(--tm-radius); }
+  }
+
+  /* ---------- Seções ---------- */
+  section.bloco { padding: clamp(2.5rem, 7vw, 4.5rem) 0; }
+  .titulo-secao { font-size: clamp(1.4rem, 3.5vw, 1.8rem); }
+  .titulo-secao + p { margin-top: .4rem; font-size: .95rem; }
+
+  /* Como funciona — 3 passos compactos */
+  .passos { list-style: none; padding: 0; margin: 1.8rem 0 0; display: grid; gap: 1.2rem; counter-reset: passo; }
+  .passos li { display: flex; gap: .9rem; align-items: flex-start; }
+  .passos .num {
+    flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--tm-verse-bg); border: 1px solid var(--tm-verse-border);
+    color: var(--tm-accent); font-family: var(--tm-font-display); font-weight: 600;
+  }
+  .passos h3 { font-size: 1.02rem; }
+  .passos p { font-size: .9rem; margin-top: .15rem; }
+  @media (min-width: 700px) { .passos { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
+
+  /* Cursos em destaque */
+  .destaques-topo { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .cards { margin-top: 1.8rem; display: grid; gap: 1.2rem; }
+  /* Tablet: curso aberto em destaque na largura toda (horizontal) + 2 "em breve" lado a lado */
+  @media (min-width: 600px) and (max-width: 899px) {
+    .cards { grid-template-columns: 1fr 1fr; }
+    .card:not(.breve) { grid-column: 1 / -1; flex-direction: row; }
+    .card:not(.breve) .capa { flex: none; width: 48%; aspect-ratio: auto; }
+    .card:not(.breve) .corpo { padding: 1.4rem 1.5rem; justify-content: center; }
+  }
+  /* Desktop: 3 colunas */
+  @media (min-width: 900px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+  .card {
+    display: flex; flex-direction: column;
+    background: var(--tm-surface); border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-lg); overflow: hidden; box-shadow: var(--tm-shadow);
+    transition: transform .2s, box-shadow .2s;
+  }
+  a.card:hover { transform: translateY(-3px); }
+  .card .capa { position: relative; aspect-ratio: 16 / 9; background: var(--tm-surface-2); }
+  .card .capa img { width: 100%; height: 100%; object-fit: cover; }
+  .selo {
+    position: absolute; top: .7rem; left: .7rem;
+    font-size: .72rem; font-weight: 600; padding: .25rem .65rem; border-radius: var(--tm-radius-pill);
+  }
+  .selo-aberto { background: var(--tm-accent); color: var(--tm-bg); }
+  .selo-breve { background: rgba(43,36,28,.72); color: #faf6ee; }
+  .card .corpo { padding: 1rem 1.1rem 1.2rem; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
+  .card h3 { font-size: 1.08rem; line-height: 1.25; }
+  .card .subt { font-size: .86rem; font-weight: 600; color: var(--tm-accent); }
+  .card .desc { font-size: .88rem; color: var(--tm-ink-muted); }
+  .card .rodape-card { margin-top: auto; padding-top: .7rem; font-size: .88rem; }
+  .card.breve .capa img { filter: saturate(.75); }
+  /* Celular e tablet: os 2 "em breve" ficam compactos (capa pequena ao lado do texto) */
+  @media (max-width: 899px) {
+    .card.breve { flex-direction: row; }
+    .card.breve .capa { flex: none; width: 34%; aspect-ratio: auto; }
+    .card.breve .desc { display: none; }
+    .card.breve .selo { top: .5rem; left: .5rem; font-size: .66rem; padding: .2rem .5rem; }
+    .card.breve .corpo { padding: .85rem .9rem; }
+  }
+  .mais {
+    margin-top: 1.4rem; padding: 1rem 1.1rem;
+    border: 1px dashed var(--tm-border); border-radius: var(--tm-radius);
+    font-size: .9rem; color: var(--tm-ink-muted);
+  }
+  .mais strong { color: var(--tm-ink); }
+
+  /* Fechamento */
+  .fecho { background: var(--tm-surface-2); border-top: 1px solid var(--tm-border); text-align: center; }
+  .fecho .wrap { display: flex; flex-direction: column; align-items: center; gap: .9rem; }
+  .fecho h2 { font-size: clamp(1.5rem, 4vw, 2rem); }
+  .fecho .versiculo {
+    font-family: var(--tm-font-display); font-style: italic; font-size: 1rem;
+    max-width: 30rem; color: var(--tm-ink-muted); margin-bottom: .4rem;
+  }
+
+  footer { border-top: 1px solid var(--tm-border); }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem 1.5rem; padding-top: 1.4rem; padding-bottom: 1.6rem; font-size: .84rem; color: var(--tm-ink-muted); }
+  footer nav { display: flex; gap: 1.2rem; }
+  footer a:hover { color: var(--tm-accent); }
+</style>
+</head>
+<body>
+
+<!-- ============ Topo ============ -->
+<header>
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Emaús — início">
+      <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M20 2.6c3 3.4 4.6 6 3.9 9.2-.5 2.2-2 3.5-3.9 3.7-2-.2-3.5-1.5-3.9-3.7-.7-3.2.9-5.8 3.9-9.2z" fill="var(--tm-accent-2)"/>
+        <path d="M20 6.9c1.5 2 2.3 3.5 1.9 5.2-.3 1.2-1 1.8-1.9 2-1-.2-1.6-.8-1.9-2-.4-1.7.4-3.2 1.9-5.2z" fill="var(--tm-gold)"/>
+        <path d="M20 17.4C15.9 14.4 10.8 13.6 5.2 15 4.5 15.2 4 15.9 4 16.6v17.2c0 1.1 1 1.9 2.1 1.7 4.6-1 9-.4 13.9 2.3V17.4z" fill="currentColor"/>
+        <path d="M20 17.4C24.1 14.4 29.2 13.6 34.8 15c.7.2 1.2.9 1.2 1.6v17.2c0 1.1-1 1.9-2.1 1.7-4.6-1-9-.4-13.9 2.3V17.4z" fill="currentColor" opacity=".86"/>
+      </svg>
+      <span>Emaús</span>
+    </a>
+    <div class="topo-acoes">
+      <button class="tema" type="button" aria-label="Alternar tema claro/escuro" onclick="alternarTema()">☾</button>
+      <a href="#" class="btn btn-sm btn-ghost">Entrar</a>
+      <a href="#" class="btn btn-sm">Criar conta</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ============ Abertura ============ -->
+  <section class="heroi">
+    <div class="wrap">
+      <div>
+        <p class="sobretitulo">Formação bíblica</p>
+        <h1>Estudar a Bíblia até o coração arder.</h1>
+        <p class="sub muted">Cursos de Bíblia e vida cristã para entender de verdade: no seu ritmo, sem viés de denominação e com um tutor que acompanha.</p>
+        <div class="acoes">
+          <a href="#" class="btn">Criar conta grátis</a>
+          <a href="#" class="link">Já tenho conta →</a>
+        </div>
+        <p class="nota muted">Grátis · sem cartão · leva um minuto</p>
+      </div>
+      <div class="heroi-img">
+        <img src="../emaus-web/public/heroi/estrada.jpg" alt="Dois discípulos caminhando pela estrada de Emaús ao pôr do sol">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Como funciona ============ -->
+  <section class="bloco">
+    <div class="wrap">
+      <h2 class="titulo-secao">Como funciona</h2>
+      <p class="muted">Do cadastro ao primeiro estudo em poucos minutos.</p>
+      <ol class="passos">
+        <li>
+          <span class="num">1</span>
+          <div><h3>Escolha um curso</h3><p class="muted">Comece pelo que faz sentido pra você agora.</p></div>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <div><h3>Estude tópico a tópico</h3><p class="muted">Leitura, slides e aplicação. Pare e volte quando puder.</p></div>
+        </li>
+        <li>
+          <span class="num">3</span>
+          <div><h3>O tutor acompanha</h3><p class="muted">Seu progresso fica salvo e o tutor aponta o que revisar.</p></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ Cursos em destaque ============ -->
+  <section class="bloco" style="padding-top:0">
+    <div class="wrap">
+      <div class="destaques-topo">
+        <div>
+          <h2 class="titulo-secao">Cursos em destaque</h2>
+          <p class="muted">Um já está aberto. Os próximos chegam em breve.</p>
+        </div>
+      </div>
+
+      <div class="cards">
+        <a href="#" class="card">
+          <div class="capa">
+            <img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt="" loading="lazy">
+            <span class="selo selo-aberto">Aberto</span>
+          </div>
+          <div class="corpo">
+            <h3>Formação do Obreiro I</h3>
+            <p class="subt">Firmados na Palavra</p>
+            <p class="desc">O chamado, a Bíblia como autoridade, a doutrina básica da fé e as disciplinas que sustentam quem serve.</p>
+            <p class="rodape-card link">Começar →</p>
+          </div>
+        </a>
+
+        <div class="card breve" aria-disabled="true">
+          <div class="capa">
+            <img src="../emaus-web/public/capas/panorama-da-biblia.jpg" alt="" loading="lazy">
+            <span class="selo selo-breve">Em breve</span>
+          </div>
+          <div class="corpo">
+            <h3>Panorama da Bíblia</h3>
+            <p class="subt">A história que une os 66 livros</p>
+            <p class="desc">Criação, queda, redenção e restauração: uma visão de conjunto pra nunca mais se perder entre os livros.</p>
+          </div>
+        </div>
+
+        <div class="card breve" aria-disabled="true">
+          <div class="capa">
+            <img src="../emaus-web/public/capas/como-estudar-a-biblia.jpg" alt="" loading="lazy">
+            <span class="selo selo-breve">Em breve</span>
+          </div>
+          <div class="corpo">
+            <h3>Como Estudar a Bíblia</h3>
+            <p class="subt">Ferramentas para ler com cuidado</p>
+            <p class="desc">Contexto, gênero literário e a regra de ouro: ouvir o texto antes de aplicá-lo.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="mais"><strong>E mais 10 cursos em preparação</strong>: João, Romanos, Salmos, Vida de Oração, Doutrinas Essenciais e outros.</p>
+    </div>
+  </section>
+
+  <!-- ============ Fechamento ============ -->
+  <section class="bloco fecho">
+    <div class="wrap">
+      <p class="versiculo">“Não estava ardendo o nosso coração, quando ele nos falava pelo caminho e nos abria as Escrituras?” — Lucas 24.32</p>
+      <h2>Comece hoje. É de graça.</h2>
+      <a href="#" class="btn">Criar conta grátis</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Emaús · plataforma de formação bíblica</span>
+    <nav><a href="#">Entrar</a><a href="#">Criar conta</a></nav>
+  </div>
+</footer>
+
+<script>
+  // Só pro protótipo: alterna o tema igual ao data-tm-theme do projeto
+  function alternarTema() {
+    const r = document.documentElement;
+    r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark";
+  }
+</script>
+</body>
+</html>

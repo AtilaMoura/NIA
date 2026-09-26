@@ -1,9 +1,16 @@
 import type { CSSProperties } from "react";
 
-// Símbolo do Emaús — SVG (crisp em qualquer tamanho, do favicon ao herói).
-// Livro aberto + brasa subindo do centro: Lc 24, as Escrituras abertas e o
-// coração que arde. O livro usa currentColor; a brasa tem tom âmbar fixo, então
-// funciona em claro e escuro. Traço reforçado pra ler bem a ~20px.
+// Símbolo do Emaús — logo 1 escolhido em 2026-09-26: o "E" com a estrada laranja
+// e o arco do sol (Lc 24, o caminho de Emaús). Recortado da prancha gerada
+// (public/marca/originais/logo1-prancha.png) com fundo transparente, em 2 versões:
+// E preto (tema claro) e E creme (tema escuro). O CSS em globals.css mostra só a
+// versão do tema ativo. Os logos 2 (chama/coração) e 3 (pão/estrada) ficam
+// guardados em public/marca/final/ como alternativas.
+// O antigo SVG (livro + brasa) está em public/marca/originais/icon-antigo-livro-brasa.svg.
+
+// Proporção do recorte (239 x 203 px) — `size` define a ALTURA.
+const PROPORCAO = 239 / 203;
+
 export function LogoSimbolo({
   size = 28,
   className = "",
@@ -16,48 +23,32 @@ export function LogoSimbolo({
   /** true = puramente decorativo (sai da árvore de acessibilidade) */
   decorativo?: boolean;
 }) {
-  const a11y = decorativo
-    ? { "aria-hidden": true as const }
-    : { role: "img" as const, "aria-label": "Emaús" };
+  const largura = Math.round(size * PROPORCAO);
+  const alt = decorativo ? "" : "Emaús";
 
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 40 40"
-      fill="none"
-      className={className}
-      style={style}
-      {...a11y}
+    <span
+      className={"inline-flex shrink-0 " + className}
+      style={{ width: largura, height: size, ...style }}
+      {...(decorativo ? { "aria-hidden": true as const } : {})}
     >
-      {/* brasa — dois traços, do quente pro claro */}
-      <path
-        d="M20 2.6c3 3.4 4.6 6 3.9 9.2-.5 2.2-2 3.5-3.9 3.7-2-.2-3.5-1.5-3.9-3.7-.7-3.2.9-5.8 3.9-9.2z"
-        fill="var(--tm-accent-2, #b8763a)"
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/marca/final/logo1-simbolo.png"
+        alt={alt}
+        width={largura}
+        height={size}
+        className="logo-tema-claro h-full w-full object-contain"
       />
-      <path
-        d="M20 6.9c1.5 2 2.3 3.5 1.9 5.2-.3 1.2-1 1.8-1.9 2-1-.2-1.6-.8-1.9-2-.4-1.7.4-3.2 1.9-5.2z"
-        fill="var(--tm-gold, #d9a441)"
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/marca/final/logo1-simbolo-escuro.png"
+        alt={alt}
+        width={largura}
+        height={size}
+        className="logo-tema-escuro h-full w-full object-contain"
       />
-      {/* livro aberto — duas páginas simétricas */}
-      <path
-        d="M20 17.4C15.9 14.4 10.8 13.6 5.2 15 4.5 15.2 4 15.9 4 16.6v17.2c0 1.1 1 1.9 2.1 1.7 4.6-1 9-.4 13.9 2.3V17.4z"
-        fill="currentColor"
-      />
-      <path
-        d="M20 17.4C24.1 14.4 29.2 13.6 34.8 15c.7.2 1.2.9 1.2 1.6v17.2c0 1.1-1 1.9-2.1 1.7-4.6-1-9-.4-13.9 2.3V17.4z"
-        fill="currentColor"
-        opacity="0.86"
-      />
-      {/* vinco central */}
-      <path
-        d="M20 17.4V38"
-        stroke="var(--tm-bg, #faf6ee)"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        opacity="0.55"
-      />
-    </svg>
+    </span>
   );
 }
 
