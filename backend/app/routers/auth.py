@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.models.models import Topico, Avaliacao, TopicoProgress, User
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.core.security import create_access_token, verify_password, hash_password, ACCESS_TOKEN_EXPIRE_MINUTES
@@ -11,7 +12,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/register", response_model=Token)
 def register(data: UserRegister, db: Session = Depends(get_db)):
-    user_db = db.query(User).filter(User.email == data.email).first()
+    user_db = db.query(User).filter(func.lower(User.email) == data.email).first()
     if user_db:
         raise HTTPException(status_code=400, detail="Email já cadastrado.")
 
@@ -95,7 +96,9 @@ def emitir_avaliacao_token(
 
 @router.post("/login", response_model=Token)
 def login(data: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == data.email).first()
+    # data.email já vem em minúsculas (schema); func.lower cobre contas antigas
+    # que tenham sido salvas com maiúscula antes dessa normalização.
+    user = db.query(User).filter(func.lower(User.email) == data.email).first()
 
     if not user:
         raise HTTPException(status_code=400, detail="Usuário não encontrado.")
