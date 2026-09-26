@@ -136,3 +136,141 @@ html { scroll-behavior: smooth; }
   border: 3px solid var(--tm-bg);
 }
 *::-webkit-scrollbar-thumb:hover { background: var(--tm-ink-muted); }
+
+/* ---------------------------------------------------------------------------
+   Tela de acesso (/entrar e /criar-conta) — redesign 2026-09-26, protótipo
+   aprovado em prototipos-front/02-entrar-criar-conta.html.
+   A ilustração da lamparina é o fundo da tela inteira; o formulário fica num
+   cartão de vidro (transparente + desfoque). As cores do cartão são fixas
+   (texto claro sobre véu escuro), iguais nos temas claro e escuro.
+   --------------------------------------------------------------------------- */
+.acesso-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: #2b241c url("/heroi/lamparina.jpg") center 35% / cover;
+}
+/* Véu: mais escuro no topo (barra), leve no meio, forte embaixo e à esquerda */
+.acesso-fundo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(27,22,16,.7) 0%, rgba(27,22,16,.2) 18%, rgba(27,22,16,.25) 40%, rgba(27,22,16,.85) 100%),
+    linear-gradient(90deg, rgba(27,22,16,.55) 0%, rgba(27,22,16,0) 60%);
+}
+.acesso-tela {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  color: #f1e7d6;
+}
+.acesso-conteudo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding: .5rem clamp(1rem, 4vw, 2.5rem) 3rem;
+}
+.acesso-versiculo {
+  font-family: var(--tm-font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  text-shadow: 0 1px 12px rgba(0,0,0,.4);
+}
+.acesso-ganhos li::before { content: "✓"; color: #e3ac6a; font-weight: 700; }
+
+@media (max-width: 899px) {
+  /* Imagem na largura toda, presa no topo: a lamparina aparece acima do cartão */
+  .acesso-fundo { background-size: 100% auto; background-position: center top; background-color: #1b1610; }
+  .acesso-fundo::after {
+    background: linear-gradient(180deg, rgba(27,22,16,.7) 0, rgba(27,22,16,.15) 70px,
+      rgba(27,22,16,.2) 55vw, #1b1610 100vw);
+  }
+  .acesso-conteudo { padding-top: max(1rem, min(calc(50vw - 70px), 180px)); }
+  .acesso-cartao { order: -1; align-self: center; }
+  .acesso-apresentacao { align-self: center; text-align: center; }
+  .acesso-ganhos { display: none; } /* no celular fica só o versículo */
+}
+@media (min-width: 900px) {
+  /* Versículo e cartão lado a lado, centralizados como bloco e na altura */
+  .acesso-conteudo {
+    display: grid;
+    grid-template-columns: minmax(0, 30rem) minmax(0, 420px);
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    gap: clamp(3rem, 7vw, 6rem);
+    padding-bottom: 4rem;
+  }
+  .acesso-versiculo { font-size: 1.3rem; }
+}
+
+/* Cartão de vidro */
+.acesso-cartao {
+  --vidro-texto: #f6eee0;
+  --vidro-suave: rgba(246,238,224,.72);
+  --vidro-destaque: #eab676;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(27,22,16,.42);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid rgba(246,238,224,.22);
+  color: var(--vidro-texto);
+  border-radius: var(--tm-radius-lg);
+  box-shadow: 0 20px 50px rgba(0,0,0,.3);
+  padding: clamp(1.4rem, 4vw, 2.2rem);
+}
+.acesso-cartao .vidro-suave { color: var(--vidro-suave); }
+.acesso-cartao .vidro-destaque { color: var(--vidro-destaque); }
+.acesso-cartao input {
+  width: 100%;
+  font: 400 1rem var(--tm-font-body);
+  padding: .7rem .85rem;
+  border-radius: var(--tm-radius);
+  border: 1px solid rgba(246,238,224,.3);
+  background: rgba(246,238,224,.1);
+  color: var(--vidro-texto);
+  transition: border-color .15s, box-shadow .15s;
+}
+.acesso-cartao input:focus {
+  outline: none;
+  border-color: var(--vidro-destaque);
+  box-shadow: 0 0 0 3px rgba(234,182,118,.25);
+}
+/* Autofill do Chrome no tom do vidro (em vez do azul claro padrão) */
+.acesso-cartao input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100px rgb(60,48,36) inset;
+  -webkit-text-fill-color: var(--vidro-texto);
+}
+.acesso-botao {
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  font: 600 .98rem var(--tm-font-body);
+  padding: .8rem 1rem;
+  border-radius: var(--tm-radius-pill);
+  background: var(--vidro-destaque);
+  color: #1b1610;
+  transition: background-color .15s;
+}
+.acesso-botao:hover { background: #f2c78f; }
+.acesso-botao:disabled { opacity: .6; cursor: default; }
+.acesso-erro {
+  font-size: .85rem;
+  color: #ffb4a8;
+  background: rgba(165,53,43,.25);
+  border: 1px solid rgba(255,180,168,.4);
+  border-radius: var(--tm-radius);
+  padding: .6rem .8rem;
+}
+.acesso-aviso {
+  font-size: .82rem;
+  color: var(--vidro-texto);
+  background: rgba(246,238,224,.12);
+  border: 1px solid rgba(234,182,118,.5);
+  border-radius: var(--tm-radius);
+  padding: .6rem .8rem;
+}

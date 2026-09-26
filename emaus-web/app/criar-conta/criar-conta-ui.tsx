@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Botao } from "../_ui/Botao";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { CampoSenha } from "../_ui/CampoSenha";
+import { destinoSeguro } from "../_lib/destino";
 
 export function CriarContaForm() {
   const router = useRouter();
+  const next = useSearchParams().get("next");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -27,7 +30,8 @@ export function CriarContaForm() {
         setErro(data.erro ?? "Não foi possível criar a conta.");
         return;
       }
-      router.push("/inicio");
+      // Volta pra onde a pessoa queria ir (ex.: um curso), senão /inicio
+      router.push(destinoSeguro(next));
       router.refresh();
     } catch {
       setErro("Falha de conexão. Tente de novo.");
@@ -36,42 +40,48 @@ export function CriarContaForm() {
     }
   }
 
+  const linkEntrar = next ? `/entrar?next=${encodeURIComponent(next)}` : "/entrar";
+
   return (
-    <form onSubmit={criar} className="flex flex-col gap-3">
-      <label className="flex flex-col gap-1 text-[.82rem] font-semibold">
-        Nome
-        <input
-          required
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          className="rounded-[var(--tm-radius)] border border-[var(--tm-border)] bg-[var(--tm-surface)] px-3 py-2 text-[.95rem] font-normal"
-        />
-      </label>
-      <label className="flex flex-col gap-1 text-[.82rem] font-semibold">
-        E-mail
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="rounded-[var(--tm-radius)] border border-[var(--tm-border)] bg-[var(--tm-surface)] px-3 py-2 text-[.95rem] font-normal"
-        />
-      </label>
-      <label className="flex flex-col gap-1 text-[.82rem] font-semibold">
-        Senha
-        <input
-          type="password"
-          required
-          minLength={6}
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-          className="rounded-[var(--tm-radius)] border border-[var(--tm-border)] bg-[var(--tm-surface)] px-3 py-2 text-[.95rem] font-normal"
-        />
-      </label>
-      {erro && <p className="m-0 text-[.82rem] text-[var(--tm-danger)]">{erro}</p>}
-      <Botao type="submit" disabled={enviando} className="mt-1 justify-center">
-        {enviando ? "Criando…" : "Criar conta"}
-      </Botao>
-    </form>
+    <>
+      <form onSubmit={criar} className="mt-6 grid gap-4">
+        <label className="grid gap-1.5 text-[.84rem] font-semibold">
+          Seu nome
+          <input name="name" autoComplete="name" required value={nome} onChange={(e) => setNome(e.target.value)} />
+        </label>
+        <label className="grid gap-1.5 text-[.84rem] font-semibold">
+          E-mail
+          <input
+            type="email"
+            name="email"
+            autoComplete="email"
+            inputMode="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </label>
+        <label className="grid gap-1.5 text-[.84rem] font-semibold">
+          Crie uma senha
+          <CampoSenha valor={senha} aoMudar={setSenha} autoComplete="new-password" minLength={6} />
+          <span className="vidro-suave text-[.78rem] font-normal">Pelo menos 6 caracteres.</span>
+        </label>
+        {erro && (
+          <p role="alert" className="acesso-erro m-0">
+            {erro}
+          </p>
+        )}
+        <button type="submit" disabled={enviando} className="acesso-botao">
+          {enviando ? "Criando…" : "Criar conta"}
+        </button>
+      </form>
+
+      <p className="vidro-suave m-0 mt-5 text-center text-[.9rem]">
+        Já tem conta?{" "}
+        <Link href={linkEntrar} className="vidro-destaque font-semibold hover:underline">
+          Entrar
+        </Link>
+      </p>
+    </>
   );
 }

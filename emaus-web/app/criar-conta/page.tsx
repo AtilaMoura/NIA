@@ -1,26 +1,24 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { LogoSimbolo } from "../_ui/Logo";
+import { redirect } from "next/navigation";
+import { TelaAcesso } from "../_ui/TelaAcesso";
+import { getSessao } from "../_lib/sessao";
+import { destinoSeguro } from "../_lib/destino";
 import { CriarContaForm } from "./criar-conta-ui";
 
 export const metadata: Metadata = { title: "Criar conta" };
 
-export default function CriarContaPage() {
+export default async function CriarContaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
+  // Já logado não precisa desta tela
+  if (await getSessao()) redirect(destinoSeguro(next));
+
   return (
-    <main className="mx-auto flex min-h-[100dvh] max-w-sm flex-col justify-center gap-8 px-[clamp(1rem,4vw,2rem)] py-10">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <LogoSimbolo size={56} className="text-[var(--tm-accent)]" />
-        <h1 className="m-0 text-[1.4rem]">Criar conta no Emaús</h1>
-      </div>
-
+    <TelaAcesso titulo="Criar sua conta" subtitulo="Grátis, sem cartão. Leva um minuto.">
       <CriarContaForm />
-
-      <p className="m-0 text-center text-[.85rem] text-[var(--tm-ink-muted)]">
-        Já tem conta?{" "}
-        <Link href="/entrar" className="font-semibold text-[var(--tm-accent)] hover:underline">
-          Entrar
-        </Link>
-      </p>
-    </main>
+    </TelaAcesso>
   );
 }

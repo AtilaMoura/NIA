@@ -15,12 +15,14 @@ e só depois montar o plano de execução (aprovar antes de mexer).
 - **Estudos pessoais** (Inglês, Engenharia de Agentes LLM, Redes e Câmeras) **saem da vitrine**. Vão pra uma página própria que só o Master vê (ex.: `/estudos`), que entra na fila de protótipos.
 - **`/` para visitante sem login**: página curta e direta que apresenta a plataforma e mostra só 3 cursos em destaque (Obreiro I aberto, Panorama da Bíblia e Como Estudar a Bíblia em breve) + "e mais N em preparação". Não mostra a grade completa. CTA principal: **Criar conta grátis**.
 - **`/` com login**: redireciona pra `/inicio`.
+- **"Esqueceu a senha?"** (2026-09-26): por enquanto só um aviso "peça pra quem administra o Emaús na sua igreja". Recuperação por e-mail fica pra depois (precisa de backend + envio de e-mail).
 
 ## Protótipos
 
 | Nº | Arquivo | Página | Status |
 |---|---|---|---|
-| 01 | `prototipos-front/01-visitante.html` | `/` visitante | aguardando aprovação |
+| 01 | `prototipos-front/01-visitante.html` | `/` visitante | ✅ aprovado e aplicado (commit `b3a445c`) |
+| 02 | `prototipos-front/02-entrar-criar-conta.html` | `/entrar` + `/criar-conta` | ✅ aprovado e aplicado |
 | — | — | `/estudos` (Master) | a fazer |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
@@ -40,9 +42,9 @@ e só depois montar o plano de execução (aprovar antes de mexer).
 
 | Status | Rota | Arquivo | O que é |
 |---|---|---|---|
-| 📝 | `/` | `app/page.tsx` | Landing pública: hero em carrossel + catálogo de cursos |
-| ⬜ | `/entrar` | `app/entrar/page.tsx` | Login |
-| ⬜ | `/criar-conta` | `app/criar-conta/page.tsx` | Cadastro |
+| ✅ | `/` | `app/page.tsx` | Landing pública: hero em carrossel + catálogo de cursos |
+| ✅ | `/entrar` | `app/entrar/page.tsx` | Login |
+| ✅ | `/criar-conta` | `app/criar-conta/page.tsx` | Cadastro |
 
 ### Aluno
 
@@ -144,3 +146,30 @@ Altura da página: ~5.000px no desktop e **~10.800px no mobile** (umas 18 telas)
 - ...
 **Prioridade:** alta / média / baixa
 -->
+
+### `/entrar` e `/criar-conta` — 2026-09-26
+
+Revisadas no desktop (1366px), tablet (560px) e mobile (375px). Não há scroll horizontal
+em nenhuma largura, e o layout em coluna única funciona no celular.
+
+**Problemas**
+1. 🔴 **O cadastro vem preenchido com o login salvo no navegador.** Nenhum campo tem `autocomplete`,
+   então o Chrome preenche e-mail e senha salvos em `/criar-conta`. Faltam `autocomplete="email"`,
+   `current-password` / `new-password` e `name`, que também ajudam o gerenciador de senhas a salvar a conta nova.
+2. 🟠 **Sem saída**: nenhum cabeçalho, e o logo não é link. Quem chegou pelo "Criar conta grátis" não
+   tem como voltar pra página inicial.
+3. 🟠 **Desktop vazio**: um form de 320px no meio de uma tela creme. Não reforça o que a pessoa ganha
+   ao criar a conta, e a página de visitante promete "grátis · sem cartão · leva um minuto".
+4. 🟠 **Sem "Esqueci minha senha"**: o backend não tem fluxo de recuperação (`routers/auth.py`).
+   Precisa decidir: fluxo por e-mail (backend novo) ou, por enquanto, "fale com o administrador".
+5. 🟡 **Senha**: sem botão de mostrar/ocultar; no cadastro, a regra de "mínimo 6 caracteres" só aparece
+   no erro do navegador.
+6. 🟡 **Quem já está logado** consegue abrir `/entrar` e `/criar-conta`; deveria ir pra `/inicio`.
+7. 🟡 **`/criar-conta` ignora `?next=`**: quem veio de um curso específico cai sempre em `/inicio`.
+8. 🟡 **Autofill** pinta o campo de azul claro (padrão do Chrome), fora da paleta.
+9. 🟡 **Mensagem de erro** sem `aria-live`: leitor de tela não anuncia.
+
+**Prioridade sugerida**
+- **Alta:** 1, 2
+- **Média:** 3, 4, 5, 6
+- **Baixa:** 7, 8, 9

@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: entrar e criar conta</title>
+<!--
+  Protótipo 02 — /entrar e /criar-conta (as duas telas num arquivo só; o seletor
+  no topo é só do protótipo, não vai pro projeto).
+  - A ilustração (lamparina) é o fundo da tela inteira, com véu escuro.
+  - Desktop: versículo + o que a pessoa ganha embaixo à esquerda; cartão com o form à direita.
+  - Tablet/celular: cartão em cima, versículo embaixo.
+  - Barra mínima com logo clicável e "voltar ao início".
+  - Campos com autocomplete certo, mostrar/ocultar senha, dica da senha no cadastro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px;
+    --tm-radius-lg: 20px;
+    --tm-radius-pill: 999px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-shadow: 0 1px 2px rgba(43,36,28,.06), 0 8px 24px rgba(43,36,28,.06);
+    --tm-bg: #faf6ee;
+    --tm-surface: #ffffff;
+    --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c;
+    --tm-ink-muted: #6b5f4f;
+    --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b;
+    --tm-accent-2: #b8763a;
+    --tm-verse-bg: #fbf3e0;
+    --tm-verse-border: #c9a24a;
+    --tm-danger: #a5352b;
+    --tm-good: #4f7a3a;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610;
+    --tm-surface: #241d15;
+    --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6;
+    --tm-ink-muted: #b0a184;
+    --tm-border: #3c3327;
+    --tm-accent: #d79b5b;
+    --tm-accent-2: #e3ac6a;
+    --tm-verse-bg: #2a2114;
+    --tm-verse-border: #7a5f2e;
+    --tm-danger: #d97b6f;
+    --tm-good: #7fae62;
+    --tm-shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100dvh;
+    background: var(--tm-bg); color: var(--tm-ink);
+    font-family: var(--tm-font-body); font-size: 17px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  .muted { color: var(--tm-ink-muted); }
+  .logo-claro, .logo-escuro { height: 30px; width: auto; display: block; }
+  .logo-escuro { display: none; }
+  [data-tm-theme="dark"] .logo-claro { display: none; }
+  [data-tm-theme="dark"] .logo-escuro { display: block; }
+
+  /* ---------- Seletor do protótipo (não vai pro projeto) ---------- */
+  .proto {
+    position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 50;
+    display: flex; gap: 4px; padding: 4px; border-radius: 999px;
+    background: #2b241c; box-shadow: 0 4px 16px rgba(0,0,0,.25);
+  }
+  .proto button {
+    border: 0; border-radius: 999px; padding: .4rem .9rem; cursor: pointer;
+    font: 600 .78rem var(--tm-font-body); background: transparent; color: #f1e7d6;
+    white-space: nowrap;
+  }
+  .proto button[aria-pressed="true"] { background: #d79b5b; color: #1b1610; }
+
+  /* ---------- Fundo: a ilustração ocupa a tela inteira ---------- */
+  .fundo {
+    position: fixed; inset: 0; z-index: -1;
+    background: #2b241c url("../emaus-web/public/heroi/lamparina.jpg") center 35% / cover;
+  }
+  /* Véu escuro: mais forte embaixo e à esquerda (onde fica o texto), leve em cima
+     pra lamparina continuar aparecendo */
+  .fundo::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(27,22,16,.7) 0%, rgba(27,22,16,.2) 18%, rgba(27,22,16,.25) 40%, rgba(27,22,16,.85) 100%),
+      linear-gradient(90deg, rgba(27,22,16,.55) 0%, rgba(27,22,16,0) 60%);
+  }
+
+  /* ---------- Estrutura ---------- */
+  .tela { min-height: 100dvh; display: flex; flex-direction: column; color: #f1e7d6; }
+  .barra {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 1rem clamp(1rem, 4vw, 2.5rem);
+  }
+  .marca { display: inline-flex; align-items: center; gap: .5rem; }
+  .marca img { height: 30px; width: auto; }
+  .marca span { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.15rem; }
+  .voltar { font-size: .85rem; font-weight: 600; opacity: .85; }
+  .voltar:hover { opacity: 1; text-decoration: underline; }
+
+  /* Celular/tablet: cartão em cima, versículo embaixo. Desktop: versículo à esquerda
+     (embaixo), cartão à direita (centralizado na altura). */
+  .conteudo {
+    flex: 1; display: flex; flex-direction: column; gap: 1.75rem;
+    padding: .5rem clamp(1rem, 4vw, 2.5rem) 5rem;
+  }
+  .apresentacao { display: flex; flex-direction: column; gap: 1.1rem; max-width: 30rem; }
+  .versiculo { font-family: var(--tm-font-display); font-style: italic; font-size: 1.05rem; line-height: 1.5; text-shadow: 0 1px 12px rgba(0,0,0,.4); }
+  .versiculo small { display: block; margin-top: .35rem; font-style: normal; font-size: .8rem; opacity: .75; }
+  .ganhos { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; font-size: .92rem; }
+  .ganhos li { display: flex; gap: .6rem; align-items: flex-start; }
+  .ganhos li::before { content: "✓"; color: #e3ac6a; font-weight: 700; }
+  @media (max-width: 899px) {
+    /* Imagem na largura toda, presa no topo: a lamparina aparece acima do cartão
+       e o resto do fundo se funde no escuro */
+    .fundo { background-size: 100% auto; background-position: center top; background-color: #1b1610; }
+    .fundo::after {
+      background: linear-gradient(180deg, rgba(27,22,16,.7) 0, rgba(27,22,16,.15) 70px,
+        rgba(27,22,16,.2) 55vw, #1b1610 100vw);
+    }
+    /* espaço pra lamparina aparecer acima do cartão; no tablet, teto de 180px
+       pra o form não ficar fora da tela (a lamparina aparece pelo vidro) */
+    .conteudo { padding-top: max(1rem, min(calc(50vw - 70px), 180px)); }
+    .cartao { order: -1; align-self: center; }
+    .apresentacao { align-self: center; text-align: center; }
+    .ganhos { display: none; } /* no celular fica só o versículo, pra não alongar */
+  }
+  /* Desktop: versículo e cartão lado a lado, os dois centralizados (na altura e
+     como bloco no meio da tela) */
+  @media (min-width: 900px) {
+    .conteudo {
+      display: grid; grid-template-columns: minmax(0, 30rem) minmax(0, 420px);
+      justify-content: center; align-content: center; align-items: center;
+      gap: clamp(3rem, 7vw, 6rem); padding-bottom: 4rem;
+    }
+    .versiculo { font-size: 1.3rem; }
+  }
+
+  /* Cartão do formulário — vidro: fundo transparente com desfoque, texto claro */
+  .cartao {
+    --vidro-texto: #f6eee0;
+    --vidro-suave: rgba(246,238,224,.72);
+    --vidro-destaque: #eab676;
+    width: 100%; max-width: 420px;
+    background: rgba(27,22,16,.42);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    backdrop-filter: blur(16px) saturate(1.2);
+    border: 1px solid rgba(246,238,224,.22);
+    color: var(--vidro-texto);
+    border-radius: var(--tm-radius-lg);
+    box-shadow: 0 20px 50px rgba(0,0,0,.3);
+    padding: clamp(1.4rem, 4vw, 2.2rem);
+  }
+  .cartao .muted, .cartao .dica, .cartao .troca { color: var(--vidro-suave); }
+  .cartao .linha a, .cartao .troca a, .cartao .olho { color: var(--vidro-destaque); }
+  .cartao input {
+    background: rgba(246,238,224,.1); color: var(--vidro-texto);
+    border-color: rgba(246,238,224,.3);
+  }
+  .cartao input:focus { border-color: var(--vidro-destaque); box-shadow: 0 0 0 3px rgba(234,182,118,.25); }
+  .cartao input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 100px rgba(60,48,36,1) inset;
+    -webkit-text-fill-color: var(--vidro-texto);
+  }
+  .cartao .btn { background: var(--vidro-destaque); color: #1b1610; }
+  .cartao .btn:hover { background: #f2c78f; }
+  .cartao .erro { color: #ffb4a8; background: rgba(165,53,43,.25); border-color: rgba(255,180,168,.4); }
+  .cartao .aviso-senha { color: var(--vidro-texto); background: rgba(246,238,224,.12); border-color: rgba(234,182,118,.5); }
+  .caixa h1 { font-size: clamp(1.5rem, 4vw, 1.85rem); }
+  .caixa .sub { margin-top: .35rem; font-size: .95rem; }
+
+  form { margin-top: 1.6rem; display: grid; gap: .95rem; }
+  label { display: grid; gap: .3rem; font-size: .84rem; font-weight: 600; }
+  .campo { position: relative; }
+  input {
+    width: 100%; font: 400 1rem var(--tm-font-body); color: var(--tm-ink);
+    padding: .7rem .85rem; border-radius: var(--tm-radius);
+    border: 1px solid var(--tm-border); background: var(--tm-surface);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus { outline: none; border-color: var(--tm-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-accent) 18%, transparent); }
+  /* Autofill do Chrome na paleta do site (em vez do azul claro) */
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 100px var(--tm-surface) inset;
+    -webkit-text-fill-color: var(--tm-ink);
+  }
+  .campo input { padding-right: 4.2rem; }
+  .olho {
+    position: absolute; right: .4rem; top: 50%; transform: translateY(-50%);
+    border: 0; background: transparent; cursor: pointer;
+    font: 600 .78rem var(--tm-font-body); color: var(--tm-accent); padding: .35rem .5rem;
+  }
+  .dica { font-weight: 400; font-size: .78rem; color: var(--tm-ink-muted); }
+  .linha { display: flex; justify-content: space-between; align-items: baseline; }
+  .linha a { font-weight: 600; font-size: .8rem; color: var(--tm-accent); }
+  .erro {
+    font-size: .85rem; color: var(--tm-danger);
+    background: color-mix(in srgb, var(--tm-danger) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tm-danger) 30%, transparent);
+    border-radius: var(--tm-radius); padding: .6rem .8rem;
+  }
+  .btn {
+    margin-top: .3rem; width: 100%; border: 0; cursor: pointer;
+    font: 600 .98rem var(--tm-font-body); padding: .8rem 1rem; border-radius: var(--tm-radius-pill);
+    background: var(--tm-accent); color: var(--tm-bg); transition: background-color .15s;
+  }
+  .btn:hover { background: var(--tm-accent-2); }
+  .troca { margin-top: 1.4rem; text-align: center; font-size: .9rem; color: var(--tm-ink-muted); }
+  .troca a { font-weight: 600; color: var(--tm-accent); }
+  .troca a:hover, .linha a:hover { text-decoration: underline; }
+  .aviso-senha {
+    display: none; font-size: .82rem; color: var(--tm-ink-muted);
+    background: var(--tm-verse-bg); border: 1px solid var(--tm-verse-border);
+    border-radius: var(--tm-radius); padding: .6rem .8rem;
+  }
+  .aviso-senha.aberto { display: block; }
+  .selo-gratis { display: inline-flex; gap: .4rem; margin-top: 1rem; font-size: .8rem; color: var(--tm-ink-muted); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="fundo" aria-hidden="true"></div>
+
+<div class="tela">
+  <!-- ============ Barra (sobre a imagem: sempre logo creme) ============ -->
+  <header class="barra">
+    <a href="01-visitante.html" class="marca" aria-label="Emaús — início">
+      <img src="../emaus-web/public/marca/final/logo1-simbolo-escuro.png" alt="">
+      <span>Emaús</span>
+    </a>
+    <a class="voltar" href="01-visitante.html">← Voltar ao início</a>
+  </header>
+
+  <main class="conteudo">
+    <!-- Versículo + o que a pessoa ganha (desktop: embaixo à esquerda) -->
+    <div class="apresentacao">
+      <p class="versiculo">“Não estava ardendo o nosso coração, quando ele nos falava pelo caminho e nos abria as Escrituras?”<small>Lucas 24.32</small></p>
+      <ul class="ganhos">
+        <li>Cursos de Bíblia e vida cristã, no seu ritmo</li>
+        <li>Seu progresso fica salvo em qualquer aparelho</li>
+        <li>Um tutor que corrige e aponta o que revisar</li>
+      </ul>
+    </div>
+
+    <!-- Cartão do formulário -->
+    <div class="cartao">
+
+      <!-- ---------- ENTRAR ---------- -->
+      <section class="caixa" id="tela-entrar">
+        <h1>Bem-vindo de volta</h1>
+        <p class="sub muted">Entre pra continuar de onde parou.</p>
+
+        <form onsubmit="event.preventDefault(); mostrarErro('entrar')">
+          <label>E-mail
+            <input type="email" name="email" autocomplete="email" inputmode="email" required>
+          </label>
+          <label>
+            <span class="linha">Senha <a href="#" onclick="event.preventDefault(); document.getElementById('aviso').classList.toggle('aberto')">Esqueceu a senha?</a></span>
+            <span class="campo">
+              <input type="password" name="password" autocomplete="current-password" required>
+              <button type="button" class="olho" onclick="alternarSenha(this)">Mostrar</button>
+            </span>
+          </label>
+          <p class="aviso-senha" id="aviso">Por enquanto, peça pra quem administra o Emaús na sua igreja redefinir sua senha.</p>
+          <p class="erro" id="erro-entrar" role="alert" hidden>E-mail ou senha incorretos. Confira e tente de novo.</p>
+          <button class="btn" type="submit">Entrar</button>
+        </form>
+
+        <p class="troca">Ainda não tem conta? <a href="#" onclick="event.preventDefault(); ir('criar')">Criar conta grátis</a></p>
+      </section>
+
+      <!-- ---------- CRIAR CONTA ---------- -->
+      <section class="caixa" id="tela-criar" hidden>
+        <h1>Criar sua conta</h1>
+        <p class="sub muted">Grátis, sem cartão. Leva um minuto.</p>
+
+        <form onsubmit="event.preventDefault(); mostrarErro('criar')">
+          <label>Seu nome
+            <input name="name" autocomplete="name" required>
+          </label>
+          <label>E-mail
+            <input type="email" name="email" autocomplete="email" inputmode="email" required>
+          </label>
+          <label>Crie uma senha
+            <span class="campo">
+              <input type="password" name="password" autocomplete="new-password" minlength="6" required>
+              <button type="button" class="olho" onclick="alternarSenha(this)">Mostrar</button>
+            </span>
+            <span class="dica">Pelo menos 6 caracteres.</span>
+          </label>
+          <p class="erro" id="erro-criar" role="alert" hidden>Já existe uma conta com esse e-mail. <a href="#" style="font-weight:600;text-decoration:underline" onclick="event.preventDefault(); ir('entrar')">Entrar</a></p>
+          <button class="btn" type="submit">Criar conta</button>
+        </form>
+
+        <p class="troca">Já tem conta? <a href="#" onclick="event.preventDefault(); ir('entrar')">Entrar</a></p>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Seletor só do protótipo -->
+<div class="proto" role="group" aria-label="Protótipo">
+  <button type="button" id="b-entrar" aria-pressed="true" onclick="ir('entrar')">Entrar</button>
+  <button type="button" id="b-criar" aria-pressed="false" onclick="ir('criar')">Criar conta</button>
+  <button type="button" onclick="document.documentElement.dataset.tmTheme = document.documentElement.dataset.tmTheme === 'dark' ? 'light' : 'dark'">☾ Tema</button>
+</div>
+
+<script>
+  // Só pro protótipo: alterna as duas telas, mostra/oculta senha e simula um erro
+  function ir(qual) {
+    document.getElementById("tela-entrar").hidden = qual !== "entrar";
+    document.getElementById("tela-criar").hidden = qual !== "criar";
+    document.getElementById("b-entrar").setAttribute("aria-pressed", qual === "entrar");
+    document.getElementById("b-criar").setAttribute("aria-pressed", qual === "criar");
+  }
+  function alternarSenha(btn) {
+    const input = btn.previousElementSibling;
+    const mostrar = input.type === "password";
+    input.type = mostrar ? "text" : "password";
+    btn.textContent = mostrar ? "Ocultar" : "Mostrar";
+  }
+  function mostrarErro(qual) {
+    document.getElementById("erro-" + qual).hidden = false;
+  }
+  // Estado inicial pela URL, ex.: #criar,erro,escuro
+  const estado = location.hash.slice(1).split(",");
+  if (estado.includes("criar")) ir("criar");
+  if (estado.includes("erro")) mostrarErro(estado.includes("criar") ? "criar" : "entrar");
+  if (estado.includes("escuro")) document.documentElement.dataset.tmTheme = "dark";
+</script>
+</body>
+</html>

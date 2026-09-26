@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Visualizar protótipo — celular, tablet e desktop</title>
+<!--
+  Mostra um protótipo em 3 larguras lado a lado.
+  Uso: _visualizar.html?p=02-entrar-criar-conta.html#criar
+  (o que vier depois do # é repassado pra cada tela)
+-->
+<style>
+  body { margin: 0; background: #2b2b2b; font: 13px system-ui, sans-serif; color: #ddd; }
+  header { padding: 8px 14px; display: flex; gap: 16px; align-items: center; }
+  .telas { display: flex; gap: 14px; padding: 0 14px 14px; align-items: flex-start; overflow-x: auto; }
+  figure { margin: 0; }
+  figcaption { margin-bottom: 4px; opacity: .7; }
+  iframe { border: 0; background: #fff; height: calc(100vh - 70px); display: block; }
+</style>
+</head>
+<body>
+<header><strong id="nome"></strong><span>celular 375 · tablet 768 · desktop 1280 (reduzido)</span></header>
+<div class="telas" id="telas"></div>
+<script>
+  const p = new URLSearchParams(location.search).get("p") || "01-visitante.html";
+  const alvo = p + location.hash;
+  document.getElementById("nome").textContent = alvo;
+  const telas = [
+    { rotulo: "Celular", w: 375, zoom: 1 },
+    { rotulo: "Tablet", w: 768, zoom: 1 },
+    { rotulo: "Desktop", w: 1280, zoom: 0.55 },
+  ];
+  for (const t of telas) {
+    const fig = document.createElement("figure");
+    fig.innerHTML = `<figcaption>${t.rotulo} (${t.w}px)</figcaption>`;
+    const f = document.createElement("iframe");
+    f.src = alvo;
+    f.style.width = t.w + "px";
+    if (t.zoom !== 1) {
+      // desktop encolhido pra caber na tela sem perder o layout de 1280px
+      f.style.transform = `scale(${t.zoom})`;
+      f.style.transformOrigin = "0 0";
+      f.style.height = `calc((100vh - 70px) / ${t.zoom})`;
+      fig.style.width = t.w * t.zoom + "px";
+    }
+    fig.appendChild(f);
+    document.getElementById("telas").appendChild(fig);
+  }
+</script>
+</body>
+</html>

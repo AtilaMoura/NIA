@@ -1,21 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Botao } from "../_ui/Botao";
-
-function proximaRota(): string {
-  if (typeof window === "undefined") return "/inicio";
-  const next = new URLSearchParams(window.location.search).get("next");
-  return next && next.startsWith("/") ? next : "/inicio";
-}
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { CampoSenha } from "../_ui/CampoSenha";
+import { destinoSeguro } from "../_lib/destino";
 
 export function EntrarForm() {
   const router = useRouter();
+  const next = useSearchParams().get("next");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [avisoSenha, setAvisoSenha] = useState(false);
   const [perfisDev, setPerfisDev] = useState<{ id: string; rotulo: string }[] | null>(null);
 
   // Botões de login rápido só existem em dev — a rota devolve 404 em produção.
@@ -41,7 +39,7 @@ export function EntrarForm() {
         setErro(data.erro ?? "Não foi possível entrar.");
         return;
       }
-      router.push(proximaRota());
+      router.push(destinoSeguro(next));
       router.refresh();
     } catch {
       setErro("Falha de conexão. Tente de novo.");
@@ -63,45 +61,69 @@ export function EntrarForm() {
         setErro("Login rápido falhou — rode o seed de usuários.");
         return;
       }
-      router.push(proximaRota());
+      router.push(destinoSeguro(next));
       router.refresh();
     } finally {
       setEnviando(false);
     }
   }
 
+  const linkCriarConta = next ? `/criar-conta?next=${encodeURIComponent(next)}` : "/criar-conta";
+
   return (
-    <div className="flex flex-col gap-6">
-      <form onSubmit={entrar} className="flex flex-col gap-3">
-        <label className="flex flex-col gap-1 text-[.82rem] font-semibold">
+    <>
+      <form onSubmit={entrar} className="mt-6 grid gap-4">
+        <label className="grid gap-1.5 text-[.84rem] font-semibold">
           E-mail
           <input
             type="email"
+            name="email"
+            autoComplete="email"
+            inputMode="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-[var(--tm-radius)] border border-[var(--tm-border)] bg-[var(--tm-surface)] px-3 py-2 text-[.95rem] font-normal"
           />
         </label>
-        <label className="flex flex-col gap-1 text-[.82rem] font-semibold">
-          Senha
-          <input
-            type="password"
-            required
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            className="rounded-[var(--tm-radius)] border border-[var(--tm-border)] bg-[var(--tm-surface)] px-3 py-2 text-[.95rem] font-normal"
-          />
+        <label className="grid gap-1.5 text-[.84rem] font-semibold">
+          <span className="flex items-baseline justify-between">
+            Senha
+            <button
+              type="button"
+              onClick={() => setAvisoSenha((v) => !v)}
+              className="vidro-destaque text-[.8rem] font-semibold hover:underline"
+            >
+              Esqueceu a senha?
+            </button>
+          </span>
+          <CampoSenha valor={senha} aoMudar={setSenha} autoComplete="current-password" />
         </label>
-        {erro && <p className="m-0 text-[.82rem] text-[var(--tm-danger)]">{erro}</p>}
-        <Botao type="submit" disabled={enviando} className="mt-1 justify-center">
+        {/* Sem recuperação por e-mail ainda (decisão 2026-09-26): o admin redefine */}
+        {avisoSenha && (
+          <p className="acesso-aviso m-0">
+            Por enquanto, peça pra quem administra o Emaús na sua igreja redefinir sua senha.
+          </p>
+        )}
+        {erro && (
+          <p role="alert" className="acesso-erro m-0">
+            {erro}
+          </p>
+        )}
+        <button type="submit" disabled={enviando} className="acesso-botao">
           {enviando ? "Entrando…" : "Entrar"}
-        </Botao>
+        </button>
       </form>
 
+      <p className="vidro-suave m-0 mt-5 text-center text-[.9rem]">
+        Ainda não tem conta?{" "}
+        <Link href={linkCriarConta} className="vidro-destaque font-semibold hover:underline">
+          Criar conta grátis
+        </Link>
+      </p>
+
       {perfisDev && perfisDev.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-[var(--tm-radius)] border border-dashed border-[var(--tm-border)] p-3">
-          <p className="m-0 text-[.75rem] font-semibold uppercase tracking-wide text-[var(--tm-ink-muted)]">
+        <div className="mt-5 flex flex-col gap-2 rounded-[var(--tm-radius)] border border-dashed border-white/25 p-3">
+          <p className="vidro-suave m-0 text-[.72rem] font-semibold uppercase tracking-wide">
             🔧 Login rápido (dev)
           </p>
           <div className="flex flex-wrap gap-2">
@@ -111,7 +133,7 @@ export function EntrarForm() {
                 type="button"
                 disabled={enviando}
                 onClick={() => entrarRapido(p.id)}
-                className="rounded-[var(--tm-radius-pill)] border border-[var(--tm-border)] px-3 py-1 text-[.78rem] hover:border-[var(--tm-accent)] hover:text-[var(--tm-accent)] disabled:opacity-50"
+                className="rounded-[var(--tm-radius-pill)] border border-white/30 px-3 py-1 text-[.78rem] hover:border-[#eab676] hover:text-[#eab676] disabled:opacity-50"
               >
                 {p.rotulo}
               </button>
@@ -119,6 +141,6 @@ export function EntrarForm() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
