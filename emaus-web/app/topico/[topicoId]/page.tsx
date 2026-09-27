@@ -7,7 +7,9 @@ import { AcoesTopico } from "./topico-ui";
 import { ReiniciarTopicoBotao } from "./reiniciar-botao";
 import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getSessao, getToken } from "../../_lib/sessao";
-import { papelPodeRevisar } from "../../_lib/papel";
+import { papelPodeRevisar, papelVeEstudosPessoais } from "../../_lib/papel";
+import { cursoPessoal } from "../../_lib/catalogo";
+import { topicoDeEstudoPessoal } from "../../_lib/meus-cursos";
 import {
   getCourse,
   getTopico,
@@ -29,6 +31,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { topicoId } = await params;
   const topico = await getTopico(Number(topicoId)).catch(() => null);
+  // Não vazar o título de um estudo pessoal na aba de quem não é Master
+  if (topico && (await topicoDeEstudoPessoal(topico.lesson_id))) {
+    const sessao = await getSessao();
+    if (!papelVeEstudosPessoais(sessao?.role)) return { title: "Página não encontrada" };
+  }
   return { title: topico?.titulo ?? "Tópico" };
 }
 
@@ -75,6 +82,8 @@ export default async function TopicoPage({
   const modulo = aula ? modules.find((m) => m.id === aula.module_id) ?? null : null;
   const CURSO_ID = modulo?.course_id ?? CURSO_ID_FALLBACK;
   const tema = TEMA_POR_CURSO[CURSO_ID] ?? THEME_TOPICO;
+  // Estudo pessoal do Master: pra qualquer outro, é como se não existisse
+  if (cursoPessoal(CURSO_ID) && !papelVeEstudosPessoais(sessao.role)) notFound();
 
   // Curso não publicado: só quem revisa passa (o aluno vê "em preparação").
   const curso = await getCourse(CURSO_ID).catch(() => null);

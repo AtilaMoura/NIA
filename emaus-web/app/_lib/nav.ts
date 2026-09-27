@@ -2,7 +2,7 @@
 // e no rodapé. A barra principal é IGUAL em toda tela e só cresce se o usuário for
 // revisor. A sub-nav da revisão só aparece dentro de /revisao/*.
 
-import { papelPodeRevisar, type Papel } from "./papel";
+import { papelPodeRevisar, papelVeEstudosPessoais, type Papel } from "./papel";
 
 // "icone" é opcional (emoji) — só o menu mobile usa hoje (redesign 2026-09-21, ver
 // PLANO_REDESIGN_EMAUS.md Fase 5); a barra desktop ignora o campo.
@@ -22,6 +22,10 @@ export function navPrincipal(papel: Papel | null | undefined): ItemNav[] {
   ];
   if (papel && papelPodeRevisar(papel)) {
     base.push({ href: "/revisao", rotulo: "Revisão", icone: "🗂️" });
+  }
+  // Estudos pessoais do Master saíram da /inicio (2026-09-27) e têm página própria
+  if (papelVeEstudosPessoais(papel)) {
+    base.push({ href: "/estudos", rotulo: "Estudos pessoais", icone: "📓" });
   }
   return base;
 }

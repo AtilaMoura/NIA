@@ -23,7 +23,8 @@ e só depois montar o plano de execução (aprovar antes de mexer).
 |---|---|---|---|
 | 01 | `prototipos-front/01-visitante.html` | `/` visitante | ✅ aprovado e aplicado (commit `b3a445c`) |
 | 02 | `prototipos-front/02-entrar-criar-conta.html` | `/entrar` + `/criar-conta` | ✅ aprovado e aplicado |
-| — | — | `/estudos` (Master) | a fazer |
+| 03 | `prototipos-front/03-inicio.html` | `/inicio` | ✅ aprovado e aplicado |
+| — | — | `/estudos` (Master) | versão funcional aplicada (mesmos cartões da /inicio); protótipo próprio a fazer |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
 
@@ -50,7 +51,7 @@ e só depois montar o plano de execução (aprovar antes de mexer).
 
 | Status | Rota | Arquivo | O que é |
 |---|---|---|---|
-| ⬜ | `/inicio` | `app/inicio/page.tsx` | Home multi-curso estilo streaming (prateleiras, "Continuar estudando") |
+| ✅ | `/inicio` | `app/inicio/page.tsx` | Home multi-curso estilo streaming (prateleiras, "Continuar estudando") |
 | ⬜ | `/curso/[courseId]` | `app/curso/[courseId]/page.tsx` | Página do curso, módulos em accordion com o próximo tópico aberto |
 | ⬜ | `/topico/[topicoId]` | `app/topico/[topicoId]/page.tsx` | Leitor do tópico em slides (iframe), aceita `?slide=N` |
 | ⬜ | `/topico/[topicoId]/prova` | `app/topico/[topicoId]/prova/page.tsx` | Prova do tópico, com bloqueio quando não tem prova ou o curso não está publicado |
@@ -173,3 +174,38 @@ em nenhuma largura, e o layout em coluna única funciona no celular.
 - **Alta:** 1, 2
 - **Média:** 3, 4, 5, 6
 - **Baixa:** 7, 8, 9
+
+### `/inicio` — 2026-09-27
+
+Revisada logada como Master, no desktop (1366px), tablet (768px) e mobile (375px).
+
+> Antes da revisão: `CartaoContinuar.tsx`, `PosterCurso.tsx` e `Prateleira.tsx` tinham alterações
+> nunca commitadas (22/09 00:24) que quebravam a página (ex.: um "0" solto embaixo do pôster).
+> Com a aprovação do usuário, elas foram salvas em `backups/wip-inicio-2026-09-22.patch` e os
+> arquivos voltaram pra versão do commit.
+
+**O que já está bom**
+- Sem scroll horizontal da página em nenhuma largura; as prateleiras deslizam de lado como esperado.
+- Nav, cabeçalho e rodapé já com o logo novo.
+
+**Problemas**
+1. 🔴 **Estudos pessoais visíveis e acessíveis pra qualquer aluno.** A prateleira "Estudos pessoais"
+   aparece pra todo mundo logado e, como Inglês, Engenharia LLM e Redes estão publicados, o aluno
+   consegue abrir e fazer esses cursos. Decisão já tomada: vão pra uma página só do Master (`/estudos`).
+   Precisa bloquear também o acesso direto em `/curso/{id}` pra quem não é Master.
+2. 🔴 **"Continuar estudando" quebrado (também em produção).** A capa ocupa o cartão inteiro e o
+   texto fica com 0px: `CapaCurso` já traz `w-full`, que vence o `w-16` passado pelo `CartaoContinuar`
+   (o mesmo conflito de classe que o comentário do `CapaCurso.tsx` avisa).
+3. 🟠 **Prateleira "Formação bíblica" com 13 cursos, 11 "Em breve"**: mais cadeado do que curso;
+   o que dá pra estudar se perde no meio.
+4. 🟠 **Títulos cortados**: "Formação do Obreiro: Do C…" nos dois obreiros, e fica impossível
+   distinguir o I do II.
+5. 🟡 **Saudação "Bom te ver de volta, Master"** pega a 1ª palavra de "Master (Atila)"; o avatar
+   continua "M(" (achado 9 da `/`).
+6. 🟡 **Obreiro II "Em breve" até pro revisor**, sem capa (placeholder "FO"); Redes sem capa ("RC").
+7. 🟡 **Barra de rolagem aparente** embaixo da prateleira no desktop.
+
+**Prioridade sugerida**
+- **Alta:** 1, 2
+- **Média:** 3, 4
+- **Baixa:** 5, 6, 7

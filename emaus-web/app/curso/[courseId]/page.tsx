@@ -9,7 +9,8 @@ import { TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getCourse, getUser } from "../../_lib/api";
 import { montarArvore } from "../../_lib/arvore";
 import { getSessao, getToken } from "../../_lib/sessao";
-import { papelPodeRevisar } from "../../_lib/papel";
+import { papelPodeRevisar, papelVeEstudosPessoais } from "../../_lib/papel";
+import { cursoPessoal } from "../../_lib/catalogo";
 import { ArvoreCursoUI } from "./arvore-ui";
 
 export async function generateMetadata({
@@ -18,6 +19,11 @@ export async function generateMetadata({
   params: Promise<{ courseId: string }>;
 }): Promise<Metadata> {
   const { courseId } = await params;
+  // Não vazar o nome de um estudo pessoal no título da aba pra quem não é Master
+  if (cursoPessoal(Number(courseId))) {
+    const sessao = await getSessao();
+    if (!papelVeEstudosPessoais(sessao?.role)) return { title: "Página não encontrada" };
+  }
   const curso = await getCourse(Number(courseId)).catch(() => null);
   return { title: curso?.title ?? "Curso" };
 }
@@ -35,6 +41,8 @@ export default async function CursoPage({
 
   const sessao = await getSessao();
   if (!sessao) redirect(`/entrar?next=/curso/${courseId}`);
+  // Estudo pessoal do Master: pra qualquer outro, é como se não existisse
+  if (cursoPessoal(courseId) && !papelVeEstudosPessoais(sessao.role)) notFound();
   const token = await getToken();
 
   const [arvore, usuario] = await Promise.all([

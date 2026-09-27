@@ -16,3 +16,9 @@ export const INFO_PAPEL: Record<Papel, { rotulo: string; tom: "info" | "aviso" |
   professor: { rotulo: "Professor", tom: "bom" },
   aluno: { rotulo: "Aluno", tom: "neutro" },
 };
+
+// Estudos pessoais (página /estudos e cursos da categoria "Estudos pessoais") são
+// só do Master — nem admin/professor veem.
+export function papelVeEstudosPessoais(papel: Papel | null | undefined): boolean {
+  return papel === "master";
+}

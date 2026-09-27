@@ -28,6 +28,9 @@ PERFIS = [
     {"email": "professor3@emaus.local", "name": "Professor 3", "role": "professor"},
     {"email": "professor4@emaus.local", "name": "Professor 4", "role": "professor"},
     {"email": "professor5@emaus.local", "name": "Professor 5", "role": "professor"},
+    # Perfil "Aluno" do login rápido (emaus-web/app/api/sessao/dev/route.ts). O antigo
+    # teste-fase7@nia.local tinha outra senha e o botão falhava (2026-09-27).
+    {"email": "aluno@emaus.local", "name": "Aluno Teste", "role": "aluno"},
 ]
 
 

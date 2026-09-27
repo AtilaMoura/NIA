@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: início do aluno</title>
+<!--
+  Protótipo 03 — /inicio (home de quem está logado). Dados de exemplo.
+  - "Continuar estudando" vira um cartão grande e legível, com botão.
+  - "Seus cursos": só o que dá pra estudar (título inteiro, progresso).
+  - "Em breve": fileira compacta separada, pra não afogar os cursos abertos.
+  - Estudos pessoais NÃO aparecem aqui (vão pra /estudos, só do Master — item na nav).
+  Estados pelo # da URL: #novo (aluno sem progresso), #escuro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px; --tm-radius-pill: 999px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-shadow: 0 1px 2px rgba(43,36,28,.06), 0 8px 24px rgba(43,36,28,.06);
+    --tm-maxw: 1100px;
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-accent-2: #b8763a; --tm-good: #4f7a3a;
+    --gutter: clamp(1rem, 4vw, 2rem);
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-accent-2: #e3ac6a; --tm-good: #7fae62;
+    --tm-shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  .wrap { max-width: var(--tm-maxw); margin: 0 auto; padding: 0 var(--gutter); }
+  .muted { color: var(--tm-ink-muted); }
+  .logo-claro { display: block; } .logo-escuro { display: none; }
+  [data-tm-theme="dark"] .logo-claro { display: none; } [data-tm-theme="dark"] .logo-escuro { display: block; }
+
+  /* ---------- Cabeçalho (logado) ---------- */
+  header { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--tm-bg) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--tm-border); }
+  header .wrap { display: flex; align-items: center; gap: 1.25rem; height: 56px; }
+  .marca { display: inline-flex; align-items: center; gap: .5rem; }
+  .marca img { height: 30px; width: auto; }
+  .marca span { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.12rem; }
+  nav.principal { display: none; gap: .3rem; font-size: .85rem; }
+  nav.principal a { padding: .35rem .75rem; border-radius: var(--tm-radius-pill); color: var(--tm-ink-muted); }
+  nav.principal a.ativo { background: var(--tm-surface-2); color: var(--tm-ink); font-weight: 600; }
+  nav.principal a:hover { color: var(--tm-accent); }
+  .direita { margin-left: auto; display: flex; align-items: center; gap: .6rem; }
+  .icone-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--tm-border); background: transparent; color: var(--tm-ink-muted); cursor: pointer; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); color: var(--tm-accent); font-weight: 700; font-size: .78rem; border: 1px solid var(--tm-border); }
+  .usuario { display: none; align-items: center; gap: .5rem; font-size: .85rem; }
+  .selo-papel { font-size: .7rem; font-weight: 600; color: var(--tm-accent); border: 1px solid var(--tm-accent); border-radius: var(--tm-radius-pill); padding: .05rem .5rem; }
+  .hamburguer { display: inline-grid; place-items: center; }
+  @media (min-width: 700px) { nav.principal { display: flex; } .usuario { display: flex; } .hamburguer { display: none; } }
+
+  main { padding: clamp(1.5rem, 4vw, 2.5rem) 0 4rem; }
+  .saudacao h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); }
+  .saudacao p { margin-top: .25rem; font-size: .95rem; }
+  section.bloco { margin-top: clamp(1.75rem, 5vw, 2.5rem); }
+  .titulo-secao { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: .9rem; }
+  .titulo-secao h2 { font-size: 1.15rem; }
+  .titulo-secao small { font-size: .82rem; color: var(--tm-ink-muted); }
+
+  /* ---------- Continuar estudando ---------- */
+  .continuar {
+    display: grid; grid-template-columns: 1fr; overflow: hidden;
+    background: var(--tm-surface); border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-lg); box-shadow: var(--tm-shadow);
+  }
+  .continuar .capa { aspect-ratio: 16 / 7; background: var(--tm-surface-2); }
+  .continuar .capa img { width: 100%; height: 100%; object-fit: cover; }
+  .continuar .corpo { padding: 1.1rem 1.2rem 1.25rem; display: flex; flex-direction: column; gap: .35rem; }
+  .sobre { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--tm-accent); }
+  .continuar h3 { font-size: 1.25rem; line-height: 1.25; }
+  .progresso { margin-top: .6rem; display: flex; align-items: center; gap: .75rem; font-size: .82rem; color: var(--tm-ink-muted); }
+  .barra { flex: 1; height: 6px; border-radius: 99px; background: var(--tm-surface-2); overflow: hidden; }
+  .barra i { display: block; height: 100%; border-radius: 99px; background: var(--tm-good); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; font-weight: 600; font-size: .92rem; padding: .7rem 1.3rem; border-radius: var(--tm-radius-pill); background: var(--tm-accent); color: var(--tm-bg); white-space: nowrap; transition: background-color .15s; }
+  .btn:hover { background: var(--tm-accent-2); }
+  .continuar .acoes { margin-top: .9rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .continuar .acoes .link { font-size: .85rem; font-weight: 600; color: var(--tm-accent); }
+  @media (min-width: 700px) {
+    .continuar { grid-template-columns: 300px 1fr; }
+    .continuar .capa { aspect-ratio: auto; min-height: 190px; }
+    .continuar .corpo { padding: 1.5rem 1.75rem; justify-content: center; }
+  }
+
+  /* ---------- Seus cursos ---------- */
+  .cursos { display: grid; gap: 1.1rem; grid-template-columns: 1fr; }
+  @media (min-width: 560px) { .cursos { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .cursos { grid-template-columns: repeat(3, 1fr); } }
+  .curso {
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--tm-surface); border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-lg); box-shadow: var(--tm-shadow);
+    transition: transform .2s;
+  }
+  a.curso:hover { transform: translateY(-3px); }
+  .curso .capa { position: relative; aspect-ratio: 16 / 9; background: linear-gradient(135deg, #3f4a24, #7d8a4a); }
+  .curso .capa img { width: 100%; height: 100%; object-fit: cover; }
+  .curso .capa .mono { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--tm-font-display); font-size: 2.4rem; color: rgba(255,255,255,.3); }
+  .curso .selo { position: absolute; left: .7rem; top: .7rem; font-size: .7rem; font-weight: 600; padding: .22rem .6rem; border-radius: var(--tm-radius-pill); background: rgba(27,22,16,.7); color: #f6eee0; }
+  .curso .corpo { padding: .95rem 1.05rem 1.1rem; display: flex; flex-direction: column; gap: .25rem; flex: 1; }
+  .curso h3 { font-size: 1.02rem; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .curso .subt { font-size: .82rem; font-weight: 600; color: var(--tm-accent); }
+  .curso .progresso { margin-top: auto; padding-top: .6rem; }
+
+  /* ---------- Em breve (fileira compacta) ---------- */
+  .fileira {
+    display: flex; gap: .8rem; overflow-x: auto; padding-bottom: .4rem;
+    scroll-snap-type: x mandatory; scrollbar-width: none;
+    mask-image: linear-gradient(90deg, #000 88%, transparent);
+  }
+  .fileira::-webkit-scrollbar { display: none; }
+  .breve { flex: none; width: 150px; scroll-snap-align: start; }
+  .breve .capa { aspect-ratio: 4 / 3; border-radius: var(--tm-radius); overflow: hidden; border: 1px solid var(--tm-border); position: relative; }
+  .breve .capa img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.8); }
+  .breve .capa::after { content: "🔒"; position: absolute; right: .4rem; top: .35rem; font-size: .7rem; }
+  .breve p { margin-top: .4rem; font-size: .8rem; font-weight: 600; line-height: 1.3; }
+  .setas { display: none; gap: .4rem; }
+  .setas button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--tm-border); background: var(--tm-surface); color: var(--tm-ink); cursor: pointer; }
+  @media (min-width: 700px) { .setas { display: flex; } }
+
+  /* Estado "aluno novo" (sem progresso): cartão de boas-vindas no lugar do Continuar */
+  .comecar { background: var(--tm-surface-2); border: 1px dashed var(--tm-border); border-radius: var(--tm-radius-lg); padding: 1.25rem 1.4rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+  .comecar p { font-size: .95rem; }
+  [hidden] { display: none !important; }
+
+  footer { border-top: 1px solid var(--tm-border); }
+  footer .wrap { padding-top: 1.2rem; padding-bottom: 1.4rem; font-size: .8rem; color: var(--tm-ink-muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="#" class="marca" aria-label="Emaús — início">
+      <img class="logo-claro" src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">
+      <img class="logo-escuro" src="../emaus-web/public/marca/final/logo1-simbolo-escuro.png" alt="">
+      <span>Emaús</span>
+    </a>
+    <nav class="principal">
+      <a href="#" class="ativo">Início</a>
+      <a href="#">Meu progresso</a>
+      <a href="#">Revisão</a>
+      <a href="#" title="Só aparece pro Master">Estudos pessoais</a>
+    </nav>
+    <div class="direita">
+      <button class="icone-btn" onclick="tema()" aria-label="Alternar tema">☾</button>
+      <span class="usuario"><span class="avatar">AT</span> Atila <span class="selo-papel">Master</span></span>
+      <button class="icone-btn hamburguer" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="saudacao">
+    <h1>Bom te ver de volta, Atila</h1>
+    <p class="muted" id="sub-saudacao">Continue de onde parou.</p>
+  </div>
+
+  <!-- ============ Continuar estudando ============ -->
+  <section class="bloco" id="bloco-continuar">
+    <div class="titulo-secao"><h2>Continuar estudando</h2></div>
+    <article class="continuar">
+      <div class="capa"><img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt=""></div>
+      <div class="corpo">
+        <p class="sobre">Formação do Obreiro I · Módulo 1</p>
+        <h3>Tópico 3 — Vocação e ofícios</h3>
+        <p class="muted" style="font-size:.9rem">Efésios 4.11-12 · uns 20 minutos</p>
+        <div class="progresso"><span class="barra"><i style="width:12%"></i></span> 12% do curso</div>
+        <div class="acoes">
+          <a href="#" class="btn">Continuar →</a>
+          <a href="#" class="link">Ver o curso</a>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Aluno novo (sem progresso): substitui o bloco acima -->
+  <section class="bloco" id="bloco-comecar" hidden>
+    <div class="comecar">
+      <p><strong>Por onde começar?</strong> <span class="muted">O Formação do Obreiro I é o curso aberto agora.</span></p>
+      <a href="#" class="btn">Começar o curso →</a>
+    </div>
+  </section>
+
+  <!-- ============ Seus cursos ============ -->
+  <section class="bloco">
+    <div class="titulo-secao"><h2>Seus cursos</h2><small>2 abertos</small></div>
+    <div class="cursos">
+      <a href="#" class="curso">
+        <div class="capa"><img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt=""></div>
+        <div class="corpo">
+          <h3>Formação do Obreiro: Do Chamado ao Serviço I</h3>
+          <p class="subt">Firmados na Palavra</p>
+          <div class="progresso"><span class="barra"><i style="width:12%"></i></span> 12%</div>
+        </div>
+      </a>
+      <a href="#" class="curso">
+        <div class="capa"><span class="mono">O II</span><span class="selo">Em revisão · só revisores</span></div>
+        <div class="corpo">
+          <h3>Formação do Obreiro: Do Chamado ao Serviço II</h3>
+          <p class="subt">Enviados para Servir</p>
+          <div class="progresso"><span class="barra"><i style="width:0%"></i></span> Não iniciado</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ Em breve ============ -->
+  <section class="bloco">
+    <div class="titulo-secao">
+      <h2>Em breve</h2>
+      <div class="setas"><button onclick="rolar(-1)" aria-label="Anteriores">‹</button><button onclick="rolar(1)" aria-label="Próximos">›</button></div>
+    </div>
+    <div class="fileira" id="fileira">
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/panorama-da-biblia.jpg" alt=""></div><p>Panorama da Bíblia</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/como-estudar-a-biblia.jpg" alt=""></div><p>Como Estudar a Bíblia</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/evangelho-de-joao.jpg" alt=""></div><p>O Evangelho de João</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/romanos.jpg" alt=""></div><p>Romanos</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/antigo-testamento-panorama.jpg" alt=""></div><p>O Antigo Testamento em Panorama</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/vida-de-oracao.jpg" alt=""></div><p>Vida de Oração</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/doutrinas-essenciais.jpg" alt=""></div><p>Doutrinas Essenciais da Fé Cristã</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/discipulado-primeiros-passos.jpg" alt=""></div><p>Discipulado — Os Primeiros Passos</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/salmos.jpg" alt=""></div><p>Salmos</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/carater-cristao.jpg" alt=""></div><p>Caráter Cristão</p></div>
+      <div class="breve"><div class="capa"><img src="../emaus-web/public/capas/missoes-e-evangelismo.jpg" alt=""></div><p>Missões e Evangelismo</p></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">Emaús · plataforma de formação bíblica</div></footer>
+
+<script>
+  // Só pro protótipo
+  function tema() { const r = document.documentElement; r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; }
+  function rolar(dir) { const f = document.getElementById("fileira"); f.scrollBy({ left: dir * f.clientWidth * .8, behavior: "smooth" }); }
+  const estado = location.hash.slice(1).split(",");
+  if (estado.includes("novo")) {
+    document.getElementById("bloco-continuar").hidden = true;
+    document.getElementById("bloco-comecar").hidden = false;
+    document.querySelector(".saudacao h1").textContent = "Que bom ter você aqui, Atila";
+    document.getElementById("sub-saudacao").textContent = "Escolha um curso pra começar.";
+    document.querySelectorAll(".curso .progresso").forEach((p) => p.remove());
+  }
+  if (estado.includes("escuro")) tema();
+</script>
+</body>
+</html>

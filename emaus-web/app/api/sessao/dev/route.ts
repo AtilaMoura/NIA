@@ -13,7 +13,7 @@ const PERFIS_DEV = [
   { id: "master", email: "master@emaus.local", rotulo: "Master (Atila)" },
   { id: "admin1", email: "admin1@emaus.local", rotulo: "Admin 1" },
   { id: "professor1", email: "professor1@emaus.local", rotulo: "Professor 1" },
-  { id: "aluno", email: "teste-fase7@nia.local", rotulo: "Aluno" },
+  { id: "aluno", email: "aluno@emaus.local", rotulo: "Aluno" },
 ] as const;
 
 export function GET() {
