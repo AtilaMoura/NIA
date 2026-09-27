@@ -24,7 +24,7 @@ export function NavPrincipal({
   const naRevisao = pathname.startsWith("/revisao");
 
   return (
-    <nav className="hidden min-w-0 flex-1 items-center gap-5 text-[.85rem] sm:flex">
+    <nav className="hidden min-w-0 flex-1 items-center gap-1 whitespace-nowrap text-[.85rem] sm:flex">
       {itens.map((i) => {
         const ativo = itemAtivo(pathname, i.href);
         return (

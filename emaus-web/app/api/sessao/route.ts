@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { API_URL } from "../../_lib/config";
 import { COOKIE_ROLE, COOKIE_TOKEN, MAX_AGE_SESSAO, type Sessao } from "../../_lib/sessao";
+import { gravarCookiesPreferencias } from "../../_lib/preferencias-cookie";
 
 function gravarCookiesSessao(res: NextResponse, token: string, sessao: Sessao) {
   const opts = {
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
 
   const res = NextResponse.json({ ok: true, sessao });
   gravarCookiesSessao(res, token, sessao);
+  await gravarCookiesPreferencias(res, sessao.id, token);
   return res;
 }
 

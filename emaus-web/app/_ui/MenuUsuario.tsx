@@ -55,7 +55,8 @@ export function MenuUsuario({ nome, papel }: { nome: string; papel?: Papel | nul
         className="flex items-center gap-2 rounded-[var(--tm-radius-pill)] border border-transparent px-1 py-0.5 hover:border-[var(--tm-border)]"
       >
         <Avatar nome={nome} tamanho="sm" />
-        <span className="hidden items-center gap-1.5 text-[.82rem] text-[var(--tm-ink-muted)] md:flex">
+        {/* Nome + selo só em tela larga: no tablet a nav (com "Estudos pessoais") quebrava em 2 linhas */}
+        <span className="hidden items-center gap-1.5 text-[.82rem] text-[var(--tm-ink-muted)] min-[1100px]:flex">
           {nome}
           {papel && <Chip tom={INFO_PAPEL[papel].tom}>{INFO_PAPEL[papel].rotulo}</Chip>}
         </span>

@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { API_URL } from "../../../_lib/config";
 import { COOKIE_ROLE, COOKIE_TOKEN, MAX_AGE_SESSAO, type Sessao } from "../../../_lib/sessao";
+import { gravarCookiesPreferencias } from "../../../_lib/preferencias-cookie";
 
 const SENHA_TESTE = "emaus2026";
 
@@ -49,5 +50,6 @@ export async function POST(req: NextRequest) {
   const opts = { httpOnly: true, sameSite: "lax" as const, secure: false, path: "/", maxAge: MAX_AGE_SESSAO };
   res.cookies.set(COOKIE_TOKEN, token, opts);
   res.cookies.set(COOKIE_ROLE, sessao.role, opts);
+  await gravarCookiesPreferencias(res, sessao.id, token);
   return res;
 }

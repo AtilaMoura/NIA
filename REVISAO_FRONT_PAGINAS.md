@@ -17,6 +17,38 @@ e só depois montar o plano de execução (aprovar antes de mexer).
 - **`/` com login**: redireciona pra `/inicio`.
 - **"Esqueceu a senha?"** (2026-09-26): por enquanto só um aviso "peça pra quem administra o Emaús na sua igreja". Recuperação por e-mail fica pra depois (precisa de backend + envio de e-mail).
 
+## Pendências levantadas pelo usuário (2026-09-27)
+
+Anotadas ao aprovar a `/inicio`. Nenhuma foi feita ainda.
+
+### P1. Cadastro simples demais — senha com confirmação
+Hoje `/criar-conta` só pede nome, e-mail e senha (mín. 6). Pedido: **campo "confirmar senha"**
+(e revisar o que mais falta no cadastro). Só front: comparar os dois campos antes de enviar e
+mostrar erro "as senhas não conferem". Avaliar junto: regra de senha mais forte e mostrar a força.
+
+### P2. "Esqueci minha senha" de verdade
+Hoje o link só mostra o aviso "peça pro administrador" (decisão provisória de 2026-09-26).
+Pedido: fluxo real de recuperação. Precisa de **backend novo**:
+- token de redefinição com validade curta (tabela nova ou campo no `User`), uso único;
+- envio de e-mail (escolher serviço — ex.: Resend/Brevo/SMTP; ver custo do tier grátis na hora);
+- telas: "informe seu e-mail" → e-mail com link → "crie uma nova senha";
+- resposta igual pra e-mail existente e inexistente (não revelar quem tem conta).
+Alternativa intermediária, sem e-mail: admin gera um link de redefinição na área de revisão.
+
+### P3. Matrícula: o curso só é "do aluno" quando ele decide fazer
+Hoje, na `/inicio`, **todo curso publicado já aparece em "Seus cursos"** pra qualquer aluno.
+Pedido: o aluno escolhe o curso ("quero fazer este curso") e só então ele vira dele.
+Proposta:
+- **Backend:** tabela `Matricula` (`user_id`, `course_id`, `criada_em`, `status`), endpoints
+  pra matricular e listar as matrículas do usuário. Soft delete (nunca apagar) ao desistir.
+- **`/inicio`:** "Seus cursos" = só os matriculados. Abaixo, "Cursos disponíveis" com o botão
+  **"Quero fazer este curso"**. Aluno novo sem matrícula vê direto os disponíveis.
+- **`/curso/{id}`:** sem matrícula → página de apresentação do curso com o botão de matrícula;
+  com matrícula → a trilha de hoje.
+- Liga com a ideia já registrada de liberar curso por usuário / assinatura (memória
+  `nia-emaus-pagamento-acesso-curso`): a matrícula é o mesmo registro que um dia pode exigir
+  pagamento ou liberação manual.
+
 ## Protótipos
 
 | Nº | Arquivo | Página | Status |
@@ -24,6 +56,7 @@ e só depois montar o plano de execução (aprovar antes de mexer).
 | 01 | `prototipos-front/01-visitante.html` | `/` visitante | ✅ aprovado e aplicado (commit `b3a445c`) |
 | 02 | `prototipos-front/02-entrar-criar-conta.html` | `/entrar` + `/criar-conta` | ✅ aprovado e aplicado |
 | 03 | `prototipos-front/03-inicio.html` | `/inicio` | ✅ aprovado e aplicado |
+| 04 | `prototipos-front/04-curso.html` | `/curso/{id}` | ✅ aprovado e aplicado |
 | — | — | `/estudos` (Master) | versão funcional aplicada (mesmos cartões da /inicio); protótipo próprio a fazer |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
@@ -52,7 +85,7 @@ e só depois montar o plano de execução (aprovar antes de mexer).
 | Status | Rota | Arquivo | O que é |
 |---|---|---|---|
 | ✅ | `/inicio` | `app/inicio/page.tsx` | Home multi-curso estilo streaming (prateleiras, "Continuar estudando") |
-| ⬜ | `/curso/[courseId]` | `app/curso/[courseId]/page.tsx` | Página do curso, módulos em accordion com o próximo tópico aberto |
+| ✅ | `/curso/[courseId]` | `app/curso/[courseId]/page.tsx` | Página do curso, módulos em accordion com o próximo tópico aberto |
 | ⬜ | `/topico/[topicoId]` | `app/topico/[topicoId]/page.tsx` | Leitor do tópico em slides (iframe), aceita `?slide=N` |
 | ⬜ | `/topico/[topicoId]/prova` | `app/topico/[topicoId]/prova/page.tsx` | Prova do tópico, com bloqueio quando não tem prova ou o curso não está publicado |
 | ⬜ | `/progresso` | `app/progresso/page.tsx` | Progresso do aluno |
@@ -209,3 +242,39 @@ Revisada logada como Master, no desktop (1366px), tablet (768px) e mobile (375px
 - **Alta:** 1, 2
 - **Média:** 3, 4
 - **Baixa:** 5, 6, 7
+
+### `/curso/{id}` — 2026-09-27
+
+Revisada logada como Master, com o curso 8 (Obreiro I), no desktop (1366px), tablet (768px) e
+mobile (375px). O banco local ainda tem o curso 8 **antes da divisão** (7 módulos, 5 tópicos
+com conteúdo).
+
+**O que já está bom**
+- Sem scroll horizontal da página; o accordion de módulos funciona e abre o módulo do próximo tópico.
+- Estado de cada tópico legível (✓ concluído, anel no atual, "…" em preparação) e chip da prova
+  travado até concluir (link irmão, não aninhado — correto).
+
+**Problemas**
+1. 🔴 **Capa do curso ocupa a primeira tela inteira** (16:9 na largura toda ≈ 1116×628 no desktop):
+   o aluno abre o curso e não vê progresso, nem "continuar", nem módulos sem rolar.
+2. 🔴 **Imagens pesadas**: capas em PNG servidas pelo backend — capa do curso 1,3 MB, módulo 1
+   1,9 MB, módulo 2 1,1 MB… ≈ 8 MB só de capas numa página. Converter pra WebP/JPG ~150 KB e
+   carregar as dos módulos sob demanda (`loading="lazy"`).
+3. 🟠 **Título escrito dentro da imagem e diferente do catálogo**: a capa diz "Formação Geral do
+   Novo Obreiro Cristão" (título antigo no banco), a vitrine diz "Formação do Obreiro: Do Chamado ao
+   Serviço I". O `<h1>` real fica escondido (`sr-only`).
+4. 🟠 **Capa de cada módulo corta o texto desenhado nela** (faixa de 144px de altura mostra
+   "E FUNDAMENTO BÍBLICO" pela metade). Todas as 7 faixas aparecem, uma por módulo, deixando a
+   página com ~3.400px.
+5. 🟠 **"Continuar em …" é um link pequeno de texto**, não um botão — a ação principal da página
+   some no meio.
+6. 🟡 Módulos "em preparação" ocupam o mesmo espaço dos que têm conteúdo (com capa grande).
+7. 🟡 **Nav no tablet (768px) quebra em 2 linhas** ("Meu progresso", "Estudos pessoais") desde que
+   o item "Estudos pessoais" entrou — afeta todas as páginas logadas.
+8. 🟡 **Tema herdado entre contas no mesmo navegador**: depois de entrar como Aluno (tema escuro),
+   o Master voltou em tema escuro — o cookie `tm_theme` não é refeito no login.
+
+**Prioridade sugerida**
+- **Alta:** 1, 2, 5
+- **Média:** 3, 4, 7
+- **Baixa:** 6, 8

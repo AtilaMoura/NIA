@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: página do curso</title>
+<!--
+  Protótipo 04 — /curso/{id}. Dados de exemplo (Obreiro I).
+  - Topo compacto: capa menor ao lado do título REAL (texto, não escrito na imagem),
+    estatísticas, progresso e botão grande "Continuar".
+  - Conteúdo do curso: módulos numa lista enxuta (sem as faixas de capa de 144px);
+    módulo aberto mostra aulas e tópicos com estado, referência e prova.
+  - Módulos em preparação ficam compactos e apagados.
+  Estados pelo # da URL: #novo (0%), #escuro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px; --tm-radius-pill: 999px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-shadow: 0 1px 2px rgba(43,36,28,.06), 0 8px 24px rgba(43,36,28,.06);
+    --tm-maxw: 1000px;
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-accent-2: #b8763a; --tm-good: #4f7a3a;
+    --tm-verse-bg: #fbf3e0; --tm-verse-border: #c9a24a;
+    --gutter: clamp(1rem, 4vw, 2rem);
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-accent-2: #e3ac6a; --tm-good: #7fae62;
+    --tm-verse-bg: #2a2114; --tm-verse-border: #7a5f2e;
+    --tm-shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  .wrap { max-width: var(--tm-maxw); margin: 0 auto; padding: 0 var(--gutter); }
+  .muted { color: var(--tm-ink-muted); }
+  .logo-claro { display: block; } .logo-escuro { display: none; }
+  [data-tm-theme="dark"] .logo-claro { display: none; } [data-tm-theme="dark"] .logo-escuro { display: block; }
+
+  /* ---------- Cabeçalho (logado) ---------- */
+  header.topo { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--tm-bg) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--tm-border); }
+  header.topo .wrap { display: flex; align-items: center; gap: 1rem; height: 56px; max-width: 1180px; }
+  .marca { display: inline-flex; align-items: center; gap: .5rem; flex: none; }
+  .marca img { height: 30px; width: auto; }
+  .marca span { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.12rem; }
+  nav.principal { display: none; gap: .15rem; font-size: .85rem; white-space: nowrap; }
+  nav.principal a { padding: .35rem .7rem; border-radius: var(--tm-radius-pill); color: var(--tm-ink-muted); }
+  nav.principal a:hover { color: var(--tm-accent); }
+  .direita { margin-left: auto; display: flex; align-items: center; gap: .6rem; }
+  .icone-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--tm-border); background: transparent; color: var(--tm-ink-muted); cursor: pointer; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); color: var(--tm-accent); font-weight: 700; font-size: .78rem; border: 1px solid var(--tm-border); }
+  .nome-usuario { display: none; }
+  .hamburguer { display: inline-grid; place-items: center; }
+  @media (min-width: 700px) { nav.principal { display: flex; } .hamburguer { display: none; } }
+  /* nome ao lado do avatar só quando sobra espaço (evita a nav quebrar no tablet) */
+  @media (min-width: 1100px) { .nome-usuario { display: inline; font-size: .85rem; } }
+
+  main { padding: clamp(1.25rem, 4vw, 2.25rem) 0 4rem; }
+  .voltar { display: inline-block; font-size: .85rem; font-weight: 600; color: var(--tm-ink-muted); margin-bottom: 1rem; }
+  .voltar:hover { color: var(--tm-accent); }
+
+  /* ---------- Topo do curso ---------- */
+  .curso-topo { display: grid; gap: 1.25rem; align-items: center; }
+  .curso-topo .capa { border-radius: var(--tm-radius-lg); overflow: hidden; border: 1px solid var(--tm-border); aspect-ratio: 16 / 9; box-shadow: var(--tm-shadow); }
+  .curso-topo .capa img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  @media (min-width: 760px) { .curso-topo { grid-template-columns: 320px 1fr; gap: 2rem; } .curso-topo .capa { aspect-ratio: 4 / 3; } }
+  @media (max-width: 759px) { .curso-topo .capa { aspect-ratio: 21 / 9; } }
+  .sobre { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--tm-accent); }
+  .curso-topo h1 { margin-top: .3rem; font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.12; }
+  .curso-topo .subt { margin-top: .2rem; font-family: var(--tm-font-display); font-style: italic; font-size: 1.05rem; color: var(--tm-ink-muted); }
+  .curso-topo .desc { margin-top: .75rem; font-size: .95rem; color: var(--tm-ink-muted); max-width: 36rem; }
+  .fatos { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: .82rem; color: var(--tm-ink-muted); }
+  .fatos b { color: var(--tm-ink); font-weight: 600; }
+
+  /* Faixa de ação: progresso + continuar */
+  .acao {
+    margin-top: 1.5rem; display: grid; gap: 1rem; align-items: center;
+    background: var(--tm-surface); border: 1px solid var(--tm-border); border-radius: var(--tm-radius-lg);
+    padding: 1.1rem 1.25rem; box-shadow: var(--tm-shadow);
+  }
+  @media (min-width: 760px) { .acao { grid-template-columns: 1fr auto; padding: 1.2rem 1.5rem; } }
+  .acao .rotulo { font-size: .8rem; color: var(--tm-ink-muted); }
+  .acao .proximo { font-weight: 600; margin-top: .1rem; }
+  .progresso { margin-top: .6rem; display: flex; align-items: center; gap: .75rem; font-size: .82rem; color: var(--tm-ink-muted); }
+  .barra { flex: 1; height: 6px; border-radius: 99px; background: var(--tm-surface-2); overflow: hidden; max-width: 360px; }
+  .barra i { display: block; height: 100%; border-radius: 99px; background: var(--tm-good); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; font-weight: 600; font-size: .95rem; padding: .75rem 1.4rem; border-radius: var(--tm-radius-pill); background: var(--tm-accent); color: var(--tm-bg); white-space: nowrap; transition: background-color .15s; }
+  .btn:hover { background: var(--tm-accent-2); }
+
+  /* ---------- Conteúdo do curso ---------- */
+  .conteudo-titulo { margin: 2.25rem 0 .9rem; display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+  .conteudo-titulo h2 { font-size: 1.2rem; }
+  .conteudo-titulo button { border: 0; background: none; cursor: pointer; font-size: .82rem; font-weight: 600; color: var(--tm-accent); }
+  .modulos { display: grid; gap: .6rem; }
+  .modulo { background: var(--tm-surface); border: 1px solid var(--tm-border); border-radius: var(--tm-radius-lg); overflow: hidden; }
+  .modulo > button {
+    width: 100%; display: flex; align-items: center; gap: .9rem; text-align: left;
+    background: none; border: 0; cursor: pointer; padding: .9rem 1.1rem;
+  }
+  .num { flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--tm-surface-2); color: var(--tm-accent); font-family: var(--tm-font-display); font-weight: 600; }
+  .modulo .info { flex: 1; min-width: 0; }
+  .modulo .info small { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--tm-ink-muted); }
+  .modulo .info span { font-family: var(--tm-font-display); font-size: 1.02rem; }
+  .modulo .contagem { flex: none; font-size: .8rem; color: var(--tm-ink-muted); text-align: right; }
+  .mini-barra { display: block; width: 64px; height: 4px; border-radius: 99px; background: var(--tm-surface-2); margin-top: .3rem; margin-left: auto; overflow: hidden; }
+  .mini-barra i { display: block; height: 100%; background: var(--tm-good); }
+  @media (max-width: 559px) { .mini-barra { display: none; } .modulo > button { gap: .7rem; padding: .8rem .9rem; } }
+  .seta { flex: none; color: var(--tm-ink-muted); transition: transform .2s; }
+  .modulo[data-aberto] .seta { transform: rotate(90deg); }
+  .modulo .corpo { display: none; border-top: 1px solid var(--tm-border); }
+  .modulo[data-aberto] .corpo { display: block; }
+  .modulo.preparo { background: transparent; border-style: dashed; }
+  .modulo.preparo > button { cursor: default; padding-top: .65rem; padding-bottom: .65rem; }
+  .modulo.preparo .num { background: transparent; border: 1px dashed var(--tm-border); color: var(--tm-ink-muted); }
+  .modulo.preparo .info span { color: var(--tm-ink-muted); font-size: .95rem; }
+
+  .aula-rotulo { padding: .5rem 1.1rem; font-size: .78rem; font-weight: 600; color: var(--tm-ink-muted); background: color-mix(in srgb, var(--tm-surface-2) 60%, transparent); }
+  .topico { display: flex; align-items: center; gap: .8rem; padding: .75rem 1.1rem; border-top: 1px solid var(--tm-border); }
+  .topico:hover { background: var(--tm-surface-2); }
+  .topico .titulo { flex: 1; min-width: 0; }
+  .topico .titulo small { display: block; font-size: .75rem; color: var(--tm-ink-muted); }
+  .circulo { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--tm-border); display: grid; place-items: center; font-size: .7rem; font-weight: 700; }
+  .circulo.feito { background: var(--tm-good); border-color: var(--tm-good); color: #fff; }
+  .circulo.atual { border-color: var(--tm-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-accent) 20%, transparent); }
+  .topico.atual .titulo { font-weight: 600; }
+  .etiqueta-atual { flex: none; font-size: .7rem; font-weight: 700; color: var(--tm-accent); text-transform: uppercase; letter-spacing: .08em; }
+  .chip { flex: none; font-size: .72rem; font-weight: 600; padding: .2rem .6rem; border-radius: var(--tm-radius-pill); border: 1px solid var(--tm-border); color: var(--tm-ink-muted); white-space: nowrap; }
+  .chip.prova { border-color: var(--tm-accent); color: var(--tm-accent); }
+  .topico.preparo { opacity: .55; }
+  .topico.preparo:hover { background: none; }
+  @media (max-width: 559px) { .ref-chip { display: none; } } /* no celular a referência vai pra linha de baixo do título */
+  @media (min-width: 560px) { .topico .titulo small { display: none; } }
+  [hidden] { display: none !important; }
+
+  footer { border-top: 1px solid var(--tm-border); }
+  footer .wrap { padding-top: 1.2rem; padding-bottom: 1.4rem; font-size: .8rem; color: var(--tm-ink-muted); max-width: 1180px; }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="wrap">
+    <a href="#" class="marca" aria-label="Emaús — início">
+      <img class="logo-claro" src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">
+      <img class="logo-escuro" src="../emaus-web/public/marca/final/logo1-simbolo-escuro.png" alt="">
+      <span>Emaús</span>
+    </a>
+    <nav class="principal">
+      <a href="#">Início</a><a href="#">Meu progresso</a><a href="#">Revisão</a><a href="#">Estudos pessoais</a>
+    </nav>
+    <div class="direita">
+      <button class="icone-btn" onclick="tema()" aria-label="Alternar tema">☾</button>
+      <span class="avatar">AT</span><span class="nome-usuario">Atila</span>
+      <button class="icone-btn hamburguer" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <a href="03-inicio.html" class="voltar">← Início</a>
+
+  <!-- ============ Topo do curso ============ -->
+  <section class="curso-topo">
+    <div class="capa"><img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt=""></div>
+    <div>
+      <p class="sobre">Formação bíblica · Nível intermediário</p>
+      <h1>Formação do Obreiro I</h1>
+      <p class="subt">Firmados na Palavra</p>
+      <p class="desc">O chamado do obreiro, a Bíblia como autoridade e como lê-la, a doutrina básica da fé cristã e as disciplinas espirituais que sustentam quem serve.</p>
+      <p class="fatos"><span><b>4</b> módulos</span><span><b>52</b> tópicos</span><span>Com tutor de IA</span><span>No seu ritmo</span></p>
+    </div>
+  </section>
+
+  <!-- Progresso + ação principal -->
+  <section class="acao" id="acao">
+    <div>
+      <p class="rotulo" id="acao-rotulo">Próximo tópico</p>
+      <p class="proximo" id="acao-proximo">Vocação e Ofícios · Ef 4.11-12</p>
+      <div class="progresso"><span class="barra"><i id="barra" style="width:12%"></i></span><span id="acao-pct">6 de 52 tópicos · 12%</span></div>
+    </div>
+    <a href="#" class="btn" id="acao-btn">Continuar →</a>
+  </section>
+
+  <!-- ============ Conteúdo do curso ============ -->
+  <div class="conteudo-titulo">
+    <h2>Conteúdo do curso</h2>
+    <button type="button" onclick="todos()">Abrir todos</button>
+  </div>
+
+  <div class="modulos">
+    <!-- Módulo com o próximo tópico: já vem aberto -->
+    <div class="modulo" data-aberto>
+      <button type="button" onclick="alternar(this)" aria-expanded="true">
+        <span class="num">1</span>
+        <span class="info"><small>Módulo 1</small><span>Chamado e Fundamento Bíblico</span></span>
+        <span class="contagem">2 de 13<span class="mini-barra"><i style="width:15%"></i></span></span>
+        <span class="seta" aria-hidden="true">▸</span>
+      </button>
+      <div class="corpo">
+        <div class="aula-rotulo">Aula 1 · O Chamado do Obreiro</div>
+        <a href="#" class="topico">
+          <span class="circulo feito">✓</span>
+          <span class="titulo">Sacerdócio de Todos os Crentes<small>1Pe 2.9</small></span>
+          <span class="chip ref-chip">1Pe 2.9</span>
+          <span class="chip prova">📝 Prova</span>
+        </a>
+        <a href="#" class="topico">
+          <span class="circulo feito">✓</span>
+          <span class="titulo">Dons Espirituais<small>Rm 12.6-8</small></span>
+          <span class="chip ref-chip">Rm 12.6-8</span>
+          <span class="chip prova">📝 Prova</span>
+        </a>
+        <a href="#" class="topico atual">
+          <span class="circulo atual"></span>
+          <span class="titulo">Vocação e Ofícios<small>Ef 4.11-12</small></span>
+          <span class="etiqueta-atual">Próximo</span>
+          <span class="chip ref-chip">Ef 4.11-12</span>
+          <span class="chip" title="A prova libera depois que você concluir o tópico">🔒 Prova</span>
+        </a>
+        <a href="#" class="topico">
+          <span class="circulo"></span>
+          <span class="titulo">Função no Corpo de Cristo<small>1Co 12.12-27</small></span>
+          <span class="chip ref-chip">1Co 12.12-27</span>
+          <span class="chip">🔒 Prova</span>
+        </a>
+        <div class="topico preparo">
+          <span class="circulo">…</span>
+          <span class="titulo">Integração na igreja local <span class="muted" style="font-size:.78rem">· em preparação</span></span>
+        </div>
+        <div class="aula-rotulo">Aula 2 · A Bíblia como autoridade</div>
+        <div class="topico preparo">
+          <span class="circulo">…</span>
+          <span class="titulo">Inspiração das Escrituras <span class="muted" style="font-size:.78rem">· em preparação</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modulo">
+      <button type="button" onclick="alternar(this)" aria-expanded="false">
+        <span class="num">2</span>
+        <span class="info"><small>Módulo 2</small><span>Doutrina Básica da Fé Cristã</span></span>
+        <span class="contagem">0 de 14<span class="mini-barra"><i style="width:0"></i></span></span>
+        <span class="seta" aria-hidden="true">▸</span>
+      </button>
+      <div class="corpo">
+        <div class="aula-rotulo">Aula 1 · Deus e a Trindade</div>
+        <a href="#" class="topico"><span class="circulo"></span><span class="titulo">Quem é Deus<small>Dt 6.4</small></span><span class="chip ref-chip">Dt 6.4</span></a>
+      </div>
+    </div>
+
+    <div class="modulo preparo">
+      <button type="button" disabled>
+        <span class="num">3</span>
+        <span class="info"><small>Módulo 3</small><span>Disciplinas Espirituais</span></span>
+        <span class="contagem">em preparação</span>
+      </button>
+    </div>
+    <div class="modulo preparo">
+      <button type="button" disabled>
+        <span class="num">4</span>
+        <span class="info"><small>Módulo 4</small><span>Vida de Serviço</span></span>
+        <span class="contagem">em preparação</span>
+      </button>
+    </div>
+  </div>
+</main>
+
+<footer><div class="wrap">Emaús · plataforma de formação bíblica</div></footer>
+
+<script>
+  // Só pro protótipo
+  function tema() { const r = document.documentElement; r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; }
+  function alternar(btn) {
+    const m = btn.closest(".modulo");
+    const abrir = !m.hasAttribute("data-aberto");
+    m.toggleAttribute("data-aberto", abrir);
+    btn.setAttribute("aria-expanded", abrir);
+  }
+  function todos() {
+    document.querySelectorAll(".modulo:not(.preparo)").forEach((m) => {
+      m.setAttribute("data-aberto", "");
+      m.querySelector("button").setAttribute("aria-expanded", "true");
+    });
+  }
+  const estado = location.hash.slice(1).split(",");
+  if (estado.includes("novo")) {
+    document.getElementById("acao-rotulo").textContent = "Comece pelo primeiro tópico";
+    document.getElementById("acao-proximo").textContent = "Sacerdócio de Todos os Crentes · 1Pe 2.9";
+    document.getElementById("barra").style.width = "0";
+    document.getElementById("acao-pct").textContent = "0 de 52 tópicos";
+    document.getElementById("acao-btn").textContent = "Começar o curso →";
+  }
+  if (estado.includes("escuro")) tema();
+</script>
+</body>
+</html>

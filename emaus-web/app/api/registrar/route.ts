@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { API_URL } from "../../_lib/config";
 import { COOKIE_ROLE, COOKIE_TOKEN, MAX_AGE_SESSAO, type Sessao } from "../../_lib/sessao";
+import { gravarCookiesPreferencias } from "../../_lib/preferencias-cookie";
 
 export async function POST(req: NextRequest) {
   const { name, email, password } = await req.json().catch(() => ({}));
@@ -35,5 +36,7 @@ export async function POST(req: NextRequest) {
   };
   res.cookies.set(COOKIE_TOKEN, token, opts);
   res.cookies.set(COOKIE_ROLE, sessao.role, opts);
+  // Conta nova não herda tema/fonte de quem usou o navegador antes
+  await gravarCookiesPreferencias(res, sessao.id, token);
   return res;
 }
