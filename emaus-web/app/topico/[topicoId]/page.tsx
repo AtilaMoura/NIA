@@ -4,11 +4,10 @@ import { notFound, redirect } from "next/navigation";
 import { LinkBotao } from "../../_ui/Botao";
 import { LogoSimbolo } from "../../_ui/Logo";
 import { AcoesTopico } from "./topico-ui";
-import { ReiniciarTopicoBotao } from "./reiniciar-botao";
 import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getSessao, getToken } from "../../_lib/sessao";
 import { papelPodeRevisar, papelVeEstudosPessoais } from "../../_lib/papel";
-import { cursoPessoal } from "../../_lib/catalogo";
+import { CATALOGO, cursoPessoal, tituloCurto } from "../../_lib/catalogo";
 import { topicoDeEstudoPessoal } from "../../_lib/meus-cursos";
 import {
   getCourse,
@@ -127,7 +126,6 @@ export default async function TopicoPage({
           </span>
         )}
       </span>
-      {!emPreparacao && <ReiniciarTopicoBotao topicoId={topico.id} />}
       <Link href="/inicio" aria-label="Emaús — início" className="shrink-0">
         <LogoSimbolo size={28} className="opacity-80" />
       </Link>
@@ -151,9 +149,19 @@ export default async function TopicoPage({
     );
   }
 
+  // Texto "onde estou" da barra de cima do render (2026-09-27): a barra do Emaús
+  // saiu — o render tem uma barra só, com voltar, título e menu ⋯ (Recomeçar lá dentro).
+  const catalogo = CATALOGO.find((c) => c.courseId === CURSO_ID);
+  const onde = [
+    catalogo ? tituloCurto(catalogo) : null,
+    aula ? `Aula ${aula.lesson_index}` : null,
+    posicao >= 0 && ordenados.length > 0 ? `Tópico ${posicao + 1} de ${ordenados.length}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <div className="flex h-[100dvh] flex-col">
-      {barraTopo}
       {/* conteúdo do backend, confiável — sem sandbox pra não quebrar o JS de slides.
           allow="fullscreen" é o que faz o botão "Tela cheia" do render funcionar dentro do iframe. */}
       <iframe
@@ -170,6 +178,7 @@ export default async function TopicoPage({
           temProximo: proximo?.id != null,
           avaliacaoId: topico.avaliacao_id,
           slide: Number.isInteger(slidePedido) && slidePedido > 0 ? slidePedido : undefined,
+          onde,
         })}
         title={topico.titulo}
         className="w-full flex-1 border-0"

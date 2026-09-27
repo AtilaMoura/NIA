@@ -2,12 +2,20 @@
 
 import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { enviarAvaliacaoTutorProva, marcarProgressoAvaliacao, type StatusTopico } from "../../../_lib/api";
+import { API_URL_PUBLICA } from "../../../_lib/config";
+import {
+  enviarAvaliacaoTutorProva,
+  marcarProgressoAvaliacao,
+  reiniciarAvaliacao,
+  type StatusTopico,
+} from "../../../_lib/api";
 
 // Ponte de mensagens entre o <iframe> do render (avaliacao.html.j2) e o Next.js —
 // sem UI própria. Este componente só existe porque o <iframe> não tem o token de
 // sessão real (fica só no servidor Next.js): quem chama a API do tutor e faz a
 // navegação continua sendo aqui, o resultado só volta pro <iframe> via postMessage.
+const ORIGEM_RENDER = new URL(API_URL_PUBLICA).origin;
+
 export function AcoesProva({
   avaliacaoId,
   topicoId,
@@ -64,6 +72,9 @@ export function AcoesProva({
 
   useEffect(() => {
     function aoReceber(e: MessageEvent) {
+      // Só aceita mensagem do render do backend (2026-09-27) — antes qualquer janela
+      // podia mandar "emaus:concluir"/"emaus:navegar" pra esta página.
+      if (e.origin !== ORIGEM_RENDER) return;
       const d = e.data;
       if (!d || typeof d !== "object") return;
       if (d.tipo === "emaus:concluir" && typeof d.texto === "string") {
@@ -74,6 +85,20 @@ export function AcoesProva({
         // Mesmo motivo do enviarResumo: sem refresh, senão o <iframe> recarrega.
         marcarProgressoAvaliacao(avaliacaoId, "concluido")
           .catch((e) => console.error("falha ao concluir prova (fallback)", e));
+      } else if (d.tipo === "emaus:refazer-topico") {
+        // "↺ Recomeçar esta prova" do menu ⋯ do render (2026-09-27, no lugar do botão
+        // com window.confirm): rodada nova (nada apagado) e recarrega o <iframe> do
+        // início, sem os parâmetros de "já concluída".
+        reiniciarAvaliacao(avaliacaoId)
+          .then(() => {
+            const iframe = document.querySelector("iframe");
+            if (!iframe) return;
+            const u = new URL(iframe.src);
+            ["concluido", "veredito", "resumo"].forEach((k) => u.searchParams.delete(k));
+            u.searchParams.set("slide", "1");
+            iframe.src = u.toString();
+          })
+          .catch((e) => console.error("falha ao recomeçar prova", e));
       } else if (d.tipo === "emaus:navegar") {
         // Prova não tem "próximo" — SEMPRE volta pro tópico de origem. Da
         // revisão ("📖 Rever no slide N") volta já no slide certo.

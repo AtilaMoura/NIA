@@ -39,6 +39,32 @@ def _para_romano(n: int) -> str:
 _env.filters["romano"] = _para_romano
 
 
+# Pasta servida em /static (mesma do app.main.STATIC_DIR: renderer -> app -> backend/static)
+STATIC_DIR = BASE_DIR.parent.parent / "static"
+SUFIXO_OTIMIZADA = ".otim.webp"
+
+
+def _imagem_web(url: str | None) -> str | None:
+    """Troca a imagem pela cópia leve (.otim.webp), se ela existir ao lado da original.
+
+    As originais (PNG/JPG de até ~4 MB, direto da câmera ou da IA) continuam intactas
+    e referenciadas no Topico.content; as cópias leves são geradas por
+    backend/scripts/otimizar_imagens.py. Sem cópia, devolve a URL original (2026-09-27).
+    """
+    if not url or "/static/" not in url:
+        return url
+    prefixo, rel = url.split("/static/", 1)
+    rel_sem_query = rel.split("?", 1)[0]
+    original = STATIC_DIR / rel_sem_query
+    otimizada = original.with_name(original.name + SUFIXO_OTIMIZADA)
+    if otimizada.is_file():
+        return f"{prefixo}/static/{rel_sem_query}{SUFIXO_OTIMIZADA}"
+    return url
+
+
+_env.filters["imagem_web"] = _imagem_web
+
+
 def carregar_temas() -> dict:
     with open(SCHEMA_DIR / "temas.json", encoding="utf-8") as f:
         data = json.load(f)

@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: leitor do tópico</title>
+<!--
+  Protótipo 05 — /topico/{id}: moldura do emaus-web + slides do backend, redesenhados juntos.
+  Texto real do Tópico 1 (Sacerdócio). 4 slides de exemplo: capa, conteúdo, checkpoint, resultado.
+  - UMA barra em cima (voltar · curso/aula · título · menu ⋯), no lugar de três faixas.
+  - Barra de progresso segmentada (15 slides; checkpoints marcados).
+  - Rótulo da seção com o TÍTULO, não o código interno ("pedras-vivas").
+  - Fontes do tema de verdade (Fraunces + Source Sans) — hoje os slides caem em Times/Arial.
+  - Dúvida e anotação viram botões da barra de baixo (nada flutuando sobre o texto).
+  - "Recomeçar" pede confirmação num diálogo da página, não no window.confirm().
+  Navegação: setas ← → ou botões. Estados pela URL: #capa #conteudo #checkpoint #resultado, e #escuro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px; --tm-radius-pill: 999px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-accent-2: #b8763a; --tm-good: #4f7a3a; --tm-warn: #a35a1e;
+    --tm-verse-bg: #fbf3e0; --tm-verse-border: #c9a24a;
+    --tm-shadow: 0 1px 2px rgba(43,36,28,.06), 0 8px 24px rgba(43,36,28,.06);
+    --barra-topo: 56px; --barra-baixo: 64px;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-accent-2: #e3ac6a; --tm-good: #7fae62; --tm-warn: #d08a4e;
+    --tm-verse-bg: #2a2114; --tm-verse-border: #7a5f2e;
+    --tm-shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; }
+  h1, h2, h3 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; letter-spacing: -.01em; line-height: 1.2; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .muted { color: var(--tm-ink-muted); }
+
+  /* ---------- Barra de cima (única) ---------- */
+  .topo { flex: none; height: var(--barra-topo); display: flex; align-items: center; gap: .6rem; padding: 0 clamp(.75rem, 3vw, 1.5rem); background: var(--tm-bg); border-bottom: 1px solid var(--tm-border); position: relative; }
+  .icone { flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--tm-border); background: var(--tm-surface); font-size: 1rem; }
+  .icone:hover { border-color: var(--tm-accent); color: var(--tm-accent); }
+  .topo .centro { flex: 1; min-width: 0; line-height: 1.25; }
+  .topo .onde { font-size: .72rem; color: var(--tm-ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topo .titulo { font-family: var(--tm-font-display); font-weight: 600; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .menu { position: absolute; right: clamp(.75rem, 3vw, 1.5rem); top: calc(var(--barra-topo) - 4px); z-index: 20; width: 230px; background: var(--tm-surface); border: 1px solid var(--tm-border); border-radius: var(--tm-radius); box-shadow: var(--tm-shadow); padding: .35rem; display: none; }
+  .menu.aberto { display: block; }
+  .menu button { display: flex; align-items: center; gap: .6rem; width: 100%; border: 0; background: none; text-align: left; padding: .55rem .7rem; border-radius: 10px; font-size: .9rem; }
+  .menu button:hover { background: var(--tm-surface-2); }
+  .menu hr { border: 0; border-top: 1px solid var(--tm-border); margin: .3rem 0; }
+
+  /* Progresso segmentado */
+  .progresso { flex: none; display: flex; gap: 3px; padding: 6px clamp(.75rem, 3vw, 1.5rem) 0; }
+  .progresso i { flex: 1; height: 4px; border-radius: 99px; background: var(--tm-surface-2); }
+  .progresso i.feito { background: var(--tm-accent); }
+  .progresso i.atual { background: var(--tm-accent-2); }
+  .progresso i.ck { flex: none; width: 10px; height: 10px; margin-top: -3px; border-radius: 3px; transform: rotate(45deg); background: var(--tm-surface-2); border: 1px solid var(--tm-border); }
+  .progresso i.ck.feito { background: var(--tm-accent); border-color: var(--tm-accent); }
+
+  /* ---------- Área do slide ---------- */
+  .palco { flex: 1; overflow-y: auto; }
+  .slide { display: none; max-width: 700px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 2.25rem) clamp(1rem, 4vw, 1.5rem) 2.5rem; animation: entra .25s ease; }
+  .slide.ativo { display: block; }
+  @keyframes entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .secao { font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--tm-accent); margin-bottom: .5rem; }
+  .slide h1 { font-size: clamp(1.7rem, 5vw, 2.3rem); }
+  .slide h2 { font-size: clamp(1.35rem, 4vw, 1.7rem); margin-bottom: .9rem; }
+  .slide p + p { margin-top: .9rem; }
+  .versiculo { margin: 1.1rem 0; padding: .9rem 1.1rem; background: var(--tm-verse-bg); border-left: 3px solid var(--tm-verse-border); border-radius: 0 var(--tm-radius) var(--tm-radius) 0; font-family: var(--tm-font-display); font-style: italic; font-size: 1.02rem; line-height: 1.6; }
+  .versiculo cite { display: block; margin-top: .45rem; font-style: normal; font-family: var(--tm-font-body); font-size: .8rem; color: var(--tm-ink-muted); }
+  .figura { margin: 1.25rem 0; border-radius: var(--tm-radius-lg); overflow: hidden; border: 1px solid var(--tm-border); aspect-ratio: 16 / 9; }
+  .figura img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* Imagem nunca passa de ~42% da altura da tela (no tablet em pé ela ocupava quase tudo) */
+  .figura, .capa-img { width: 100%; max-height: 42vh; } /* largura travada: senão o limite de altura encolhe a imagem de lado */
+  [hidden] { display: none !important; } /* o display dos botões não pode vencer o atributo hidden */
+  .ouvir { display: inline-flex; align-items: center; gap: .45rem; margin-top: .8rem; padding: .35rem .8rem; border-radius: var(--tm-radius-pill); border: 1px solid var(--tm-border); background: var(--tm-surface); font-size: .8rem; font-weight: 600; color: var(--tm-accent); }
+  .atencao { margin-top: 1.2rem; padding: 1rem 1.1rem; border-radius: var(--tm-radius); background: var(--tm-surface); border: 1px solid var(--tm-border); }
+  .atencao strong { display: block; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--tm-warn); margin-bottom: .3rem; }
+
+  /* Capa */
+  .capa-img { margin: 1.1rem 0 1.25rem; border-radius: var(--tm-radius-lg); overflow: hidden; aspect-ratio: 21 / 9; border: 1px solid var(--tm-border); }
+  .capa-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .roteiro { list-style: none; padding: 0; margin: .6rem 0 0; display: grid; gap: .35rem; counter-reset: r; }
+  @media (min-width: 620px) { .roteiro { grid-template-columns: 1fr 1fr; column-gap: 1.5rem; } }
+  .roteiro li { counter-increment: r; display: flex; gap: .6rem; font-size: .92rem; }
+  .roteiro li::before { content: counter(r); flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: .72rem; font-weight: 700; color: var(--tm-accent); border: 1px solid var(--tm-border); }
+  .fatos { margin-top: 1.1rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+  .fatos span { font-size: .8rem; padding: .3rem .75rem; border-radius: var(--tm-radius-pill); background: var(--tm-surface-2); color: var(--tm-ink-muted); }
+
+  /* Checkpoint */
+  .tipo-q { display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .25rem .7rem; border-radius: var(--tm-radius-pill); background: var(--tm-surface-2); color: var(--tm-ink-muted); margin-bottom: .8rem; }
+  .pergunta { font-size: 1.05rem; font-weight: 600; line-height: 1.5; }
+  .opcoes { margin-top: 1rem; display: grid; gap: .55rem; }
+  .opcao { display: flex; gap: .75rem; align-items: flex-start; text-align: left; width: 100%; padding: .85rem 1rem; border-radius: var(--tm-radius); border: 1px solid var(--tm-border); background: var(--tm-surface); font-size: .95rem; line-height: 1.45; }
+  .opcao:hover { border-color: var(--tm-accent); }
+  .opcao .letra { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--tm-border); font-size: .78rem; font-weight: 700; color: var(--tm-ink-muted); }
+  .opcao.escolhida { border-color: var(--tm-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-accent) 18%, transparent); }
+  .opcao.escolhida .letra { background: var(--tm-accent); color: var(--tm-bg); border-color: var(--tm-accent); }
+  .opcao.certa { border-color: var(--tm-good); }
+  .opcao.certa .letra { background: var(--tm-good); border-color: var(--tm-good); color: #fff; }
+  .confianca { margin-top: 1rem; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; font-size: .82rem; color: var(--tm-ink-muted); }
+  .confianca button { border: 1px solid var(--tm-border); background: var(--tm-surface); border-radius: var(--tm-radius-pill); padding: .25rem .8rem; font-size: .8rem; }
+  .confianca button[aria-pressed="true"] { background: var(--tm-surface-2); border-color: var(--tm-accent); color: var(--tm-accent); font-weight: 600; }
+  .explicacao { display: none; margin-top: 1rem; padding: .9rem 1rem; border-radius: var(--tm-radius); background: color-mix(in srgb, var(--tm-good) 10%, transparent); border: 1px solid color-mix(in srgb, var(--tm-good) 35%, transparent); font-size: .92rem; }
+  .explicacao.visivel { display: block; }
+  .aviso-trava { margin-top: 1rem; font-size: .82rem; color: var(--tm-ink-muted); }
+
+  /* Resultado */
+  .resultado-card { margin-top: 1rem; padding: 1.25rem; border-radius: var(--tm-radius-lg); background: var(--tm-surface); border: 1px solid var(--tm-border); box-shadow: var(--tm-shadow); }
+  .veredito { display: inline-flex; align-items: center; gap: .4rem; font-weight: 700; font-size: .85rem; color: var(--tm-good); }
+  .acoes-fim { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: .75rem; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; font-weight: 600; font-size: .95rem; padding: .7rem 1.3rem; border-radius: var(--tm-radius-pill); background: var(--tm-accent); color: var(--tm-bg); border: 0; white-space: nowrap; }
+  .btn:hover { background: var(--tm-accent-2); }
+  .btn.fantasma { background: transparent; color: var(--tm-ink); border: 1px solid var(--tm-border); }
+  .btn:disabled, .icone:disabled { opacity: .45; cursor: not-allowed; }
+  /* Celular: ações do resultado empilhadas na largura toda */
+  @media (max-width: 520px) { .acoes-fim { flex-direction: column; } .acoes-fim .btn { width: 100%; } .dialogo .acoes-fim { flex-direction: row; } .dialogo .acoes-fim .btn { width: auto; } }
+
+  /* ---------- Barra de baixo ---------- */
+  .baixo { flex: none; height: var(--barra-baixo); display: flex; align-items: center; gap: .5rem; padding: 0 clamp(.75rem, 3vw, 1.5rem); border-top: 1px solid var(--tm-border); background: var(--tm-bg); }
+  .baixo .ferramentas { display: flex; gap: .4rem; }
+  .baixo .contador { margin-left: auto; font-size: .82rem; color: var(--tm-ink-muted); white-space: nowrap; }
+  .baixo .btn { padding: .65rem 1.2rem; }
+  @media (max-width: 420px) { .baixo .contador { display: none; } .baixo .btn { margin-left: auto; } }
+
+  /* Diálogo da página (no lugar do window.confirm) */
+  .fundo-dialogo { position: fixed; inset: 0; background: rgba(20,14,8,.45); display: none; place-items: center; z-index: 50; padding: 1rem; }
+  .fundo-dialogo.aberto { display: grid; }
+  .dialogo { max-width: 380px; background: var(--tm-surface); border-radius: var(--tm-radius-lg); padding: 1.4rem; box-shadow: 0 20px 50px rgba(0,0,0,.3); }
+  .dialogo h3 { font-size: 1.15rem; }
+  .dialogo p { margin-top: .5rem; font-size: .92rem; color: var(--tm-ink-muted); }
+  .dialogo .acoes-fim { justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<!-- ============ Barra de cima ============ -->
+<header class="topo">
+  <a href="04-curso.html" class="icone" aria-label="Voltar ao curso">‹</a>
+  <div class="centro">
+    <p class="onde">Formação do Obreiro I · Aula 1 · Tópico 1 de 5</p>
+    <p class="titulo">Sacerdócio de Todos os Crentes</p>
+  </div>
+  <button class="icone" id="btn-menu" aria-label="Mais opções" aria-expanded="false" onclick="menu()">⋯</button>
+  <div class="menu" id="menu" role="menu">
+    <button role="menuitem">☰ Ler em texto corrido</button>
+    <button role="menuitem" onclick="tema()">☾ Tema claro / escuro</button>
+    <button role="menuitem">⛶ Tela cheia</button>
+    <hr>
+    <button role="menuitem" onclick="abrirDialogo()">↺ Recomeçar este tópico</button>
+  </div>
+</header>
+<div class="progresso" id="progresso" aria-hidden="true"></div>
+
+<!-- ============ Slides ============ -->
+<main class="palco" id="palco">
+
+  <!-- Capa -->
+  <section class="slide" data-n="1" data-id="capa">
+    <p class="secao">Tópico 1</p>
+    <h1>Sacerdócio de Todos os Crentes</h1>
+    <div class="capa-img"><img src="../emaus-web/public/heroi/grupo.jpg" alt="Um pequeno grupo estudando junto"></div>
+    <div class="versiculo">“…para que anuncieis as grandezas daquele que vos chamou das trevas para a sua maravilhosa luz.”<cite>1 Pedro 2.9</cite></div>
+    <p class="muted">Antes de aprender o que fazer como obreiro, é preciso entender o que você já é.</p>
+    <h3 style="margin-top:1.4rem;font-size:1.05rem">Roteiro deste tópico</h3>
+    <ol class="roteiro">
+      <li>O texto central (1Pe 2.9)</li><li>Pedras vivas, casa espiritual</li>
+      <li>Raízes no Antigo Testamento</li><li>Sacerdócio real</li>
+      <li>Um Mediador só</li><li>Da igreja primitiva à Reforma</li>
+      <li>Implicações práticas</li><li>Pra você, novo obreiro</li>
+    </ol>
+    <div class="fatos"><span>⏱ ~22 min</span><span>🎧 áudio em cada seção</span><span>✍️ 3 checkpoints</span></div>
+  </section>
+
+  <!-- Conteúdo -->
+  <section class="slide" data-n="3" data-id="conteudo">
+    <p class="secao">Seção 2 · Pedras Vivas, Casa Espiritual</p>
+    <h2>Pedras Vivas, Casa Espiritual</h2>
+    <p>1 Pedro 2.9 não aparece isolado. Pedro vinha construindo uma imagem nos versículos anteriores que explica por que ele pode chamar pessoas comuns de sacerdotes.</p>
+    <button class="ouvir">🎧 Ouvir explicação</button>
+    <div class="versiculo">“…chegando-vos para ele, pedra viva, rejeitada, na verdade, pelos homens, mas, para com Deus eleita e preciosa, vós também, quais pedras vivas, sois edificados como casa espiritual para serdes sacerdócio santo…”<cite>1 Pedro 2.4-6 (Almeida)</cite></div>
+    <figure class="figura" style="margin-left:0;margin-right:0"><img src="../emaus-web/public/heroi/estrada.jpg" alt="Ilustração" loading="lazy"></figure>
+    <p>A lógica do texto é: Jesus é a pedra angular — a pedra que define o alinhamento de todo o edifício. Quem se aproxima dele não fica do lado de fora observando; é encaixado na mesma construção, como mais uma pedra viva.</p>
+    <div class="atencao"><strong>Ponto de atenção</strong>Nenhuma pedra, por mais “viva” que seja, constrói algo sozinha. O texto nunca fala de “pedra viva” no singular isolado — é sempre “pedras”.</div>
+  </section>
+
+  <!-- Checkpoint -->
+  <section class="slide" data-n="4" data-id="checkpoint">
+    <p class="secao">Checkpoint 1 de 3</p>
+    <span class="tipo-q">Múltipla escolha</span>
+    <p class="pergunta">A passagem de 1 Pedro 2.4-6 descreve os crentes como “pedras vivas” sendo edificadas como uma “casa espiritual”. Qual afirmação melhor capta o significado dessa imagem?</p>
+    <div class="opcoes" id="opcoes">
+      <button class="opcao" data-i="0"><span class="letra">A</span>Cada crente é uma pedra única e independente, com sua própria relação direta com Deus.</button>
+      <button class="opcao" data-i="1"><span class="letra">B</span>A imagem enfatiza que o sacerdócio é um privilégio individual que não depende da comunidade.</button>
+      <button class="opcao" data-i="2"><span class="letra">C</span>As “pedras vivas” indicam que o sacerdócio é uma verdade comunitária: os crentes são parte de uma construção maior.</button>
+      <button class="opcao" data-i="3"><span class="letra">D</span>O objetivo é que cada crente se torne uma “pedra angular” em sua própria fé.</button>
+    </div>
+    <div class="confianca">Quão seguro você está?
+      <button aria-pressed="false">Pouco</button><button aria-pressed="false">Médio</button><button aria-pressed="false">Muito</button>
+    </div>
+    <div class="explicacao" id="explicacao"><strong>✓ Isso mesmo.</strong> Nenhuma pedra constrói algo sozinha — o sacerdócio é uma verdade comunitária antes de ser individual.</div>
+    <p class="aviso-trava" id="aviso-trava">Responda pra liberar o próximo slide.</p>
+  </section>
+
+  <!-- Resultado -->
+  <section class="slide" data-n="15" data-id="resultado">
+    <p class="secao">Fim do tópico</p>
+    <h2>Resultado</h2>
+    <div class="resultado-card">
+      <p class="veredito">✓ Você domina o conteúdo</p>
+      <p style="margin-top:.6rem">Você entendeu que o sacerdócio de todos os crentes é comunitário e que existe um só Mediador. Vale reler “Raízes no Antigo Testamento” pra fixar a ligação com Êxodo 19.</p>
+    </div>
+    <div class="acoes-fim">
+      <a href="#" class="btn">Fazer a prova →</a>
+      <a href="#" class="btn fantasma">Próximo tópico</a>
+      <a href="04-curso.html" class="btn fantasma">Voltar ao curso</a>
+    </div>
+  </section>
+</main>
+
+<!-- ============ Barra de baixo ============ -->
+<footer class="baixo">
+  <button class="icone" id="btn-anterior" onclick="ir(-1)" aria-label="Slide anterior">◀</button>
+  <div class="ferramentas">
+    <button class="icone" aria-label="Ouvir este slide" title="Ouvir (velocidade no menu do player)">🎧</button>
+    <button class="icone" aria-label="Tirar dúvida com o tutor" title="Tirar dúvida">❓</button>
+    <button class="icone" aria-label="Fazer uma anotação" title="Anotar">✍️</button>
+  </div>
+  <span class="contador" id="contador">1 de 15</span>
+  <button class="btn" id="btn-proximo" onclick="ir(1)">Próximo ▶</button>
+</footer>
+
+<!-- Diálogo "Recomeçar" -->
+<div class="fundo-dialogo" id="dialogo" role="dialog" aria-modal="true" aria-labelledby="dlg-t">
+  <div class="dialogo">
+    <h3 id="dlg-t">Recomeçar este tópico?</h3>
+    <p>Suas respostas atuais saem da tela e você responde tudo de novo. Nada é apagado — a tentativa anterior fica no histórico.</p>
+    <div class="acoes-fim">
+      <button class="btn fantasma" onclick="fecharDialogo()">Cancelar</button>
+      <button class="btn" onclick="fecharDialogo()">Recomeçar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Só pro protótipo: 4 slides de exemplo mapeados nas posições reais (1, 3, 4 e 15 de 15)
+  const TOTAL = 15, CHECKPOINTS = [4, 8, 12];
+  const slides = [...document.querySelectorAll(".slide")];
+  let atual = 0, respondido = false;
+
+  function desenharProgresso(n) {
+    const p = document.getElementById("progresso");
+    p.innerHTML = "";
+    for (let i = 1; i <= TOTAL; i++) {
+      const el = document.createElement("i");
+      if (CHECKPOINTS.includes(i)) el.className = "ck";
+      if (i < n) el.classList.add("feito");
+      else if (i === n && !CHECKPOINTS.includes(i)) el.classList.add("atual");
+      p.appendChild(el);
+    }
+  }
+  function mostrar(i) {
+    atual = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, k) => s.classList.toggle("ativo", k === atual));
+    const n = Number(slides[atual].dataset.n);
+    document.getElementById("contador").textContent = `${n} de ${TOTAL}`;
+    desenharProgresso(n);
+    const ehCk = slides[atual].dataset.id === "checkpoint";
+    const ehFim = slides[atual].dataset.id === "resultado";
+    const prox = document.getElementById("btn-proximo");
+    prox.disabled = ehCk && !respondido;
+    // No resultado as ações ficam no próprio slide (prova / próximo / curso)
+    prox.hidden = ehFim;
+    document.getElementById("btn-anterior").disabled = atual === 0;
+    document.getElementById("palco").scrollTop = 0;
+  }
+  function ir(d) { if (d > 0 && document.getElementById("btn-proximo").disabled) return; if (d < 0 && atual === 0) return; mostrar(atual + d); }
+  document.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") ir(1); if (e.key === "ArrowLeft") ir(-1); if (e.key === "Escape") { fecharDialogo(); fecharMenu(); } });
+
+  document.querySelectorAll(".opcao").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opcao").forEach((o) => o.classList.remove("escolhida", "certa"));
+    b.classList.add(b.dataset.i === "2" ? "certa" : "escolhida");
+    respondido = true;
+    document.getElementById("explicacao").classList.toggle("visivel", b.dataset.i === "2");
+    document.getElementById("aviso-trava").textContent = b.dataset.i === "2" ? "" : "Não é essa — releia “Ponto de atenção” e tente de novo, ou siga em frente.";
+    mostrar(atual);
+  }));
+  document.querySelectorAll(".confianca button").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".confianca button").forEach((o) => o.setAttribute("aria-pressed", o === b));
+  }));
+
+  function tema() { const r = document.documentElement; r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; fecharMenu(); }
+  function menu() { const m = document.getElementById("menu"); const a = !m.classList.contains("aberto"); m.classList.toggle("aberto", a); document.getElementById("btn-menu").setAttribute("aria-expanded", a); }
+  function fecharMenu() { document.getElementById("menu").classList.remove("aberto"); document.getElementById("btn-menu").setAttribute("aria-expanded", "false"); }
+  function abrirDialogo() { fecharMenu(); document.getElementById("dialogo").classList.add("aberto"); }
+  function fecharDialogo() { document.getElementById("dialogo").classList.remove("aberto"); }
+  document.addEventListener("click", (e) => { if (!e.target.closest("#menu, #btn-menu")) fecharMenu(); });
+
+  const estado = location.hash.slice(1).split(",");
+  const inicial = slides.findIndex((s) => estado.includes(s.dataset.id));
+  if (estado.includes("escuro")) document.documentElement.dataset.tmTheme = "dark";
+  mostrar(inicial >= 0 ? inicial : 0);
+</script>
+</body>
+</html>

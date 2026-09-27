@@ -119,7 +119,7 @@
   {% elif bloco.tipo == 'imagem_sugerida' %}
     {% if bloco.url %}
     <figure class="fig-wrap" style="padding:0; overflow:hidden;">
-      <img src="{{ bloco.url }}" alt="{{ bloco.alt or bloco.descricao }}" style="width:100%; display:block; border-radius: var(--radius-lg);">
+      <img src="{{ bloco.url | imagem_web }}" alt="{{ bloco.alt or bloco.descricao }}" loading="lazy" decoding="async" class="bloco-imagem" style="width:100%; display:block; border-radius: var(--radius-lg);">
       {% if bloco.legenda %}<figcaption style="font-size:12px; color:var(--text-muted); padding:8px 12px;">{{ bloco.legenda }}</figcaption>{% endif %}
     </figure>
     {% else %}
@@ -253,40 +253,60 @@
     --violet: {{ tema.cores.violet }};
     --radius: {{ tema.radius }};
     --radius-lg: {{ tema.radiusLg }};
-    --font-display: {{ tema.fontFamilyDisplay | default(tema.fontFamily) }};
-    --font-label: {{ tema.fontFamilyLabel | default(tema.fontFamily) }};
+    --font-display: {{ tema.fontFamilyDisplay | default(tema.fontFamily) | safe }};
+    --font-label: {{ tema.fontFamilyLabel | default(tema.fontFamily) | safe }};
   }
   html, body {
     margin: 0; padding: 0;
-    font-family: {{ tema.fontFamily }};
+    font-family: {{ tema.fontFamily | safe }};
     color: var(--text);
     background: var(--bg);
     height: 100%;
     overflow: hidden;
   }
 
+  /* Barra de cima ÚNICA (redesign 2026-09-27, protótipo prototipos-front/05-topico.html):
+     voltar · onde estou + título · menu ⋯. Antes eram 3 faixas (barra do Emaús +
+     esta + rótulo da seção) e no celular sobravam ~360px pra ler. */
   .topbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 60;
-    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
     backdrop-filter: blur(18px) saturate(140%);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
     color: var(--text);
-    padding: 13px 16px 11px;
+    padding: 8px clamp(12px, 3vw, 24px) 0;
     border-bottom: 1px solid var(--border-soft);
   }
-  .topbar-row { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; gap: 10px; }
-  .topbar-title { font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); font-size: 10.5px; }
-  .topbar-right { display: flex; align-items: center; gap: 10px; }
-  .topbar-count { color: var(--text-dim); font-variant-numeric: tabular-nums; }
-  .fullscreen-btn {
-    flex: 0 0 auto; width: 26px; height: 26px; border-radius: var(--radius-lg);
-    border: 1px solid var(--border); background: var(--surface);
-    color: var(--text); font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: background .2s ease, transform .15s ease;
+  .topbar-row { display: flex; align-items: center; gap: 10px; min-height: 42px; }
+  .topbar-centro { flex: 1; min-width: 0; line-height: 1.25; }
+  .topbar-onde { display: block; font-family: var(--font-label); font-size: 11.5px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-title { display: block; font-family: var(--font-display); font-weight: 600; font-size: 15.5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-icone {
+    flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    font-size: 17px; line-height: 1; cursor: pointer; display: grid; place-items: center;
+    transition: border-color .15s ease, color .15s ease; font-family: inherit;
   }
-  .fullscreen-btn:hover { background: var(--surface-2); }
-  .fullscreen-btn:active { transform: scale(.92); }
-  .modo-btn { width: auto; padding: 0 10px; font-family: var(--font-label); font-size: 10px; letter-spacing: .03em; white-space: nowrap; }
+  .topbar-icone:hover { border-color: var(--accent); color: var(--accent); }
+  .topbar-icone[hidden] { display: none; }
+  .topbar-menu {
+    position: absolute; right: clamp(12px, 3vw, 24px); top: 54px; z-index: 80; width: 240px;
+    background: linear-gradient(var(--surface), var(--surface)), var(--bg);
+    border: 1px solid var(--border-soft); border-radius: var(--radius-lg);
+    box-shadow: 0 10px 30px rgba(0,0,0,.22); padding: 6px;
+  }
+  .topbar-menu[hidden] { display: none; }
+  .topbar-menu hr { border: 0; border-top: 1px solid var(--border-soft); margin: 4px 0; }
+  /* Os botões do menu mantêm os ids/classes antigos (o JS de modo/tema/PDF/tela cheia
+     continua o mesmo) — só mudam de lugar e de visual. */
+  .topbar-menu .fullscreen-btn, .topbar-menu .menu-item {
+    width: 100%; height: auto; display: flex; justify-content: flex-start; gap: 8px;
+    padding: 9px 11px; border: 0; border-radius: var(--radius); background: none;
+    color: var(--text); font-family: var(--font-label); font-size: 13.5px; letter-spacing: 0;
+    text-align: left; cursor: pointer;
+  }
+  .topbar-menu .fullscreen-btn:hover, .topbar-menu .menu-item:hover { background: var(--surface-2); }
+  .topbar-menu [hidden] { display: none; }
   .modo-btn[hidden] { display: none; }
 
   body[data-modo="corrido"] .slide { display: block !important; position: static; height: auto; overflow: visible; padding-bottom: 36px; margin-bottom: 10px; border-bottom: 1px solid var(--border-soft); animation: none !important; }
@@ -295,11 +315,19 @@
   body[data-modo="corrido"] .topbar-count,
   body[data-modo="corrido"] .progress-track { display: none; }
   body[data-modo="corrido"] .slides { height: auto; overflow: visible; padding-bottom: 0; }
-  .progress-track { height: 2px; background: var(--border-soft); margin-top: 10px; overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
-  .section-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--text-dim); margin-top: 8px; font-weight: 600; }
+  /* Progresso segmentado: 1 traço por slide, checkpoints como losango (montado no JS) */
+  .progress-track { display: flex; align-items: center; gap: 3px; padding: 7px 0 8px; }
+  .progress-track i { flex: 1; height: 4px; border-radius: 99px; background: var(--border-soft); transition: background .3s ease; }
+  .progress-track i.feito { background: var(--accent); }
+  .progress-track i.atual { background: color-mix(in srgb, var(--accent) 60%, var(--border-soft)); }
+  .progress-track i.ck { flex: 0 0 9px; height: 9px; border-radius: 2px; transform: rotate(45deg); border: 1px solid var(--border); background: var(--surface); }
+  .progress-track i.ck.feito { background: var(--accent); border-color: var(--accent); }
+  .progress-track i.ck.atual { border-color: var(--accent); }
+  /* Rótulo da seção saiu da barra (mostrava o código interno, ex. "PEDRAS-VIVAS");
+     o título da seção já está no próprio slide. Mantido no DOM só por compatibilidade. */
+  .section-label { display: none; }
 
-  .slides { height: 100%; padding-top: 72px; padding-bottom: 82px; overflow: hidden; background: var(--bg); }
+  .slides { height: 100%; padding-top: 80px; padding-bottom: 64px; overflow: hidden; background: var(--bg); }
   .slide { display: none; height: 100%; overflow-y: auto; padding: 26px 20px 32px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
   .slide::-webkit-scrollbar { width: 7px; }
   .slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
@@ -311,11 +339,13 @@
 
   .conteudo-split { display: flex; flex-direction: column; gap: 22px; }
   .conteudo-split .conteudo-figura { margin: 0; }
+  /* Imagem nunca passa de ~42% da altura da tela (no tablet em pé ocupava quase tudo) */
+  .bloco-imagem, .capa-imagem { max-height: 42vh; object-fit: cover; }
   @media (min-width: 760px) {
     .conteudo-split { flex-direction: row; align-items: flex-start; gap: 32px; }
     .conteudo-split.flip { flex-direction: row-reverse; }
     .conteudo-split .conteudo-texto { flex: 1.3; min-width: 0; }
-    .conteudo-split .conteudo-figura { flex: 1; min-width: 0; position: sticky; top: 88px; }
+    .conteudo-split .conteudo-figura { flex: 1; min-width: 0; }
   }
 
   h1.title { font-family: var(--font-display); font-size: 24px; color: var(--text); margin: 0 0 8px 0; font-weight: {{ tema.pesoTitulo }}; line-height: 1.28; letter-spacing: -.3px; }
@@ -420,6 +450,10 @@
   .confidence button.active { background: var(--accent); color: var(--accent-text-on); border-color: var(--accent); font-weight: 700; }
   .confidence button:active { transform: scale(.94); }
 
+  /* Letra (A, B, C…) antes de cada opção — protótipo 05 (2026-09-27) */
+  .opts { counter-reset: opcao; }
+  .opts .opt-btn { display: flex !important; gap: 10px; align-items: flex-start; }
+  .opts .opt-btn::before { counter-increment: opcao; content: counter(opcao, upper-alpha); flex: 0 0 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--border); font-size: 11.5px; font-weight: 700; color: var(--text-muted); font-family: var(--font-label); }
   .opt-btn { display: block; width: 100%; text-align: left; padding: 12px 13px; margin: 6px 0; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--surface-2); font-size: 14px; cursor: pointer; color: var(--text); transition: border-color .15s ease, transform .12s ease; font-family: inherit; }
   .opt-btn:hover { border-color: var(--accent); transform: translateX(2px); }
   .opt-btn.correct { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; color: var(--accent); }
@@ -460,45 +494,49 @@
 
   .navbar {
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
-    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
     backdrop-filter: blur(18px) saturate(140%);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
     border-top: 1px solid var(--border-soft);
-    padding: 11px 16px; display: flex; align-items: center; gap: 7px;
+    padding: 10px clamp(12px, 3vw, 24px); display: flex; align-items: center; gap: 6px;
   }
-  .nav-btn { flex: 1; padding: 12px; border-radius: var(--radius); border: none; font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: .3px; transition: transform .12s ease, filter .15s ease; font-family: inherit; }
+  .nav-btn { padding: 11px 18px; border-radius: 999px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; letter-spacing: .2px; transition: transform .12s ease, filter .15s ease; font-family: var(--font-label); white-space: nowrap; }
   .nav-btn:active { transform: scale(.97); }
-  .nav-prev { background: var(--surface-2); color: var(--text); border: 1px solid var(--border-soft); flex: 0 0 60px; }
-  .nav-prev:hover:not(:disabled) { border-color: var(--border); }
-  .nav-next { background: var(--accent); color: var(--accent-text-on); flex: 1; }
+  .nav-next { background: var(--accent); color: var(--accent-text-on); margin-left: auto; }
   .nav-next:hover:not(:disabled) { filter: brightness(1.08); }
   .nav-next:disabled { background: var(--surface-2); color: var(--text-dim); cursor: not-allowed; }
-  .nav-audio { flex: 0 0 42px; background: var(--surface-2); border: 1px solid var(--border-soft); color: var(--text); border-radius: var(--radius); font-size: 14px; cursor: pointer; transition: border-color .15s ease; }
-  .nav-audio:hover { border-color: var(--accent); }
+  .nav-next[hidden] { display: none; }
+  /* Ferramentas redondas: voltar slide, ouvir, dúvida, anotar */
+  .nav-prev, .nav-audio, .nav-tool {
+    flex: 0 0 auto; width: 40px; height: 40px; padding: 0; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    font-size: 15px; cursor: pointer; display: grid; place-items: center; position: relative;
+    transition: border-color .15s ease;
+  }
+  .nav-prev:hover:not(:disabled), .nav-audio:hover, .nav-tool:hover { border-color: var(--accent); }
+  .nav-prev:disabled { opacity: .45; cursor: not-allowed; }
   .nav-audio.speaking { background: var(--accent); color: var(--accent-text-on); border-color: var(--accent); }
-  .nav-speed { flex: 0 0 46px; background: var(--surface-2); border: 1px solid var(--border-soft); color: var(--text); border-radius: var(--radius); font-size: 10.5px; font-weight: 700; cursor: pointer; transition: border-color .15s ease; font-family: inherit; }
+  .nav-speed { flex: 0 0 auto; height: 28px; padding: 0 8px; background: none; border: 1px solid var(--border-soft); color: var(--text-muted); border-radius: 999px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-label); }
   .nav-speed:hover { border-color: var(--accent); }
   .nav-speed:active { transform: scale(.94); }
-
-  .anotacao-fab {
-    position: fixed; right: 16px; bottom: 84px; z-index: 70;
-    width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--surface);
-    background: var(--accent); color: var(--accent-text-on); font-size: 19px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.4);
-    transition: transform .12s ease, filter .15s ease;
+  .nav-tool[hidden] { display: none; }
+  .nav-count { margin-left: auto; font-family: var(--font-label); font-size: 12.5px; color: var(--text-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .nav-count + .nav-next { margin-left: 8px; }
+  @media (max-width: 480px) {
+    .nav-count, .nav-speed { display: none; }
+    .nav-count + .nav-next { margin-left: auto; }
+    .nav-prev, .nav-audio, .nav-tool { width: 38px; height: 38px; }
   }
-  /* display:flex acima atropelava o atributo hidden — os botões ✍️/❓
-     apareciam na prova e na revisão do professor, onde o JS os esconde. */
+
+  /* ✍️/❓ eram botões flutuantes por cima do texto; agora ficam na barra de baixo
+     (.nav-tool). A classe anotacao-fab continua porque o JS usa. */
   .anotacao-fab[hidden] { display: none; }
-  .anotacao-fab:hover { filter: brightness(1.08); }
-  .anotacao-fab:active { transform: scale(.94); }
   .anotacao-fab.tem-notas::after {
     content: ''; position: absolute; top: 2px; right: 2px; width: 10px; height: 10px;
-    border-radius: 50%; background: var(--bad); border: 1.5px solid var(--accent);
+    border-radius: 50%; background: var(--bad); border: 1.5px solid var(--surface);
   }
   .anotacao-painel {
-    position: fixed; right: 16px; bottom: 138px; z-index: 70; width: min(340px, calc(100vw - 32px));
+    position: fixed; right: 16px; bottom: 70px; z-index: 70; width: min(340px, calc(100vw - 32px));
     max-height: min(420px, calc(100vh - 220px)); display: flex; flex-direction: column;
     /* --surface é translúcido em temas "vidro" (ex: vidro-fume, 3.5% de branco)
        — sozinho deixava o texto do slide vazar por trás do painel. --bg por
@@ -522,8 +560,6 @@
   .anotacao-lista-item-slide { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); font-weight: 700; }
   .anotacao-lista-item-texto { font-size: 12.5px; margin-top: 2px; color: var(--text-muted); white-space: pre-wrap; }
 
-  .duvida-fab { right: 70px; background: var(--blue); }
-  .duvida-painel { right: 70px; }
   /* Chat de dúvidas (2026-09-23) — conteúdo com classe própria, NÃO
      .anotacao-aba: o JS da anotação esconde toda .anotacao-aba que não seja a
      aba ativa dele, e isso deixava este painel vazio (bug real). */
@@ -633,6 +669,17 @@
   .anotacao-toggle { background: none; border: 1px solid var(--border-soft); color: var(--text-dim); padding: 8px 14px; border-radius: var(--radius); font-size: 12.5px; cursor: pointer; font-family: inherit; }
   .anotacao-toggle:hover { border-color: var(--accent); color: var(--text); }
 
+  /* Diálogo de confirmação (Recomeçar) no visual da página, no lugar do window.confirm */
+  .dialogo-fundo { position: fixed; inset: 0; z-index: 90; background: rgba(20,14,8,.45); display: grid; place-items: center; padding: 16px; }
+  .dialogo-fundo[hidden] { display: none; }
+  .dialogo { max-width: 380px; width: 100%; background: linear-gradient(var(--surface), var(--surface)), var(--bg); border-radius: var(--radius-lg); padding: 22px; box-shadow: 0 20px 50px rgba(0,0,0,.3); }
+  .dialogo h3 { font-family: var(--font-display); margin: 0; font-size: 18px; color: var(--text); }
+  .dialogo p { font-size: 14px; color: var(--text-muted); }
+  .dialogo-acoes { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .dialogo-acoes button { border-radius: 999px; padding: 10px 18px; font-family: var(--font-label); font-size: 14px; font-weight: 600; cursor: pointer; }
+  .dialogo-cancelar { background: none; border: 1px solid var(--border); color: var(--text); }
+  .dialogo-ok { background: var(--accent); border: 1px solid var(--accent); color: var(--accent-text-on); }
+
   svg { width: 100%; height: auto; display: block; }
 
   @media (min-width: 720px) {
@@ -700,7 +747,7 @@
     .topbar, .navbar, .progress-track, .section-label,
     .gate-hint, .confidence, .badge-row, .anotacao-fab, .anotacao-painel,
     .vocab-listen, .vocab-listen-exemplo, .vocab-listen-secao,
-    #pdfBtn, .modo-btn, .fullscreen-btn, .nav-audio,
+    #pdfBtn, .modo-btn, .fullscreen-btn, .nav-audio, .topbar-menu, .dialogo-fundo,
     .slide[data-tipo="checkpoint"],
     .slide[data-tipo="avaliacao_intro"],
     .slide[data-tipo="avaliacao_pergunta"],
@@ -711,7 +758,7 @@
 
     .print-header { display: block !important; font-size: 9.5pt; color: #666;
       border-bottom: 1px solid #bbb; padding-bottom: 6px; margin-bottom: 16px;
-      font-family: {{ tema.fontFamily }}; }
+      font-family: {{ tema.fontFamily | safe }}; }
 
     /* composição de imagem some (sticky não existe em papel) */
     .conteudo-split, .conteudo-split.flip { display: block !important; }
@@ -734,19 +781,28 @@
 
 <div class="topbar">
   <div class="topbar-row">
-    <span class="topbar-title">📖 Tópico {{ content.numero }} · {{ content.titulo }}</span>
-    <span class="topbar-right">
-      <button class="fullscreen-btn modo-btn" id="pdfBtn" title="Baixar PDF (texto corrido) — abre a caixa de impressão, escolha “Salvar como PDF”" hidden>📄 PDF</button>
-      <button class="fullscreen-btn modo-btn" id="modoBtn" title="Alternar entre slide e corrido">☰ Corrido</button>
+    <button type="button" class="topbar-icone" id="voltarBtn" title="Voltar ao curso" aria-label="Voltar ao curso" hidden>‹</button>
+    <div class="topbar-centro">
+      <!-- "onde" vem do Emaús (?onde=Curso · Aula · Tópico X de Y); sem ele, o básico -->
+      <span class="topbar-onde" id="topbarOnde">Tópico {{ content.numero }}{% if content.aula %} · Aula {{ content.aula }}{% endif %}</span>
+      <span class="topbar-title">{{ content.titulo }}</span>
+    </div>
+    <button type="button" class="topbar-icone" id="menuBtn" title="Mais opções" aria-label="Mais opções" aria-haspopup="true" aria-expanded="false">⋯</button>
+    <div class="topbar-menu" id="topbarMenu" role="menu" hidden>
+      <button class="fullscreen-btn modo-btn" id="modoBtn" role="menuitem">☰ Ler em texto corrido</button>
       {% if cores_dark_json %}
-      <button class="fullscreen-btn modo-btn" id="temaBtn" title="Alternar entre claro e escuro">🌙 Escuro</button>
+      <button class="fullscreen-btn modo-btn" id="temaBtn" role="menuitem">🌙 Tema escuro</button>
       {% endif %}
-      <span class="topbar-count" id="slideCount">1/{{ content.slides|length }}</span>
-      <button class="fullscreen-btn" id="fullscreenBtn" title="Tela cheia">⛶</button>
-    </span>
+      <button class="fullscreen-btn" id="fullscreenBtn" role="menuitem">⛶ Tela cheia</button>
+      <button class="fullscreen-btn modo-btn" id="pdfBtn" role="menuitem" title="Abre a caixa de impressão — escolha “Salvar como PDF”" hidden>📄 Baixar PDF</button>
+      <div id="recomecarGrupo" hidden>
+        <hr>
+        <button type="button" class="menu-item" id="recomecarBtn" role="menuitem">↺ Recomeçar este tópico</button>
+      </div>
+    </div>
   </div>
-  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-  <div class="section-label" id="sectionLabel">Conteúdo</div>
+  <div class="progress-track" id="progressTrack" aria-hidden="true"><div class="progress-fill" id="progressFill" hidden></div></div>
+  <div class="section-label" id="sectionLabel"></div>
 </div>
 
 <div class="slides" id="slides">
@@ -759,7 +815,7 @@
         <h1 class="title">{{ slide.titulo }}</h1>
         <h2 class="sub">{{ slide.subtitulo }}</h2>
         {% if content.imagem_capa %}
-        <img class="capa-imagem" src="{{ content.imagem_capa.url }}" alt="{{ content.imagem_capa.alt or slide.titulo }}">
+        <img class="capa-imagem" src="{{ content.imagem_capa.url | imagem_web }}" alt="{{ content.imagem_capa.alt or slide.titulo }}">
         {% endif %}
         {% if slide.instrucoes_box %}
         <div class="box box-instr">
@@ -875,7 +931,6 @@
 {% endfor %}
 </div>
 
-<button type="button" class="anotacao-fab" id="anotacaoFab" title="Anotações" aria-label="Anotações">✍️</button>
 <div class="anotacao-painel" id="anotacaoPainel" hidden>
   <div class="anotacao-painel-tabs">
     <button type="button" class="anotacao-tab active" data-aba="anotar">Anotar este slide</button>
@@ -891,7 +946,6 @@
   </div>
 </div>
 
-<button type="button" class="anotacao-fab duvida-fab" id="duvidaFab" title="Tirar dúvida com a IA" aria-label="Tirar dúvida com a IA">❓</button>
 <div class="anotacao-painel duvida-painel" id="duvidaPainel" hidden>
   <div class="duvida-cabecalho">Tire sua dúvida com a IA</div>
   <div class="duvida-mensagens" id="duvidaMensagens">
@@ -914,10 +968,24 @@
   </div>
 </div>
 
+<div class="dialogo-fundo" id="recomecarDialogo" role="dialog" aria-modal="true" aria-labelledby="recomecarTitulo" hidden>
+  <div class="dialogo">
+    <h3 id="recomecarTitulo">Recomeçar este tópico?</h3>
+    <p>Suas respostas atuais saem da tela e você responde tudo de novo. Nada é apagado — a tentativa anterior fica no histórico.</p>
+    <div class="dialogo-acoes">
+      <button type="button" class="dialogo-cancelar" id="recomecarCancelar">Cancelar</button>
+      <button type="button" class="dialogo-ok" id="recomecarOk">Recomeçar</button>
+    </div>
+  </div>
+</div>
+
 <div class="navbar">
-  <button class="nav-btn nav-prev" id="prevBtn">◀</button>
-  <button class="nav-audio" id="audioBtn" title="Ouvir este slide">🔊</button>
+  <button class="nav-prev" id="prevBtn" title="Slide anterior" aria-label="Slide anterior">◀</button>
+  <button class="nav-audio" id="audioBtn" title="Ouvir este slide" aria-label="Ouvir este slide">🎧</button>
   <button class="nav-speed" id="speedBtn" title="Velocidade do áudio (leitura do slide e 🔊 de vocabulário)">1x</button>
+  <button type="button" class="nav-tool anotacao-fab duvida-fab" id="duvidaFab" title="Tirar dúvida com a IA" aria-label="Tirar dúvida com a IA">❓</button>
+  <button type="button" class="nav-tool anotacao-fab" id="anotacaoFab" title="Anotações" aria-label="Anotações">✍️</button>
+  <span class="nav-count" id="slideCount">1 de {{ content.slides|length }}</span>
   <button class="nav-btn nav-next" id="nextBtn">Próximo ▶</button>
 </div>
 
@@ -1839,6 +1907,8 @@ function dispararCorrecaoIA(qid, respostaDada) {
 // o pai chamou a API (só ele tem o token de sessão real) e manda a resposta
 // de volta pra cá.
 window.addEventListener('message', function (e) {
+  // Só o Emaús que embute este render fala com ele (2026-09-27)
+  if (!EMBUTIDO || e.source !== window.parent) return;
   var d = e.data;
   if (!d) return;
   if (d.tipo === 'emaus:ir-slide' && typeof d.indice === 'number') {
@@ -2253,14 +2323,32 @@ function checkGate(slideEl) {
   }
 }
 
+// Progresso segmentado (2026-09-27): 1 traço por slide, checkpoint/pergunta como
+// losango. Montado uma vez; a cada troca de slide só muda a classe.
+function desenharProgresso(idx) {
+  var trilha = document.getElementById('progressTrack');
+  if (!trilha) return;
+  if (!trilha.dataset.montada) {
+    slides.forEach(function (sl) {
+      var seg = document.createElement('i');
+      if (sl.dataset.gate) seg.className = 'ck';
+      trilha.appendChild(seg);
+    });
+    trilha.dataset.montada = '1';
+  }
+  Array.from(trilha.querySelectorAll('i')).forEach(function (seg, i) {
+    seg.classList.toggle('feito', i < idx);
+    seg.classList.toggle('atual', i === idx);
+  });
+}
+
 function showSlide(idx) {
   stopSpeech();
   slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
   current = idx;
   const slideEl = slides[idx];
-  document.getElementById('slideCount').textContent = (idx + 1) + '/' + slides.length;
-  document.getElementById('progressFill').style.width = ((idx + 1) / slides.length * 100) + '%';
-  document.getElementById('sectionLabel').textContent = slideEl.dataset.section || '';
+  document.getElementById('slideCount').textContent = (idx + 1) + ' de ' + slides.length;
+  desenharProgresso(idx);
   document.getElementById('prevBtn').disabled = idx === 0;
   const nextBtn = document.getElementById('nextBtn');
   nextBtn.textContent = idx === slides.length - 1 ? 'Fim' : 'Próximo ▶';
@@ -2310,6 +2398,9 @@ document.getElementById('nextBtn').addEventListener('click', function () {
   } catch (e) {}
 });
 document.addEventListener('keydown', function (e) {
+  // Digitando (resposta aberta, anotação, dúvida): seta move o cursor, não o slide
+  var alvo = e.target;
+  if (alvo && (alvo.tagName === 'TEXTAREA' || alvo.tagName === 'INPUT' || alvo.isContentEditable)) return;
   if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
   if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
 });
@@ -2435,7 +2526,7 @@ function avisarPai(ligado) {
 function syncFullscreenUI() {
   const on = !!document.fullscreenElement || fallbackFullscreen;
   document.body.classList.toggle('is-fullscreen', on);
-  fullscreenBtn.textContent = on ? '✕' : '⛶';
+  fullscreenBtn.textContent = on ? '✕ Sair da tela cheia' : '⛶ Tela cheia';
   fullscreenBtn.title = on ? 'Sair da tela cheia' : 'Tela cheia';
 }
 fullscreenBtn.addEventListener('click', function () {
@@ -2489,7 +2580,7 @@ abrirSlideInicial();
     document.documentElement.style.height = corrido ? 'auto' : '';
     document.body.style.overflow = corrido ? 'auto' : '';
     document.body.style.height = corrido ? 'auto' : '';
-    modoBtn.textContent = corrido ? '▤ Slide' : '☰ Corrido';
+    modoBtn.textContent = corrido ? '▤ Voltar aos slides' : '☰ Ler em texto corrido';
     try { localStorage.setItem('emausTopicoModo', modo); } catch (e) {}
     if (corrido) { stopSpeech(); buildSummary(); }
   }
@@ -2523,6 +2614,69 @@ abrirSlideInicial();
   });
 })();
 
+
+// Barra de cima (2026-09-27): voltar, "onde estou", menu ⋯ e Recomeçar.
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var isRevisao = params.get('contexto') === 'revisao';
+
+  // "Curso · Aula N · Tópico X de Y" montado pelo Emaús (tem a sessão e os nomes)
+  var onde = params.get('onde');
+  if (onde) document.getElementById('topbarOnde').textContent = onde;
+
+  var ehProva = RESPOSTAS_PREFIXO === 'avaliacao';
+
+  // Voltar: só embutido no Emaús (quem navega é o pai); a revisão tem a barra dela.
+  // Na prova, o Emaús devolve pro tópico de origem.
+  var voltarBtn = document.getElementById('voltarBtn');
+  if (EMBUTIDO && !isRevisao) {
+    voltarBtn.hidden = false;
+    if (ehProva) { voltarBtn.title = 'Voltar ao tópico'; voltarBtn.setAttribute('aria-label', 'Voltar ao tópico'); }
+    voltarBtn.addEventListener('click', function () {
+      try { window.parent.postMessage({ tipo: 'emaus:navegar', destino: 'curso' }, '*'); } catch (e) {}
+    });
+  }
+
+  // Menu ⋯
+  var menuBtn = document.getElementById('menuBtn');
+  var menu = document.getElementById('topbarMenu');
+  function fecharMenu() { menu.hidden = true; menuBtn.setAttribute('aria-expanded', 'false'); }
+  menuBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    menu.hidden = !menu.hidden;
+    menuBtn.setAttribute('aria-expanded', menu.hidden ? 'false' : 'true');
+  });
+  document.addEventListener('click', function (e) { if (!menu.contains(e.target)) fecharMenu(); });
+  menu.addEventListener('click', function (e) { if (e.target.closest('button')) fecharMenu(); });
+
+  // Recomeçar: tópico e prova, embutidos no Emaús (a revisão não tem)
+  var grupo = document.getElementById('recomecarGrupo');
+  var dialogo = document.getElementById('recomecarDialogo');
+  if (EMBUTIDO && !isRevisao && (RESPOSTAS_PREFIXO === 'topico' || ehProva)) {
+    grupo.hidden = false;
+    if (ehProva) {
+      document.getElementById('recomecarBtn').textContent = '↺ Recomeçar esta prova';
+      document.getElementById('recomecarTitulo').textContent = 'Recomeçar esta prova?';
+    }
+    document.getElementById('recomecarBtn').addEventListener('click', function () {
+      dialogo.hidden = false;
+      document.getElementById('recomecarCancelar').focus();
+    });
+    document.getElementById('recomecarCancelar').addEventListener('click', function () { dialogo.hidden = true; });
+    dialogo.addEventListener('click', function (e) { if (e.target === dialogo) dialogo.hidden = true; });
+    // O Emaús abre uma rodada nova (nada é apagado) e recarrega este iframe no slide 1
+    document.getElementById('recomecarOk').addEventListener('click', function () {
+      dialogo.hidden = true;
+      try { window.parent.postMessage({ tipo: 'emaus:refazer-topico' }, '*'); } catch (e) {}
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    fecharMenu();
+    dialogo.hidden = true;
+  });
+})();
 {% if cores_dark_json %}
 // Toggle Escuro/Claro — só existe pra temas que definem 'coresDark' em temas.json.
 // Troca as CSS custom properties direto no client (sem re-render), preferência em
@@ -2548,12 +2702,13 @@ abrirSlideInicial();
     Object.keys(mapaVar).forEach(function (chave) {
       if (cores[chave]) document.documentElement.style.setProperty(mapaVar[chave], cores[chave]);
     });
-    temaBtn.textContent = escuro ? '☀ Claro' : '🌙 Escuro';
+    temaBtn.textContent = escuro ? '☀ Tema claro' : '🌙 Tema escuro';
+    temaBtn.dataset.escuro = escuro ? '1' : '';
     try { localStorage.setItem('emausTopicoTema', escuro ? 'escuro' : 'claro'); } catch (e) {}
   }
 
   temaBtn.addEventListener('click', function () {
-    aplicarTema(temaBtn.textContent.indexOf('Escuro') !== -1);
+    aplicarTema(!temaBtn.dataset.escuro);
   });
 
   var temaSalvo = 'claro';

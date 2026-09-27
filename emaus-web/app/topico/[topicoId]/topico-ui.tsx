@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { API_URL_PUBLICA } from "../../_lib/config";
 import { enviarAvaliacaoTutor, marcarProgresso, reiniciarTopico, type StatusTopico } from "../../_lib/api";
 
 // Ponte de mensagens entre o <iframe> do render (topico.html.j2) e o Next.js —
@@ -12,6 +13,8 @@ import { enviarAvaliacaoTutor, marcarProgresso, reiniciarTopico, type StatusTopi
 // servidor Next.js — ver docstring de topico_respostas.py): quem chama a API
 // do tutor e faz a navegação continua sendo aqui, o resultado só volta pro
 // <iframe> via postMessage pra aparecer dentro do slide.
+const ORIGEM_RENDER = new URL(API_URL_PUBLICA).origin;
+
 export function AcoesTopico({
   topicoId,
   cursoId,
@@ -73,6 +76,9 @@ export function AcoesTopico({
 
   useEffect(() => {
     function aoReceber(e: MessageEvent) {
+      // Só aceita mensagem do render do backend (2026-09-27) — antes qualquer janela
+      // podia mandar "emaus:concluir"/"emaus:navegar" pra esta página.
+      if (e.origin !== ORIGEM_RENDER) return;
       const d = e.data;
       if (!d || typeof d !== "object") return;
       if (d.tipo === "emaus:concluir" && typeof d.texto === "string") {

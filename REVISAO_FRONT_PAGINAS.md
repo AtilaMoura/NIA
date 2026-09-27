@@ -57,6 +57,7 @@ Proposta:
 | 02 | `prototipos-front/02-entrar-criar-conta.html` | `/entrar` + `/criar-conta` | ✅ aprovado e aplicado |
 | 03 | `prototipos-front/03-inicio.html` | `/inicio` | ✅ aprovado e aplicado |
 | 04 | `prototipos-front/04-curso.html` | `/curso/{id}` | ✅ aprovado e aplicado |
+| 05 | `prototipos-front/05-topico.html` | `/topico/{id}` (moldura + slides) | ✅ aprovado e aplicado (vale também pra prova) |
 | — | — | `/estudos` (Master) | versão funcional aplicada (mesmos cartões da /inicio); protótipo próprio a fazer |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
@@ -86,7 +87,7 @@ Proposta:
 |---|---|---|---|
 | ✅ | `/inicio` | `app/inicio/page.tsx` | Home multi-curso estilo streaming (prateleiras, "Continuar estudando") |
 | ✅ | `/curso/[courseId]` | `app/curso/[courseId]/page.tsx` | Página do curso, módulos em accordion com o próximo tópico aberto |
-| ⬜ | `/topico/[topicoId]` | `app/topico/[topicoId]/page.tsx` | Leitor do tópico em slides (iframe), aceita `?slide=N` |
+| ✅ | `/topico/[topicoId]` | `app/topico/[topicoId]/page.tsx` | Leitor do tópico em slides (iframe), aceita `?slide=N` |
 | ⬜ | `/topico/[topicoId]/prova` | `app/topico/[topicoId]/prova/page.tsx` | Prova do tópico, com bloqueio quando não tem prova ou o curso não está publicado |
 | ⬜ | `/progresso` | `app/progresso/page.tsx` | Progresso do aluno |
 | ⬜ | `/perfil` | `app/perfil/page.tsx` | Perfil |
@@ -278,3 +279,56 @@ com conteúdo).
 - **Alta:** 1, 2, 5
 - **Média:** 3, 4, 7
 - **Baixa:** 6, 8
+
+### `/topico/{id}` — moldura + slides — 2026-09-27
+
+Escopo **B** (decisão do usuário): a moldura do `emaus-web` **e** os slides renderizados pelo
+backend (`backend/app/renderer/templates/topico.html.j2`, 2.567 linhas; temas em
+`docs/schema/temas.json`). Revisado com o Tópico 1 (Sacerdócio, tema `trigo-maduro`, 15 slides:
+capa, 10 de conteúdo, 3 checkpoints, resultado). O dev do Next caiu por falta de memória
+(0,9 GB livres), então os slides foram revisados direto pelo backend (`:8100/topicos/1/render`).
+
+**Problemas**
+1. 🔴 **Os slides nunca usaram a fonte do tema (bug, também em produção).** O Jinja escapa as
+   aspas dos nomes de fonte dentro do `<style>` (`&#39;Fraunces&#39;`), o CSS fica inválido e o
+   navegador cai em **Times New Roman / Arial**. Afeta todos os temas com nome de fonte entre aspas.
+   Correção: `| safe` nos 4 pontos do template (linhas 256, 257, 261, 714) — valores vêm do
+   `temas.json`, que é nosso.
+2. 🔴 **Imagens pesadíssimas**: ~11 MB só de imagens no Tópico 1 (`pedras-vivas.jpg` 3,8 MB em
+   4032×3024, direto da câmera; capa 2,5 MB; outras 1,2–1,3 MB). Converter pra WebP/JPG ~1600px
+   (~150–250 KB) e `loading="lazy"` depois do 1º slide.
+3. 🟠 **Três faixas de cabeçalho empilhadas**: barra do Emaús ("Voltar ao curso · aula · Tópico X de Y ·
+   Recomeçar · logo") + barra do slide ("Tópico 1 · título · Corrido · Claro · 1/15 · ⛶") + rótulo da
+   seção. No celular, as barras fixas somam ~200px de 560 → sobra ~360px pra ler.
+4. 🟠 **Rótulo da seção mostra o código interno** ("PEDRAS-VIVAS", "TEXTO-CENTRAL") em vez do
+   título ("Pedras Vivas, Casa Espiritual").
+5. 🟠 **Botões flutuantes (❓ dúvida, ✍️ anotação) ficam por cima do conteúdo** — sobre o texto e a
+   imagem.
+6. 🟠 **Capa corta o título desenhado na imagem** ("SACERDÓCIO" some) — mesmo problema das capas
+   com texto embutido.
+7. 🟡 **No celular o título do tópico quebra em 3 linhas** na barra do slide.
+8. 🟡 **Imagem "grudada" (sticky) de 223px** no conteúdo do desktop: ocupa boa parte da tela baixa.
+9. 🟡 **"↺ Recomeçar" usa `window.confirm()`** (caixa nativa do navegador), fora do visual.
+10. 🟡 **Mensagens do iframe sem checar origem** (`topico-ui.tsx` aceita `postMessage` de qualquer
+    janela); risco baixo, mas o certo é aceitar só do backend.
+
+**Prioridade sugerida**
+- **Alta:** 1 (correção de 4 linhas), 2, 3
+- **Média:** 4, 5, 6
+- **Baixa:** 7, 8, 9, 10
+
+**Aplicado em 2026-09-27**
+- Template `topico.html.j2`: fontes com `| safe` (Fraunces/Source Sans voltaram); barra de cima
+  única (voltar · onde · título · menu ⋯ com corrido/tema/tela cheia/PDF/Recomeçar); progresso
+  segmentado com losango nos checkpoints; rótulo de seção com código interno escondido; ✍️/❓ na
+  barra de baixo; imagem sem "sticky" e com teto de 42% da tela; letras A/B/C nas opções;
+  "Recomeçar" com diálogo da página (tópico e prova); setas não trocam slide enquanto digita;
+  só aceita mensagem do próprio pai.
+- Imagens: `backend/scripts/otimizar_imagens.py` gera cópias `.otim.webp` (1600px, q80) ao lado
+  das originais; filtro `imagem_web` no `render.py` usa a cópia se existir. 110 imagens:
+  **61,3 MB → 6,6 MB**. Originais intactas. **Em produção: rodar o script no servidor.**
+- `emaus-web`: tópico e prova sem a barra própria (passam `?onde=`); removidos os 2 botões
+  "Recomeçar" com `window.confirm`; prova trata o "Recomeçar" do menu; tópico e prova só aceitam
+  `postMessage` da origem do backend.
+- Testado: tópico, prova e modo revisão (render direto + página de teste temporária no backend,
+  já apagada); voltar e Recomeçar pelo Emaús; celular 375px (barras 139px, sem scroll lateral).

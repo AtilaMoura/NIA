@@ -262,6 +262,8 @@ export function topicoRenderUrl(
     temProximo?: boolean;
     avaliacaoId?: number | null;
     slide?: number;
+    /** "Curso · Aula N · Tópico X de Y" pra barra de cima do render (2026-09-27) */
+    onde?: string;
   },
 ) {
   const params = new URLSearchParams({
@@ -284,6 +286,7 @@ export function topicoRenderUrl(
   if (opts.avaliacaoId != null) params.set("avaliacao", "1");
   // Abre direto nesse slide (1-based) em vez do último onde o aluno parou.
   if (opts.slide) params.set("slide", String(opts.slide));
+  if (opts.onde) params.set("onde", opts.onde);
   // Estado inicial da avaliação do tutor (2026-09-11) — reabrir um tópico já
   // concluído já mostra o resultado no slide "Resultado", sem precisar clicar
   // em "Fim" de novo. Só o essencial pro slide renderizar (não manda lacunas).
@@ -307,6 +310,8 @@ export function avaliacaoRenderUrl(
     respostasToken?: string;
     avaliacaoInicial?: AvaliacaoTutor | null;
     concluido?: boolean;
+    /** texto da barra de cima do render (ver topicoRenderUrl) */
+    onde?: string;
   },
 ) {
   const params = new URLSearchParams({
@@ -314,6 +319,7 @@ export function avaliacaoRenderUrl(
     theme: opts.theme ?? THEME_TOPICO,
   });
   if (opts.respostasToken) params.set("token", opts.respostasToken);
+  if (opts.onde) params.set("onde", opts.onde);
   if (opts.concluido && opts.avaliacaoInicial) {
     params.set("concluido", "1");
     params.set("veredito", opts.avaliacaoInicial.veredito);

@@ -4,7 +4,6 @@ import { notFound, redirect } from "next/navigation";
 import { LinkBotao } from "../../../_ui/Botao";
 import { LogoSimbolo } from "../../../_ui/Logo";
 import { AcoesProva } from "./prova-ui";
-import { ReiniciarAvaliacaoBotao } from "./reiniciar-avaliacao-botao";
 import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../../_lib/config";
 import { getSessao, getToken } from "../../../_lib/sessao";
 import { papelPodeRevisar, papelVeEstudosPessoais } from "../../../_lib/papel";
@@ -145,35 +144,15 @@ export default async function ProvaPage({
   const estadoInicial: StatusTopico = progProva?.status ?? "nao_iniciado";
   const analiseInicial = progProva?.tutor_analise?.ultima_avaliacao ?? null;
 
-  const barraTopo = (
-    <div
-      id="barra-topo-topico"
-      className="flex items-center gap-3 border-b border-[var(--tm-border)] bg-[var(--tm-bg)] px-[clamp(1rem,4vw,2rem)] py-2.5 text-[.82rem]"
-    >
-      <Link
-        href={`/curso/${CURSO_ID}`}
-        className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-[var(--tm-accent)] hover:underline"
-      >
-        <span aria-hidden>‹</span> Voltar ao curso
-      </Link>
-      <span className="min-w-0 flex-1 truncate text-[var(--tm-ink-muted)]">
-        {aula?.title}
-        {posicao >= 0 && ordenados.length > 0 && (
-          <span className="ml-2 whitespace-nowrap">
-            · Tópico {posicao + 1} de {ordenados.length}
-          </span>
-        )}
-      </span>
-      <ReiniciarAvaliacaoBotao avaliacaoId={topico.avaliacao_id} />
-      <Link href="/inicio" aria-label="Emaús — início" className="shrink-0">
-        <LogoSimbolo size={28} className="opacity-80" />
-      </Link>
-    </div>
-  );
+
+  // Mesma barra única do render do tópico (2026-09-27): voltar (ao tópico),
+  // título e menu ⋯ com "Recomeçar esta prova".
+  const onde = [aula ? `Aula ${aula.lesson_index}` : null, "Prova do tópico"]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <div className="flex h-[100dvh] flex-col">
-      {barraTopo}
       {/* conteúdo do backend, confiável — sem sandbox pra não quebrar o JS de slides.
           allow="fullscreen" é o que faz o botão "Tela cheia" do render funcionar dentro do iframe. */}
       <iframe
@@ -185,6 +164,7 @@ export default async function ProvaPage({
           // "Resultado" do render, sem precisar clicar em "Fim" de novo.
           concluido: estadoInicial === "concluido",
           avaliacaoInicial: analiseInicial,
+          onde,
         })}
         title={`${topico.titulo} — Prova`}
         className="w-full flex-1 border-0"

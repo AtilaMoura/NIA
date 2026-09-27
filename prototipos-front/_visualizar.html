@@ -4,46 +4,83 @@
 <meta charset="utf-8">
 <title>Visualizar protótipo — celular, tablet e desktop</title>
 <!--
-  Mostra um protótipo em 3 larguras lado a lado.
-  Uso: _visualizar.html?p=02-entrar-criar-conta.html#criar
-  (o que vier depois do # é repassado pra cada tela)
+  Mostra um protótipo em 3 larguras lado a lado, e TODOS os estados/slides dele,
+  um embaixo do outro (uma linha por estado).
+  Uso: _visualizar.html?p=05-topico.html
+       _visualizar.html?p=05-topico.html&estados=capa,conteudo   (escolhe os estados)
+  Cada estado vira o # passado pro protótipo (ex.: 05-topico.html#checkpoint).
+  Sem ?p= mostra a lista de protótipos.
 -->
 <style>
   body { margin: 0; background: #2b2b2b; font: 13px system-ui, sans-serif; color: #ddd; }
-  header { padding: 8px 14px; display: flex; gap: 16px; align-items: center; }
-  .telas { display: flex; gap: 14px; padding: 0 14px 14px; align-items: flex-start; overflow-x: auto; }
-  figure { margin: 0; }
+  header { position: sticky; top: 0; z-index: 5; background: #2b2b2b; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; border-bottom: 1px solid #444; }
+  header a { color: #eab676; text-decoration: none; }
+  header a.atual { color: #fff; font-weight: 700; }
+  .estado { padding: 14px; border-bottom: 1px solid #3a3a3a; }
+  .estado h2 { margin: 0 0 8px; font-size: 14px; color: #fff; }
+  .estado h2 small { font-weight: 400; color: #999; margin-left: 6px; }
+  .telas { display: flex; gap: 14px; align-items: flex-start; overflow-x: auto; }
+  figure { margin: 0; flex: none; }
   figcaption { margin-bottom: 4px; opacity: .7; }
-  iframe { border: 0; background: #fff; height: calc(100vh - 70px); display: block; }
+  iframe { border: 0; background: #fff; display: block; }
 </style>
 </head>
 <body>
-<header><strong id="nome"></strong><span>celular 375 · tablet 768 · desktop 1280 (reduzido)</span></header>
-<div class="telas" id="telas"></div>
+<header id="topo"></header>
+<main id="conteudo"></main>
 <script>
-  const p = new URLSearchParams(location.search).get("p") || "01-visitante.html";
-  const alvo = p + location.hash;
-  document.getElementById("nome").textContent = alvo;
-  const telas = [
-    { rotulo: "Celular", w: 375, zoom: 1 },
-    { rotulo: "Tablet", w: 768, zoom: 1 },
-    { rotulo: "Desktop", w: 1280, zoom: 0.55 },
+  // Estados conhecidos de cada protótipo (o que vai depois do # na URL dele)
+  const PROTOTIPOS = {
+    "01-visitante.html": { nome: "01 · Visitante", estados: [["", "Página"], ["escuro", "Tema escuro"]] },
+    "02-entrar-criar-conta.html": { nome: "02 · Entrar / Criar conta", estados: [["", "Entrar"], ["erro", "Entrar com erro"], ["criar", "Criar conta"], ["criar,erro,escuro", "Criar conta · erro · escuro"]] },
+    "03-inicio.html": { nome: "03 · Início", estados: [["", "Com curso em andamento"], ["novo", "Aluno novo"], ["escuro", "Tema escuro"]] },
+    "04-curso.html": { nome: "04 · Curso", estados: [["", "Em andamento"], ["novo", "0% (começar)"], ["escuro", "Tema escuro"]] },
+    "05-topico.html": { nome: "05 · Tópico", estados: [["capa", "Capa"], ["conteudo", "Conteúdo"], ["checkpoint", "Checkpoint"], ["resultado", "Resultado"], ["conteudo,escuro", "Conteúdo · escuro"]] },
+  };
+  const TELAS = [
+    { rotulo: "Celular", w: 375, h: 700, zoom: 1 },
+    { rotulo: "Tablet", w: 768, h: 700, zoom: 0.75 },
+    { rotulo: "Desktop", w: 1280, h: 760, zoom: 0.55 },
   ];
-  for (const t of telas) {
-    const fig = document.createElement("figure");
-    fig.innerHTML = `<figcaption>${t.rotulo} (${t.w}px)</figcaption>`;
-    const f = document.createElement("iframe");
-    f.src = alvo;
-    f.style.width = t.w + "px";
-    if (t.zoom !== 1) {
-      // desktop encolhido pra caber na tela sem perder o layout de 1280px
-      f.style.transform = `scale(${t.zoom})`;
-      f.style.transformOrigin = "0 0";
-      f.style.height = `calc((100vh - 70px) / ${t.zoom})`;
-      fig.style.width = t.w * t.zoom + "px";
+
+  const params = new URLSearchParams(location.search);
+  const p = params.get("p");
+  const topo = document.getElementById("topo");
+  topo.innerHTML = Object.entries(PROTOTIPOS)
+    .map(([arq, info]) => `<a href="?p=${arq}" class="${arq === p ? "atual" : ""}">${info.nome}</a>`)
+    .join("");
+
+  if (p) {
+    const info = PROTOTIPOS[p] ?? { estados: [["", p]] };
+    const pedidos = params.get("estados");
+    const estados = pedidos ? pedidos.split(";").map((e) => [e, e || "Padrão"]) : info.estados;
+    const main = document.getElementById("conteudo");
+
+    for (const [hash, rotulo] of estados) {
+      const sec = document.createElement("section");
+      sec.className = "estado";
+      sec.innerHTML = `<h2>${rotulo}<small>${p}${hash ? "#" + hash : ""}</small></h2><div class="telas"></div>`;
+      const telas = sec.querySelector(".telas");
+      for (const t of TELAS) {
+        const fig = document.createElement("figure");
+        fig.innerHTML = `<figcaption>${t.rotulo} (${t.w}px)</figcaption>`;
+        const f = document.createElement("iframe");
+        f.loading = "lazy"; // só carrega quando a linha chega perto da tela
+        f.src = p + (hash ? "#" + hash : "");
+        f.style.width = t.w + "px";
+        f.style.height = t.h + "px";
+        if (t.zoom !== 1) {
+          // encolhido pra caber sem perder o layout daquela largura
+          f.style.transform = `scale(${t.zoom})`;
+          f.style.transformOrigin = "0 0";
+          fig.style.width = t.w * t.zoom + "px";
+          fig.style.height = t.h * t.zoom + 20 + "px";
+        }
+        fig.appendChild(f);
+        telas.appendChild(fig);
+      }
+      main.appendChild(sec);
     }
-    fig.appendChild(f);
-    document.getElementById("telas").appendChild(fig);
   }
 </script>
 </body>
