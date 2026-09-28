@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.core.security import create_access_token, verify_password, hash_password, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.core.auth import get_current_user
-from app.schemas.auth import TopicoTokenRequest, AvaliacaoTokenRequest, UserLogin, UserRegister, Token, UserMe
+from app.schemas.auth import TopicoTokenRequest, AvaliacaoTokenRequest, UserLogin, UserRegister, Token, UserMe, TrocarSenha
 from app.database import get_db
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -28,6 +28,24 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
 
     access_token = create_access_token({"sub": str(new_user.id)})
     return Token(access_token=access_token)
+
+@router.post("/trocar-senha")
+def trocar_senha(
+    data: TrocarSenha,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """O próprio usuário troca a senha (perfil do Emaús, 2026-09-27). Exige a senha
+    atual — quem só pegou o aparelho destravado não consegue trocar. O token atual
+    continua valendo (não derruba a sessão)."""
+    if not verify_password(data.senha_atual, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="A senha atual não confere.")
+    if verify_password(data.senha_nova, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="A nova senha precisa ser diferente da atual.")
+    current_user.password_hash = hash_password(data.senha_nova)
+    db.commit()
+    return {"ok": True}
+
 
 @router.get("/me", response_model=UserMe)
 def me(current_user: User = Depends(get_current_user)):

@@ -12,11 +12,17 @@ export function CriarContaForm() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [confirma, setConfirma] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   async function criar(e: React.FormEvent) {
     e.preventDefault();
+    // Confirmação de senha (pendência P1, 2026-09-27): evita criar conta com senha digitada errado
+    if (senha !== confirma) {
+      setErro("As senhas não conferem. Digite a mesma senha nos dois campos.");
+      return;
+    }
     setEnviando(true);
     setErro(null);
     try {
@@ -65,6 +71,21 @@ export function CriarContaForm() {
           Crie uma senha
           <CampoSenha valor={senha} aoMudar={setSenha} autoComplete="new-password" minLength={6} />
           <span className="vidro-suave text-[.78rem] font-normal">Pelo menos 6 caracteres.</span>
+        </label>
+        <label className="grid gap-1.5 text-[.84rem] font-semibold">
+          Confirme a senha
+          <input
+            type="password"
+            name="confirmar-senha"
+            autoComplete="new-password"
+            required
+            value={confirma}
+            onChange={(e) => setConfirma(e.target.value)}
+            aria-invalid={confirma.length > 0 && confirma !== senha}
+          />
+          {confirma.length > 0 && confirma !== senha && (
+            <span className="text-[.78rem] font-normal text-[#ffb4a8]">Ainda não é igual à senha acima.</span>
+          )}
         </label>
         {erro && (
           <p role="alert" className="acesso-erro m-0">

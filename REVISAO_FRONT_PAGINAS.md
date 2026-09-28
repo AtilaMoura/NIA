@@ -21,7 +21,7 @@ e só depois montar o plano de execução (aprovar antes de mexer).
 
 Anotadas ao aprovar a `/inicio`. Nenhuma foi feita ainda.
 
-### P1. Cadastro simples demais — senha com confirmação
+### P1. Cadastro simples demais — senha com confirmação ✅ FEITO (2026-09-27)
 Hoje `/criar-conta` só pede nome, e-mail e senha (mín. 6). Pedido: **campo "confirmar senha"**
 (e revisar o que mais falta no cadastro). Só front: comparar os dois campos antes de enviar e
 mostrar erro "as senhas não conferem". Avaliar junto: regra de senha mais forte e mostrar a força.
@@ -60,6 +60,7 @@ Proposta:
 | 05 | `prototipos-front/05-topico.html` | `/topico/{id}` (moldura + slides) | ✅ aprovado e aplicado (vale também pra prova) |
 | 06 | `prototipos-front/06-prova.html` | `/topico/{id}/prova` | ✅ aprovado e aplicado |
 | 07 | `prototipos-front/07-progresso.html` | `/progresso` | ✅ aprovado e aplicado |
+| 08 | `prototipos-front/08-perfil.html` | `/perfil` | ✅ aprovado e aplicado |
 | — | — | `/estudos` (Master) | versão funcional aplicada (mesmos cartões da /inicio); protótipo próprio a fazer |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
@@ -92,7 +93,7 @@ Proposta:
 | ✅ | `/topico/[topicoId]` | `app/topico/[topicoId]/page.tsx` | Leitor do tópico em slides (iframe), aceita `?slide=N` |
 | ✅ | `/topico/[topicoId]/prova` | `app/topico/[topicoId]/prova/page.tsx` | Prova do tópico, com bloqueio quando não tem prova ou o curso não está publicado |
 | ✅ | `/progresso` | `app/progresso/page.tsx` | Progresso do aluno |
-| ⬜ | `/perfil` | `app/perfil/page.tsx` | Perfil |
+| ✅ | `/perfil` | `app/perfil/page.tsx` | Perfil |
 | ⬜ | `/preferencias` | `app/preferencias/page.tsx` | Preferências (tema) |
 
 ### Revisão (professor/admin)
@@ -414,3 +415,29 @@ tópicos agrupada por aula (`_ui/LinhaDoTempoTopicos.tsx`, também usada em `/re
   título antigo: fica pra revisão das páginas de revisão.
 - Testado: Master com 3 cursos (Inglês, Engenharia, Obreiro I), celular 375px sem scroll lateral,
   aluno sem progresso vê o estado vazio e não vê curso pessoal.
+
+### `/perfil` — 2026-09-27
+
+Revisada logada como Master (desktop).
+
+**Problemas**
+1. 🟠 **"Estudo" fixo num curso só** (`TEOLOGIA_COURSE_IDS[0]`), com o título antigo do banco e
+   0% — e repete, pior, o que a `/progresso` já mostra.
+2. 🟠 **Não dá pra trocar a senha.** Só o nome é editável; o backend também não tem esse
+   recurso (só `/auth/register` e `/auth/login`). Liga com as pendências P1 (senha no cadastro) e
+   P2 (esqueci a senha).
+3. 🟡 **Sem "Sair" nem atalho pra Preferências** na página — só no menu do avatar.
+4. 🟡 **Página quase vazia** (avatar, nome e uma barra); sem "membro desde".
+
+**Prioridade sugerida**
+- **Média:** 1, 2
+- **Baixa:** 3, 4
+
+**Aplicado em 2026-09-27**
+- Backend: `POST /auth/trocar-senha` (schema `TrocarSenha`, mínimo 6, exige a senha atual, recusa
+  nova igual à atual; o token atual continua valendo). Testado: atual errada, nova curta, troca
+  ok, login com a antiga falha, volta ao original.
+- `emaus-web`: `/api/senha` (proxy com o token httpOnly); `/perfil` com conta (nome editável,
+  papel, e-mail, "no Emaús desde"), "Seu estudo" com dados reais de todos os cursos + "Ver meu
+  progresso", trocar senha (atual + nova + confirmar), atalho Preferências e Sair.
+- **Pendência P1 feita**: "Confirme a senha" no `/criar-conta` (aviso ao digitar + bloqueia envio).

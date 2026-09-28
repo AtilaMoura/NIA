@@ -20,6 +20,20 @@ class UserRegister(BaseModel):
 
     _email_normalizado = field_validator("email")(_normalizar_email)
 
+class TrocarSenha(BaseModel):
+    """Troca de senha pelo próprio usuário logado (perfil, 2026-09-27)."""
+    senha_atual: str
+    senha_nova: str
+
+    @field_validator("senha_nova")
+    @classmethod
+    def _tamanho_minimo(cls, valor: str) -> str:
+        # Mesma regra do cadastro no front (mínimo 6)
+        if len(valor) < 6:
+            raise ValueError("A nova senha precisa ter pelo menos 6 caracteres.")
+        return valor
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

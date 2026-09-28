@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: perfil</title>
+<!--
+  Protótipo 08 — /perfil. Dados de exemplo.
+  - Cartão da conta: avatar, nome (editável), papel, e-mail, "no Emaús desde".
+  - "Seu estudo": 3 números + atalho "Ver meu progresso" (em vez da barra fixa de 1 curso).
+  - "Senha": trocar senha (atual + nova + confirmar) — PRECISA DE BACKEND NOVO.
+  - "Preferências" (atalho) e "Sair da conta".
+  Estados: #editando (editando o nome), #senha (formulário de senha aberto), #senha-ok, #escuro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-shadow: 0 1px 2px rgba(43,36,28,.06), 0 8px 24px rgba(43,36,28,.06);
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-accent-2: #b8763a; --tm-good: #3f7a34; --tm-danger: #a5352b;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-accent-2: #e3ac6a; --tm-good: #8cc06e; --tm-danger: #e48a7e;
+    --tm-shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  h1, h2 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button, input { font: inherit; color: inherit; }
+  .muted { color: var(--tm-ink-muted); }
+  [hidden] { display: none !important; }
+
+  header.topo { border-bottom: 1px solid var(--tm-border); }
+  header.topo .in { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); display: flex; align-items: center; gap: 1rem; height: 56px; }
+  .marca { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.12rem; display: inline-flex; align-items: center; gap: .5rem; }
+  .marca img { height: 28px; }
+  .av-mini { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); border: 1px solid var(--tm-border); color: var(--tm-accent); font-weight: 700; font-size: .78rem; cursor: pointer; }
+
+  main { max-width: 640px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2rem) 4rem; display: grid; gap: 1.1rem; }
+  .cartao { background: var(--tm-surface); border: 1px solid var(--tm-border); border-radius: var(--tm-radius-lg); padding: 1.25rem; }
+  .cartao h2 { font-size: 1.05rem; margin-bottom: .75rem; }
+
+  /* Conta */
+  .conta { display: flex; gap: 1rem; align-items: center; }
+  .avatar { flex: none; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); color: var(--tm-accent); font-family: var(--tm-font-display); font-weight: 600; font-size: 1.5rem; border: 1px solid var(--tm-border); }
+  .nome-linha { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .nome-linha h1 { font-size: 1.4rem; }
+  .papel { font-size: .72rem; font-weight: 700; padding: .1rem .55rem; border-radius: 999px; border: 1px solid var(--tm-accent); color: var(--tm-accent); }
+  .link { background: none; border: 0; padding: 0; cursor: pointer; font-size: .85rem; font-weight: 600; color: var(--tm-accent); }
+  .link:hover { text-decoration: underline; }
+  .desde { font-size: .82rem; margin-top: .15rem; }
+  .editar { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+  input { width: 100%; padding: .6rem .8rem; border-radius: var(--tm-radius); border: 1px solid var(--tm-border); background: var(--tm-surface); }
+  input:focus { outline: none; border-color: var(--tm-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-accent) 18%, transparent); }
+  .editar input { flex: 1; min-width: 180px; }
+
+  /* Estudo */
+  .numeros { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+  .numeros div { padding: .75rem .85rem; border-radius: var(--tm-radius); background: var(--tm-surface-2); }
+  .numeros b { display: block; font-family: var(--tm-font-display); font-size: 1.35rem; line-height: 1.15; }
+  .numeros span { font-size: .78rem; color: var(--tm-ink-muted); }
+  .rodape-cartao { margin-top: .85rem; }
+
+  /* Linhas de ação */
+  .linha { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .linha p.muted { font-size: .88rem; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: .9rem; padding: .6rem 1.1rem; border-radius: 999px; background: var(--tm-accent); color: var(--tm-bg); border: 0; cursor: pointer; white-space: nowrap; }
+  .btn.fantasma { background: transparent; color: var(--tm-ink); border: 1px solid var(--tm-border); }
+  .btn.perigo { background: transparent; color: var(--tm-danger); border: 1px solid color-mix(in srgb, var(--tm-danger) 50%, transparent); }
+  .form-senha { margin-top: 1rem; display: grid; gap: .75rem; }
+  .form-senha label { display: grid; gap: .3rem; font-size: .84rem; font-weight: 600; }
+  .form-senha .dica { font-size: .78rem; font-weight: 400; color: var(--tm-ink-muted); }
+  .form-senha .acoes { display: flex; gap: .6rem; justify-content: flex-end; }
+  .ok { margin-top: .75rem; padding: .7rem .9rem; border-radius: var(--tm-radius); background: color-mix(in srgb, var(--tm-good) 12%, transparent); color: var(--tm-good); font-size: .9rem; font-weight: 600; }
+  @media (max-width: 480px) { .linha { flex-direction: column; align-items: stretch; } .linha .btn { width: 100%; } .conta { flex-direction: column; text-align: center; } .nome-linha { justify-content: center; } }
+</style>
+</head>
+<body>
+<header class="topo"><div class="in">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús</span>
+  <span class="av-mini" onclick="tema()" title="(protótipo) alterna o tema">AT</span>
+</div></header>
+
+<main>
+  <!-- Conta -->
+  <section class="cartao">
+    <div class="conta">
+      <div class="avatar">AT</div>
+      <div style="min-width:0;flex:1">
+        <div class="nome-linha" id="nome-ver">
+          <h1>Atila</h1><span class="papel">Master</span>
+          <button class="link" onclick="editar(true)">Editar nome</button>
+        </div>
+        <div class="editar" id="nome-editar" hidden>
+          <input value="Atila" aria-label="Seu nome">
+          <button class="btn" onclick="editar(false)">Salvar</button>
+          <button class="link" onclick="editar(false)">Cancelar</button>
+        </div>
+        <p class="muted" style="margin-top:.25rem">master@emaus.local</p>
+        <p class="muted desde">No Emaús desde setembro de 2026</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Estudo -->
+  <section class="cartao">
+    <h2>Seu estudo</h2>
+    <div class="numeros">
+      <div><b>3</b><span>cursos</span></div>
+      <div><b>10</b><span>tópicos concluídos</span></div>
+      <div><b>1</b><span>prova feita</span></div>
+    </div>
+    <p class="rodape-cartao"><a href="07-progresso.html" class="link">Ver meu progresso →</a></p>
+  </section>
+
+  <!-- Senha -->
+  <section class="cartao">
+    <div class="linha">
+      <div><h2 style="margin:0">Senha</h2><p class="muted">Troque quando quiser. Você continua conectado.</p></div>
+      <button class="btn fantasma" id="btn-senha" onclick="senha(true)">Trocar senha</button>
+    </div>
+    <div class="form-senha" id="form-senha" hidden>
+      <label>Senha atual<input type="password" autocomplete="current-password"></label>
+      <label>Nova senha<input type="password" autocomplete="new-password"><span class="dica">Pelo menos 6 caracteres.</span></label>
+      <label>Confirme a nova senha<input type="password" autocomplete="new-password"></label>
+      <div class="acoes"><button class="link" onclick="senha(false)">Cancelar</button><button class="btn" onclick="senhaOk()">Salvar nova senha</button></div>
+    </div>
+    <p class="ok" id="senha-ok" hidden>✓ Senha alterada.</p>
+  </section>
+
+  <!-- Preferências -->
+  <section class="cartao">
+    <div class="linha">
+      <div><h2 style="margin:0">Preferências</h2><p class="muted">Tema claro ou escuro e tamanho do texto.</p></div>
+      <a href="#" class="btn fantasma">Ajustar</a>
+    </div>
+  </section>
+
+  <!-- Sair -->
+  <section class="cartao">
+    <div class="linha">
+      <div><h2 style="margin:0">Sair da conta</h2><p class="muted">Neste aparelho.</p></div>
+      <button class="btn perigo">Sair</button>
+    </div>
+  </section>
+</main>
+
+<script>
+  // Só pro protótipo
+  function tema() { const r = document.documentElement; r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; }
+  function editar(on) { document.getElementById("nome-ver").hidden = on; document.getElementById("nome-editar").hidden = !on; }
+  function senha(on) { document.getElementById("form-senha").hidden = !on; document.getElementById("btn-senha").hidden = on; document.getElementById("senha-ok").hidden = true; }
+  function senhaOk() { senha(false); document.getElementById("senha-ok").hidden = false; }
+  const e = location.hash.slice(1).split(",");
+  if (e.includes("editando")) editar(true);
+  if (e.includes("senha")) senha(true);
+  if (e.includes("senha-ok")) senhaOk();
+  if (e.includes("escuro")) tema();
+</script>
+</body>
+</html>
