@@ -24,6 +24,10 @@ RUN useradd -m -u 10001 nia
 # NÃO entra aqui — é montado como volume em runtime (ver docker-compose.backend.yml).
 COPY backend/app ./app
 COPY backend/_seed_emaus_users.py ./
+# Scripts de manutenção de dados rodados via `compose exec` (ex.:
+# scripts/corrigir_intro_provas.py, 2026-09-27). Gravam backup em /app, por isso
+# entram antes do chown.
+COPY backend/scripts ./scripts
 RUN mkdir -p ./static && chown -R nia:nia /app
 
 # Schema de temas do renderizador — fora de /app porque o código resolve o
