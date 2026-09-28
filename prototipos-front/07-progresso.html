@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: seu progresso</title>
+<!--
+  Protótipo 07 — /progresso. Dados de exemplo.
+  - Resumo geral: tópicos concluídos · provas feitas · dominados pelo tutor · tempo de estudo.
+  - Um bloco por curso em que o aluno tem progresso (não mais só o Obreiro I fixo no código).
+  - Lista compacta: a linha inteira é o link; estado, data, veredito do tutor e prova na mesma linha.
+  - Tópico começado aparece "Em andamento" (não "Disponível"); sem aviso contraditório.
+  Estados pelo #: #novo (nada começado), #escuro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px; --tm-radius-pill: 999px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-shadow: 0 1px 2px rgba(43,36,28,.06), 0 8px 24px rgba(43,36,28,.06);
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-accent-2: #b8763a; --tm-good: #3f7a34; --tm-warn: #a35a1e;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-accent-2: #e3ac6a; --tm-good: #8cc06e; --tm-warn: #d08a4e;
+    --tm-shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
+  .muted { color: var(--tm-ink-muted); }
+  [hidden] { display: none !important; }
+
+  header.topo { border-bottom: 1px solid var(--tm-border); }
+  header.topo .wrap { max-width: 1180px; display: flex; align-items: center; gap: 1rem; height: 56px; }
+  .marca { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.12rem; display: inline-flex; align-items: center; gap: .5rem; }
+  .marca img { height: 28px; }
+  nav { display: none; gap: .15rem; font-size: .85rem; }
+  nav a { padding: .35rem .7rem; border-radius: 999px; color: var(--tm-ink-muted); }
+  nav a.ativo { background: var(--tm-surface-2); color: var(--tm-ink); font-weight: 600; }
+  @media (min-width: 700px) { nav { display: flex; } }
+  .avatar { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); border: 1px solid var(--tm-border); color: var(--tm-accent); font-weight: 700; font-size: .78rem; cursor: pointer; }
+
+  main { padding: clamp(1.5rem, 4vw, 2.5rem) 0 4rem; }
+  h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); }
+
+  /* Resumo geral */
+  .resumo { margin-top: 1.1rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: .7rem; }
+  @media (min-width: 640px) { .resumo { grid-template-columns: repeat(4, 1fr); } }
+  .numero { padding: .9rem 1rem; border-radius: var(--tm-radius); background: var(--tm-surface); border: 1px solid var(--tm-border); }
+  .numero b { display: block; font-family: var(--tm-font-display); font-size: 1.55rem; line-height: 1.15; }
+  .numero span { font-size: .82rem; color: var(--tm-ink-muted); }
+
+  /* Bloco do curso */
+  .curso { margin-top: 1.75rem; border-radius: var(--tm-radius-lg); background: var(--tm-surface); border: 1px solid var(--tm-border); box-shadow: var(--tm-shadow); overflow: hidden; }
+  .curso-topo { display: grid; grid-template-columns: 1fr; gap: 1rem; padding: 1.1rem 1.2rem; align-items: center; }
+  @media (min-width: 640px) { .curso-topo { grid-template-columns: 110px 1fr auto; } }
+  .curso-topo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--tm-radius); display: none; }
+  @media (min-width: 640px) { .curso-topo img { display: block; } }
+  .curso-topo h2 { font-size: 1.15rem; }
+  .barra-linha { margin-top: .5rem; display: flex; align-items: center; gap: .75rem; font-size: .82rem; color: var(--tm-ink-muted); }
+  .barra { flex: 1; max-width: 320px; height: 6px; border-radius: 99px; background: var(--tm-surface-2); overflow: hidden; }
+  .barra i { display: block; height: 100%; background: var(--tm-good); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: .92rem; padding: .65rem 1.2rem; border-radius: 999px; background: var(--tm-accent); color: var(--tm-bg); white-space: nowrap; }
+  @media (max-width: 639px) { .curso-topo .btn { width: 100%; } }
+
+  /* Lista de tópicos */
+  details { border-top: 1px solid var(--tm-border); }
+  summary { list-style: none; cursor: pointer; padding: .7rem 1.2rem; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tm-ink-muted); display: flex; justify-content: space-between; gap: 1rem; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "▸"; transition: transform .2s; }
+  details[open] summary::after { transform: rotate(90deg); }
+  summary span { text-transform: none; letter-spacing: 0; font-weight: 600; }
+  .topico { display: flex; align-items: center; gap: .75rem; padding: .7rem 1.2rem; border-top: 1px solid var(--tm-border); }
+  a.topico:hover { background: var(--tm-surface-2); }
+  .icone { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: .7rem; font-weight: 700; border: 2px solid var(--tm-border); }
+  .icone.feito { background: var(--tm-good); border-color: var(--tm-good); color: #fff; }
+  .icone.andamento { border-color: var(--tm-accent); }
+  .topico .texto { flex: 1; min-width: 0; }
+  .topico .titulo { font-size: .95rem; }
+  .topico .sub { display: block; font-size: .76rem; color: var(--tm-ink-muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: .35rem; justify-content: flex-end; }
+  .chip { font-size: .72rem; font-weight: 600; padding: .15rem .55rem; border-radius: 999px; border: 1px solid var(--tm-border); color: var(--tm-ink-muted); white-space: nowrap; }
+  .chip.bom { border-color: color-mix(in srgb, var(--tm-good) 55%, transparent); color: var(--tm-good); }
+  .chip.aviso { border-color: color-mix(in srgb, var(--tm-warn) 55%, transparent); color: var(--tm-warn); }
+  @media (max-width: 559px) { .topico { flex-wrap: wrap; } .chips { width: 100%; justify-content: flex-start; padding-left: 2.1rem; } }
+  .topico.preparo { opacity: .55; }
+
+  .vazio { margin-top: 1.5rem; padding: 1.5rem; border-radius: var(--tm-radius-lg); border: 1px dashed var(--tm-border); background: var(--tm-surface-2); text-align: center; }
+  .vazio p { margin: .4rem 0 1rem; color: var(--tm-ink-muted); }
+</style>
+</head>
+<body>
+<header class="topo"><div class="wrap">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús</span>
+  <nav><a href="#">Início</a><a href="#" class="ativo">Meu progresso</a><a href="#">Revisão</a><a href="#">Estudos pessoais</a></nav>
+  <span class="avatar" onclick="tema()" title="(protótipo) alterna o tema">AT</span>
+</div></header>
+
+<main class="wrap">
+  <h1>Seu progresso</h1>
+
+  <div id="com-progresso">
+    <div class="resumo">
+      <div class="numero"><b>6</b><span>tópicos concluídos</span></div>
+      <div class="numero"><b>5</b><span>dominados pelo tutor</span></div>
+      <div class="numero"><b>2</b><span>provas feitas</span></div>
+      <div class="numero"><b>3h 20min</b><span>de estudo</span></div>
+    </div>
+
+    <section class="curso">
+      <div class="curso-topo">
+        <img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt="">
+        <div>
+          <h2>Formação do Obreiro I</h2>
+          <p class="muted" style="font-size:.85rem">Firmados na Palavra</p>
+          <div class="barra-linha"><span class="barra"><i style="width:12%"></i></span>6 de 52 tópicos · 12%</div>
+        </div>
+        <a href="#" class="btn">Continuar →</a>
+      </div>
+
+      <details open>
+        <summary>Módulo 1 · Chamado e Fundamento Bíblico <span>6 de 13</span></summary>
+        <a href="#" class="topico">
+          <span class="icone feito">✓</span>
+          <span class="texto"><span class="titulo">Sacerdócio de Todos os Crentes</span><span class="sub">Concluído em 6 de set · 1Pe 2.9</span></span>
+          <span class="chips"><span class="chip bom">Tutor: dominado</span><span class="chip bom">Prova: pode seguir</span></span>
+        </a>
+        <a href="#" class="topico">
+          <span class="icone feito">✓</span>
+          <span class="texto"><span class="titulo">Dons Espirituais</span><span class="sub">Concluído em 8 de set · Rm 12.6-8</span></span>
+          <span class="chips"><span class="chip aviso">Tutor: reforço</span><span class="chip">Prova: não feita</span></span>
+        </a>
+        <a href="#" class="topico">
+          <span class="icone andamento"></span>
+          <span class="texto"><span class="titulo">Vocação e Ofícios</span><span class="sub">Em andamento desde 10 de set · Ef 4.11-12</span></span>
+          <span class="chips"><span class="chip">Continuar</span></span>
+        </a>
+        <a href="#" class="topico">
+          <span class="icone"></span>
+          <span class="texto"><span class="titulo">Função no Corpo de Cristo</span><span class="sub">Não iniciado · 1Co 12.12-27</span></span>
+        </a>
+        <div class="topico preparo">
+          <span class="icone">…</span>
+          <span class="texto"><span class="titulo">Integração na igreja local</span><span class="sub">Em preparação</span></span>
+        </div>
+      </details>
+      <details>
+        <summary>Módulo 2 · Doutrina Básica da Fé Cristã <span>0 de 14</span></summary>
+        <a href="#" class="topico"><span class="icone"></span><span class="texto"><span class="titulo">Quem é Deus</span><span class="sub">Não iniciado · Dt 6.4</span></span></a>
+      </details>
+    </section>
+  </div>
+
+  <!-- Aluno sem nada começado -->
+  <div class="vazio" id="sem-progresso" hidden>
+    <h2 style="font-size:1.2rem">Você ainda não começou nenhum curso</h2>
+    <p>Quando você estudar um tópico, o seu avanço aparece aqui.</p>
+    <a href="03-inicio.html" class="btn">Escolher um curso</a>
+  </div>
+</main>
+
+<script>
+  // Só pro protótipo
+  function tema() { const r = document.documentElement; r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; }
+  const estado = location.hash.slice(1).split(",");
+  if (estado.includes("novo")) { document.getElementById("com-progresso").hidden = true; document.getElementById("sem-progresso").hidden = false; }
+  if (estado.includes("escuro")) tema();
+</script>
+</body>
+</html>

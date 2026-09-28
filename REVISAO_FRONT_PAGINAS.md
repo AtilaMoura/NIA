@@ -59,6 +59,7 @@ Proposta:
 | 04 | `prototipos-front/04-curso.html` | `/curso/{id}` | ✅ aprovado e aplicado |
 | 05 | `prototipos-front/05-topico.html` | `/topico/{id}` (moldura + slides) | ✅ aprovado e aplicado (vale também pra prova) |
 | 06 | `prototipos-front/06-prova.html` | `/topico/{id}/prova` | ✅ aprovado e aplicado |
+| 07 | `prototipos-front/07-progresso.html` | `/progresso` | ✅ aprovado e aplicado |
 | — | — | `/estudos` (Master) | versão funcional aplicada (mesmos cartões da /inicio); protótipo próprio a fazer |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
@@ -90,7 +91,7 @@ Proposta:
 | ✅ | `/curso/[courseId]` | `app/curso/[courseId]/page.tsx` | Página do curso, módulos em accordion com o próximo tópico aberto |
 | ✅ | `/topico/[topicoId]` | `app/topico/[topicoId]/page.tsx` | Leitor do tópico em slides (iframe), aceita `?slide=N` |
 | ✅ | `/topico/[topicoId]/prova` | `app/topico/[topicoId]/prova/page.tsx` | Prova do tópico, com bloqueio quando não tem prova ou o curso não está publicado |
-| ⬜ | `/progresso` | `app/progresso/page.tsx` | Progresso do aluno |
+| ✅ | `/progresso` | `app/progresso/page.tsx` | Progresso do aluno |
 | ⬜ | `/perfil` | `app/perfil/page.tsx` | Perfil |
 | ⬜ | `/preferencias` | `app/preferencias/page.tsx` | Preferências (tema) |
 
@@ -375,3 +376,41 @@ intro, 3 objetivas, 2 abertas, resultado) direto pelo backend, e a tela de bloqu
   **Em produção: rodar `docker exec nia_backend python scripts/corrigir_intro_provas.py --aplicar`.**
 - `emaus-web`: `_ui/TelaAviso.tsx` (barra igual à do render + ícone + passos + botão principal)
   em "a prova abre quando concluir o tópico", "tópico em preparação" e "curso em preparação".
+
+### `/progresso` — 2026-09-27
+
+Revisada logada como Master (desktop). Página simples: título, barra do curso, aviso e a lista de
+tópicos agrupada por aula (`_ui/LinhaDoTempoTopicos.tsx`, também usada em `/revisao/aluno/[id]`).
+
+**Problemas**
+1. 🔴 **Um curso só, fixo no código** (`TEOLOGIA_COURSE_IDS[0]` = Obreiro I). Quem faz outro curso
+   não vê o próprio progresso. E usa o título antigo do banco ("Formação Geral do Novo Obreiro
+   Cristão").
+2. 🟠 **Mensagens que se contradizem**: "Você ainda não concluiu nenhum tópico. Comece pelo
+   primeiro" + botão "Começar: …" enquanto a lista mostra o 1º tópico "Continuar · Em andamento
+   desde 6 de set".
+3. 🟠 **"Disponível" com "Em andamento desde 5 de set"**: o selo usa o estado da árvore (só o 1º
+   não concluído é "atual"), mas a data vem do progresso real — tópico começado aparece como
+   "Disponível".
+4. 🟠 **As provas não aparecem** (nem feita, nem veredito), apesar de o dado existir
+   (`listAvaliacaoProgress`).
+5. 🟡 **Cada tópico é um cartão alto** (selo + título + data + link "Abrir tópico" em 3 linhas):
+   com 50+ tópicos por curso a página fica enorme.
+6. 🟡 Tempo de estudo só aparece se > 0 e fica escondido numa linha pequena.
+
+**Prioridade sugerida**
+- **Alta:** 1
+- **Média:** 2, 3, 4
+- **Baixa:** 5, 6
+
+**Aplicado em 2026-09-27**
+- `_lib/progresso.ts`: junta todos os cursos em que o aluno já estudou (estudos pessoais só pro
+  Master) + progresso das provas + resumo geral.
+- `/progresso`: resumo (concluídos · dominados · provas · tempo), um bloco por curso com
+  Continuar, estado vazio "Você ainda não começou nenhum curso".
+- `_ui/LinhaDoTempoTopicos.tsx` compacto, por módulo (abre onde o aluno está), linha inteira é
+  link, "Em andamento" pra tópico começado, chips de tutor e prova. Também muda o visual de
+  `/revisao/aluno/[id]` (cartão em volta) — o cabeçalho dessa página ainda é de 1 curso só e com
+  título antigo: fica pra revisão das páginas de revisão.
+- Testado: Master com 3 cursos (Inglês, Engenharia, Obreiro I), celular 375px sem scroll lateral,
+  aluno sem progresso vê o estado vazio e não vê curso pessoal.

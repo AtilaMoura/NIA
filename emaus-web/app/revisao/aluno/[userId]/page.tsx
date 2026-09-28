@@ -63,10 +63,13 @@ export default async function RevisaoAlunoPage({
         {linhaDoTempo.length === 0 ? (
           <p className="text-[.9rem] text-[var(--tm-ink-muted)]">Ainda sem tópicos disponíveis.</p>
         ) : (
-          <LinhaDoTempoTopicos
-            linhaDoTempo={linhaDoTempo}
-            hrefTopico={(id) => `/revisao/topico/${id}`}
-          />
+          // Lista compacta nova (2026-09-27) não traz moldura própria — o cartão fica aqui
+          <div className="overflow-hidden rounded-[var(--tm-radius-lg)] border border-[var(--tm-border)] bg-[var(--tm-surface)] [&>div>details:first-child]:border-t-0">
+            <LinhaDoTempoTopicos
+              linhaDoTempo={linhaDoTempo}
+              hrefTopico={(id) => `/revisao/topico/${id}`}
+            />
+          </div>
         )}
       </main>
 
