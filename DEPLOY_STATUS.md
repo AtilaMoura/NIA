@@ -8,7 +8,16 @@ capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://
 (backend) e `https://caminho-emaus.duckdns.org` (Emaús) em produção com HTTPS. O `A1.Flex`
 (VM maior) segue em retry automático via cron na VM 2, não bloqueia nada.
 
-## 🚀 Último deploy — 2026-09-27 (redesign do front do aluno)
+## 🚀 Último deploy — 2026-09-28 (página Pessoas + rodapé)
+
+Commit `ca52316`. **VM 1:** backup antes em **`~/backups/antes_pessoas_2026-09-28.dump`**
+(pg_dump -Fc), `git pull` + `up -d --build`; no start criou `ultimo_sinal_em` em
+`topico_progress` e `avaliacao_progress`. **VM 2:** `git pull` + `up -d --build` do Emaús
+(~6 min, não travou). Conferido: API 200, `/pessoas/` sem login → 401, site 200,
+`/revisao/pessoas` sem login → redireciona pro /entrar. Login e tempo de estudo passam a ser
+gravados a partir deste deploy (não há histórico antes).
+
+## 🚀 Deploy anterior — 2026-09-27 (redesign do front do aluno)
 
 Commits `b3a445c` → `a54b779` (visitante, entrar/criar conta, início, curso, tópico/slides,
 prova, progresso, perfil, preferências). Feito nas 2 VMs, sem queda além dos segundos da troca
