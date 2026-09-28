@@ -424,7 +424,8 @@ class TopicoProgress(Base):
 
     iniciado_em = Column(DateTime(timezone=True))    # 1ª vez que virou 'em_andamento'
     concluido_em = Column(DateTime(timezone=True))   # quando virou 'concluido' (não é limpo depois)
-    time_spent_s = Column(Integer, default=0)        # reservado (FASE 3 popula)
+    time_spent_s = Column(Integer, default=0)        # tempo de estudo (sinal do slide a cada minuto, 2026-09-28)
+    ultimo_sinal_em = Column(DateTime(timezone=True))  # último sinal de tempo — impede somar sinal repetido
 
     # Avaliação do Tutor por tópico (FASE 4 do front Emaús). É o análogo, por
     # TÓPICO, do Progress.tutor_analysis por MÓDULO — o Emaús navega por tópico e
@@ -791,7 +792,8 @@ class AvaliacaoProgress(Base):
 
     iniciado_em = Column(DateTime(timezone=True))    # 1ª vez que virou 'em_andamento'
     concluido_em = Column(DateTime(timezone=True))   # quando virou 'concluido' (não é limpo depois)
-    time_spent_s = Column(Integer, default=0)        # reservado (mesmo padrão do TopicoProgress)
+    time_spent_s = Column(Integer, default=0)        # tempo na prova (mesmo sinal do TopicoProgress)
+    ultimo_sinal_em = Column(DateTime(timezone=True))
 
     tutor_veredito = Column(String(10))              # 'dominado' | 'reforco' | None
     tutor_analise = Column(JSONB)                    # { ultima_avaliacao: {...}, historico: [...] }

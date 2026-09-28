@@ -53,3 +53,10 @@ class ResultadoAvaliacaoOut(BaseModel):
     escopo curto do render — não expõe nada além do próprio aluno/recurso."""
     status: str
     analise: dict | None = None
+
+
+class TempoEstudoOut(BaseModel):
+    """Resposta do sinal de tempo (POST /topico-progress/{id}/tempo e o da prova)."""
+
+    contou: bool
+    time_spent_s: int

@@ -17,6 +17,7 @@ from app.routers import topico_anotacoes
 from app.routers import topico_tutor
 from app.routers import revisao
 from app.routers import governanca
+from app.routers import pessoas
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
@@ -64,6 +65,10 @@ def _ensure_colunas_extras(bind):
         "ALTER TABLE users DROP CONSTRAINT IF EXISTS valid_preferred_panel_mode",
         "ALTER TABLE users ADD CONSTRAINT valid_preferred_panel_mode "
         "CHECK (preferred_panel_mode IN ('light', 'dark', 'auto'))",
+        # Página Pessoas do Master (2026-09-28): tempo de estudo vem de um sinal do
+        # slide a cada minuto; esta coluna guarda o último pra não somar repetido.
+        "ALTER TABLE topico_progress ADD COLUMN IF NOT EXISTS ultimo_sinal_em TIMESTAMPTZ",
+        "ALTER TABLE avaliacao_progress ADD COLUMN IF NOT EXISTS ultimo_sinal_em TIMESTAMPTZ",
     ]
     with bind.begin() as conn:
         for s in stmts:
@@ -123,6 +128,7 @@ def create_app():
     app.include_router(topico_tutor.router)
     app.include_router(revisao.router)
     app.include_router(governanca.router)
+    app.include_router(pessoas.router)
     app.include_router(pipeline.router)
     # test_ai.router NÃO é registrado em produção (achado de segurança 2026-09-23:
     # endpoints públicos sem autenticação, aceitando prompt livre — deixavam

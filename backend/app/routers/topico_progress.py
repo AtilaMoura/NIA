@@ -10,10 +10,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
 from app.database import get_db
+from app.services.tempo_estudo import registrar_sinal
 from app.models.models import Topico, TopicoProgress, User
 from app.core.auth import get_current_user, get_topico_resposta_user_id
 from app.schemas.topico_progress import (
     ResultadoAvaliacaoOut,
+    TempoEstudoOut,
     TopicoProgressOut,
     TopicoProgressSlideOut,
     TopicoProgressSlideUpsert,
@@ -221,3 +223,25 @@ def reiniciar_topico(
     db.commit()
     db.refresh(registro)
     return registro
+
+
+@router.post("/{topico_id}/tempo", response_model=TempoEstudoOut)
+def sinal_de_tempo(
+    topico_id: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_topico_resposta_user_id),
+):
+    """Sinal de tempo de estudo do <iframe> (a cada minuto com o slide aberto e a
+    aba visível — 2026-09-28). Mesmo token de escopo curto das respostas. Sem
+    registro de progresso (nunca abriu de verdade) não conta nada."""
+    registro = (
+        db.query(TopicoProgress)
+        .filter(TopicoProgress.user_id == user_id, TopicoProgress.topico_id == topico_id)
+        .first()
+    )
+    if not registro:
+        return TempoEstudoOut(contou=False, time_spent_s=0)
+    contou = registrar_sinal(registro)
+    if contou:
+        db.commit()
+    return TempoEstudoOut(contou=contou, time_spent_s=registro.time_spent_s or 0)

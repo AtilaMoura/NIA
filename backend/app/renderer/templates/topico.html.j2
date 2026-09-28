@@ -1120,6 +1120,26 @@ function salvarSlideRemoto(idx) {
   }).catch(function (e) { console.error('falha ao salvar slide atual', e); });
 }
 
+// Tempo de estudo (página Pessoas do Master, 2026-09-28): a cada minuto, se a aba
+// está visível e a pessoa mexeu na página nos últimos 10 min (clique, tecla,
+// rolagem, toque), manda um sinal. O backend soma no máximo 1 min por sinal e
+// ignora sinal repetido (ver app/services/tempo_estudo.py). Revisão não conta.
+(function () {
+  if (!RESPOSTAS_ATIVO) return;
+  var ultimaInteracao = Date.now();
+  ['pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'].forEach(function (ev) {
+    window.addEventListener(ev, function () { ultimaInteracao = Date.now(); }, { passive: true, capture: true });
+  });
+  setInterval(function () {
+    if (document.visibilityState !== 'visible') return;
+    if (Date.now() - ultimaInteracao > 10 * 60 * 1000) return;
+    fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/tempo', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    }).catch(function () { /* sem rede: só perde este minuto */ });
+  }, 60 * 1000);
+})();
+
 // Este render roda dentro de um <iframe> no Emaús (emaus-web/app/topico) ou
 // sozinho (aba própria, uso pessoal). Vários comportamentos abaixo (botão
 // "Fim" concluir, caixa de copiar resumo, anotação) mudam conforme isso.

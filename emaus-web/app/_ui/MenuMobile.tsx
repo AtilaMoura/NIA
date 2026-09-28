@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Avatar } from "./Avatar";
 import { Chip } from "./Chip";
 import { INFO_PAPEL, type Papel } from "../_lib/papel";
-import { ITENS_AVATAR, NAV_DESLOGADO, NAV_REVISAO, navPrincipal } from "../_lib/nav";
+import { ITENS_AVATAR, NAV_DESLOGADO, navRevisao, navPrincipal } from "../_lib/nav";
 
 // Menu do mobile: hambúrguer + painel deslizante. Mesma navegação do desktop.
 export function MenuMobile({ nome, papel }: { nome?: string | null; papel?: Papel | null }) {
@@ -117,7 +117,7 @@ export function MenuMobile({ nome, papel }: { nome?: string | null; papel?: Pape
 
           {logado && naRevisao && (
             <nav className="flex flex-col gap-0.5 border-t border-[var(--tm-border)] pt-1 text-[.85rem] text-[var(--tm-ink-muted)]">
-              {NAV_REVISAO.map((i) => (
+              {navRevisao(papel).map((i) => (
                 <Link key={i.href} href={i.href} className="rounded-[var(--tm-radius)] px-2 py-2 pl-[2.6rem] hover:bg-[var(--tm-surface-2)]">
                   {i.rotulo}
                 </Link>

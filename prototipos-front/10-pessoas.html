@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: pessoas (Master)</title>
+<!--
+  Protótipo 10 — /revisao/pessoas (só Master). NOMES FICTÍCIOS (o repo é público).
+  - Lista de TODO mundo (alunos, admins, professores), não só alunos.
+  - Por pessoa: papel, cadastro, último acesso (login), última atividade de estudo,
+    tópicos começados/concluídos, provas, tempo de estudo, e um "sinal" (hoje / semana / parado).
+  - Filtro por papel + busca + ordenação. Tabela no desktop, cartões no celular.
+  - Detalhe (#detalhe): números da pessoa + o que estudou tópico a tópico, com datas e tempo.
+  - Rodapé logado compacto (uma linha), no lugar do antigo.
+  - Aviso: acesso e tempo passam a ser registrados a partir do próximo deploy (sem histórico antigo).
+  Estados: #detalhe, #escuro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-shadow: 0 1px 2px rgba(43,36,28,.06), 0 8px 24px rgba(43,36,28,.06);
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-good: #3f7a34; --tm-warn: #a35a1e; --tm-bad: #a5352b;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-good: #8cc06e; --tm-warn: #d08a4e; --tm-bad: #e48a7e;
+    --tm-shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+  h1, h2, h3 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button, input, select { font: inherit; color: inherit; }
+  .muted { color: var(--tm-ink-muted); }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); width: 100%; }
+
+  header.topo { border-bottom: 1px solid var(--tm-border); }
+  header.topo .wrap { max-width: 1180px; display: flex; align-items: center; gap: 1rem; height: 56px; }
+  .marca { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.12rem; display: inline-flex; align-items: center; gap: .5rem; }
+  .marca img { height: 28px; }
+  nav { display: none; gap: .15rem; font-size: .85rem; white-space: nowrap; }
+  nav a { padding: .35rem .7rem; border-radius: 999px; color: var(--tm-ink-muted); }
+  nav a.ativo { background: var(--tm-surface-2); color: var(--tm-ink); font-weight: 600; }
+  @media (min-width: 760px) { nav { display: flex; } }
+  .sub { border-bottom: 1px solid var(--tm-border); }
+  .sub .wrap { max-width: 1180px; display: flex; gap: 1rem; font-size: .82rem; height: 40px; align-items: center; overflow-x: auto; }
+  .sub a { color: var(--tm-ink-muted); white-space: nowrap; }
+  .sub a.ativo { color: var(--tm-accent); font-weight: 700; }
+  .av { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); border: 1px solid var(--tm-border); color: var(--tm-accent); font-weight: 700; font-size: .78rem; cursor: pointer; }
+
+  main { flex: 1; padding: clamp(1.25rem, 4vw, 2.25rem) 0 3rem; }
+  h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); }
+  .aviso { margin-top: .9rem; padding: .7rem .9rem; border-radius: var(--tm-radius); background: var(--tm-surface-2); font-size: .85rem; color: var(--tm-ink-muted); }
+
+  /* Resumo */
+  .resumo { margin-top: 1rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+  @media (min-width: 700px) { .resumo { grid-template-columns: repeat(4, 1fr); } }
+  .num { padding: .8rem .95rem; border-radius: var(--tm-radius); background: var(--tm-surface); border: 1px solid var(--tm-border); }
+  .num b { display: block; font-family: var(--tm-font-display); font-size: 1.45rem; line-height: 1.15; }
+  .num span { font-size: .8rem; color: var(--tm-ink-muted); }
+  .num.alerta b { color: var(--tm-warn); }
+
+  /* Filtros */
+  .filtros { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+  .abas { display: inline-flex; border: 1px solid var(--tm-border); border-radius: 999px; overflow: hidden; }
+  .abas button { border: 0; background: none; padding: .4rem .85rem; font-size: .85rem; cursor: pointer; color: var(--tm-ink-muted); }
+  .abas button[aria-pressed="true"] { background: var(--tm-accent); color: var(--tm-bg); font-weight: 600; }
+  .busca { flex: 1; min-width: 180px; padding: .5rem .8rem; border-radius: 999px; border: 1px solid var(--tm-border); background: var(--tm-surface); }
+  select { padding: .45rem .7rem; border-radius: 999px; border: 1px solid var(--tm-border); background: var(--tm-surface); font-size: .85rem; }
+
+  /* Tabela (desktop) / cartões (celular) */
+  .lista { margin-top: 1rem; border-radius: var(--tm-radius-lg); border: 1px solid var(--tm-border); background: var(--tm-surface); overflow: hidden; }
+  .linha { display: grid; grid-template-columns: 2.2fr 1.2fr 1.2fr .9fr .6fr .8fr 18px; gap: .75rem; align-items: center; padding: .75rem 1.1rem; border-top: 1px solid var(--tm-border); font-size: .88rem; }
+  .linha:first-child { border-top: 0; }
+  .linha.cab { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--tm-ink-muted); background: var(--tm-surface-2); }
+  a.linha:hover { background: var(--tm-surface-2); }
+  .pessoa { display: flex; align-items: center; gap: .65rem; min-width: 0; }
+  .ini { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); color: var(--tm-accent); font-weight: 700; font-size: .78rem; }
+  .pessoa b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .papel { font-size: .7rem; font-weight: 700; padding: .05rem .45rem; border-radius: 999px; border: 1px solid var(--tm-border); color: var(--tm-ink-muted); }
+  .papel.admin { border-color: var(--tm-accent); color: var(--tm-accent); }
+  .sinal { display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap; }
+  .sinal::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--tm-border); }
+  .sinal.hoje::before { background: var(--tm-good); }
+  .sinal.semana::before { background: var(--tm-warn); }
+  .sinal.parado::before { background: var(--tm-bad); }
+  .seta { color: var(--tm-ink-muted); }
+  .rot { display: none; }
+  @media (max-width: 759px) {
+    .linha.cab { display: none; }
+    .linha { grid-template-columns: 1fr 1fr; row-gap: .45rem; padding: .9rem 1rem; }
+    .linha .pessoa { grid-column: 1 / -1; }
+    .linha .seta { display: none; }
+    .rot { display: block; font-size: .7rem; color: var(--tm-ink-muted); text-transform: uppercase; letter-spacing: .06em; }
+  }
+
+  /* Detalhe */
+  .voltar { display: inline-block; font-size: .85rem; font-weight: 600; color: var(--tm-ink-muted); margin-bottom: .9rem; }
+  .ficha { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .ficha .ini { width: 60px; height: 60px; font-size: 1.1rem; }
+  .ficha h1 { font-size: 1.5rem; }
+  .datas { margin-top: .35rem; display: flex; flex-wrap: wrap; gap: .25rem 1.2rem; font-size: .85rem; color: var(--tm-ink-muted); }
+  .datas b { color: var(--tm-ink); font-weight: 600; }
+  .curso { margin-top: 1.25rem; border-radius: var(--tm-radius-lg); border: 1px solid var(--tm-border); background: var(--tm-surface); overflow: hidden; }
+  .curso-cab { padding: .9rem 1.1rem; display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .curso-cab h2 { font-size: 1.05rem; }
+  .barra { height: 6px; width: 180px; border-radius: 99px; background: var(--tm-surface-2); overflow: hidden; }
+  .barra i { display: block; height: 100%; background: var(--tm-good); }
+  .top { display: grid; grid-template-columns: 22px 1fr auto; gap: .7rem; align-items: center; padding: .65rem 1.1rem; border-top: 1px solid var(--tm-border); font-size: .9rem; }
+  .ic { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--tm-border); display: grid; place-items: center; font-size: .68rem; font-weight: 700; }
+  .ic.ok { background: var(--tm-good); border-color: var(--tm-good); color: #fff; }
+  .ic.and { border-color: var(--tm-accent); }
+  .top small { display: block; font-size: .76rem; color: var(--tm-ink-muted); }
+  .chips { display: flex; gap: .35rem; flex-wrap: wrap; justify-content: flex-end; }
+  .chip { font-size: .72rem; font-weight: 600; padding: .12rem .5rem; border-radius: 999px; border: 1px solid var(--tm-border); color: var(--tm-ink-muted); white-space: nowrap; }
+  .chip.bom { border-color: color-mix(in srgb, var(--tm-good) 55%, transparent); color: var(--tm-good); }
+  .chip.aviso { border-color: color-mix(in srgb, var(--tm-warn) 55%, transparent); color: var(--tm-warn); }
+  @media (max-width: 559px) { .top { grid-template-columns: 22px 1fr; } .top .chips { grid-column: 2; justify-content: flex-start; } }
+
+  /* Rodapé logado compacto (vale pra todas as páginas logadas) */
+  footer { border-top: 1px solid var(--tm-border); }
+  footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1.5rem; padding-top: 1rem; padding-bottom: 1.1rem; font-size: .82rem; color: var(--tm-ink-muted); }
+  footer .marca { font-size: .95rem; color: var(--tm-ink); }
+  footer .marca img { height: 22px; }
+  footer nav { display: flex; gap: 1.1rem; font-size: .82rem; }
+  footer nav a { padding: 0; color: var(--tm-ink-muted); }
+  footer nav a:hover { color: var(--tm-accent); }
+</style>
+</head>
+<body>
+<header class="topo"><div class="wrap">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús</span>
+  <nav><a href="#">Início</a><a href="#">Meu progresso</a><a href="#" class="ativo">Revisão</a><a href="#">Estudos pessoais</a></nav>
+  <span class="av" onclick="tema()" title="(protótipo) alterna o tema">AT</span>
+</div></header>
+<div class="sub"><div class="wrap"><a href="#">Fila de revisão</a><a href="#" class="ativo">Pessoas</a></div></div>
+
+<main class="wrap">
+  <!-- ================= LISTA ================= -->
+  <section id="lista">
+    <h1>Pessoas</h1>
+    <p class="muted" style="margin-top:.2rem">Quem está estudando, desde quando e quanto.</p>
+    <p class="aviso">ⓘ Último acesso e tempo de estudo são registrados a partir de 28/09. Antes disso só existe a atividade nos tópicos.</p>
+
+    <div class="resumo">
+      <div class="num"><b>9</b><span>pessoas cadastradas</span></div>
+      <div class="num"><b>3</b><span>estudaram nos últimos 7 dias</span></div>
+      <div class="num"><b>14</b><span>tópicos concluídos (todos)</span></div>
+      <div class="num alerta"><b>3</b><span>admins sem concluir nada</span></div>
+    </div>
+
+    <div class="filtros">
+      <div class="abas" role="group" aria-label="Filtrar por papel">
+        <button aria-pressed="true">Todos</button><button aria-pressed="false">Alunos</button><button aria-pressed="false">Admins</button><button aria-pressed="false">Professores</button>
+      </div>
+      <input class="busca" type="search" placeholder="Buscar por nome ou e-mail">
+      <select aria-label="Ordenar"><option>Última atividade</option><option>Nome</option><option>Cadastro</option><option>Mais parado</option></select>
+    </div>
+
+    <div class="lista">
+      <div class="linha cab"><span>Pessoa</span><span>Último acesso</span><span>Última atividade</span><span>Tópicos</span><span>Provas</span><span>Tempo</span><span></span></div>
+
+      <a href="#detalhe" class="linha" onclick="detalhe(true)">
+        <span class="pessoa"><span class="ini">RL</span><span style="min-width:0"><b>Rafael Lima</b><span class="papel">Aluno</span></span></span>
+        <span><span class="rot">Último acesso</span>hoje, 16:10</span>
+        <span><span class="rot">Última atividade</span><span class="sinal hoje">hoje, 16:13</span></span>
+        <span><span class="rot">Tópicos</span>0 de 2</span>
+        <span><span class="rot">Provas</span>0</span>
+        <span><span class="rot">Tempo</span>42 min</span>
+        <span class="seta">›</span>
+      </a>
+      <a href="#detalhe" class="linha" onclick="detalhe(true)">
+        <span class="pessoa"><span class="ini">JS</span><span style="min-width:0"><b>Joana Souza</b><span class="papel">Aluna</span></span></span>
+        <span><span class="rot">Último acesso</span>ontem, 00:20</span>
+        <span><span class="rot">Última atividade</span><span class="sinal hoje">ontem, 00:46</span></span>
+        <span><span class="rot">Tópicos</span>0 de 2</span>
+        <span><span class="rot">Provas</span>0</span>
+        <span><span class="rot">Tempo</span>18 min</span>
+        <span class="seta">›</span>
+      </a>
+      <a href="#detalhe" class="linha" onclick="detalhe(true)">
+        <span class="pessoa"><span class="ini">MC</span><span style="min-width:0"><b>Marcos Costa</b><span class="papel admin">Admin</span></span></span>
+        <span><span class="rot">Último acesso</span>há 3 dias</span>
+        <span><span class="rot">Última atividade</span><span class="sinal semana">há 3 dias</span></span>
+        <span><span class="rot">Tópicos</span>0 de 1</span>
+        <span><span class="rot">Provas</span>0</span>
+        <span><span class="rot">Tempo</span>6 min</span>
+        <span class="seta">›</span>
+      </a>
+      <a href="#detalhe" class="linha" onclick="detalhe(true)">
+        <span class="pessoa"><span class="ini">PA</span><span style="min-width:0"><b>Paulo Andrade</b><span class="papel admin">Admin</span></span></span>
+        <span><span class="rot">Último acesso</span>—</span>
+        <span><span class="rot">Última atividade</span><span class="sinal parado">há 6 dias</span></span>
+        <span><span class="rot">Tópicos</span>0 de 2</span>
+        <span><span class="rot">Provas</span>0</span>
+        <span><span class="rot">Tempo</span>—</span>
+        <span class="seta">›</span>
+      </a>
+      <a href="#detalhe" class="linha" onclick="detalhe(true)">
+        <span class="pessoa"><span class="ini">CL</span><span style="min-width:0"><b>Clara Lopes</b><span class="papel">Aluna</span></span></span>
+        <span><span class="rot">Último acesso</span>—</span>
+        <span><span class="rot">Última atividade</span><span class="sinal parado">há 8 dias</span></span>
+        <span><span class="rot">Tópicos</span>0 de 1</span>
+        <span><span class="rot">Provas</span>0</span>
+        <span><span class="rot">Tempo</span>—</span>
+        <span class="seta">›</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= DETALHE ================= -->
+  <section id="detalhe" hidden>
+    <a href="#" class="voltar" onclick="detalhe(false)">← Pessoas</a>
+    <div class="ficha">
+      <span class="ini">RL</span>
+      <div>
+        <h1>Rafael Lima <span class="papel" style="vertical-align:middle">Aluno</span></h1>
+        <p class="muted" style="font-size:.9rem">rafael@exemplo.com</p>
+        <p class="datas"><span>Cadastro <b>26/09</b></span><span>Último acesso <b>hoje, 16:10</b></span><span>Última atividade <b>hoje, 16:13</b></span></p>
+      </div>
+    </div>
+
+    <div class="resumo">
+      <div class="num"><b>2</b><span>tópicos começados</span></div>
+      <div class="num"><b>0</b><span>concluídos</span></div>
+      <div class="num"><b>0</b><span>provas feitas</span></div>
+      <div class="num"><b>42 min</b><span>de estudo</span></div>
+    </div>
+
+    <div class="curso">
+      <div class="curso-cab">
+        <h2>Formação do Obreiro I</h2>
+        <span class="muted" style="font-size:.85rem;display:flex;align-items:center;gap:.6rem"><span class="barra"><i style="width:0%"></i></span>0 de 5</span>
+      </div>
+      <div class="top">
+        <span class="ic and"></span>
+        <span>Sacerdócio de Todos os Crentes<small>Começou 26/09 11:10 · parou no slide 9 de 15 · 30 min</small></span>
+        <span class="chips"><span class="chip">Em andamento</span></span>
+      </div>
+      <div class="top">
+        <span class="ic and"></span>
+        <span>Dons Espirituais<small>Começou 27/09 16:02 · parou no slide 3 de 14 · 12 min</small></span>
+        <span class="chips"><span class="chip">Em andamento</span></span>
+      </div>
+      <div class="top">
+        <span class="ic"></span>
+        <span>Vocação e Ofícios<small>Não iniciado</small></span>
+        <span class="chips"></span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Rodapé logado compacto -->
+<footer><div class="wrap">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús <span class="muted" style="font-family:var(--tm-font-body);font-weight:400;font-size:.8rem">· plataforma de formação bíblica</span></span>
+  <nav><a href="#">Início</a><a href="#">Meu progresso</a><a href="#">Revisão</a><a href="#">Estudos pessoais</a></nav>
+</div></footer>
+
+<script>
+  // Só pro protótipo
+  function tema() { const r = document.documentElement; r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; }
+  function detalhe(on) { document.getElementById("lista").hidden = on; document.getElementById("detalhe").hidden = !on; scrollTo(0, 0); }
+  document.querySelectorAll(".abas button").forEach((b) => b.addEventListener("click", () => document.querySelectorAll(".abas button").forEach((o) => o.setAttribute("aria-pressed", o === b))));
+  const e = location.hash.slice(1).split(",");
+  if (e.includes("detalhe")) detalhe(true);
+  if (e.includes("escuro")) tema();
+</script>
+</body>
+</html>

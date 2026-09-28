@@ -36,11 +36,16 @@ export const NAV_DESLOGADO: ItemNav[] = [
   { href: "/#como-funciona", rotulo: "Como funciona", icone: "💡" },
 ];
 
-// Sub-nav da área de revisão (2ª linha, só dentro de /revisao/*).
-export const NAV_REVISAO: ItemNav[] = [
-  { href: "/revisao", rotulo: "Fila de revisão", icone: "🗂️" },
-  { href: "/revisao/alunos", rotulo: "Alunos", icone: "🧑‍🎓" },
-];
+// Sub-nav da área de revisão (2ª linha, só dentro de /revisao/*). O Master vê
+// "Pessoas" (todo mundo, com acesso e tempo — 2026-09-28) no lugar de "Alunos".
+export function navRevisao(papel: Papel | null | undefined): ItemNav[] {
+  return [
+    { href: "/revisao", rotulo: "Fila de revisão", icone: "🗂️" },
+    papel === "master"
+      ? { href: "/revisao/pessoas", rotulo: "Pessoas", icone: "👥" }
+      : { href: "/revisao/alunos", rotulo: "Alunos", icone: "🧑‍🎓" },
+  ];
+}
 
 // Itens do menu do avatar (Sair é tratado à parte).
 export const ITENS_AVATAR: ItemNav[] = [

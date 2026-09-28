@@ -62,6 +62,7 @@ Proposta:
 | 07 | `prototipos-front/07-progresso.html` | `/progresso` | ✅ aprovado e aplicado |
 | 08 | `prototipos-front/08-perfil.html` | `/perfil` | ✅ aprovado e aplicado |
 | 09 | `prototipos-front/09-preferencias.html` | `/preferencias` | ✅ aprovado e aplicado |
+| 10 | `prototipos-front/10-pessoas.html` | `/revisao/pessoas` (+ rodapé logado) | ✅ aprovado e aplicado |
 | — | — | `/estudos` (Master) | versão funcional aplicada (mesmos cartões da /inicio); protótipo próprio a fazer |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
@@ -106,6 +107,8 @@ Proposta:
 | ⬜ | `/revisao/topico/[topicoId]` | `app/revisao/topico/[topicoId]/page.tsx` | Revisão de um tópico |
 | ⬜ | `/revisao/alunos` | `app/revisao/alunos/page.tsx` | Lista de alunos |
 | ⬜ | `/revisao/aluno/[userId]` | `app/revisao/aluno/[userId]/page.tsx` | Detalhe de um aluno |
+| ✅ | `/revisao/pessoas` | `app/revisao/pessoas/page.tsx` | Pessoas (só Master): todo mundo, login, atividade, tempo |
+| ✅ | `/revisao/pessoas/[userId]` | `app/revisao/pessoas/[userId]/page.tsx` | Detalhe de uma pessoa (só Master) |
 
 ### Dev (fora da navegação)
 
@@ -468,3 +471,26 @@ na conta e no cookie.
 - **Valem nos slides**: o Emaús passa `?modo=&fonte=` pro render (tópico e prova); o render
   aplica o tema pedido (vale mais que o botão salvo no navegador) e o tamanho via `zoom` no
   slide. Testado: site escuro + grande → slides escuros e maiores; celular 375px sem estourar.
+
+### `/revisao/pessoas` + rodapé logado — 2026-09-28
+
+**Pedido:** o Master precisa ver se os admins entram e leem o curso, ver todo mundo (alunos
+e equipe) e quando/quanto tempo cada um estuda. O rodapé logado de produção estava estranho
+(logo, links em coluna, linha embaixo).
+
+**Aplicado**
+- **Rodapé** numa linha só (logo + assinatura à esquerda, links à direita), logado e visitante.
+- **Pessoas** (só Master; admin/professor continuam em `/revisao/alunos`): resumo (cadastrados,
+  estudaram em 7 dias, concluídos, admins/professores sem concluir nada), filtro por papel,
+  busca, ordenação; tabela no desktop, cartões no celular. Detalhe: números + tópicos por curso
+  com datas, slide onde parou, tempo, tutor e prova. Sub-nav da revisão: Master vê "Pessoas".
+- **Backend:** `GET /pessoas/` e `/pessoas/{id}` (router → `services/pessoas_service.py`, 403 pra
+  quem não é master). Login e cadastro gravam `users.last_login` (antes nunca era gravado).
+- **Tempo de estudo:** o render manda `POST /{topico|avaliacao}-progress/{id}/tempo` a cada minuto
+  se a aba está visível e houve interação nos últimos 10 min; o backend soma 60s e ignora sinal
+  com menos de 50s do anterior (coluna nova `ultimo_sinal_em`, migration em `main.py`). Revisão
+  (`?contexto=revisao`) não conta.
+- **Histórico:** login e tempo só existem a partir do deploy — a página avisa.
+- Testado: 375/800/1280 sem estourar; aluno recebe 403; sinal repetido não soma; sinal real do
+  render chegou e somou 60s (minuto de teste desfeito no banco local).
+

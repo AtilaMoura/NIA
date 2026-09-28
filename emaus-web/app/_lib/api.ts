@@ -554,3 +554,45 @@ export function publicarCurso(courseId: number) {
 export function despublicarCurso(courseId: number) {
   return chamarMesmaOrigem<GovernancaCurso>("/api/revisao/curso-publicar", "PUT", { courseId });
 }
+
+// ---- Pessoas (só Master, 2026-09-28) ----
+
+export type PessoaResumo = {
+  id: number;
+  name: string | null;
+  email: string;
+  role: string;
+  cadastro_em: string | null;
+  ultimo_login: string | null;
+  ultima_atividade: string | null;
+  topicos_iniciados: number;
+  topicos_concluidos: number;
+  provas_feitas: number;
+  tempo_s: number;
+};
+
+export type TopicoDaPessoa = {
+  topico_id: number;
+  titulo: string;
+  course_id: number;
+  curso: string;
+  status: string;
+  iniciado_em: string | null;
+  concluido_em: string | null;
+  ultimo_slide: number | null;
+  tempo_s: number;
+  tutor_veredito: string | null;
+  prova_status: string | null;
+  prova_veredito: string | null;
+};
+
+export type PessoaDetalhe = PessoaResumo & { topicos: TopicoDaPessoa[] };
+
+export function listPessoas(token: string | null | undefined) {
+  if (!token) return Promise.resolve<PessoaResumo[]>([]);
+  return fetchJson<PessoaResumo[]>("/pessoas/", { headers: { Authorization: `Bearer ${token}` } });
+}
+
+export function getPessoa(userId: number, token: string | null | undefined) {
+  return fetchJson<PessoaDetalhe>(`/pessoas/${userId}`, { headers: { Authorization: `Bearer ${token ?? ""}` } });
+}

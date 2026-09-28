@@ -19,7 +19,8 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
     new_user = User(
         name=data.name,
         email=data.email,
-        password_hash=hash_password(data.password)
+        password_hash=hash_password(data.password),
+        last_login=func.now(),  # cadastro já entra logado
     )
 
     db.add(new_user)
@@ -123,6 +124,10 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
 
     if not verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Senha incorreta.")
+
+    # Último acesso (página Pessoas do Master, 2026-09-28) — antes nunca era gravado
+    user.last_login = func.now()
+    db.commit()
 
     access_token = create_access_token(
         {"sub": str(user.id)},

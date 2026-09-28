@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import type { Papel } from "../_lib/papel";
 import {
   NAV_DESLOGADO,
-  NAV_REVISAO,
+  navRevisao,
   itemAtivo,
   navPrincipal,
 } from "../_lib/nav";
@@ -46,7 +46,7 @@ export function NavPrincipal({
 
       {logado && naRevisao && (
         <span className="ml-2 flex items-center gap-4 border-l border-[var(--tm-border)] pl-5 text-[.82rem]">
-          {NAV_REVISAO.map((i) => {
+          {navRevisao(papel).map((i) => {
             const ativo =
               i.href === "/revisao"
                 ? pathname === "/revisao" || pathname.startsWith("/revisao/curso") || pathname.startsWith("/revisao/topico")
