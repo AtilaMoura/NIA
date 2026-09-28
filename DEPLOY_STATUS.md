@@ -8,6 +8,24 @@ capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://
 (backend) e `https://caminho-emaus.duckdns.org` (Emaús) em produção com HTTPS. O `A1.Flex`
 (VM maior) segue em retry automático via cron na VM 2, não bloqueia nada.
 
+## 🚀 Último deploy — 2026-09-27 (redesign do front do aluno)
+
+Commits `b3a445c` → `a54b779` (visitante, entrar/criar conta, início, curso, tópico/slides,
+prova, progresso, perfil, preferências). Feito nas 2 VMs, sem queda além dos segundos da troca
+do container do Emaús.
+
+- **VM 1:** `git pull` + `up -d --build` do backend. No start, a CHECK de
+  `users.preferred_panel_mode` passou a aceitar `auto`. Imagens leves: as 110 cópias
+  `*.otim.webp` estão em `backend/static/course-images/` (36 vieram pelo git, 74 por `tar` via
+  SSH). Texto antigo da intro das provas corrigido em **16 provas (ids 19–34)** com
+  `scripts/corrigir_intro_provas.py --aplicar` — backup em **`~/backups/_backup_intro_provas_2026-09-28_0213.json`**
+  na VM 1 (fora do container).
+- **VM 2:** `git pull` + `up -d --build` do Emaús (~7 min, pico de swap ~950 MB, **não travou**).
+- Verificado: API 200, slides com fonte do tema e imagens leves, página de visitante nova no ar.
+- **Imagem nova de curso daqui pra frente:** depois de copiar pra `backend/static/`, gerar a cópia
+  leve (`python backend/scripts/otimizar_imagens.py` na máquina local, com Pillow) e copiar o
+  `.otim.webp` junto — sem ela o slide só usa a imagem original (funciona, só pesa mais).
+
 ## 🟢 URLs em produção
 - **API:** https://nia-api.duckdns.org
 - **Emaús:** https://caminho-emaus.duckdns.org
