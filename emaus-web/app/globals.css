@@ -57,6 +57,30 @@
 [data-tm-theme="dark"] .logo-tema-claro { display: none; }
 [data-tm-theme="dark"] .logo-tema-escuro { display: block; }
 
+/* Tema "auto" (2026-09-27): segue o aparelho — mesmas cores do escuro quando o
+   sistema está no modo escuro. */
+@media (prefers-color-scheme: dark) {
+  [data-tm-theme="auto"] {
+    --tm-bg: #1b1610;
+    --tm-surface: #241d15;
+    --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6;
+    --tm-ink-muted: #b0a184;
+    --tm-border: #3c3327;
+    --tm-accent: #d79b5b;
+    --tm-accent-2: #e3ac6a;
+    --tm-gold: #dcb87a;
+    --tm-verse-bg: #2a2114;
+    --tm-verse-border: #7a5f2e;
+    --tm-good: #7fae62;
+    --tm-warn: #d08a4e;
+    --tm-danger: #d97b6f;
+    --tm-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+  [data-tm-theme="auto"] .logo-tema-claro { display: none; }
+  [data-tm-theme="auto"] .logo-tema-escuro { display: block; }
+}
+
 [data-tm-fontsize="sm"] { --tm-fs: 15px; }
 [data-tm-fontsize="md"] { --tm-fs: 17px; }
 [data-tm-fontsize="lg"] { --tm-fs: 19px; }

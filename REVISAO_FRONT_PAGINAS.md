@@ -61,6 +61,7 @@ Proposta:
 | 06 | `prototipos-front/06-prova.html` | `/topico/{id}/prova` | ✅ aprovado e aplicado |
 | 07 | `prototipos-front/07-progresso.html` | `/progresso` | ✅ aprovado e aplicado |
 | 08 | `prototipos-front/08-perfil.html` | `/perfil` | ✅ aprovado e aplicado |
+| 09 | `prototipos-front/09-preferencias.html` | `/preferencias` | ✅ aprovado e aplicado |
 | — | — | `/estudos` (Master) | versão funcional aplicada (mesmos cartões da /inicio); protótipo próprio a fazer |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
@@ -94,7 +95,7 @@ Proposta:
 | ✅ | `/topico/[topicoId]/prova` | `app/topico/[topicoId]/prova/page.tsx` | Prova do tópico, com bloqueio quando não tem prova ou o curso não está publicado |
 | ✅ | `/progresso` | `app/progresso/page.tsx` | Progresso do aluno |
 | ✅ | `/perfil` | `app/perfil/page.tsx` | Perfil |
-| ⬜ | `/preferencias` | `app/preferencias/page.tsx` | Preferências (tema) |
+| ✅ | `/preferencias` | `app/preferencias/page.tsx` | Preferências (tema) |
 
 ### Revisão (professor/admin)
 
@@ -441,3 +442,29 @@ Revisada logada como Master (desktop).
   papel, e-mail, "no Emaús desde"), "Seu estudo" com dados reais de todos os cursos + "Ver meu
   progresso", trocar senha (atual + nova + confirmar), atalho Preferências e Sair.
 - **Pendência P1 feita**: "Confirme a senha" no `/criar-conta` (aviso ao digitar + bloqueia envio).
+
+### `/preferencias` — 2026-09-27
+
+Revisada logada como Master (desktop). Tema (claro/escuro) + tamanho do texto (P/M/G), salvos
+na conta e no cookie.
+
+**Problemas**
+1. 🟠 **Não vale pros slides** — onde o aluno passa quase todo o tempo. O render dos slides tem o
+   próprio botão de tema (guardado à parte, `localStorage` do backend) e não tem tamanho de
+   texto; a URL do render só recebe o tema do curso, não o modo claro/escuro nem a fonte.
+2. 🟡 **Sem "Automático"** (seguir o tema do aparelho).
+3. 🟡 **Os 3 tamanhos quebram em 2 linhas** ("Grande" cai pra baixo) e não há prévia do efeito.
+
+**Prioridade sugerida**
+- **Média:** 1
+- **Baixa:** 2, 3
+
+**Aplicado em 2026-09-27**
+- Tema **"Automático"**: backend aceita `auto` (CHECK recriada em `main.py`, roda sozinha no
+  start — **em produção entra no deploy**); CSS usa as cores escuras quando o aparelho está no
+  escuro; botão ☾/☀ do cabeçalho troca pro oposto do que está na tela.
+- `/preferencias`: Aparência (Claro · Escuro · Automático com amostras), Tamanho do texto numa
+  linha, prévia ao vivo.
+- **Valem nos slides**: o Emaús passa `?modo=&fonte=` pro render (tópico e prova); o render
+  aplica o tema pedido (vale mais que o botão salvo no navegador) e o tamanho via `zoom` no
+  slide. Testado: site escuro + grande → slides escuros e maiores; celular 375px sem estourar.

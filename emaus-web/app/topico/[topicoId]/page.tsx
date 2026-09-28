@@ -6,6 +6,7 @@ import { getSessao, getToken } from "../../_lib/sessao";
 import { papelPodeRevisar, papelVeEstudosPessoais } from "../../_lib/papel";
 import { CATALOGO, cursoPessoal, tituloCurto } from "../../_lib/catalogo";
 import { TelaAviso } from "../../_ui/TelaAviso";
+import { preferenciasDosSlides } from "../../_lib/preferencias-slides";
 import { topicoDeEstudoPessoal } from "../../_lib/meus-cursos";
 import {
   getCourse,
@@ -139,6 +140,7 @@ export default async function TopicoPage({
           allow="fullscreen" é o que faz o botão "Tela cheia" do render funcionar dentro do iframe. */}
       <iframe
         src={topicoRenderUrl(topico.id, {
+          ...(await preferenciasDosSlides()),
           userId: sessao.id,
           theme: tema,
           // botão "📄 PDF" no render só pra quem revisa (professor/admin/master)

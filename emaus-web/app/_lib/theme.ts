@@ -3,7 +3,8 @@
 // Troca tema/tamanho de fonte. Grava cookie (lido pelo root layout no próximo
 // request, sem flash) e aplica no <html> na hora (sem reload).
 
-export type TmTheme = "light" | "dark";
+// "auto" (2026-09-27) = segue o tema do aparelho
+export type TmTheme = "light" | "dark" | "auto";
 export type TmFontsize = "sm" | "md" | "lg";
 
 function setCookie(nome: string, valor: string) {
@@ -11,7 +12,15 @@ function setCookie(nome: string, valor: string) {
 }
 
 export function getTmTheme(): TmTheme {
-  return document.documentElement.dataset.tmTheme === "dark" ? "dark" : "light";
+  const v = document.documentElement.dataset.tmTheme;
+  return v === "dark" || v === "auto" ? v : "light";
+}
+
+/** O que está na tela de fato: "auto" vira claro/escuro conforme o aparelho. */
+export function temaEfetivo(): "light" | "dark" {
+  const t = getTmTheme();
+  if (t !== "auto") return t;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 export function setTmTheme(v: TmTheme) {
@@ -20,7 +29,7 @@ export function setTmTheme(v: TmTheme) {
 }
 
 export function toggleTmTheme() {
-  setTmTheme(getTmTheme() === "dark" ? "light" : "dark");
+  setTmTheme(temaEfetivo() === "dark" ? "light" : "dark");
 }
 
 export function getTmFontsize(): TmFontsize {

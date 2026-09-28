@@ -40,7 +40,8 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const jar = await cookies();
-  const theme = jar.get("tm_theme")?.value === "dark" ? "dark" : "light";
+  const temaCookie = jar.get("tm_theme")?.value;
+  const theme = temaCookie === "dark" || temaCookie === "auto" ? temaCookie : "light";
   const fsRaw = jar.get("tm_fontsize")?.value ?? "md";
   const fontsize = fsRaw === "sm" || fsRaw === "lg" ? fsRaw : "md";
 

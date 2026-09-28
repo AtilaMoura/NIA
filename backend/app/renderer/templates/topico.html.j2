@@ -686,6 +686,11 @@
   .anotacao-toggle { background: none; border: 1px solid var(--border-soft); color: var(--text-dim); padding: 8px 14px; border-radius: var(--radius); font-size: 12.5px; cursor: pointer; font-family: inherit; }
   .anotacao-toggle:hover { border-color: var(--accent); color: var(--text); }
 
+  /* Tamanho do texto escolhido nas Preferências do Emaús (?fonte=sm|lg, 2026-09-27).
+     zoom escala o slide inteiro — boa parte dos tamanhos aqui é em px fixo. */
+  body[data-fonte="sm"] .slide-inner { zoom: .9; }
+  body[data-fonte="lg"] .slide-inner { zoom: 1.12; }
+
   /* Prova (protótipo 06, 2026-09-27) */
   .prova-fatos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0 6px; }
   .prova-fato { padding: 12px 14px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border-soft); }
@@ -1033,6 +1038,10 @@
 </div>
 
 <script>
+(function () {
+  var f = new URLSearchParams(window.location.search).get('fonte');
+  if (f === 'sm' || f === 'lg') document.body.dataset.fonte = f;
+})();
 const TOPICO_ID = {{ content.topico_id|tojson }};
 const TOPICO_TITULO = {{ content.titulo|tojson }};
 const TOPICO_NUMERO = {{ content.numero }};
@@ -2766,6 +2775,18 @@ abrirSlideInicial();
     aplicarTema(!temaBtn.dataset.escuro);
   });
 
+  // Preferência do aluno no Emaús (?modo=light|dark|auto, 2026-09-27) vale mais que o
+  // botão de tema salvo neste navegador — antes o site em escuro abria os slides claros.
+  var modoPedido = new URLSearchParams(window.location.search).get('modo');
+  if (modoPedido === 'light' || modoPedido === 'dark' || modoPedido === 'auto') {
+    var escuroDoAparelho = window.matchMedia('(prefers-color-scheme: dark)');
+    var resolver = function () { return modoPedido === 'dark' || (modoPedido === 'auto' && escuroDoAparelho.matches); };
+    aplicarTema(resolver());
+    if (modoPedido === 'auto' && escuroDoAparelho.addEventListener) {
+      escuroDoAparelho.addEventListener('change', function () { aplicarTema(resolver()); });
+    }
+    return;
+  }
   var temaSalvo = 'claro';
   try { temaSalvo = localStorage.getItem('emausTopicoTema') || 'claro'; } catch (e) {}
   if (temaSalvo === 'escuro') aplicarTema(true);

@@ -1,21 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTmTheme, setTmTheme, type TmTheme } from "../_lib/theme";
+import { setTmTheme, temaEfetivo } from "../_lib/theme";
 
 // Botão de modo claro/escuro no cabeçalho. Provisório até a tela /preferencias
 // (FASE 4) — mas grava no mesmo cookie `tm_theme` que o layout lê no servidor.
 export function AlternarTema({ className = "" }: { className?: string }) {
   const [montado, setMontado] = useState(false);
-  const [tema, setTema] = useState<TmTheme>("light");
+  const [tema, setTema] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    setTema(getTmTheme());
+    setTema(temaEfetivo());
     setMontado(true);
   }, []);
 
   function trocar() {
-    const proximo: TmTheme = tema === "dark" ? "light" : "dark";
+    // Com "auto" ativo, o botão escolhe o oposto do que está na tela (vira explícito)
+    const proximo = tema === "dark" ? "light" : "dark";
     setTmTheme(proximo);
     setTema(proximo);
   }

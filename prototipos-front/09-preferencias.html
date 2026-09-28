@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: preferências</title>
+<!--
+  Protótipo 09 — /preferencias.
+  - Aparência: Claro · Escuro · Automático (segue o aparelho).
+  - Tamanho do texto: 3 opções numa linha só.
+  - Prévia ao vivo: um "mini slide" que muda na hora.
+  - Aviso: "vale pro site e pros slides dos cursos" (hoje os slides ignoram essas escolhas).
+  Os botões funcionam de verdade neste protótipo (mudam a prévia e a página).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,400&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-accent-2: #b8763a; --tm-verse-bg: #fbf3e0; --tm-verse-border: #c9a24a;
+    --fs: 17px;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-accent-2: #e3ac6a; --tm-verse-bg: #2a2114; --tm-verse-border: #7a5f2e;
+  }
+  [data-fs="sm"] { --fs: 15px; } [data-fs="lg"] { --fs: 19px; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); font-size: var(--fs); line-height: 1.55; -webkit-font-smoothing: antialiased; transition: background .2s, color .2s; }
+  h1, h2 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .muted { color: var(--tm-ink-muted); }
+
+  header.topo { border-bottom: 1px solid var(--tm-border); }
+  header.topo .in { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); display: flex; align-items: center; height: 56px; }
+  .marca { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.12rem; display: inline-flex; align-items: center; gap: .5rem; }
+  .marca img { height: 28px; }
+
+  main { max-width: 640px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2rem) 4rem; display: grid; gap: 1.1rem; }
+  h1 { font-size: 1.7rem; }
+  .cartao { background: var(--tm-surface); border: 1px solid var(--tm-border); border-radius: var(--tm-radius-lg); padding: 1.25rem; }
+  .cartao h2 { font-size: 1.05rem; }
+  .cartao > p.muted { font-size: .88rem; margin-top: .15rem; }
+
+  /* Escolhas */
+  .opcoes { margin-top: .9rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+  .opcao { display: grid; justify-items: start; gap: .35rem; text-align: left; padding: .8rem .9rem; border-radius: var(--tm-radius); border: 1px solid var(--tm-border); background: var(--tm-surface); }
+  .opcao:hover { border-color: var(--tm-accent); }
+  .opcao[aria-pressed="true"] { border-color: var(--tm-accent); background: var(--tm-verse-bg); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-accent) 15%, transparent); }
+  .opcao b { font-size: .88rem; }
+  .opcao small { font-size: .75rem; color: var(--tm-ink-muted); }
+  .amostra-tema { width: 100%; height: 34px; border-radius: 8px; border: 1px solid var(--tm-border); }
+  .amostra-tema.claro { background: linear-gradient(90deg, #faf6ee 60%, #8a5a2b 60% 70%, #faf6ee 70%); }
+  .amostra-tema.escuro { background: linear-gradient(90deg, #1b1610 60%, #d79b5b 60% 70%, #1b1610 70%); }
+  .amostra-tema.auto { background: linear-gradient(90deg, #faf6ee 50%, #1b1610 50%); }
+  .amostra-texto { font-family: var(--tm-font-display); line-height: 1.1; }
+
+  /* Prévia */
+  .previa { margin-top: .9rem; border-radius: var(--tm-radius); border: 1px solid var(--tm-border); background: var(--tm-bg); padding: 1rem 1.1rem; }
+  .previa .rotulo { font-size: .7em; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--tm-accent); }
+  .previa h3 { font-family: var(--tm-font-display); font-size: 1.25em; margin: .2rem 0 .5rem; }
+  .previa p { font-size: 1em; }
+  .previa .verso { margin-top: .6rem; padding: .6rem .8rem; background: var(--tm-verse-bg); border-left: 3px solid var(--tm-verse-border); font-family: var(--tm-font-display); font-style: italic; font-size: .95em; border-radius: 0 10px 10px 0; }
+  .nota { margin-top: .75rem; font-size: .82rem; display: flex; gap: .5rem; }
+  .salvo { font-size: .82rem; text-align: center; color: var(--tm-ink-muted); }
+  @media (max-width: 420px) { .opcoes { gap: .45rem; } .opcao { padding: .65rem .6rem; } .opcao small { display: none; } }
+</style>
+</head>
+<body>
+<header class="topo"><div class="in"><span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús</span></div></header>
+
+<main>
+  <h1>Preferências</h1>
+
+  <section class="cartao">
+    <h2>Aparência</h2>
+    <p class="muted">Vale pro site e pros slides dos cursos.</p>
+    <div class="opcoes" role="group" aria-label="Aparência">
+      <button class="opcao" data-tema="light" aria-pressed="true"><span class="amostra-tema claro"></span><b>Claro</b><small>Fundo creme</small></button>
+      <button class="opcao" data-tema="dark" aria-pressed="false"><span class="amostra-tema escuro"></span><b>Escuro</b><small>Melhor à noite</small></button>
+      <button class="opcao" data-tema="auto" aria-pressed="false"><span class="amostra-tema auto"></span><b>Automático</b><small>Segue o aparelho</small></button>
+    </div>
+  </section>
+
+  <section class="cartao">
+    <h2>Tamanho do texto</h2>
+    <p class="muted">Nos slides e em todo o site.</p>
+    <div class="opcoes" role="group" aria-label="Tamanho do texto">
+      <button class="opcao" data-fs="sm" aria-pressed="false"><span class="amostra-texto" style="font-size:18px">Aa</span><b>Pequeno</b></button>
+      <button class="opcao" data-fs="md" aria-pressed="true"><span class="amostra-texto" style="font-size:22px">Aa</span><b>Médio</b></button>
+      <button class="opcao" data-fs="lg" aria-pressed="false"><span class="amostra-texto" style="font-size:26px">Aa</span><b>Grande</b></button>
+    </div>
+
+    <div class="previa" aria-label="Prévia">
+      <p class="rotulo">Prévia de um slide</p>
+      <h3>Pedras Vivas, Casa Espiritual</h3>
+      <p>Pedro vinha construindo uma imagem que explica por que ele chama pessoas comuns de sacerdotes.</p>
+      <p class="verso">“…vós também, quais pedras vivas, sois edificados casa espiritual…” — 1Pe 2.5</p>
+    </div>
+  </section>
+
+  <p class="salvo">✓ Salvo na sua conta — aparece igual em qualquer aparelho.</p>
+</main>
+
+<script>
+  // Só pro protótipo: aplica na hora
+  const raiz = document.documentElement;
+  const escuroDoAparelho = matchMedia("(prefers-color-scheme: dark)");
+  let tema = "light";
+  function aplicarTema() { raiz.dataset.tmTheme = tema === "auto" ? (escuroDoAparelho.matches ? "dark" : "light") : tema; }
+  document.querySelectorAll("[data-tema]").forEach((b) => b.addEventListener("click", () => {
+    tema = b.dataset.tema;
+    document.querySelectorAll("[data-tema]").forEach((o) => o.setAttribute("aria-pressed", o === b));
+    aplicarTema();
+  }));
+  escuroDoAparelho.addEventListener("change", aplicarTema);
+  document.querySelectorAll("[data-fs]").forEach((b) => b.addEventListener("click", () => {
+    raiz.dataset.fs = b.dataset.fs;
+    document.querySelectorAll("button[data-fs]").forEach((o) => o.setAttribute("aria-pressed", o === b));
+  }));
+  if (location.hash.includes("escuro")) document.querySelector('[data-tema="dark"]').click();
+  if (location.hash.includes("grande")) document.querySelector('button[data-fs="lg"]').click();
+</script>
+</body>
+</html>

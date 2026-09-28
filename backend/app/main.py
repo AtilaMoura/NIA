@@ -59,6 +59,11 @@ def _ensure_colunas_extras(bind):
         "ALTER TABLE topico_respostas ADD CONSTRAINT uq_topico_resposta_user_topico_question_rodada "
         "UNIQUE (user_id, topico_id, question_id, rodada); "
         "END IF; END $$;",
+        # Preferências do Emaús (2026-09-27): tema ganha 'auto' (segue o aparelho).
+        # A CHECK original só tinha 'light'/'dark' — dropa e recria (idempotente).
+        "ALTER TABLE users DROP CONSTRAINT IF EXISTS valid_preferred_panel_mode",
+        "ALTER TABLE users ADD CONSTRAINT valid_preferred_panel_mode "
+        "CHECK (preferred_panel_mode IN ('light', 'dark', 'auto'))",
     ]
     with bind.begin() as conn:
         for s in stmts:

@@ -11,7 +11,8 @@ export async function gravarCookiesPreferencias(
   token: string,
 ): Promise<void> {
   const usuario = await getUser(userId, token).catch(() => null);
-  const tema = usuario?.preferred_panel_mode === "dark" ? "dark" : "light";
+  const pm = usuario?.preferred_panel_mode;
+  const tema = pm === "dark" || pm === "auto" ? pm : "light";
   const fs = usuario?.preferred_font_size;
   const fonte = fs === "sm" || fs === "lg" ? fs : "md";
 

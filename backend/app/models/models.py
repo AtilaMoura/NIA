@@ -71,7 +71,7 @@ class User(Base):
             "preferred_mood IN ('musgo', 'ambar', 'mare', 'framboesa', 'lavanda')",
             name='valid_preferred_mood',
         ),
-        CheckConstraint("preferred_panel_mode IN ('light', 'dark')", name='valid_preferred_panel_mode'),
+        CheckConstraint("preferred_panel_mode IN ('light', 'dark', 'auto')", name='valid_preferred_panel_mode'),
         CheckConstraint(
             "preferred_panel_layout IN ('retomar', 'biblioteca', 'trilha')",
             name='valid_preferred_panel_layout',

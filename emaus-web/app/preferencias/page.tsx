@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { CabecalhoApp } from "../_ui/CabecalhoApp";
@@ -22,9 +21,9 @@ export default async function PreferenciasPage() {
 
   // A fonte da verdade é users/1; o cookie é só o fast-path do SSR. Se o banco
   // não respondeu, cai pro cookie / default.
-  const modo =
-    usuario?.preferred_panel_mode ??
-    (jar.get("tm_theme")?.value === "dark" ? "dark" : "light");
+  const salvo = usuario?.preferred_panel_mode;
+  const cookieModo = jar.get("tm_theme")?.value;
+  const modo = salvo ?? (cookieModo === "dark" || cookieModo === "auto" ? cookieModo : "light");
   const fsRaw = usuario?.preferred_font_size ?? jar.get("tm_fontsize")?.value ?? "md";
   const fonte: FontSize = fsRaw === "sm" || fsRaw === "lg" ? fsRaw : "md";
 
@@ -32,12 +31,9 @@ export default async function PreferenciasPage() {
     <>
       <CabecalhoApp nomeUsuario={usuario?.name ?? "Aluno"} papel={sessao.role} />
 
-      <main className="mx-auto flex max-w-xl flex-col gap-8 px-[clamp(1rem,4vw,2rem)] py-10">
-        <h1 className="m-0 text-[1.5rem]">Preferências</h1>
+      <main className="mx-auto flex max-w-[640px] flex-col gap-4 px-[clamp(1rem,4vw,2rem)] pb-16 pt-[clamp(1.5rem,4vw,2.5rem)]">
+        <h1 className="m-0 text-[1.7rem]">Preferências</h1>
         <Preferencias modoInicial={modo} fonteInicial={fonte} />
-        <p className="m-0 text-[.8rem] text-[var(--tm-ink-muted)]">
-          As preferências são aplicadas na hora e ficam salvas na sua conta.
-        </p>
       </main>
 
       <Rodape papel={sessao.role} />
