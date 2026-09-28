@@ -124,11 +124,14 @@ def montar_avaliacao(conteudo: dict, perguntas: dict) -> dict:
             "titulo": "Avaliação Final",
             "subtitulo": "5 questões — algumas juntam mais de um conceito. Duas são abertas.",
             "instrucoes_box": {
-                "label": "📋 Antes de começar",
+                "label": "📋 Como funciona",
+                # Texto antigo falava em "levar o resumo pro chat com o Claude" — da época
+                # em que o tutor era externo. Hoje o tutor corrige dentro da plataforma
+                # (2026-09-27); provas antigas corrigidas por scripts/corrigir_intro_provas.py.
                 "texto": (
-                    "A correção objetiva já aparece na hora. Mas a avaliação final de "
-                    "verdade — com feedback honesto e a decisão de seguir ou reforçar — "
-                    "acontece quando você levar o resumo desta tela pro chat com o Claude."
+                    "As questões objetivas mostram a resposta certa na hora. No fim, você "
+                    "envia a prova e o tutor corrige tudo — inclusive as abertas — e diz se "
+                    "você pode seguir ou o que vale revisar."
                 ),
             },
         },

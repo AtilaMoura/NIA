@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { LinkBotao } from "../../../_ui/Botao";
-import { LogoSimbolo } from "../../../_ui/Logo";
 import { AcoesProva } from "./prova-ui";
 import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../../_lib/config";
 import { getSessao, getToken } from "../../../_lib/sessao";
 import { papelPodeRevisar, papelVeEstudosPessoais } from "../../../_lib/papel";
-import { cursoPessoal } from "../../../_lib/catalogo";
+import { CATALOGO, cursoPessoal, tituloCurto } from "../../../_lib/catalogo";
+import { TelaAviso } from "../../../_ui/TelaAviso";
 import { topicoDeEstudoPessoal } from "../../../_lib/meus-cursos";
 import {
   getCourse,
@@ -84,58 +82,48 @@ export default async function ProvaPage({
   const curso = await getCourse(CURSO_ID).catch(() => null);
   if (curso && curso.status !== "published" && !papelPodeRevisar(sessao.role)) {
     return (
-      <main className="mx-auto flex min-h-[100dvh] max-w-md flex-col items-start justify-center gap-4 px-[clamp(1rem,4vw,2rem)]">
-        <h1 className="text-[1.4rem]">Curso em preparação</h1>
-        <p className="m-0 text-[.9rem] text-[var(--tm-ink-muted)]">
-          Este curso ainda não foi publicado.
-        </p>
-        <LinkBotao href="/" variante="fantasma">
-          Ver os cursos disponíveis
-        </LinkBotao>
-      </main>
+      <TelaAviso
+        voltarHref="/inicio"
+        voltarRotulo="Voltar ao início"
+        icone="🌱"
+        titulo="Este curso ainda está em preparação"
+        texto="Ele ainda não foi publicado. Volte em breve — enquanto isso, veja os cursos que já estão abertos."
+        acao={{ href: "/inicio", rotulo: "Ver os cursos abertos" }}
+      />
     );
   }
   const ordenados = [...irmaos].sort((a, b) => a.topico_index - b.topico_index);
   const posicao = ordenados.findIndex((t) => t.id === topico.id);
+
+  const catalogo = CATALOGO.find((c) => c.courseId === CURSO_ID);
+  const ondeTopico = [
+    catalogo ? tituloCurto(catalogo) : null,
+    aula ? `Aula ${aula.lesson_index}` : null,
+    posicao >= 0 && ordenados.length > 0 ? `Tópico ${posicao + 1} de ${ordenados.length}` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   // GATING DE VERDADE: tópico pai precisa estar concluído (salvo revisores)
   const progTopico = progressoTopicos.find((p) => p.topico_id === topico.id) ?? null;
   const statusTopico = progTopico?.status ?? "nao_iniciado";
   if (statusTopico !== "concluido" && !papelPodeRevisar(sessao.role)) {
     return (
-      <div className="flex min-h-[100dvh] flex-col">
-        <div
-          id="barra-topo-topico"
-          className="flex items-center gap-3 border-b border-[var(--tm-border)] bg-[var(--tm-bg)] px-[clamp(1rem,4vw,2rem)] py-2.5 text-[.82rem]"
-        >
-          <Link
-            href={`/curso/${CURSO_ID}`}
-            className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-[var(--tm-accent)] hover:underline"
-          >
-            <span aria-hidden>‹</span> Voltar ao curso
-          </Link>
-          <span className="min-w-0 flex-1 truncate text-[var(--tm-ink-muted)]">
-            {aula?.title}
-            {posicao >= 0 && ordenados.length > 0 && (
-              <span className="ml-2 whitespace-nowrap">
-                · Tópico {posicao + 1} de {ordenados.length}
-              </span>
-            )}
-          </span>
-          <Link href="/inicio" aria-label="Emaús — início" className="shrink-0">
-            <LogoSimbolo size={28} className="opacity-80" />
-          </Link>
-        </div>
-        <main className="mx-auto flex max-w-md flex-1 flex-col items-start justify-center gap-4 px-[clamp(1rem,4vw,2rem)]">
-          <h1 className="text-[1.4rem]">Termine o tópico primeiro</h1>
-          <p className="m-0 text-[.9rem] text-[var(--tm-ink-muted)]">
-            Você precisa concluir o tópico antes de fazer a prova.&nbsp;“{topico.titulo}”
-          </p>
-          <LinkBotao href={`/topico/${topico.id}`} variante="fantasma">
-            Voltar ao tópico
-          </LinkBotao>
-        </main>
-      </div>
+      <TelaAviso
+        voltarHref={`/topico/${topico.id}`}
+        voltarRotulo="Voltar ao tópico"
+        onde={ondeTopico}
+        tituloBarra={topico.titulo}
+        icone="🔒"
+        titulo="A prova abre quando você concluir o tópico"
+        texto={`Falta terminar “${topico.titulo}”.`}
+        passos={[
+          "Leia os slides até o fim e responda os checkpoints.",
+          "No último slide, envie pro tutor corrigir.",
+          "Pronto: a prova libera aqui.",
+        ]}
+        acao={{ href: `/topico/${topico.id}`, rotulo: "Continuar o tópico →" }}
+      />
     );
   }
 
@@ -147,7 +135,7 @@ export default async function ProvaPage({
 
   // Mesma barra única do render do tópico (2026-09-27): voltar (ao tópico),
   // título e menu ⋯ com "Recomeçar esta prova".
-  const onde = [aula ? `Aula ${aula.lesson_index}` : null, "Prova do tópico"]
+  const onde = [catalogo ? tituloCurto(catalogo) : null, aula ? `Aula ${aula.lesson_index}` : null, "Prova do tópico"]
     .filter(Boolean)
     .join(" · ");
 

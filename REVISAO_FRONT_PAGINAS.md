@@ -58,6 +58,7 @@ Proposta:
 | 03 | `prototipos-front/03-inicio.html` | `/inicio` | ✅ aprovado e aplicado |
 | 04 | `prototipos-front/04-curso.html` | `/curso/{id}` | ✅ aprovado e aplicado |
 | 05 | `prototipos-front/05-topico.html` | `/topico/{id}` (moldura + slides) | ✅ aprovado e aplicado (vale também pra prova) |
+| 06 | `prototipos-front/06-prova.html` | `/topico/{id}/prova` | ✅ aprovado e aplicado |
 | — | — | `/estudos` (Master) | versão funcional aplicada (mesmos cartões da /inicio); protótipo próprio a fazer |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
@@ -88,7 +89,7 @@ Proposta:
 | ✅ | `/inicio` | `app/inicio/page.tsx` | Home multi-curso estilo streaming (prateleiras, "Continuar estudando") |
 | ✅ | `/curso/[courseId]` | `app/curso/[courseId]/page.tsx` | Página do curso, módulos em accordion com o próximo tópico aberto |
 | ✅ | `/topico/[topicoId]` | `app/topico/[topicoId]/page.tsx` | Leitor do tópico em slides (iframe), aceita `?slide=N` |
-| ⬜ | `/topico/[topicoId]/prova` | `app/topico/[topicoId]/prova/page.tsx` | Prova do tópico, com bloqueio quando não tem prova ou o curso não está publicado |
+| ✅ | `/topico/[topicoId]/prova` | `app/topico/[topicoId]/prova/page.tsx` | Prova do tópico, com bloqueio quando não tem prova ou o curso não está publicado |
 | ⬜ | `/progresso` | `app/progresso/page.tsx` | Progresso do aluno |
 | ⬜ | `/perfil` | `app/perfil/page.tsx` | Perfil |
 | ⬜ | `/preferencias` | `app/preferencias/page.tsx` | Preferências (tema) |
@@ -332,3 +333,45 @@ capa, 10 de conteúdo, 3 checkpoints, resultado). O dev do Next caiu por falta d
   `postMessage` da origem do backend.
 - Testado: tópico, prova e modo revisão (render direto + página de teste temporária no backend,
   já apagada); voltar e Recomeçar pelo Emaús; celular 375px (barras 139px, sem scroll lateral).
+
+### `/topico/{id}/prova` — 2026-09-27
+
+Já herdou a barra única do render (commit `2ed9426`). Revisada com a prova 17 (7 slides:
+intro, 3 objetivas, 2 abertas, resultado) direto pelo backend, e a tela de bloqueio como Aluno.
+
+**Problemas**
+1. 🔴 **Texto errado na introdução de 16 das 18 provas**: "a avaliação final de verdade acontece
+   quando você levar o resumo desta tela pro chat com o Claude" — da época em que o tutor era
+   externo. Vem fixo do gerador (`backend/app/agents/montar_topico.py`), então toda prova nova
+   nasce com ele. Corrigir o gerador + script de dados (com backup) pras provas existentes
+   (local e produção).
+2. 🔴 **A ação principal do resultado está escondida**: o slide diz "Clique em 'Fim', embaixo, pra
+   enviar sua avaliação" — o envio pro tutor depende de um botão pequeno na barra de baixo.
+3. 🟠 **Resposta certa aparece em laranja (cor de destaque), não verde**, e certo/errado só por cor
+   (sem ✓/✗ escrito) — confunde com "selecionada" e não funciona pra daltônico.
+4. 🟠 **Progresso da prova embolado**: com 5 de 7 slides sendo pergunta, os losangos se amontoam no
+   meio e intro/resultado ocupam metade da barra cada.
+5. 🟠 **Tela "Termine o tópico primeiro"** usa a barra antiga do Emaús (diferente da nova), botão
+   fantasma "Voltar ao tópico" e muito vazio. Mesmo visual antigo em "Curso em preparação" e
+   "Tópico em preparação".
+6. 🟡 Pergunta sem "Questão X de 5"; só o tipo ("Múltipla escolha").
+7. 🟡 Rótulos técnicos no resultado: "Acertos automáticos", "Respostas com alta confiança e erro".
+8. 🟡 Caixa da resposta aberta com 2 linhas (pequena pra resposta de 2 partes).
+
+**Prioridade sugerida**
+- **Alta:** 1, 2
+- **Média:** 3, 4, 5
+- **Baixa:** 6, 7, 8
+
+**Aplicado em 2026-09-27**
+- Template: verde de acerto (`--good`, os temas não tinham) com "✓ Correta" / "✗ Sua resposta"
+  escritos — vale também pros checkpoints do tópico; "Questão X de N"; intro com números contados
+  das perguntas (questões · abertas · ~minutos); caixa da aberta maior; resultado com rótulos
+  simples e botão grande **"Enviar pro tutor corrigir →"** no slide (o "Fim" da barra some
+  quando embutido); estado "O tutor está corrigindo…" com animação; progresso sem losangos
+  quando a maioria dos slides é pergunta.
+- Gerador (`montar_topico.py`): intro nova. Dados: `backend/scripts/corrigir_intro_provas.py`
+  corrigiu 16 provas locais (backup `backend/_backup_intro_provas_2026-09-27_2009.json`).
+  **Em produção: rodar `docker exec nia_backend python scripts/corrigir_intro_provas.py --aplicar`.**
+- `emaus-web`: `_ui/TelaAviso.tsx` (barra igual à do render + ícone + passos + botão principal)
+  em "a prova abre quando concluir o tópico", "tópico em preparação" e "curso em preparação".

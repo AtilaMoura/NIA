@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { LinkBotao } from "../../_ui/Botao";
-import { LogoSimbolo } from "../../_ui/Logo";
 import { AcoesTopico } from "./topico-ui";
 import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getSessao, getToken } from "../../_lib/sessao";
 import { papelPodeRevisar, papelVeEstudosPessoais } from "../../_lib/papel";
 import { CATALOGO, cursoPessoal, tituloCurto } from "../../_lib/catalogo";
+import { TelaAviso } from "../../_ui/TelaAviso";
 import { topicoDeEstudoPessoal } from "../../_lib/meus-cursos";
 import {
   getCourse,
@@ -88,15 +86,14 @@ export default async function TopicoPage({
   const curso = await getCourse(CURSO_ID).catch(() => null);
   if (curso && curso.status !== "published" && !papelPodeRevisar(sessao.role)) {
     return (
-      <main className="mx-auto flex min-h-[100dvh] max-w-md flex-col items-start justify-center gap-4 px-[clamp(1rem,4vw,2rem)]">
-        <h1 className="text-[1.4rem]">Curso em preparação</h1>
-        <p className="m-0 text-[.9rem] text-[var(--tm-ink-muted)]">
-          Este curso ainda não foi publicado.
-        </p>
-        <LinkBotao href="/" variante="fantasma">
-          Ver os cursos disponíveis
-        </LinkBotao>
-      </main>
+      <TelaAviso
+        voltarHref="/inicio"
+        voltarRotulo="Voltar ao início"
+        icone="🌱"
+        titulo="Este curso ainda está em preparação"
+        texto="Ele ainda não foi publicado. Volte em breve — enquanto isso, veja os cursos que já estão abertos."
+        acao={{ href: "/inicio", rotulo: "Ver os cursos abertos" }}
+      />
     );
   }
   const ordenados = [...irmaos].sort((a, b) => a.topico_index - b.topico_index);
@@ -108,46 +105,6 @@ export default async function TopicoPage({
   const estadoInicial: StatusTopico = progTopico?.status ?? "nao_iniciado";
   const analiseInicial = progTopico?.tutor_analise?.ultima_avaliacao ?? null;
 
-  const barraTopo = (
-    <div
-      id="barra-topo-topico"
-      className="flex items-center gap-3 border-b border-[var(--tm-border)] bg-[var(--tm-bg)] px-[clamp(1rem,4vw,2rem)] py-2.5 text-[.82rem]">
-      <Link
-        href={`/curso/${CURSO_ID}`}
-        className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-[var(--tm-accent)] hover:underline"
-      >
-        <span aria-hidden>‹</span> Voltar ao curso
-      </Link>
-      <span className="min-w-0 flex-1 truncate text-[var(--tm-ink-muted)]">
-        {aula?.title}
-        {posicao >= 0 && ordenados.length > 0 && (
-          <span className="ml-2 whitespace-nowrap">
-            · Tópico {posicao + 1} de {ordenados.length}
-          </span>
-        )}
-      </span>
-      <Link href="/inicio" aria-label="Emaús — início" className="shrink-0">
-        <LogoSimbolo size={28} className="opacity-80" />
-      </Link>
-    </div>
-  );
-
-  if (emPreparacao) {
-    return (
-      <div className="flex min-h-[100dvh] flex-col">
-        {barraTopo}
-        <main className="mx-auto flex max-w-md flex-1 flex-col items-start justify-center gap-4 px-[clamp(1rem,4vw,2rem)]">
-          <h1 className="text-[1.4rem]">Este tópico ainda está em preparação</h1>
-          <p className="m-0 text-[.9rem] text-[var(--tm-ink-muted)]">
-            “{topico.titulo}” ainda não tem conteúdo publicado. Volte em breve.
-          </p>
-          <LinkBotao href={`/curso/${CURSO_ID}`} variante="fantasma">
-            Voltar ao curso
-          </LinkBotao>
-        </main>
-      </div>
-    );
-  }
 
   // Texto "onde estou" da barra de cima do render (2026-09-27): a barra do Emaús
   // saiu — o render tem uma barra só, com voltar, título e menu ⋯ (Recomeçar lá dentro).
@@ -159,6 +116,22 @@ export default async function TopicoPage({
   ]
     .filter(Boolean)
     .join(" · ");
+
+  if (emPreparacao) {
+    return (
+      <TelaAviso
+        voltarHref={`/curso/${CURSO_ID}`}
+        voltarRotulo="Voltar ao curso"
+        onde={onde}
+        tituloBarra={topico.titulo}
+        icone="✍️"
+        titulo="Este tópico ainda está em preparação"
+        texto={`“${topico.titulo}” ainda não tem conteúdo publicado. Volte em breve.`}
+        acao={{ href: `/curso/${CURSO_ID}`, rotulo: "Voltar ao curso" }}
+      />
+    );
+  }
+
 
   return (
     <div className="flex h-[100dvh] flex-col">

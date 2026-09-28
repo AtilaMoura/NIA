@@ -253,6 +253,13 @@
     --violet: {{ tema.cores.violet }};
     --radius: {{ tema.radius }};
     --radius-lg: {{ tema.radiusLg }};
+    /* Verde de acerto (2026-09-27): os temas não definem; antes o certo saía na cor
+       de destaque e confundia com "selecionada". Texto fica misturado com --text pra
+       ter contraste em tema claro e escuro. */
+    --good: {{ tema.cores.good | default('#3f8f4a') }};
+    --good-soft: color-mix(in srgb, var(--good) 16%, var(--surface-2));
+    --good-text: color-mix(in srgb, var(--good) 72%, var(--text));
+    --bad-text: color-mix(in srgb, var(--bad) 80%, var(--text));
     --font-display: {{ tema.fontFamilyDisplay | default(tema.fontFamily) | safe }};
     --font-label: {{ tema.fontFamilyLabel | default(tema.fontFamily) | safe }};
   }
@@ -456,15 +463,23 @@
   .opts .opt-btn::before { counter-increment: opcao; content: counter(opcao, upper-alpha); flex: 0 0 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--border); font-size: 11.5px; font-weight: 700; color: var(--text-muted); font-family: var(--font-label); }
   .opt-btn { display: block; width: 100%; text-align: left; padding: 12px 13px; margin: 6px 0; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--surface-2); font-size: 14px; cursor: pointer; color: var(--text); transition: border-color .15s ease, transform .12s ease; font-family: inherit; }
   .opt-btn:hover { border-color: var(--accent); transform: translateX(2px); }
-  .opt-btn.correct { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; color: var(--accent); }
-  .opt-btn.incorrect { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+  .opt-btn.correct { background: var(--good-soft); border-color: var(--good); font-weight: 600; color: var(--text); }
+  .opt-btn.incorrect { background: var(--bad-soft); border-color: var(--bad); color: var(--text); }
+  /* Certo/errado também por texto, não só por cor (daltonismo) */
+  .opt-btn.correct::after, .opt-btn.incorrect::after { margin-left: auto; padding-left: 10px; flex: 0 0 auto; font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .opt-btn.correct::after { content: '✓ Correta'; color: var(--good-text); }
+  .opt-btn.incorrect::after { content: '✗ Sua resposta'; color: var(--bad-text); }
+  .opts .opt-btn.correct::before { background: var(--good); border-color: var(--good); color: #fff; }
+  .opts .opt-btn.incorrect::before { background: var(--bad); border-color: var(--bad); color: #fff; }
   .opt-btn:disabled { cursor: default; transform: none; }
 
   .tf-row { display: flex; gap: 8px; margin: 8px 0; }
   .tf-btn { flex: 1; padding: 12px; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--surface-2); font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text); transition: border-color .15s ease; font-family: inherit; }
   .tf-btn:hover:not(:disabled) { border-color: var(--accent); }
-  .tf-btn.correct { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
-  .tf-btn.incorrect { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+  .tf-btn.correct { background: var(--good-soft); border-color: var(--good); color: var(--text); }
+  .tf-btn.incorrect { background: var(--bad-soft); border-color: var(--bad); color: var(--text); }
+  .tf-btn.correct::before { content: '✓ '; color: var(--good-text); }
+  .tf-btn.incorrect::before { content: '✗ '; color: var(--bad-text); }
   .tf-btn:disabled { cursor: default; }
 
   textarea { width: 100%; min-height: 70px; border-radius: var(--radius); border: 1px solid var(--border); padding: 11px; font-size: 14px; font-family: inherit; resize: vertical; margin: 6px 0; background: var(--surface-2); color: var(--text); transition: border-color .15s ease; }
@@ -477,8 +492,10 @@
   .classify-btns { display: flex; gap: 6px; }
   .classify-btns button { font-size: 10.5px; padding: 7px 10px; border-radius: var(--radius); border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: border-color .15s ease; font-family: inherit; }
   .classify-btns button:hover:not(:disabled) { border-color: var(--accent); }
-  .classify-btns button.correct { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
-  .classify-btns button.incorrect { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+  .classify-btns button.correct { background: var(--good-soft); border-color: var(--good); color: var(--text); }
+  .classify-btns button.incorrect { background: var(--bad-soft); border-color: var(--bad); color: var(--text); }
+  .classify-btns button.correct::before { content: '✓ '; color: var(--good-text); }
+  .classify-btns button.incorrect::before { content: '✗ '; color: var(--bad-text); }
 
   .reveal-btn, .register-btn { margin-top: 8px; font-size: 13px; padding: 10px 16px; border-radius: var(--radius); border: none; background: var(--accent); color: var(--accent-text-on); cursor: pointer; font-weight: 700; transition: transform .12s ease, box-shadow .2s ease; animation: breathe 3s ease-in-out infinite; font-family: inherit; }
   .reveal-btn:hover, .register-btn:hover { transform: translateY(-1px); }
@@ -669,6 +686,21 @@
   .anotacao-toggle { background: none; border: 1px solid var(--border-soft); color: var(--text-dim); padding: 8px 14px; border-radius: var(--radius); font-size: 12.5px; cursor: pointer; font-family: inherit; }
   .anotacao-toggle:hover { border-color: var(--accent); color: var(--text); }
 
+  /* Prova (protótipo 06, 2026-09-27) */
+  .prova-fatos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0 6px; }
+  .prova-fato { padding: 12px 14px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border-soft); }
+  .prova-fato b { display: block; font-family: var(--font-display); font-size: 22px; color: var(--text); line-height: 1.1; }
+  .prova-fato span { font-family: var(--font-label); font-size: 12.5px; color: var(--text-muted); }
+  .q-numero { font-family: var(--font-label); font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+  .slide[data-tipo="avaliacao_pergunta"] textarea { min-height: 140px; }
+  .enviar-tutor { margin-top: 4px; }
+  .enviar-tutor p { margin: 0 0 12px; font-size: 14.5px; color: var(--text-muted); }
+  .enviar-tutor-btn { width: 100%; padding: 14px 18px; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-text-on); font-family: var(--font-label); font-size: 15.5px; font-weight: 700; cursor: pointer; transition: filter .15s ease; }
+  .enviar-tutor-btn:hover { filter: brightness(1.08); }
+  .avaliando { display: flex; align-items: center; gap: 12px; font-size: 14.5px; color: var(--text); }
+  .avaliando-giro { flex: 0 0 26px; height: 26px; border-radius: 50%; border: 3px solid var(--border-soft); border-top-color: var(--accent); animation: giro 1s linear infinite; }
+  @keyframes giro { to { transform: rotate(360deg); } }
+
   /* Diálogo de confirmação (Recomeçar) no visual da página, no lugar do window.confirm */
   .dialogo-fundo { position: fixed; inset: 0; z-index: 90; background: rgba(20,14,8,.45); display: grid; place-items: center; padding: 16px; }
   .dialogo-fundo[hidden] { display: none; }
@@ -806,7 +838,7 @@
 </div>
 
 <div class="slides" id="slides">
-{% set ns = namespace(secao_idx=0) %}
+{% set ns = namespace(secao_idx=0, questao=0) %}
 {% for slide in content.slides %}
   <div class="slide{% if loop.first %} active{% endif %}" data-section="{{ slide.secao }}" data-tipo="{{ slide.tipo }}"{% if slide.gate_id %} data-gate="{{ slide.gate_id }}"{% endif %}>
     <div class="slide-inner"{% if slide.narracao %} data-narracao='{{ slide.narracao | tojson }}'{% endif %}>
@@ -869,8 +901,16 @@
         <div class="gate-hint" data-gate-hint="{{ slide.gate_id }}">👆 Responda antes de continuar.</div>
 
       {% elif slide.tipo == 'avaliacao_intro' %}
+        {# Números contados das perguntas de verdade (o subtítulo salvo era fixo e
+           às vezes errado: "5 questões… Duas são abertas") #}
+        {% set perguntas_prova = content.slides | selectattr('tipo', 'equalto', 'avaliacao_pergunta') | list %}
+        {% set abertas_prova = perguntas_prova | selectattr('pergunta.tipo', 'equalto', 'open') | list %}
         <h1 class="title">{{ slide.titulo }}</h1>
-        <h2 class="sub">{{ slide.subtitulo }}</h2>
+        <div class="prova-fatos">
+          <div class="prova-fato"><b>{{ perguntas_prova | length }}</b><span>questões</span></div>
+          <div class="prova-fato"><b>{{ abertas_prova | length }}</b><span>abertas (escreva)</span></div>
+          <div class="prova-fato"><b>~{{ (perguntas_prova | length) * 2 }}</b><span>minutos</span></div>
+        </div>
         {% if slide.instrucoes_box %}
         <div class="box box-instr">
           <div class="box-label">{{ slide.instrucoes_box.label }}</div>
@@ -879,16 +919,18 @@
         {% endif %}
 
       {% elif slide.tipo == 'avaliacao_pergunta' %}
+        {% set ns.questao = (ns.questao | default(0)) + 1 %}
+        <p class="q-numero">Questão {{ ns.questao }} de {{ content.slides | selectattr('tipo', 'equalto', 'avaliacao_pergunta') | list | length }}</p>
         {{ render_pergunta(slide.pergunta) }}
         <div class="gate-hint" data-gate-hint="{{ slide.gate_id }}">👆 Responda antes de continuar.</div>
 
       {% elif slide.tipo == 'resultado' %}
         <h1 class="title">{{ slide.titulo }}</h1>
         <div class="box box-summary" id="statsBox">
-          <div class="box-label">📊 Pontuação objetiva</div>
-          <div class="stat-row"><span>Acertos automáticos</span><span class="stat-val" id="statScore">0 / 0</span></div>
-          <div class="stat-row"><span>Respostas com alta confiança e erro</span><span class="stat-val" id="statFlags">0</span></div>
-          <div class="stat-row"><span>Questões abertas registradas</span><span class="stat-val" id="statOpen">0 / {{ open_total }}</span></div>
+          <div class="box-label">📊 Até aqui</div>
+          <div class="stat-row"><span>Objetivas certas</span><span class="stat-val" id="statScore">0 / 0</span></div>
+          <div class="stat-row"><span>Erros em que você estava muito seguro</span><span class="stat-val" id="statFlags">0</span></div>
+          <div class="stat-row"><span>Abertas respondidas</span><span class="stat-val" id="statOpen">0 / {{ open_total }}</span></div>
         </div>
         <div class="box box-instr" id="instrPadraoBox">
           <div class="box-label">➡ Próximo passo</div>
@@ -900,11 +942,12 @@
           <button class="copy-btn" id="copyBtn">Copiar resumo</button>
         </div>
         <div class="box box-instr" id="resumoEmbutidoBox" hidden>
-          <div id="avaliacaoPendente">
+          <div id="avaliacaoPendente" class="enviar-tutor">
             <div class="box-label">➡ Próximo passo</div>
-            Clique em <strong>“Fim”</strong>, embaixo, pra enviar sua avaliação.
+            <p>O tutor corrige as abertas, junta com as objetivas e diz se você pode seguir ou o que revisar.</p>
+            <button type="button" class="enviar-tutor-btn" id="enviarTutorBtn">Enviar pro tutor corrigir →</button>
           </div>
-          <div id="avaliacaoCarregando" hidden>Avaliando seu estudo…</div>
+          <div id="avaliacaoCarregando" hidden><div class="avaliando"><span class="avaliando-giro" aria-hidden="true"></span>O tutor está corrigindo… leva uns segundos.</div></div>
           <div id="avaliacaoErro" hidden>
             <p id="avaliacaoErroMsg"></p>
             <button type="button" class="register-btn" id="avaliacaoTentarDeNovo">Tentar de novo</button>
@@ -2329,9 +2372,12 @@ function desenharProgresso(idx) {
   var trilha = document.getElementById('progressTrack');
   if (!trilha) return;
   if (!trilha.dataset.montada) {
+    // Na prova quase todo slide é pergunta: losango em todos embolava a barra
+    var nGates = slides.filter(function (sl) { return sl.dataset.gate; }).length;
+    var marcarGates = nGates * 2 < slides.length;
     slides.forEach(function (sl) {
       var seg = document.createElement('i');
-      if (sl.dataset.gate) seg.className = 'ck';
+      if (sl.dataset.gate && marcarGates) seg.className = 'ck';
       trilha.appendChild(seg);
     });
     trilha.dataset.montada = '1';
@@ -2352,6 +2398,9 @@ function showSlide(idx) {
   document.getElementById('prevBtn').disabled = idx === 0;
   const nextBtn = document.getElementById('nextBtn');
   nextBtn.textContent = idx === slides.length - 1 ? 'Fim' : 'Próximo ▶';
+  // Embutido no Emaús, o envio pro tutor é o botão grande dentro do slide de
+  // resultado (2026-09-27) — o "Fim" pequeno da barra some pra não duplicar.
+  nextBtn.hidden = EMBUTIDO && idx === slides.length - 1;
   if (slideEl.dataset.gate) { checkGate(slideEl); } else { nextBtn.disabled = false; }
   if (idx === slides.length - 1) buildSummary();
 
@@ -2397,6 +2446,12 @@ document.getElementById('nextBtn').addEventListener('click', function () {
     window.parent.postMessage({ tipo: 'emaus:concluir', texto: ultimoResumoEnviado }, '*');
   } catch (e) {}
 });
+// Botão grande "Enviar pro tutor corrigir" = o mesmo envio do antigo "Fim"
+(function () {
+  var b = document.getElementById('enviarTutorBtn');
+  if (b) b.addEventListener('click', function () { document.getElementById('nextBtn').click(); });
+})();
+
 document.addEventListener('keydown', function (e) {
   // Digitando (resposta aberta, anotação, dúvida): seta move o cursor, não o slide
   var alvo = e.target;
