@@ -145,6 +145,9 @@ class ServicoComReserva:
                 kw = {k: v for k, v in kwargs.items() if k in aceitos}
                 try:
                     resposta = await metodo(*args, **kw)
+                    # Resposta vazia (visto no Gemma 4 em 2026-10-01: text=None) também é falha
+                    if resposta is None or (isinstance(resposta, str) and not resposta.strip()):
+                        raise RuntimeError("resposta vazia")
                     self.ultimo_modelo = chave
                     return resposta
                 except Exception as e:
