@@ -1,0 +1,51 @@
+[
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: a cover composition showing one central isometric network device with several glowing service doors on its sides, each door connected by a colored cable to a different icon (browser window, padlock, video camera, cloud with upload arrow), conveying that one address has many ports. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico31-portas",
+    "arquivo": "t31-capa-portas.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: a single isometric apartment-style building representing one network device, with several distinct doors on its front, each door glowing in a slightly different shade, and small arrows arriving at the building entrance and splitting toward different doors, implying one address with many service doors. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico31-portas",
+    "arquivo": "t31-predio-apartamentos.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: two parallel delivery paths between a sender device and a receiver device: the upper path shows packets traveling in a neat ordered line with small check-mark-shaped return arrows (no actual text), the lower path shows packets traveling loosely without any return arrows, some slightly scattered, implying guaranteed versus best-effort delivery. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico31-portas",
+    "arquivo": "t31-tcp-udp-dois-caminhos.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: a long horizontal ruler-like bar divided into three clearly separated segments of different lengths — a short first segment, a long middle segment and a medium last segment — each segment tinted differently, with small service icons (a globe, a video camera, a rotating arrow) hovering above each segment. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico31-portas",
+    "arquivo": "t31-faixas-portas.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: a central isometric network video recorder box with four distinct connection doors on its side, each door with its own glowing cable leading to a different icon: a web browser window, a padlocked browser window, a video camera, and a cloud with an upload arrow. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico31-portas",
+    "arquivo": "t31-quatro-portas.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: two isometric devices facing each other — a network video recorder on the left and a security camera on the right — connected by a cable; on the recorder side a small temporary door glows briefly (dashed outline), on the camera side a solid permanent door glows amber; arrows go from the temporary door to the permanent door and back. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico31-portas",
+    "arquivo": "t31-origem-destino.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: a wide isometric map of many small connected devices (security cameras, recorders, routers); several of them have their doors left wide open with a faint warning glow, and thin dark lines from those open-door devices converge toward a single distant overloaded server tower, implying many weak devices hijacked into one attack. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico31-portas",
+    "arquivo": "t31-mirai-portas-abertas.png"
+  }
+]
