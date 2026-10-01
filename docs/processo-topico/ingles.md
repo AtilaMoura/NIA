@@ -11,7 +11,12 @@ em explicação de conceito. Histórico: `estudo-ingles/PASSO_A_PASSO.md`, `estu
 
 ## Passo 1 — Fonte
 
-- Fonte = o material real: transcrição do vídeo (`estudo-ingles/unidades/<nn>/_transcricao.md`,
+- **Prioridade nova (2026-10-01):** montar a base do **básico ao intermediário** antes das
+  músicas, com fonte de instituição: descritores CEFR, Oxford 3000, English Vocabulary
+  Profile, British Council, BBC Learning English, Cambridge Dictionary (IPA), YouGlish.
+  Lista completa no [FONTES_GUIA.md](FONTES_GUIA.md). Músicas e vídeos vêm depois, como
+  prática da base.
+- Fonte das aulas de música/vídeo = o material real: transcrição do vídeo (`estudo-ingles/unidades/<nn>/_transcricao.md`,
   com timestamps) ou pesquisa da música (`_pesquisa.md`).
 - **Nunca reproduzir letra de música** ou trecho longo com copyright — parafrasear o
   sentido e mandar acompanhar a letra oficial (YouTube/Genius). Exemplos são frases próprias.
@@ -19,9 +24,11 @@ em explicação de conceito. Histórico: `estudo-ingles/PASSO_A_PASSO.md`, `estu
 
 ## Passo 2 — Escrita (substitui a BASE)
 
-- **À mão.** `ContentAgent` (Groq e Gemini) **não respeita lista fechada** de palavras —
-  inventou vocabulário e testou palavra nunca ensinada. Usar IA só pra `QuizAgent`
-  em cima do conteúdo já fechado.
+- **Híbrido a partir do dossiê** (BASE, Passo 2). Cuidado conhecido: o `ContentAgent`
+  (Groq e Gemini) **não respeita lista fechada** de palavras quando escreve de memória —
+  inventou vocabulário e testou palavra nunca ensinada. Por isso: a lista de palavras do
+  tópico vem pronta do dossiê, a IA só organiza explicação/exemplo, e a auditoria confere
+  palavra por palavra (nenhuma a mais, nenhuma a menos, toda pergunta só com palavra ensinada).
 - Formato pedido pelo Atila: **"palavra por palavra"** — toda palavra/expressão de
   conteúdo do trecho vira bloco `vocab` (termo, classe, tradução, `exemplo_en`, cuidado);
   palavra de função só aparece na frase traduzida.

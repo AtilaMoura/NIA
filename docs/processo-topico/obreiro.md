@@ -15,6 +15,10 @@ e `curso de obreiro/anotação para IA.md`.
   erradas de memória já foram achadas no T2).
 - Re-conferir citações de tópicos ANTERIORES que o novo reusa.
 - Buscar bem mais passagens do que a IA usaria (~15-20).
+- Mais nomes além do Guzik (2026-10-01): clássicos em domínio público (Matthew Henry,
+  Spurgeon, Calvino, John Gill, Adam Clarke) podem ser citados; modernos (Stott, Wiersbe,
+  F. F. Bruce, Carson) só em paráfrase. Léxico Strong/Vine pra palavra no original. Lista
+  completa no [FONTES_GUIA.md](FONTES_GUIA.md).
 - Comentário: Guzik/Enduring Word via Firecrawl
   (`enduringword.com/bible-commentary/<livro-cap>/`) — **só paráfrase atribuída**
   ("Guzik resume assim: …"), nunca citação longa (copyright).

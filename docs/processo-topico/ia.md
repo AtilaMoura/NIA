@@ -16,6 +16,10 @@ Segue a [BASE](BASE.md). Plano geral e fases: `PLANO_CURSO_IA_EMAUS.md`.
   **portar** com `scripts/portar_exercicio_para_schema.py` em vez de escrever do zero.
 - Fato fora da apostila (número de dimensões de um modelo, fórmula, paper) →
   conferir em fonte primária (paper original, doc oficial) antes de escrever.
+- **A apostila sozinha não basta (2026-10-01):** o dossiê soma papers originais, livros
+  (Jurafsky & Martin, Raschka, Chip Huyen), explicação de especialista (Alammar, Weng,
+  Karpathy) e **casos que deram errado** (Air Canada, concessionária Chevrolet,
+  Mata v. Avianca). Lista no [FONTES_GUIA.md](FONTES_GUIA.md).
 
 ## Passo 2 — Escrita
 
@@ -25,7 +29,9 @@ Segue a [BASE](BASE.md). Plano geral e fases: `PLANO_CURSO_IA_EMAUS.md`.
   (`_montar_<tema>_final.py`) → `_criar_topico_<tema>.py`.
 - Correções que SEMPRE precisam ser feitas na mão: Groq modo pro deixa avaliação toda
   `mc`; Gemini modo pro trunca JSON no QuizAgent.
-- Sempre fechar o tópico com aplicação no agente do Garden Center.
+- Sempre fechar o tópico com aplicação prática num agente real. Não precisa ser só o
+  Garden Center: alternar com **empresa de segurança/portaria/câmeras/portões** (onde o
+  Atila presta serviço) e outros (clínica, condomínio, atendimento de loja).
 - Fórmula/mecanismo → `fluxo` (e, se precisar de conta, bloco de código).
 
 ## Passo 6 — Imagens

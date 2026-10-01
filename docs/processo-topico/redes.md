@@ -19,6 +19,9 @@ verificação por fonte é a única rede de segurança, não a revisão humana.
 
 ## Passo 1 — Fonte (obrigatório ANTES de escrever)
 
+0. Dossiê no formato do [FONTES_GUIA.md](FONTES_GUIA.md): além de RFC/doc, buscar livro
+   (Kurose & Ross, Tanenbaum, CCNA), caso real e **caso que deu errado** (Mirai, câmera
+   exposta sem senha).
 1. `estudo-redes-cameras/FONTES.md` primeiro (RFCs, specs ONVIF/W3C/ITU-T, docs
    oficiais Tailscale/AWS/MediaMTX/Backblaze, OWASP, Kurose & Ross — organizado por módulo).
 2. Tudo que não estiver lá: `WebSearch`/`WebFetch` em fonte primária (RFC, doc oficial).
@@ -26,10 +29,15 @@ verificação por fonte é a única rede de segurança, não a revisão humana.
    prática recomendada — tem fonte anotada. Se não achou fonte, não escreve.
 4. Fonte nova achada → acrescentar em `FONTES.md` no módulo certo.
 
-## Passo 2 — Escrita (substitui a BASE)
+## Passo 2 — Escrita
 
-- **100% à mão**, sem `ContentAgent`/`ReviewerAgent` (Groq/Gemini geram de memória,
-  sem fonte).
+- **Híbrido a partir do dossiê** (BASE, Passo 2; mudou em 2026-10-01 — antes era 100% à
+  mão). Groq/Gemini só **organizam** o dossiê; nunca entra afirmação técnica deles que não
+  esteja no dossiê. O erro real que motivou o cuidado: Groq escreveu de memória "câmera
+  envia UDP pra porta 554" (RTSP usa TCP por padrão). Toda afirmação técnica passa pela
+  checagem de alto risco da auditoria.
+- **Exemplos variados**, não só o NVR de Piazza Fontana: condomínio, pequena empresa,
+  residência, comércio, portaria. O NVR real continua como fio condutor.
 - Conectar sempre com a tela real de config de câmera/NVR/roteador (o "pra que serve isso
   no meu projeto").
 - Mecanismo/sequência → `fluxo`. Comparações → `cols2`/tabela.

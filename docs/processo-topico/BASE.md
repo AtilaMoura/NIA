@@ -11,6 +11,8 @@ diz o que ACRESCENTA ou SUBSTITUI aqui:
 | Redes e Câmeras | 11 | [redes.md](redes.md) |
 | Engenharia de Agentes LLM (IA) | 5 | [ia.md](ia.md) |
 
+Comum a todos: [FONTES_GUIA.md](FONTES_GUIA.md) (o que buscar de fonte e o dossiê).
+
 Regra de leitura: **ler a BASE + a especificação do curso antes de começar qualquer
 tópico.** Onde as duas discordarem, vale a especificação.
 
@@ -24,14 +26,21 @@ tópico.** Onde as duas discordarem, vale a especificação.
   consulta no banco local (`docker exec nia_backend python -c ...`) ou `GET` da árvore.
 - Anotar `Topico.id`, `lesson_id` e o título do tópico anterior (pra costura/continuidade).
 
-## Passo 1 — Pesquisa / fonte (específico por curso)
+## Passo 1 — Dossiê de fontes
 
+- Seguir **[FONTES_GUIA.md](FONTES_GUIA.md)**: 8 tipos de fonte (meta: 5+ tipos por
+  tópico), hierarquia de confiança, direito autoral, lista de fontes por curso.
 - **Nunca escrever fato verificável de memória** (versículo, porta, data, palavra,
-  número). A fonte muda por curso — ver a especificação.
-- Guardar a pesquisa (arquivo `_pesquisa*.md`/JSON), não descartar: é a base da
-  auditoria do Passo 5.
+  número, nome de paper).
+- Entregável: `fontes/<curso>/topicoN-<slug>.md` (modelo no guia). É a matéria-prima do
+  Passo 2 e a régua do Passo 5.
 
-## Passo 2 — Escrever o conteúdo (quem escreve é específico por curso)
+## Passo 2 — Escrever o conteúdo (híbrido, a partir do dossiê)
+
+Padrão de todo curso (decidido 2026-10-01): Groq e Gemini geram **separados** a partir do
+dossiê ("organize este material"), eu comparo, junto o melhor e completo o que ficou de
+fora. Se os dois falharem, escrevo direto do dossiê. Detalhes e exceções por curso na
+especificação.
 
 Padrão mínimo de estrutura de todo tópico:
 
@@ -65,10 +74,27 @@ Regras de bloco que valem pra todo curso:
 3. Renderizar (`GET /topicos/{id}/render?theme=<tema>`) e fazer `grep -n "None"` no HTML.
 4. Conferir: `imagem_capa` presente, nenhum checkpoint vazio, Reflexão + Resumo existem.
 
-## Passo 5 — Auditoria de conteúdo (contra a pesquisa do Passo 1)
+## Passo 5 — Auditoria IA (obrigatória pra aprovar)
 
-- Toda afirmação verificável bate com a fonte? (checklist próprio na especificação)
-- Continuidade com o tópico anterior (não repetir, não contradizer).
+O Atila cria vários cursos **pra aprender**, então não tem como revisar o conteúdo. **A
+validação é minha (Claude)**, formal, com relatório. Sem relatório aprovado, não existe
+`is_approved=true`.
+
+Entregável: `fontes/<curso>/topicoN-<slug>-auditoria.md`
+
+| Checagem | Como |
+|---|---|
+| **Fato** | Cada afirmação verificável do tópico → fonte do dossiê que a sustenta. Sem fonte = corrigir ou remover |
+| **Fato de alto risco** | Em Redes e IA (número, porta, comportamento, data), refazer 1 busca independente, não só reler o dossiê |
+| **Pedagogia** | Toda pergunta é respondível com o que foi ensinado; ordem do simples ao complexo; exemplo antes de abstração |
+| **Direito autoral** | Nenhum bloco longo copiado de material moderno; letra de música nunca |
+| **Continuidade** | Não repete nem contradiz o tópico anterior; usa o vocabulário já ensinado |
+| **Estrutura** | `validar_topico()` vazio, `grep None` limpo, Reflexão + Resumo, tipos de pergunta variados |
+| **Checklist do curso** | O da especificação (ex.: neutralidade doutrinária, exemplo ancorado em caso real) |
+
+Formato do relatório: tabela `afirmação | fonte | status (ok / corrigido / removido)` +
+lista do que foi mudado. **Aprovar só com zero pendências.** Revisão humana (Atila,
+teólogo, professor) continua bem-vinda quando houver, mas não é pré-requisito.
 
 ## Passo 6 — Imagens
 
@@ -116,6 +142,7 @@ Regras de bloco que valem pra todo curso:
 
 ## Passo 9 — Conferência final (checklist)
 
+- [ ] Dossiê com 5+ tipos de fonte e relatório de auditoria sem pendências
 - [ ] `validar_topico()` vazio e `grep None` sem resultado
 - [ ] Capa + imagens carregam (nenhum 404), local e produção
 - [ ] Reflexão + Resumo + avaliação com tipos variados
