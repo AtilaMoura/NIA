@@ -12,8 +12,8 @@ O chat de dúvidas (2026-09-23) manda o texto do tópico como referência,
 cortado num teto fixo (ver agents/contexto_topico.py) — o teto continua
 existindo mesmo com o Gemini como principal (Groq ainda é o respaldo).
 
-Gemini 3.5 Flash Lite é o modelo PRINCIPAL desde 2026-09-23 (Groq como
-respaldo) — ver `MODELO_GEMINI_TUTOR` e `_com_fallback_gemini` abaixo.
+Modelos: cadeia "tutor" de app/services/modelos.py (Gemini 3.5 Flash Lite primeiro,
+reserva automática pros próximos — 2026-10-01).
 """
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -33,8 +33,8 @@ from app.schemas.topico_tutor import (
 from app.agents.tutor_agent import TutorAgent
 from app.agents.perfis import resolver_perfil
 from app.agents.contexto_topico import carregar_content, montar_contexto_duvida
-from app.services.gemini_service import GeminiService
-from app.routers.pipeline import _perfil_do_curso, _rate_limited, _service
+from app.services.modelos import servico
+from app.routers.pipeline import _perfil_do_curso, _rate_limited
 
 router = APIRouter(prefix="/topico-tutor", tags=["Topico Tutor"])
 
@@ -42,30 +42,11 @@ router = APIRouter(prefix="/topico-tutor", tags=["Topico Tutor"])
 # do Groq — o histórico completo continua no banco e aparece na tela).
 HISTORICO_DUVIDAS_NO_PROMPT = 6
 
-# Tutor ao vivo (2026-09-23): Gemini 3.5 Flash Lite é o modelo PRINCIPAL — o
-# Groq só entra como respaldo se o Gemini falhar ou estourar a cota (500 RPD
-# free tier, bem mais folgado que o teto de 8000 tokens/min do Groq).
-# Decisão baseada em comparação real: as 11 dúvidas que o Atila tirou no chat
-# do curso de IA (topico_id=19) foram reenviadas pro Gemini e comparadas com
-# as respostas que o Groq já tinha dado de verdade em produção — o Gemini
-# respondeu mais rápido (~1-2s) e seguiu o fio condutor do domínio (exemplo
-# do Garden Center) em todas as respostas; o Groq foi mais inconsistente
-# nisso (às vezes usava exemplo genérico em vez do exemplo do curso).
-MODELO_GEMINI_TUTOR = "gemini-3.5-flash-lite"
-
-
-async def _com_fallback_gemini(chamar_gemini, chamar_groq):
-    """Tenta primeiro no Gemini (principal); se ele lançar qualquer erro
-    (rate limit ou outra falha), tenta de novo com o Groq (respaldo) antes de
-    desistir. Se os dois falharem, propaga o erro do Gemini (é o service
-    principal, mais informativo pro _rate_limited/log)."""
-    try:
-        return await chamar_gemini()
-    except Exception as erro_gemini:
-        try:
-            return await chamar_groq()
-        except Exception:
-            raise erro_gemini
+# Tutor ao vivo: modelos vêm da cadeia "tutor" em app/services/modelos.py
+# (2026-10-01) — Gemini 3.5 Flash Lite → 3.1 Flash Lite → Groq, com reserva
+# automática. Histórico da escolha (2026-09-23): as 11 dúvidas reais do chat do
+# curso de IA (topico_id=19) reenviadas pro Gemini foram mais rápidas (~1-2s) e
+# seguiram melhor o exemplo do domínio que as respostas do Groq.
 
 
 def _buscar_pergunta(topico: Topico, question_id: str) -> dict | None:
@@ -103,13 +84,8 @@ async def corrigir_exercicio(
     perfil_id = _perfil_do_curso(db, topico)
     perfil = resolver_perfil(perfil_id)
     try:
-        resultado = await _com_fallback_gemini(
-            lambda: TutorAgent(GeminiService(model_name=MODELO_GEMINI_TUTOR)).corrigir_exercicio(
-                pergunta, data.resposta_dada, contexto_topico=topico.titulo, perfil=perfil,
-            ),
-            lambda: TutorAgent(_service("groq")).corrigir_exercicio(
-                pergunta, data.resposta_dada, contexto_topico=topico.titulo, perfil=perfil,
-            ),
+        resultado = await TutorAgent(servico("tutor")).corrigir_exercicio(
+            pergunta, data.resposta_dada, contexto_topico=topico.titulo, perfil=perfil,
         )
     except Exception as e:
         if _rate_limited(e):
@@ -199,27 +175,15 @@ async def tirar_duvida(
     perfil_id = _perfil_do_curso(db, topico)
     perfil = resolver_perfil(perfil_id)
     try:
-        resposta_texto = await _com_fallback_gemini(
-            lambda: TutorAgent(GeminiService(model_name=MODELO_GEMINI_TUTOR)).responder_duvida(
-                data.pergunta_aluno,
-                contexto_slide=contexto_slide,
-                contexto_topico=topico.titulo,
-                perfil=perfil,
-                material_topico=material_topico,
-                numero_slide=data.slide_index + 1,
-                historico=historico,
-                tamanho=data.tamanho,
-            ),
-            lambda: TutorAgent(_service("groq")).responder_duvida(
-                data.pergunta_aluno,
-                contexto_slide=contexto_slide,
-                contexto_topico=topico.titulo,
-                perfil=perfil,
-                material_topico=material_topico,
-                numero_slide=data.slide_index + 1,
-                historico=historico,
-                tamanho=data.tamanho,
-            ),
+        resposta_texto = await TutorAgent(servico("tutor")).responder_duvida(
+            data.pergunta_aluno,
+            contexto_slide=contexto_slide,
+            contexto_topico=topico.titulo,
+            perfil=perfil,
+            material_topico=material_topico,
+            numero_slide=data.slide_index + 1,
+            historico=historico,
+            tamanho=data.tamanho,
         )
     except Exception as e:
         if _rate_limited(e):

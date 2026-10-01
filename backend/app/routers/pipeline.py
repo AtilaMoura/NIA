@@ -33,17 +33,18 @@ from app.agents.revisao_avaliacao import NOTA_MINIMA_PROVA, corrigir_e_revisar, 
 from app.agents.perfis import resolver_perfil
 from app.schemas.topico_progress import AvaliarTopicoRequest, TopicoProgressOut
 from app.schemas.avaliacao_progress import AvaliacaoProgressOut
-from app.services.groq_service import GroqService
-from app.services.gemini_service import GeminiService
+from app.services.modelos import servico
 from app.services.biblia_service import buscar_todos_textos
 
 router = APIRouter(prefix="/pipeline", tags=["Pipeline"])
 
 
 def _service(modelo: str):
+    # Cadeias de modelos com reserva automática (app/services/modelos.py, 2026-10-01):
+    # "gemini" = cadeia de conteúdo (Gemini Flash revezando); "groq" = segunda opinião
     if modelo == "gemini":
-        return GeminiService()
-    return GroqService()
+        return servico("conteudo")
+    return servico("segunda_opiniao")
 
 
 # ============================================================
@@ -533,7 +534,8 @@ def _perfil_do_curso(db: Session, topico: Topico) -> str:
 
 def _rate_limited(err: Exception) -> bool:
     msg = str(err).lower()
-    return "429" in msg or "rate_limit" in msg or "rate limit" in msg
+    # 503/unavailable: Gemini "alta demanda" — também é sobrecarga passageira, não bug
+    return any(s in msg for s in ("429", "rate_limit", "rate limit", "resource_exhausted", "503", "unavailable"))
 
 
 # Teto do texto do tópico (numerado por "[Slide N]") que vai na correção —

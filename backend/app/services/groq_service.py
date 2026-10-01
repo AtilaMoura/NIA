@@ -60,8 +60,10 @@ class GroqService:
             # "content" vazio/truncado (visto na prática: max_tokens=50 sem isso
             # voltou content="", finish_reason="length"). "low" mantém raciocínio
             # mínimo e sobra orçamento pro JSON de verdade.
-            "reasoning_effort": "low",
         }
+        if self.model.startswith("openai/gpt-oss"):
+            # Só os gpt-oss aceitam "low"; outros modelos do Groq (ex.: qwen) têm outros valores
+            payload["reasoning_effort"] = "low"
         
         # Headers
         headers = {

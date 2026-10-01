@@ -8,8 +8,7 @@ from .quiz_agent import QuizAgent
 # ✅ IMPORTAR OS MODELS
 from app.models.models import Course, Module, Progress, Lesson
 
-from app.services.gemini_service import GeminiService 
-from app.services.groq_service import GroqService
+from app.services.modelos import servico
 
 
 class Orchestrator:
@@ -18,12 +17,9 @@ class Orchestrator:
     """
 
     def __init__(self, model: str = "gemini"):
-        if model == "gemini":
-            service = GeminiService()
-        elif model == "llama":
-            service = GroqService()
-        else:
-            service = GeminiService()
+        # Cadeias com reserva automática (app/services/modelos.py); "llama" é o nome
+        # antigo do Groq e continua aceito
+        service = servico("segunda_opiniao" if model in ("llama", "groq") else "conteudo")
 
         self.context =  ContextAgent(service)
         self.specialist = SpecialistAgent(service)
