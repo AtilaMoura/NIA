@@ -55,6 +55,17 @@ CADEIAS: dict[str, list[tuple[str, str]]] = {
         ("gemini", "gemini-3.1-flash-lite"),
         ("groq", "qwen/qwen3.8-27b"),
     ],
+    # Correção do fim do tópico e da prova (nota + revisão do aluno). Antes caía no Groq
+    # (rota com modelo="groq" por padrão) — e o Groq foi quem mais errou fato no teste
+    # comparativo; num caso real (T66, 2026-10-01) inventou detalhe bíblico na revisão.
+    "correcao": [
+        ("gemini", "gemini-3.5-flash"),
+        ("gemini", "gemini-3.7-flash"),
+        ("gemini", "gemini-2.5-flash"),
+        ("gemini", "gemini-3.5-flash-lite"),
+        ("gemini", "gemini-3.1-flash-lite"),
+        ("groq", "qwen/qwen3.8-27b"),
+    ],
     # Tutor ao vivo na plataforma (rápido, muitos pedidos/dia)
     "tutor": [
         ("gemini", "gemini-3.5-flash-lite"),

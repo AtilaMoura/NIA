@@ -662,7 +662,9 @@ async def avaliar_resumo_topico(
     rodada = registro.rodada_atual if registro else 1
     content_topico = carregar_content(topico)
     perfil = resolver_perfil(_perfil_do_curso(db, topico))
-    agente = TutorAgent(_service(data.modelo))
+    # Correção/nota do aluno: sempre a cadeia "correcao" (Gemini primeiro), ignorando
+    # data.modelo — o padrão "groq" mandava pra qwen/gpt-oss, que erram fato (2026-10-01)
+    agente = TutorAgent(servico("correcao"))
 
     respostas = {
         r.question_id: {"resposta": r.resposta_dada, "correta": r.correta}
@@ -761,7 +763,9 @@ async def avaliar_resumo_avaliacao(
     topico = avaliacao.topico
     content_topico = carregar_content(topico) if topico and topico.content else {"slides": []}
     perfil = resolver_perfil(_perfil_do_curso(db, topico) if topico else "tech")
-    agente = TutorAgent(_service(data.modelo))
+    # Correção/nota do aluno: sempre a cadeia "correcao" (Gemini primeiro), ignorando
+    # data.modelo — o padrão "groq" mandava pra qwen/gpt-oss, que erram fato (2026-10-01)
+    agente = TutorAgent(servico("correcao"))
 
     # Mesmo formato de slide que o render da prova monta (routers/avaliacoes.py).
     slides_prova = [

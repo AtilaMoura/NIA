@@ -153,6 +153,8 @@ RESUMO COLADO PELO ALUNO:
 Você corrige respostas abertas de um aluno do {perfil.contexto_curso} e prepara, pra cada
 uma, um cartão curto de revisão pra ele reler.
 
+{perfil.fio_condutor}
+
 MATERIAL DO TÓPICO (numerado por slide):
 {material}
 
@@ -160,9 +162,12 @@ PERGUNTAS E RESPOSTAS:
 {perguntas}
 
 CLASSIFICAÇÃO (compare com o gabarito/material de cada pergunta, nunca com a sua opinião):
+- Julgue a IDEIA, não as palavras: a resposta esperada é UM jeito de responder, não uma lista
+  de termos obrigatórios. Se o aluno expressa a ideia central com as palavras dele, é "certa"
+  — mesmo sem repetir expressões da resposta esperada.
 - "certa": responde o que foi pedido, sem contradizer o material (outras palavras e forma curta valem).
-- "parcial": ideia central certa, mas faltou algo que a pergunta pediu explicitamente, ou
-  mistura um conceito de forma imprecisa.
+- "parcial": ideia central certa, mas faltou uma parte que a PERGUNTA pediu explicitamente
+  (não basta faltar um detalhe da resposta esperada), ou mistura um conceito de forma imprecisa.
 - "errada": contradiz o material, ou não responde o que foi pedido.
 
 Pra perguntas do tipo FRASE, julgue a FRASE INTEIRA (não só um trecho):
@@ -180,6 +185,15 @@ Devolva APENAS um JSON válido (sem markdown), com UM item por pergunta, mesmo i
   "o_que_faltou": "1 frase dirigida ao aluno: o que faltou ou ficou impreciso na resposta DELE (vazio se certa)",
   "exemplo": "1 exemplo NOVO e curto, DIFERENTE da resposta certa, usando a mesma regra",
   "slide": número do slide do material onde isso é explicado (inteiro, ou null)}}]}}
+
+FIDELIDADE (vale pra ponto_certo, o_que_faltou e exemplo):
+- Use só o que está no MATERIAL. NUNCA acrescente fato, citação, nome, número ou detalhe
+  (bíblico, técnico ou histórico) que não esteja nele — ex.: não diga que um personagem
+  "escrevia" se o texto diz que ele "falava".
+- O exemplo deve ser uma situação simples do dia a dia ou algo do próprio material, nunca
+  uma afirmação nova sobre o conteúdo.
+- Se o material apresenta um tema com neutralidade (posições diferentes entre tradições ou
+  escolas), não tome partido nem apresente uma das posições como a certa.
 """
         return await self.run_json_com_retry(prompt, max_tokens=2200)
 
@@ -197,6 +211,13 @@ Devolva APENAS um JSON válido (sem markdown), com UM item por pergunta, mesmo i
 Um aluno do {perfil.contexto_curso} errou (ou acertou em parte) as questões abaixo. Monte uma
 REVISÃO curta e clara das dificuldades DELE, agrupada por ASSUNTO (não questão por questão),
 fiel ao material. A resposta certa de cada questão já está definida — não questione.
+
+{perfil.fio_condutor}
+
+FIDELIDADE: regras e exemplos usam só o que está no MATERIAL — nunca acrescente fato, citação,
+nome, número ou detalhe (bíblico, técnico ou histórico) que não esteja nele. Exemplos são
+situações simples do dia a dia ou trechos do próprio material. Se o material trata um tema
+com neutralidade entre posições diferentes, não tome partido.
 
 MATERIAL DO TÓPICO (numerado por slide):
 {material}

@@ -137,6 +137,11 @@ teólogo, professor) continua bem-vinda quando houver, mas não é pré-requisit
      revezando 3 vozes, corte pela transcrição do Whisper. Falha de corte fica guardada em
      `backend/_audio_falhas/`.
   4. `mp3` — comprime (WAV 30 MB → MP3 5 MB) com ffmpeg num container descartável
+  4b. **CONFERIR o áudio** antes de publicar: `python backend/_conferir_audio.py <topico_id> <course_id>`
+     — transcreve cada pedaço com Whisper (idioma automático) e compara com a narração. Achado real
+     (T66, 2026-10-01): a voz **trocou pra inglês no fim** do resumo ("…2 Peter 3.16, preparing the
+     obrero…"), ouvido pelo Atila em produção. Causa provável: muitas referências bíblicas seguidas
+     no mesmo bloco. Correção: reescrever a narração com menos referências e gerar de novo só ele.
   5. `aplicar` (local) → `scp` dos `.mp3` pra `~/NIA/backend/static/audio/curso<N>/` da VM1
      → `aplicar prod` (NIA_EMAIL/NIA_SENHA)
 - Antes de propor gerar/hospedar mídia nova, checar se o navegador já resolve (lição do Inglês).
