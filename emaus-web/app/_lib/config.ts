@@ -14,9 +14,11 @@ export const TEOLOGIA_COURSE_IDS = [8, 12, 9, 5, 11] as const;
 // Default do sistema; cursos com identidade visual própria entram no mapa abaixo
 // (mesmo padrão do `_PERFIL_POR_CURSO` no backend).
 export const THEME_TOPICO = "trigo-maduro";
+// Escolhido no catálogo visual (docs/estilos/, 2026-10-01) — cursos 8/12 seguem no default.
 export const TEMA_POR_CURSO: Record<number, string> = {
-  9: "papel-latao", // curso de Inglês
-  5: "vidro-fume", // Engenharia de Agentes LLM — identidade "Vidro Fumê" do estudo original
+  9: "caderno-escolar", // Inglês (antes: papel-latao)
+  5: "vinho-ouro", // Engenharia de Agentes LLM (antes: vidro-fume)
+  11: "alto-contraste", // Redes e Câmeras (antes: default trigo-maduro)
 };
 
 // FASE 1 (auth) trocou isto pela sessão de verdade (`_lib/sessao.ts`, getSessao().id) em

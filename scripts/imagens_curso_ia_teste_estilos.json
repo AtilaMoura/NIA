@@ -1,0 +1,37 @@
+[
+  {
+    "descricao": "Generate an image. Wide 16:9. Modern minimalist glowing technical diagram illustration; clean geometric shapes and thin precise lines; a single lime-green accent (around #c8e06b) plus restrained cool-blue and warm-amber secondary accents; near-black charcoal background (around #111412); subtle soft glow; generous negative space; no photorealism, no text, no letters, no numbers, no logos, no people. Scene: a horizontal row of six identical small glowing rounded tiles representing words in a sentence; above the row, several thin smooth sine waves of different frequencies (slow long waves and fast short waves) flow from left to right, and at each tile a thin vertical line drops from the waves into the tile, giving each tile a slightly different subtle colour pattern, suggesting that every word receives a unique position signature.",
+    "modulo": "curso-ia",
+    "aula": "teste-estilos",
+    "topico": "positional-encoding",
+    "arquivo": "estilo1-diagrama-brilhante.png"
+  },
+  {
+    "descricao": "Generate an image. Wide 16:9. Isometric technical 3D illustration, clean flat shading, dark charcoal background (around #111412), lime-green (around #c8e06b) main accent with muted blue and amber details, soft ambient glow, precise engineering look; no photorealism, no text, no letters, no numbers, no logos, no people. Scene: an isometric conveyor belt carrying six identical small cubes representing words; the belt passes under an isometric machine that stamps each cube with a different stack of thin coloured stripes of varying spacing (like a barcode of waves), so the cubes leave the machine each carrying a unique position pattern; clean isometric grid floor.",
+    "modulo": "curso-ia",
+    "aula": "teste-estilos",
+    "topico": "positional-encoding",
+    "arquivo": "estilo2-isometrico.png"
+  },
+  {
+    "descricao": "Generate an image. Wide 16:9. 3D data visualization art, scientific and elegant, dark charcoal background (around #111412), glowing lime-green (around #c8e06b) with cool-blue and amber highlights, depth of field, soft bloom; no photorealism of people, no text, no letters, no numbers, no axis labels, no logos, no people. Scene: a smooth undulating 3D surface made of many fine glowing lines, formed by layered sine waves of different frequencies stretching into depth; along the front edge, a row of six glowing points sits on the surface, each one at a different height and colour, showing that each position in a sequence gets a unique place on the wave landscape.",
+    "modulo": "curso-ia",
+    "aula": "teste-estilos",
+    "topico": "positional-encoding",
+    "arquivo": "estilo4-dados-3d.png"
+  },
+  {
+    "descricao": "Generate an image. Wide 16:9. Modern flat colourful editorial illustration, friendly but sophisticated, soft grain texture, dark charcoal greenhouse night atmosphere (background around #111412) with lime-green (around #c8e06b) as the main accent plus warm amber lamp light and cool blue shadows; no photorealism, no text, no letters, no numbers, no logos, no people, no faces. Scene: inside a garden center greenhouse at night, a long wooden shelf holds six identical small seed pots in a row; above the shelf hangs a string of lights whose glow falls in gentle waves of different rhythms, so each pot is lit by a slightly different combination of colours and brightness, a metaphor for every word in a sentence receiving its own unique position signal.",
+    "modulo": "curso-ia",
+    "aula": "teste-estilos",
+    "topico": "positional-encoding",
+    "arquivo": "estilo5-garden-center.png"
+  },
+  {
+    "descricao": "Generate an image. Wide 16:9. Engineering blueprint style illustration: thin lime-green line drawing on a dark charcoal background with a faint square grid; no text, no numbers, no people. Scene: six simple rectangles in a row, with smooth wave curves above them and thin straight lines connecting the waves down to each rectangle.",
+    "modulo": "curso-ia",
+    "aula": "teste-estilos",
+    "topico": "positional-encoding",
+    "arquivo": "estilo3-blueprint.png"
+  }
+]

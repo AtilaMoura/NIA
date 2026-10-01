@@ -1,0 +1,369 @@
+<title>Catálogo Visual NIA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Tokens: tema claro completo no :root, escuro redefine só os tokens */
+  :root {
+    --bg: #eceeea; --surface: #ffffff; --ink: #1a1f1c; --muted: #58615b; --line: #d3d8d3;
+    --accent: #2f5d50; --accent-ink: #ffffff; --accent-soft: #dfe9e4;
+    --colorido: #c2410c; --realista: #1d6fb8; --desenho: #7a5a36;
+    --display: "Familjen Grotesk", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #121513; --surface: #1b201d; --ink: #e6ebe7; --muted: #9ca69f; --line: #2d3530;
+      --accent: #93c9b2; --accent-ink: #0f1a15; --accent-soft: #22322b;
+      --colorido: #f08a4b; --realista: #6fb2ec; --desenho: #c9a276;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #121513; --surface: #1b201d; --ink: #e6ebe7; --muted: #9ca69f; --line: #2d3530;
+    --accent: #93c9b2; --accent-ink: #0f1a15; --accent-soft: #22322b;
+    --colorido: #f08a4b; --realista: #6fb2ec; --desenho: #c9a276;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); padding-inline: 16px; padding-block: 28px 64px; }
+  .wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 22px; }
+  h1 { font: 700 clamp(1.7rem, 3.4vw, 2.4rem)/1.1 var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  .intro { color: var(--muted); max-width: 68ch; margin: 6px 0 0; }
+  .label { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+  /* Barra de controle: curso + filtros */
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .row .label { min-width: 74px; }
+  .chip { font: 500 13px/1 var(--body); border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .chip:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .status { font: 400 12px/1.4 var(--mono); color: var(--muted); }
+
+  /* Resumo das escolhas por curso */
+  .resumo { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+  .res { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; }
+  .res b { font: 700 15px/1.2 var(--display); }
+  .res ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
+  .res li { font-size: 12.5px; background: var(--accent-soft); padding: 3px 8px; border-radius: 4px; }
+  .res li.prin { background: var(--accent); color: var(--accent-ink); }
+  .res .vazio { color: var(--muted); font-size: 13px; }
+
+  /* Grade de estilos */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+  .card.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .thumb { aspect-ratio: 16 / 9; background: var(--bg); display: grid; place-items: center; overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb .sem { font: 400 12px/1.4 var(--mono); color: var(--muted); padding: 16px; text-align: center; }
+  .body { padding: 14px 16px 16px; display: grid; gap: 9px; align-content: start; }
+  .topo { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .body h2 { font: 700 17px/1.2 var(--display); margin: 0; text-wrap: balance; }
+  .fam { font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+  .fam::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .fam.colorido { color: var(--colorido); } .fam.realista { color: var(--realista); } .fam.desenho { color: var(--desenho); }
+  .desc { margin: 0; color: var(--muted); font-size: 14px; }
+  .cats { display: flex; flex-wrap: wrap; gap: 4px; }
+  .cats span { font-size: 12px; border: 1px solid var(--line); padding: 2px 8px; border-radius: 4px; }
+  .origem { font: 400 11.5px/1.3 var(--mono); color: var(--muted); }
+  .acoes { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; }
+  .btn { font: 700 13px/1 var(--body); border: 1px solid var(--accent); background: transparent; color: var(--accent); padding: 9px 12px; border-radius: 6px; cursor: pointer; }
+  .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  details { border-top: 1px dashed var(--line); padding-top: 8px; }
+  summary { cursor: pointer; font: 500 12px/1.4 var(--mono); color: var(--muted); }
+  pre { white-space: pre-wrap; font: 400 12px/1.5 var(--mono); background: var(--bg); padding: 10px; border-radius: 6px; margin: 8px 0 6px; }
+  .copiar { font: 500 12px/1 var(--mono); background: none; border: 0; color: var(--accent); cursor: pointer; padding: 4px 0; }
+  .nenhum { color: var(--muted); padding: 30px 0; }
+
+  /* Abas */
+  .abas { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+  .aba { font: 700 15px/1 var(--display); background: none; border: 0; border-bottom: 3px solid transparent; color: var(--muted); padding: 12px 14px; cursor: pointer; }
+  .aba[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+  /* Aba de temas: lista + prévia */
+  .temas { display: grid; grid-template-columns: minmax(240px, 300px) 1fr; gap: 18px; align-items: start; }
+  .tlista { display: grid; gap: 8px; }
+  .tema { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; cursor: pointer; color: var(--ink); display: grid; gap: 4px; font: inherit; }
+  .tema[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .tema b { font: 700 15px/1.2 var(--display); }
+  .tema span { font-size: 13px; color: var(--muted); }
+  .tema .uso { font: 500 11px/1.3 var(--mono); color: var(--accent); }
+  .previa { display: grid; gap: 10px; }
+  .molduras { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+  .moldura { display: grid; gap: 6px; }
+  .previa iframe { width: 100%; height: min(74vh, 720px); border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  .previa .acoes { align-items: center; }
+  .versoes { font: 500 11px/1.3 var(--mono); color: var(--muted); }
+  @media (max-width: 760px) { .temas { grid-template-columns: 1fr; } .previa iframe { height: 70vh; } }
+  @media (prefers-reduced-motion: no-preference) { .card { transition: box-shadow .15s, border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Catálogo visual dos cursos</h1>
+    <p class="intro">Escolha, pra cada curso, os estilos de imagem e o tema dos slides. Na aba de estilos, cada cartão tem uma imagem de exemplo e o prompt-base em inglês usado no Gemini; as categorias são sugestão, não regra. Um curso pode ter vários estilos, e a estrela marca o principal (usado nas capas).</p>
+  </header>
+
+  <div class="abas" role="tablist">
+    <button type="button" class="aba" role="tab" id="aba-estilos" aria-selected="true">Estilos de imagem</button>
+    <button type="button" class="aba" role="tab" id="aba-temas" aria-selected="false">Temas dos slides</button>
+  </div>
+
+  <div class="bar" role="region" aria-label="Controles">
+    <div class="row"><span class="label">Curso</span><div class="row" id="cursos"></div></div>
+    <div class="row filtros"><span class="label">Família</span><div class="row" id="familias"></div></div>
+    <div class="row filtros"><span class="label">Categoria</span><div class="row" id="categorias"></div></div>
+    <div class="status" id="status">Conectando ao salvamento…</div>
+  </div>
+
+  <section aria-label="Escolhas por curso">
+    <div class="label" style="margin-bottom:8px">Escolhas por curso</div>
+    <div class="resumo" id="resumo"></div>
+  </section>
+
+  <main class="grid" id="grid"></main>
+
+  <section class="temas" id="painel-temas" hidden>
+    <div class="tlista" id="tlista"></div>
+    <div class="previa">
+      <div class="acoes">
+        <button type="button" class="btn" id="usar-tema" aria-pressed="false">Usar este tema</button>
+        <span class="status">Prévia: tópico real de Redes, "O que é um endereço IP". Navegue pelos slides dentro da moldura.</span>
+      </div>
+      <div class="molduras" id="molduras"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+// Dados do catálogo — injetados por _montar_catalogo.py a partir de catalogo.json
+const CAT = {"_leia": "Catálogo de estilos de imagem do NIA/Emaús. Fonte única: a página catalogo-estilos.html é gerada daqui por _montar_catalogo.py. 'sugerido_para' é sugestão, não regra. 'prompt_base' é a parte de ESTILO do prompt (em inglês, pro Gemini web via scripts/gerar_imagem_gemini.py) — a cena vem depois, específica de cada imagem.", "categorias": {"tecnologia": "Tecnologia e programação", "ia-dados": "IA e dados", "seguranca": "Segurança e câmeras", "linguas": "Línguas", "biblico": "Bíblia e teologia", "negocios": "Negócios e atendimento", "geral": "Qualquer curso"}, "familias": {"colorido": "Colorido", "realista": "Realista", "desenho": "Desenho"}, "cursos": [{"id": "c8", "nome": "Obreiro I", "course_id": 8}, {"id": "c12", "nome": "Obreiro II", "course_id": 12}, {"id": "c9", "nome": "Inglês", "course_id": 9}, {"id": "c11", "nome": "Redes e Câmeras", "course_id": 11}, {"id": "c5", "nome": "IA / Agentes LLM", "course_id": 5}], "estilos": [{"id": "diagrama-brilhante", "nome": "Diagrama brilhante", "familia": "colorido", "sugerido_para": ["ia-dados", "tecnologia"], "descricao": "Formas geométricas finas com brilho suave sobre fundo quase preto, um acento forte e muito espaço vazio. Explica mecanismo abstrato sem distrair.", "prompt_base": "Modern minimalist glowing technical diagram illustration; clean geometric shapes and thin precise lines; a single strong accent colour plus restrained secondary accents; near-black charcoal background; subtle soft glow; generous negative space; no photorealism, no text, no letters, no numbers, no logos, no people.", "imagem": "imagem/curso-ia/teste-estilos/positional-encoding/estilo1-diagrama-brilhante.png", "origem": "teste curso de IA (Positional Encoding)", "img": "img/diagrama-brilhante.jpg"}, {"id": "isometrico-escuro", "nome": "Isométrico técnico escuro", "familia": "colorido", "sugerido_para": ["tecnologia", "ia-dados"], "descricao": "Máquinas e blocos em perspectiva isométrica sobre fundo escuro. Ótimo pra mostrar 'como funciona por dentro' e fluxo de etapas.", "prompt_base": "Isometric technical 3D illustration, clean flat shading, dark charcoal background, one bright accent colour with muted secondary details, soft ambient glow, precise engineering look, isometric grid floor; no photorealism, no text, no letters, no numbers, no logos, no people.", "imagem": "imagem/curso-ia/teste-estilos/positional-encoding/estilo2-isometrico.png", "origem": "teste curso de IA (Positional Encoding)", "img": "img/isometrico-escuro.jpg"}, {"id": "isometrico-claro", "nome": "Isométrico flat claro", "familia": "colorido", "sugerido_para": ["tecnologia", "seguranca"], "descricao": "Vetorial isométrico flat com paleta controlada (azul-petróleo, azul, âmbar). Cenários de equipamentos, rede e infraestrutura.", "prompt_base": "Flat isometric vector illustration, clean geometric shapes, limited palette of dark slate, bright blue and amber, soft shadows, tidy technical infographic look; no photorealistic people, no text, no pseudo-text, no logos.", "imagem": "backend/static/course-images/curso11/topico1-capa-endereco-ip.jpg", "origem": "em uso: Redes e Câmeras", "img": "img/isometrico-claro.jpg"}, {"id": "dados-3d", "nome": "Visualização de dados 3D", "familia": "colorido", "sugerido_para": ["ia-dados"], "descricao": "Superfícies, nuvens de pontos e campos de ondas com profundidade e brilho. Muito impactante em temas matemáticos; forçado em temas não numéricos.", "prompt_base": "3D data visualization art, scientific and elegant, dark background, glowing lines and points, depth of field, soft bloom; no text, no letters, no numbers, no axis labels, no logos, no people.", "imagem": "imagem/curso-ia/teste-estilos/positional-encoding/estilo4-dados-3d.png", "origem": "teste curso de IA (Positional Encoding)", "img": "img/dados-3d.jpg"}, {"id": "metafora-ilustrada", "nome": "Metáfora ilustrada", "familia": "colorido", "sugerido_para": ["ia-dados", "negocios", "geral"], "descricao": "Ilustração flat com textura leve que traduz o conceito numa cena do mundo real (vasos na estufa = posições). Memorável, liga teoria a caso prático.", "prompt_base": "Modern flat colourful editorial illustration, friendly but sophisticated, soft grain texture, atmospheric lighting, one main accent colour plus warm and cool secondary lights; no photorealism, no text, no letters, no numbers, no logos, no faces.", "imagem": "imagem/curso-ia/teste-estilos/positional-encoding/estilo5-garden-center.png", "origem": "teste curso de IA (Positional Encoding)", "img": "img/metafora-ilustrada.jpg"}, {"id": "flat-escuro-latao", "nome": "Flat escuro com luz latão", "familia": "colorido", "sugerido_para": ["linguas", "geral"], "descricao": "Flat moderno sobre fundo escuro com luz dourada de palco, sem rosto. Clima de conversa e cena do dia a dia.", "prompt_base": "Modern flat colourful illustration, dark background, warm brass stage-light glow, simple shapes, people without detailed faces; no text, no letters, no logos.", "imagem": "backend/static/course-images/curso9/aula2-topico1-capa.jpg", "origem": "em uso: Inglês", "img": "img/flat-escuro-latao.jpg"}, {"id": "flat-vibrante", "nome": "Flat vibrante", "familia": "colorido", "sugerido_para": ["linguas", "negocios", "geral"], "descricao": "Vetor chapado com cores saturadas e fundo claro. Alegre, leve, lê rápido em tela pequena.", "prompt_base": "Bright vibrant flat vector illustration, bold saturated colours, simple geometric shapes, no outlines, cheerful modern educational style, clean light background; no text, no letters, no words, no logos.", "imagem": "imagem/catalogo-estilos/novos/v1/c1-flat-vibrante.png", "origem": "novo (catálogo)", "img": "img/flat-vibrante.jpg"}, {"id": "papercraft", "nome": "Papercraft (papel recortado)", "familia": "colorido", "sugerido_para": ["ia-dados", "negocios", "geral"], "descricao": "Camadas de papel colorido com sombra real entre elas, cara de maquete feita à mão. Acolhedor e tátil.", "prompt_base": "Layered paper-cut papercraft illustration, colourful cardstock layers with soft realistic shadows between them, handmade diorama feel, warm cheerful palette; no text, no letters, no numbers, no logos.", "imagem": "imagem/catalogo-estilos/novos/v1/c2-papercraft.png", "origem": "novo (catálogo)", "img": "img/papercraft.jpg"}, {"id": "clay-3d", "nome": "3D de massinha (clay)", "familia": "colorido", "sugerido_para": ["tecnologia", "ia-dados", "linguas"], "descricao": "Personagens e objetos 3D arredondados com textura de massinha. Simpático, bom pra deixar tema técnico menos intimidador. Atenção: em cena cheia de objetos o Gemini escreveu placas (\"Menu\", \"CLOSED\") mesmo proibido — preferir cena simples.", "prompt_base": "Cute 3D clay render (claymorphism), soft rounded shapes, matte plasticine texture, soft studio lighting, pastel but colourful palette, playful and friendly; no text, no letters, no logos.", "imagem": "imagem/catalogo-estilos/novos/v1/c3-clay-3d.png", "origem": "novo (catálogo)", "img": "img/clay-3d.jpg"}, {"id": "low-poly", "nome": "Low-poly", "familia": "colorido", "sugerido_para": ["seguranca", "tecnologia"], "descricao": "Cena 3D feita de polígonos facetados com degradê de cor. Moderno, geométrico, bom pra ambientes e cenários.", "prompt_base": "Low-poly 3D illustration, faceted geometric polygons, colourful gradient palette, stylised, clean; no text, no letters, no logos, no people.", "imagem": "imagem/catalogo-estilos/novos/v1/c4-low-poly.png", "origem": "novo (catálogo)", "img": "img/low-poly.jpg"}, {"id": "neon-cyber", "nome": "Neon cyberpunk", "familia": "colorido", "sugerido_para": ["seguranca", "tecnologia"], "descricao": "Linhas de neon magenta/ciano sobre fundo escuro, clima de ameaça e defesa digital. Forte pra segurança; cansa se usado em tudo.", "prompt_base": "Neon cyberpunk digital art, dark background, glowing magenta, cyan and electric purple neon lines, holographic feel, high contrast, futuristic; no text, no letters, no numbers, no logos, no people.", "imagem": "imagem/catalogo-estilos/novos/v1/c5-neon-cyber.png", "origem": "novo (catálogo)", "img": "img/neon-cyber.jpg"}, {"id": "vidro-3d", "nome": "Vidro 3D iridescente", "familia": "colorido", "sugerido_para": ["ia-dados", "tecnologia"], "descricao": "Formas de vidro fosco translúcido com degradês iridescentes. Estética de produto tech moderno, bom pra camadas e abstrações.", "prompt_base": "Abstract 3D glassmorphism render, translucent frosted glass shapes with colourful iridescent gradients, soft light refraction, modern tech product aesthetic, dark background; no text, no letters, no logos, no people.", "imagem": "imagem/catalogo-estilos/novos/v1/c8-glass-3d.png", "origem": "novo (catálogo)", "img": "img/vidro-3d.jpg"}, {"id": "pop-art", "nome": "Pop art / quadrinhos", "familia": "colorido", "sugerido_para": ["linguas", "geral"], "descricao": "Contorno preto grosso, retícula de pontos e cores primárias, em quadros de HQ. Divertido pra diálogo e situações do dia a dia.", "prompt_base": "Retro pop art comic style, bold black outlines, Ben-Day halftone dots, primary colours, dynamic comic panel composition; no text, no letters, no words, no logos.", "imagem": "imagem/catalogo-estilos/novos/v1/c6-pop-art.png", "origem": "novo (catálogo)", "img": "img/pop-art.jpg"}, {"id": "colagem-editorial", "nome": "Colagem editorial", "familia": "colorido", "sugerido_para": ["biblico", "linguas", "geral"], "descricao": "Papéis rasgados, recortes e blocos de cor como capa de revista. Sofisticado, bom pra história e contexto cultural.", "prompt_base": "Mixed-media editorial collage, torn vintage paper textures, cut-out shapes, halftone photo fragments mixed with painted colour blocks, magazine art-direction style; no readable text, no letters, no logos.", "imagem": "imagem/catalogo-estilos/novos/v1/c7-colagem-editorial.png", "origem": "novo (catálogo)", "img": "img/colagem-editorial.jpg"}, {"id": "cinematografico-semirrealista", "nome": "Cinematográfico semi-realista", "familia": "realista", "sugerido_para": ["biblico"], "descricao": "Pintura digital aquarela/guache com luz de cinema, anatomia natural, composição narrativa. A capa pode ter o título pintado na cena.", "prompt_base": "Contemporary biblical editorial illustration, hand-painted watercolor and gouache digital painting, semi-realistic storybook art, cinematic warm lighting, painterly textures, loose expressive brushwork, narrative concept art, rich earthy colors, dramatic chiaroscuro, sophisticated Christian educational illustration.", "imagem": "backend/static/course-images/curso8/topico5-integracao-tres-capa-atila.png", "origem": "em uso: Obreiro (desde T5)", "img": "img/cinematografico-semirrealista.jpg"}, {"id": "foto-documental", "nome": "Foto documental", "familia": "realista", "sugerido_para": ["biblico", "negocios", "geral"], "descricao": "Fotografia com luz natural dourada, gente real em cena espontânea. Aproxima o conteúdo da vida prática.", "prompt_base": "Documentary-style editorial photography, warm golden-hour natural light, real-looking people in everyday clothing, candid unposed composition, shallow depth of field, focus on human gesture; no text or logos, avoid polished stock-photo look.", "imagem": "backend/static/course-images/curso8/_versao-fotografica/topico3-reconhecimento-oficio-ia.png", "origem": "usado no Obreiro T3 (versão fotográfica)", "img": "img/foto-documental.jpg"}, {"id": "cinematico-realista", "nome": "Foto cinematográfica noturna", "familia": "realista", "sugerido_para": ["seguranca", "tecnologia"], "descricao": "Foto realista com luz azul-petróleo e laranja, chuva, profundidade de campo. Clima de vigilância e campo real.", "prompt_base": "Photorealistic cinematic photograph, night scene, moody teal and orange lighting, shallow depth of field, film grain, realistic; no text, no logos, no brand names, no readable signs.", "imagem": "imagem/catalogo-estilos/novos/v1/r2-cinematico-realista.png", "origem": "novo (catálogo)", "img": "img/cinematico-realista.jpg"}, {"id": "macro-produto", "nome": "Macro de produto", "familia": "realista", "sugerido_para": ["tecnologia", "ia-dados", "seguranca"], "descricao": "Close extremo de hardware com luz de estúdio e contorno colorido. Mostra o equipamento de verdade, bom pra capa.", "prompt_base": "Photorealistic macro product photography, extreme close-up, studio lighting, crisp detail, dark background with a subtle coloured rim light; no text, no logos, no brand names, no readable markings.", "imagem": "imagem/catalogo-estilos/novos/v1/r3-macro-produto.png", "origem": "novo (catálogo)", "img": "img/macro-produto.jpg"}, {"id": "aquarela-livro", "nome": "Aquarela de livro ilustrado", "familia": "desenho", "sugerido_para": ["biblico", "linguas"], "descricao": "Aquarela colorida e suave, como livro infantil ilustrado. Acolhedor, bom pra narrativa e estudo devocional.", "prompt_base": "Colourful watercolor storybook illustration, soft washes, gentle ink lines, warm natural palette, illustrated children's book feel; no text, no letters, no logos.", "imagem": "imagem/emaus/cenas/v1/01-capa-estrada.png", "origem": "em uso: estudo de Emaús", "img": "img/aquarela-livro.jpg"}, {"id": "nanquim-sepia", "nome": "Nanquim sépia", "familia": "desenho", "sugerido_para": ["biblico", "geral"], "descricao": "Pena e aguada sépia sobre papel envelhecido, como gravura de livro antigo. Ótimo pra conceito abstrato e texto histórico.", "prompt_base": "Hand-drawn editorial illustration, warm sepia/amber ink-wash, loose expressive pen-and-ink linework similar to 19th-century book illustration or woodcut, aged paper texture, simplified faces, no photorealism; no text, no logos.", "imagem": "backend/static/course-images/curso8/topico3-reconhecimento-oficio-desenho.png", "origem": "testado no Obreiro T3", "img": "img/nanquim-sepia.jpg"}, {"id": "line-art", "nome": "Traço único (line art)", "familia": "desenho", "sugerido_para": ["geral", "negocios", "linguas"], "descricao": "Uma linha contínua de uma cor com uma mancha de cor de apoio. Elegante, leve, sem poluir o slide.", "prompt_base": "Minimal continuous single-line art drawing, one colour line on off-white paper background with one flat accent colour shape, elegant and simple, lots of white space; no text, no letters, no numbers, no logos.", "imagem": "imagem/catalogo-estilos/novos/v1/d2-line-art.png", "origem": "novo (catálogo)", "img": "img/line-art.jpg"}, {"id": "blueprint", "nome": "Blueprint (planta técnica)", "familia": "desenho", "sugerido_para": ["tecnologia", "seguranca"], "descricao": "Linhas brancas finas sobre papel azul quadriculado, como projeto de engenharia. Bom pra instalação e esquema físico. Atenção: o Gemini tende a escrever rótulos em inglês nesse estilo (saiu \"CABLE\", \"Equipment Room\") — conferir e regerar se precisar.", "prompt_base": "Classic blueprint technical drawing, white thin lines on deep blue paper background with a faint grid; no text, no numbers, no people.", "imagem": "imagem/catalogo-estilos/novos/v1/d3-blueprint.png", "origem": "novo (catálogo)", "img": "img/blueprint.jpg"}, {"id": "sketchnote", "nome": "Sketchnote (caderno desenhado)", "familia": "desenho", "sugerido_para": ["linguas", "geral", "negocios"], "descricao": "Rabiscos em caderno com marca-texto, setas e ícones. Parece anotação de aluno, ótimo pra resumo e mapa mental.", "prompt_base": "Hand-drawn sketchnote style on a notebook page, black ink doodles with a few highlighter colours, arrows, boxes, simple icons, visual note-taking look; no readable text, no letters, no words, no logos.", "imagem": "imagem/catalogo-estilos/novos/v1/d4-sketchnote.png", "origem": "novo (catálogo)", "img": "img/sketchnote.jpg"}, {"id": "risografia", "nome": "Risografia", "familia": "desenho", "sugerido_para": ["biblico", "linguas", "geral"], "descricao": "Impressão de 2-3 cores chapadas com granulado e leve desencaixe, cara de pôster independente. Marcante e artesanal.", "prompt_base": "Risograph print illustration, two or three overlapping spot colours, grainy texture, slight misregistration, indie poster style; no text, no letters, no logos.", "imagem": "imagem/catalogo-estilos/novos/v1/d5-riso.png", "origem": "novo (catálogo)", "img": "img/risografia.jpg"}], "temas": [{"id": "vidro-fume", "nome": "Vidro Fumê", "descricao": "Minimalista, quase preto neutro, um único acento em lima suave — futurista discreto, sem neon.", "arquivo": "temas/vidro-fume.html", "versoes": ["escuro"]}, {"id": "estufa-noturna", "nome": "Estufa Noturna", "descricao": "Vidro fosco sobre verde quase-preto, com brilho lima/verde-água pulsando de leve — bioluminescente.", "arquivo": "temas/estufa-noturna.html", "versoes": ["escuro"]}, {"id": "console-verde", "nome": "Console Verde", "descricao": "Preto absoluto, fonte monoespaçada, scanlines sutis e texto com glow — visual de terminal/HUD.", "arquivo": "temas/console-verde.html", "versoes": ["escuro"]}, {"id": "trigo-maduro", "nome": "Trigo Maduro", "descricao": "Identidade específica do curso de Formação do Novo Obreiro — pergaminho dourado, tinta cor de terra, serifada nos títulos. Não é o padrão do sistema, só usado nesse curso.", "arquivo": "temas/trigo-maduro.html", "versoes": ["claro", "escuro"]}, {"id": "papel-latao", "nome": "Palco & Latão", "descricao": "Identidade específica do estudo pessoal de Inglês — fundo escuro, acento latão brilhando como luz de palco, ameixa nas seções de 'sentido'. Não é o padrão do sistema, só usado no curso de Inglês. (Era clara/'Papel & Latão'; virou escura a pedido do Atila, 2026-09-05 — o brilho do latão contra o escuro combina até melhor com 'luz de palco'.)", "arquivo": "temas/papel-latao.html", "versoes": ["escuro"]}, {"id": "aurora-botanica", "nome": "Aurora Botânica", "descricao": "Índigo escuro com manchas de aurora roxo/verde se movendo devagar no fundo — mais 'app premium' que 'hacker'.", "arquivo": "temas/aurora-botanica.html", "versoes": ["escuro"]}, {"id": "ceu-manha", "nome": "Céu de Manhã", "descricao": "Azul-céu claro com acento coral. Leve e acolhedor, bom pra línguas e cursos gerais.", "arquivo": "temas/ceu-manha.html", "versoes": ["claro", "escuro"]}, {"id": "menta-grafite", "nome": "Menta & Grafite", "descricao": "Branco-menta com verde-água e texto grafite. Técnico e calmo, bom pra IA e dados.", "arquivo": "temas/menta-grafite.html", "versoes": ["claro", "escuro"]}, {"id": "oceano", "nome": "Oceano", "descricao": "Branco azulado com azul-marinho e turquesa. Sério e limpo, bom pra redes e segurança.", "arquivo": "temas/oceano.html", "versoes": ["claro", "escuro"]}, {"id": "azul-petroleo", "nome": "Azul Petróleo", "descricao": "Petróleo com acento âmbar e creme. Combina com as ilustrações isométricas do curso de Redes.", "arquivo": "temas/azul-petroleo.html", "versoes": ["claro", "escuro"]}, {"id": "por-do-sol", "nome": "Pôr do Sol", "descricao": "Pêssego com laranja queimado e roxo. Quente e criativo, bom pra línguas e temas de cultura.", "arquivo": "temas/por-do-sol.html", "versoes": ["claro", "escuro"]}, {"id": "lavanda", "nome": "Lavanda", "descricao": "Lilás claro com roxo e mostarda. Suave e moderno, serve pra qualquer curso.", "arquivo": "temas/lavanda.html", "versoes": ["claro", "escuro"]}, {"id": "terracota-salvia", "nome": "Terracota & Sálvia", "descricao": "Off-white com terracota e verde-sálvia. Terroso e sereno, bom pra estudo bíblico e devocional.", "arquivo": "temas/terracota-salvia.html", "versoes": ["claro", "escuro"]}, {"id": "papel-kraft", "nome": "Papel Kraft", "descricao": "Papel kraft com verde-oliva e vermelho-tijolo. Rústico, cara de caderno de estudo antigo; bom pra Bíblia e história.", "arquivo": "temas/papel-kraft.html", "versoes": ["claro", "escuro"]}, {"id": "vinho-ouro", "nome": "Vinho & Ouro", "descricao": "Marfim com bordô no claro; bordô com dourado no escuro. Solene, bom pra teologia e cursos formais.", "arquivo": "temas/vinho-ouro.html", "versoes": ["claro", "escuro"]}, {"id": "floresta", "nome": "Floresta", "descricao": "Verde profundo com creme e laranja. Natural e vivo, bom pra IA e temas de natureza.", "arquivo": "temas/floresta.html", "versoes": ["claro", "escuro"]}, {"id": "caderno-escolar", "nome": "Caderno Escolar", "descricao": "Folha pautada com caneta azul e marca-texto amarelo. Cara de caderno de aluno, bom pra línguas e estudo.", "arquivo": "temas/caderno-escolar.html", "versoes": ["claro", "escuro"]}, {"id": "alto-contraste", "nome": "Alto Contraste", "descricao": "Preto e branco puros, acento azul no claro e amarelo no escuro, fonte grande de leitura fácil. Pra quem enxerga pouco.", "arquivo": "temas/alto-contraste.html", "versoes": ["claro", "escuro"]}]};
+
+const estado = {
+  aba: "estilos",   // "estilos" | "temas"
+  curso: CAT.cursos[0].id,
+  familia: "todas",
+  categoria: "todas",
+  temaVisto: null,  // tema aberto na prévia
+  escolhas: {},     // { c5: { estilos: [...], principal: "id" | null, tema: "id" | null } }
+  modo: "carregando" // "db" | "local" | "leitura"
+};
+const nomeTema = (id) => (CAT.temas.find((t) => t.id === id) || { nome: id }).nome;
+
+const $ = (id) => document.getElementById(id);
+let db = null;
+
+// ---------- salvamento ----------
+function lerLocal() {
+  try { return JSON.parse(localStorage.getItem("catalogoEstilosEscolhas") || "{}"); } catch { return {}; }
+}
+function gravarLocal() {
+  try { localStorage.setItem("catalogoEstilosEscolhas", JSON.stringify(estado.escolhas)); } catch {}
+}
+function escolhaDo(curso) {
+  return estado.escolhas[curso] || { estilos: [], principal: null, tema: null };
+}
+async function salvar(curso) {
+  const e = escolhaDo(curso);
+  if (estado.modo === "db") {
+    try {
+      await db.collection("cursos").doc(curso).set({ estilos: e.estilos, principal: e.principal, tema: e.tema || null, atualizado: new Date().toISOString() });
+    } catch (err) {
+      if (err && err.code === "invalid_argument") { estado.modo = "leitura"; mostrarStatus(); render(); }
+      else { $("status").textContent = "Não salvou agora (" + (err && err.code || "erro") + "). Tente de novo em instantes."; }
+    }
+  } else if (estado.modo === "local") {
+    gravarLocal();
+  }
+}
+function mostrarStatus() {
+  const s = $("status");
+  if (estado.modo === "db") s.textContent = "Escolhas salvas no banco do artifact (o Claude lê direto daqui).";
+  else if (estado.modo === "local") s.textContent = "Salvamento compartilhado indisponível: escolhas ficam só neste navegador.";
+  else if (estado.modo === "leitura") s.textContent = "Somente leitura: você não tem permissão de alterar as escolhas.";
+  else s.textContent = "Conectando ao salvamento…";
+}
+
+// ---------- ações ----------
+function alternarEstilo(id) {
+  const c = estado.curso;
+  const e = { ...escolhaDo(c) };
+  e.estilos = e.estilos.includes(id) ? e.estilos.filter((x) => x !== id) : [...e.estilos, id];
+  if (!e.estilos.includes(e.principal)) e.principal = e.estilos[0] || null;
+  estado.escolhas[c] = e;
+  render(); salvar(c);
+}
+function definirPrincipal(id) {
+  const c = estado.curso;
+  const e = { ...escolhaDo(c) };
+  if (!e.estilos.includes(id)) e.estilos = [...e.estilos, id];
+  e.principal = id;
+  estado.escolhas[c] = e;
+  render(); salvar(c);
+}
+
+function escolherTema(id) {
+  const c = estado.curso;
+  const e = { ...escolhaDo(c) };
+  e.tema = e.tema === id ? null : id;
+  estado.escolhas[c] = e;
+  render(); salvar(c);
+}
+
+// ---------- render ----------
+function chips(alvo, opcoes, atual, onClick) {
+  const el = $(alvo); el.innerHTML = "";
+  for (const [valor, rotulo] of opcoes) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = rotulo;
+    b.setAttribute("aria-pressed", String(valor === atual));
+    b.addEventListener("click", () => onClick(valor));
+    el.appendChild(b);
+  }
+}
+const nomeEstilo = (id) => (CAT.estilos.find((s) => s.id === id) || { nome: id }).nome;
+
+function render() {
+  chips("cursos", CAT.cursos.map((c) => [c.id, c.nome]), estado.curso, (v) => { estado.curso = v; render(); });
+  chips("familias", [["todas", "Todas"], ...Object.entries(CAT.familias)], estado.familia, (v) => { estado.familia = v; render(); });
+  chips("categorias", [["todas", "Todas"], ...Object.entries(CAT.categorias)], estado.categoria, (v) => { estado.categoria = v; render(); });
+
+  // resumo
+  const r = $("resumo"); r.innerHTML = "";
+  for (const c of CAT.cursos) {
+    const e = escolhaDo(c.id);
+    const d = document.createElement("div"); d.className = "res";
+    const b = document.createElement("b"); b.textContent = c.nome; d.appendChild(b);
+    const t = document.createElement("span"); t.className = "origem";
+    t.textContent = "Tema: " + (e.tema ? nomeTema(e.tema) : "não escolhido"); d.appendChild(t);
+    if (!e.estilos.length) {
+      const v = document.createElement("span"); v.className = "vazio"; v.textContent = "Nenhum estilo escolhido"; d.appendChild(v);
+    } else {
+      const ul = document.createElement("ul");
+      for (const id of e.estilos) {
+        const li = document.createElement("li");
+        li.textContent = (id === e.principal ? "★ " : "") + nomeEstilo(id);
+        if (id === e.principal) li.className = "prin";
+        ul.appendChild(li);
+      }
+      d.appendChild(ul);
+    }
+    r.appendChild(d);
+  }
+
+  // abas
+  const emTemas = estado.aba === "temas";
+  $("aba-estilos").setAttribute("aria-selected", String(!emTemas));
+  $("aba-temas").setAttribute("aria-selected", String(emTemas));
+  document.querySelectorAll(".filtros").forEach((el) => { el.hidden = emTemas; });
+  $("grid").hidden = emTemas;
+  $("painel-temas").hidden = !emTemas;
+
+  const eCurso = escolhaDo(estado.curso);
+  const nomeCurso = CAT.cursos.find((c) => c.id === estado.curso).nome;
+  const podeEditar = estado.modo === "db" || estado.modo === "local";
+
+  if (emTemas) { renderTemas(eCurso, nomeCurso, podeEditar); return; }
+
+  // grade
+  const g = $("grid"); g.innerHTML = "";
+  const lista = CAT.estilos.filter((s) =>
+    (estado.familia === "todas" || s.familia === estado.familia) &&
+    (estado.categoria === "todas" || s.sugerido_para.includes(estado.categoria)));
+  if (!lista.length) { g.innerHTML = '<p class="nenhum">Nenhum estilo com esse filtro.</p>'; return; }
+
+  for (const s of lista) {
+    const usado = eCurso.estilos.includes(s.id);
+    const card = document.createElement("article");
+    card.className = "card" + (usado ? " sel" : "");
+    const thumb = s.img
+      ? `<img src="${s.img}" alt="Exemplo do estilo ${s.nome}" loading="lazy">`
+      : `<div class="sem">Imagem de exemplo ainda não gerada</div>`;
+    card.innerHTML = `
+      <div class="thumb">${thumb}</div>
+      <div class="body">
+        <div class="topo"><h2></h2><span class="fam ${s.familia}">${CAT.familias[s.familia]}</span></div>
+        <p class="desc"></p>
+        <div class="cats">${s.sugerido_para.map((k) => `<span>${CAT.categorias[k]}</span>`).join("")}</div>
+        <div class="origem"></div>
+        <div class="acoes">
+          <button type="button" class="btn usar" aria-pressed="${usado}">${usado ? "✓ Em " : "Usar em "}${nomeCurso}</button>
+          <button type="button" class="btn prin" aria-pressed="${eCurso.principal === s.id}" title="Estilo principal do curso (capas)">★ Principal</button>
+        </div>
+        <details><summary>Prompt-base (inglês)</summary><pre></pre><button type="button" class="copiar">Copiar prompt</button></details>
+      </div>`;
+    card.querySelector("h2").textContent = s.nome;
+    card.querySelector(".desc").textContent = s.descricao;
+    card.querySelector(".origem").textContent = s.origem;
+    card.querySelector("pre").textContent = s.prompt_base;
+    const bUsar = card.querySelector(".usar"), bPrin = card.querySelector(".prin");
+    bUsar.disabled = bPrin.disabled = !podeEditar;
+    bUsar.addEventListener("click", () => alternarEstilo(s.id));
+    bPrin.addEventListener("click", () => definirPrincipal(s.id));
+    card.querySelector(".copiar").addEventListener("click", (ev) => {
+      const pre = card.querySelector("pre");
+      navigator.clipboard.writeText(s.prompt_base).then(
+        () => { ev.target.textContent = "Copiado"; setTimeout(() => ev.target.textContent = "Copiar prompt", 1500); },
+        () => { const sel = getSelection(); const rg = document.createRange(); rg.selectNodeContents(pre); sel.removeAllRanges(); sel.addRange(rg); });
+    });
+    g.appendChild(card);
+  }
+}
+
+function renderTemas(eCurso, nomeCurso, podeEditar) {
+  if (!estado.temaVisto) estado.temaVisto = eCurso.tema || CAT.temas[0].id;
+  const l = $("tlista"); l.innerHTML = "";
+  for (const t of CAT.temas) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "tema";
+    b.setAttribute("aria-pressed", String(t.id === estado.temaVisto));
+    const usos = CAT.cursos.filter((c) => escolhaDo(c.id).tema === t.id).map((c) => c.nome);
+    b.innerHTML = "<b></b><span></span><em class='versoes'></em><em class='uso'></em>";
+    b.querySelector("b").textContent = t.nome;
+    b.querySelector("span").textContent = t.descricao;
+    b.querySelector(".versoes").textContent = t.versoes.length > 1 ? "Claro + escuro" : "Só " + t.versoes[0];
+    b.querySelector(".uso").textContent = usos.length ? "Em uso: " + usos.join(", ") : "";
+    b.addEventListener("click", () => { estado.temaVisto = t.id; render(); });
+    l.appendChild(b);
+  }
+  // Uma moldura por versão (claro/escuro); só recria quando troca o tema
+  const tv = CAT.temas.find((t) => t.id === estado.temaVisto);
+  const m = $("molduras");
+  if (m.dataset.tema !== tv.id) {
+    m.dataset.tema = tv.id; m.innerHTML = "";
+    for (const v of tv.versoes) {
+      const d = document.createElement("div"); d.className = "moldura";
+      const rot = document.createElement("span"); rot.className = "label"; rot.textContent = "Versão " + v;
+      const f = document.createElement("iframe");
+      f.title = "Prévia do tema " + tv.nome + " (" + v + ")"; f.loading = "lazy";
+      f.src = tv.versoes.length > 1 ? tv.arquivo + "?modo=" + (v === "escuro" ? "dark" : "light") : tv.arquivo;
+      d.append(rot, f); m.appendChild(d);
+    }
+  }
+  const bt = $("usar-tema");
+  const ativo = eCurso.tema === estado.temaVisto;
+  bt.setAttribute("aria-pressed", String(ativo));
+  bt.textContent = (ativo ? "✓ Tema de " : "Usar este tema em ") + nomeCurso;
+  bt.disabled = !podeEditar;
+}
+
+// ---------- início ----------
+$("aba-estilos").addEventListener("click", () => { estado.aba = "estilos"; render(); });
+$("aba-temas").addEventListener("click", () => { estado.aba = "temas"; render(); });
+$("usar-tema").addEventListener("click", () => escolherTema(estado.temaVisto));
+render();
+(async () => {
+  try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch { db = null; }
+  if (!db) { estado.modo = "local"; estado.escolhas = lerLocal(); mostrarStatus(); render(); return; }
+  estado.modo = "db"; mostrarStatus(); render();
+  // Assina a coleção uma vez; o banco é a fonte das escolhas
+  db.collection("cursos").onSnapshot((snap) => {
+    const novo = {};
+    for (const d of snap.docs) { const v = d.data() || {}; novo[d.id] = { estilos: Array.isArray(v.estilos) ? v.estilos : [], principal: v.principal || null, tema: v.tema || null }; }
+    estado.escolhas = novo; render();
+  }, () => { estado.modo = "local"; estado.escolhas = lerLocal(); mostrarStatus(); render(); });
+})();
+</script>
