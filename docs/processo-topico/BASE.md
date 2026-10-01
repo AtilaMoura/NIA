@@ -127,9 +127,19 @@ teólogo, professor) continua bem-vinda quando houver, mas não é pré-requisit
 
 - **Já existe pra todo curso, sem fazer nada:** botão "🔊 ouvir este slide" (Web Speech
   API do navegador, pt-BR). Campo opcional `slide.narracao` substitui o texto lido.
-- Áudio "de verdade" por bloco (`bloco.audio_url` → botão "🎧 Ouvir explicação") hoje só
-  existe no Obreiro — ver [obreiro.md](obreiro.md). Antes de propor gerar/hospedar mídia
-  nova, checar se o navegador já resolve (lição do Inglês).
+- **Áudio de explicação por bloco, pra todo curso** (2026-10-01, piloto T31: 22 blocos,
+  11 min, 5 MB): `backend/_gerar_audio_topico.py <topico_id> <course_id> <etapa>`:
+  1. `narracao` — texto de professor por bloco (cadeia "narracao" de `app/services/modelos.py`)
+  2. **REVISAR as narrações antes da voz** (`backend/_audio_topico<ID>.json`): no T31, 6 de 22
+     tinham erro — número por extenso errado ("443" lido como 434, "NVD 1304" como 304),
+     sigla soletrada, link lido caractere por caractere. Corrigir no JSON.
+  3. `voz` — ~5 blocos por chamada de TTS (só texto puro: o modelo LÊ qualquer instrução),
+     revezando 3 vozes, corte pela transcrição do Whisper. Falha de corte fica guardada em
+     `backend/_audio_falhas/`.
+  4. `mp3` — comprime (WAV 30 MB → MP3 5 MB) com ffmpeg num container descartável
+  5. `aplicar` (local) → `scp` dos `.mp3` pra `~/NIA/backend/static/audio/curso<N>/` da VM1
+     → `aplicar prod` (NIA_EMAIL/NIA_SENHA)
+- Antes de propor gerar/hospedar mídia nova, checar se o navegador já resolve (lição do Inglês).
 
 ## Passo 8 — Salvar / deploy (só API, nunca SSH/git pra conteúdo)
 
