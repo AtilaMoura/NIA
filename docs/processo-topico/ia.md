@@ -2,7 +2,7 @@
 
 Segue a [BASE](BASE.md). Plano geral e fases: `PLANO_CURSO_IA_EMAUS.md`.
 
-- **Tema:** `vinho-ouro` (claro + escuro; escolhido 2026-10-01, antes `vidro-fume`)
+- **Tema:** `azul-petroleo` (claro + escuro; escolhido 2026-10-03 no catálogo — antes `vinho-ouro`, `vidro-fume`)
 - **Perfil de agente:** `PERFIL_TECH` (`backend/app/agents/perfis.py`) — bate com o curso
   (agente de vendas WhatsApp do Garden Center).
 - **Referência de qualidade:** Tópicos 13-19 (portados dos decks) e 20 (Embeddings).

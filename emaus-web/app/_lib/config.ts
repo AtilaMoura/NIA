@@ -17,7 +17,7 @@ export const THEME_TOPICO = "trigo-maduro";
 // Escolhido no catálogo visual (docs/estilos/, 2026-10-01) — cursos 8/12 seguem no default.
 export const TEMA_POR_CURSO: Record<number, string> = {
   9: "caderno-escolar", // Inglês (antes: papel-latao)
-  5: "vinho-ouro", // Engenharia de Agentes LLM (antes: vidro-fume)
+  5: "azul-petroleo", // Engenharia de Agentes LLM (catálogo 2026-10-03; antes vinho-ouro, vidro-fume)
   11: "alto-contraste", // Redes e Câmeras (antes: default trigo-maduro)
 };
 
