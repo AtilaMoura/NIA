@@ -38,6 +38,24 @@ backend/_topico*_ingles*.json
 backend/_tts_*.wav
 backend/requirements_old.txt
 
+# Só local (pedido do Atila, 2026-10-04): backups de banco, rascunhos de
+# backend, mídia de curso gerada e dados de geração de imagem. Mídia vai pra
+# produção pela API/volume, não pelo git; os arquivos que já estavam
+# versionados continuam versionados.
+*.dump
+*.stackdump
+/backups/
+/estudo-redes-cameras/
+/.claude/
+backend/_*
+!backend/_seed_emaus_users.py
+backend/static/audio/
+backend/static/course-images/
+scripts/*.json
+scripts/aplicar_imagens_*.py
+scripts/combinar_imagens_lado_a_lado.py
+scripts/portar_exercicio_para_schema.py
+
 # Environment Variables
 .env
 .env.*
