@@ -23,6 +23,14 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       API_URL_INTERNAL: ${API_URL_INTERNAL}
+      # Node limpa a memória antes de bater no teto do container (abaixo)
+      NODE_OPTIONS: --max-old-space-size=320
+    # Teto de memória (2026-10-04): a VM 2 tem só ~950 MB e travava inteira em
+    # pico. Com teto, quem passa do limite é só o container (o Docker reinicia
+    # sozinho, restart: unless-stopped) — a VM continua respondendo. Parado o
+    # Emaús usa ~80 MB.
+    mem_limit: 450m
+    memswap_limit: 700m
     networks: [internal]
 
   # ---------- Proxy reverso + HTTPS automático ----------
@@ -30,6 +38,7 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     depends_on: [emaus]
+    mem_limit: 100m  # usa ~45 MB
     ports:
       - "80:80"
       - "443:443"
