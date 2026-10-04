@@ -271,7 +271,7 @@ def sinal_de_tempo(
     )
     if not registro:
         return TempoEstudoOut(contou=False, time_spent_s=0)
-    contou = registrar_sinal(registro)
+    contou = registrar_sinal(db, registro)
     if contou:
         db.commit()
     return TempoEstudoOut(contou=contou, time_spent_s=registro.time_spent_s or 0)

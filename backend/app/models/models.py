@@ -4,7 +4,7 @@ Define as tabelas: users, courses, modules, lessons, lesson_completions, progres
 """
 
 from sqlalchemy import (
-    Column, Integer, String, Text, Boolean, DECIMAL, DateTime,
+    Column, Integer, String, Text, Boolean, DECIMAL, DateTime, Date,
     ForeignKey, CheckConstraint, UniqueConstraint
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -952,3 +952,27 @@ class AlunoTermo(Base):
 
     def __repr__(self):
         return f"<AlunoTermo(user_id={self.user_id}, termo='{self.termo}')>"
+
+
+# ------------------------------------------------------------
+# MODEL: TEMPO_ESTUDO_DIA (2026-10-04)
+# ------------------------------------------------------------
+# Tempo estudado por dia (horário de Brasília), somado pelo mesmo sinal de
+# minuto do slide que alimenta TopicoProgress.time_spent_s — dá o gráfico da
+# semana e a sequência de dias na /estudos. Só soma, nunca apaga.
+
+class TempoEstudoDia(Base):
+    __tablename__ = "tempo_estudo_dia"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    dia = Column(Date, nullable=False)
+    segundos = Column(Integer, nullable=False, default=0)
+
+    __table_args__ = (
+        CheckConstraint('segundos >= 0', name='valid_tempo_estudo_dia_segundos'),
+        UniqueConstraint('user_id', 'dia', name='uq_tempo_estudo_dia_user_dia'),
+    )
+
+    def __repr__(self):
+        return f"<TempoEstudoDia(user_id={self.user_id}, dia={self.dia}, segundos={self.segundos})>"

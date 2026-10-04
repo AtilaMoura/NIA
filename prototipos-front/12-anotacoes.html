@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: minhas anotações</title>
+<!--
+  Protótipo 12 — /anotacoes (todo aluno logado; cada um vê só as suas).
+  - Hoje o aluno anota em cada slide, mas não existe lugar pra ver tudo junto.
+  - Organizado por curso → tópico → slide (com o título do slide).
+  - Busca no texto + filtro por curso. "Abrir no slide" volta direto pro lugar.
+  - Notas salvas do tira-dúvida do tutor aparecem com o selo "Dúvida".
+  - Botão "Copiar tudo do tópico" (pra estudar fora / imprimir).
+  - Entra no menu do avatar ("Minhas anotações") e nos atalhos de /progresso e /estudos.
+  Estados: #vazio, #busca (resultado filtrado), #escuro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,400&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-verse-bg: #fbf3e0; --tm-verse-border: #c9a24a; --tm-good: #3f7a34;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-verse-bg: #2a2114; --tm-verse-border: #7a5f2e; --tm-good: #8cc06e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); line-height: 1.55; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+  h1, h2, h3 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button, input, select { font: inherit; color: inherit; }
+  [hidden] { display: none !important; }
+  .muted { color: var(--tm-ink-muted); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); width: 100%; }
+
+  header.topo { border-bottom: 1px solid var(--tm-border); }
+  header.topo .wrap { max-width: 1180px; display: flex; align-items: center; gap: 1rem; height: 56px; }
+  .marca { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.12rem; display: inline-flex; align-items: center; gap: .5rem; }
+  .marca img { height: 28px; }
+  nav.principal { display: none; gap: .15rem; font-size: .85rem; white-space: nowrap; }
+  nav.principal a { padding: .35rem .7rem; border-radius: 999px; color: var(--tm-ink-muted); }
+  @media (min-width: 760px) { nav.principal { display: flex; } }
+  .av { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); border: 1px solid var(--tm-border); color: var(--tm-accent); font-weight: 700; font-size: .78rem; cursor: pointer; }
+
+  main { flex: 1; padding: clamp(1.25rem, 4vw, 2.25rem) 0 3rem; }
+  h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); }
+  .filtros { margin-top: 1.1rem; display: flex; flex-wrap: wrap; gap: .6rem; }
+  .busca { flex: 1; min-width: 200px; padding: .55rem .9rem; border-radius: 999px; border: 1px solid var(--tm-border); background: var(--tm-surface); }
+  select { padding: .5rem .8rem; border-radius: 999px; border: 1px solid var(--tm-border); background: var(--tm-surface); font-size: .88rem; max-width: 100%; }
+  .conta { margin-top: .6rem; font-size: .82rem; color: var(--tm-ink-muted); }
+
+  .curso { margin-top: 1.6rem; }
+  .curso > h2 { font-size: 1.15rem; display: flex; align-items: center; gap: .55rem; }
+  .curso > h2 .bola { width: 12px; height: 12px; border-radius: 50%; }
+  .topico { margin-top: .8rem; border-radius: var(--tm-radius-lg); border: 1px solid var(--tm-border); background: var(--tm-surface); overflow: hidden; }
+  .topico summary { list-style: none; cursor: pointer; padding: .85rem 1.05rem; display: flex; align-items: center; gap: .75rem; }
+  .topico summary::-webkit-details-marker { display: none; }
+  .topico summary .tit { flex: 1; min-width: 0; }
+  .topico summary .tit b { display: block; font-weight: 600; }
+  .topico summary .tit small { font-size: .78rem; color: var(--tm-ink-muted); }
+  .topico summary .seta { color: var(--tm-ink-muted); transition: transform .15s; }
+  .topico[open] summary .seta { transform: rotate(90deg); }
+  .notas { border-top: 1px solid var(--tm-border); }
+  .nota { padding: .85rem 1.05rem; border-top: 1px solid var(--tm-border); display: grid; gap: .35rem; }
+  .nota:first-child { border-top: 0; }
+  .nota .onde { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; font-size: .78rem; color: var(--tm-ink-muted); }
+  .nota .onde b { color: var(--tm-accent); font-weight: 700; }
+  .selo { font-size: .68rem; font-weight: 700; padding: .05rem .45rem; border-radius: 999px; border: 1px solid var(--tm-verse-border); background: var(--tm-verse-bg); color: var(--tm-accent); }
+  .nota .texto { white-space: pre-wrap; font-size: .95rem; }
+  .nota .texto mark { background: color-mix(in srgb, var(--tm-verse-border) 45%, transparent); color: inherit; border-radius: 3px; padding: 0 2px; }
+  .nota .acoes { display: flex; gap: 1rem; font-size: .82rem; font-weight: 600; }
+  .nota .acoes a { color: var(--tm-accent); }
+  .barra-topico { display: flex; justify-content: flex-end; padding: .6rem 1.05rem; border-top: 1px solid var(--tm-border); background: var(--tm-surface-2); }
+  .barra-topico button { border: 1px solid var(--tm-border); background: var(--tm-surface); border-radius: 999px; padding: .35rem .85rem; font-size: .82rem; font-weight: 600; cursor: pointer; }
+
+  .vazio { margin-top: 1.5rem; text-align: center; padding: 2.5rem 1rem; border: 1px dashed var(--tm-border); border-radius: var(--tm-radius-lg); }
+
+  footer { border-top: 1px solid var(--tm-border); }
+  footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1.5rem; padding-top: 1.1rem; padding-bottom: 1.1rem; font-size: .82rem; color: var(--tm-ink-muted); }
+  footer .marca { font-size: .95rem; color: var(--tm-ink); }
+  footer .marca img { height: 22px; }
+  footer nav { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; }
+</style>
+</head>
+<body>
+<header class="topo"><div class="wrap">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús</span>
+  <nav class="principal"><a href="#">Início</a><a href="#">Meu progresso</a></nav>
+  <span class="av" onclick="tema()" title="(protótipo) alterna o tema">RL</span>
+</div></header>
+
+<main class="wrap">
+  <h1>Minhas anotações</h1>
+  <p class="muted" style="margin-top:.2rem">Tudo o que você anotou nos slides, organizado por curso e tópico.</p>
+
+  <div class="filtros">
+    <input class="busca" type="search" placeholder="Buscar nas anotações" aria-label="Buscar">
+    <select aria-label="Curso"><option>Todos os cursos</option><option>Formação do Obreiro I</option><option>Formação do Obreiro II</option></select>
+  </div>
+  <p class="conta" id="conta">9 anotações em 3 tópicos</p>
+
+  <div id="lista">
+    <section class="curso">
+      <h2><span class="bola" style="background:#c9a24a"></span>Formação do Obreiro I</h2>
+
+      <details class="topico" open>
+        <summary>
+          <span class="tit"><b>Sacerdócio de Todos os Crentes</b><small>Módulo 1 · 4 anotações · última em 26/09</small></span>
+          <span class="seta">›</span>
+        </summary>
+        <div class="notas">
+          <div class="nota">
+            <p class="onde"><b>Slide 3</b> Pedras vivas, casa espiritual</p>
+            <p class="texto">Pedro fala pra igreja inteira, não só pros líderes. "Sacerdócio santo" = todo mundo oferece sacrifício espiritual.</p>
+            <p class="acoes"><a href="#">Abrir no slide ▶</a></p>
+          </div>
+          <div class="nota">
+            <p class="onde"><b>Slide 6</b> O véu rasgado <span class="selo">Dúvida</span></p>
+            <p class="texto">Pergunta: por que o véu rasgou de cima pra baixo?
+Tutor: indica que foi ação de Deus, não humana — o acesso foi aberto por Ele (Mt 27.51; Hb 10.19-20).</p>
+            <p class="acoes"><a href="#">Abrir no slide ▶</a></p>
+          </div>
+          <div class="nota">
+            <p class="onde"><b>Slide 9</b> Sacrifícios espirituais hoje</p>
+            <p class="texto">Rm 12.1 — o corpo como sacrifício vivo. Ligar com a aula de vocação.</p>
+            <p class="acoes"><a href="#">Abrir no slide ▶</a></p>
+          </div>
+          <div class="nota">
+            <p class="onde"><b>Slide 12</b> Para guardar</p>
+            <p class="texto">Resumo pra mim: acesso direto a Deus + responsabilidade de servir.</p>
+            <p class="acoes"><a href="#">Abrir no slide ▶</a></p>
+          </div>
+        </div>
+        <div class="barra-topico"><button type="button">Copiar as 4 anotações</button></div>
+      </details>
+
+      <details class="topico">
+        <summary>
+          <span class="tit"><b>Dons Espirituais</b><small>Módulo 1 · 3 anotações · última em 27/09</small></span>
+          <span class="seta">›</span>
+        </summary>
+      </details>
+    </section>
+
+    <section class="curso">
+      <h2><span class="bola" style="background:#8a5a2b"></span>Formação do Obreiro II</h2>
+      <details class="topico">
+        <summary>
+          <span class="tit"><b>Inspiração das Escrituras</b><small>Módulo 1 · 2 anotações · última em 02/10</small></span>
+          <span class="seta">›</span>
+        </summary>
+      </details>
+    </section>
+  </div>
+
+  <div id="resultado" hidden>
+    <section class="curso">
+      <h2><span class="bola" style="background:#c9a24a"></span>Formação do Obreiro I</h2>
+      <div class="topico">
+        <div class="notas">
+          <div class="nota">
+            <p class="onde"><b>Sacerdócio de Todos os Crentes · Slide 6</b> O véu rasgado <span class="selo">Dúvida</span></p>
+            <p class="texto">Pergunta: por que o <mark>véu</mark> rasgou de cima pra baixo?
+Tutor: indica que foi ação de Deus, não humana — o acesso foi aberto por Ele (Mt 27.51; Hb 10.19-20).</p>
+            <p class="acoes"><a href="#">Abrir no slide ▶</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section id="vazio" class="vazio" hidden>
+    <h2 style="font-size:1.2rem">Você ainda não fez anotações</h2>
+    <p class="muted" style="margin-top:.35rem">Durante o tópico, use o botão 📝 em qualquer slide. Tudo o que você anotar aparece aqui.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús <span class="muted" style="font-family:var(--tm-font-body);font-weight:400;font-size:.8rem">· plataforma de formação bíblica</span></span>
+  <nav><a href="#">Início</a><a href="#">Meu progresso</a></nav>
+</div></footer>
+
+<script>
+  // Só pro protótipo
+  function tema() { const r = document.documentElement; r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; }
+  const e = location.hash.slice(1).split(",");
+  if (e.includes("escuro")) tema();
+  if (e.includes("vazio")) { ["lista", "conta"].forEach((id) => document.getElementById(id).hidden = true); document.querySelector(".filtros").hidden = true; document.getElementById("vazio").hidden = false; }
+  if (e.includes("busca")) { document.querySelector(".busca").value = "véu"; document.getElementById("lista").hidden = true; document.getElementById("resultado").hidden = false; document.getElementById("conta").textContent = "1 anotação encontrada"; }
+</script>
+</body>
+</html>

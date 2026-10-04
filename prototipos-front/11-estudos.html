@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: estudos pessoais (Master)</title>
+<!--
+  Protótipo 11 — /estudos (só Master).
+  - Diferente da /inicio: aqui é o painel de quem está APRENDENDO, não a vitrine.
+  - "Continuar de onde parou": o tópico mais recente, com o slide exato.
+  - Semana: tempo estudado (agora existe — sinal de tempo, 2026-09-28) e tópicos concluídos.
+  - Um cartão por estudo, na cor do tema do curso: progresso, próximo tópico,
+    tempo total, anotações e o que o tutor pediu pra reforçar.
+  - Atalho "Minhas anotações" (protótipo 12).
+  Estados: #vazio (nenhum estudo começado), #escuro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-good: #3f7a34; --tm-warn: #a35a1e;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-good: #8cc06e; --tm-warn: #d08a4e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+  h1, h2, h3 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  [hidden] { display: none !important; }
+  .muted { color: var(--tm-ink-muted); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); width: 100%; }
+
+  header.topo { border-bottom: 1px solid var(--tm-border); }
+  header.topo .wrap { max-width: 1180px; display: flex; align-items: center; gap: 1rem; height: 56px; }
+  .marca { font-family: var(--tm-font-display); font-weight: 600; font-size: 1.12rem; display: inline-flex; align-items: center; gap: .5rem; }
+  .marca img { height: 28px; }
+  nav.principal { display: none; gap: .15rem; font-size: .85rem; white-space: nowrap; }
+  nav.principal a { padding: .35rem .7rem; border-radius: 999px; color: var(--tm-ink-muted); }
+  nav.principal a.ativo { background: var(--tm-surface-2); color: var(--tm-ink); font-weight: 600; }
+  @media (min-width: 760px) { nav.principal { display: flex; } }
+  .av { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); border: 1px solid var(--tm-border); color: var(--tm-accent); font-weight: 700; font-size: .78rem; cursor: pointer; }
+
+  main { flex: 1; padding: clamp(1.25rem, 4vw, 2.25rem) 0 3rem; display: flex; flex-direction: column; gap: clamp(1.5rem, 4vw, 2.25rem); }
+  .cab { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .75rem; }
+  h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); }
+  .btn { display: inline-flex; align-items: center; gap: .4rem; padding: .55rem 1rem; border-radius: 999px; font-weight: 600; font-size: .9rem; border: 1px solid var(--tm-border); background: var(--tm-surface); white-space: nowrap; }
+  .btn.forte { background: var(--tm-accent); border-color: var(--tm-accent); color: var(--tm-bg); }
+  h2.secao { font-size: 1.15rem; margin-bottom: .8rem; }
+
+  /* Continuar */
+  .continuar { display: grid; grid-template-columns: 1fr; border-radius: var(--tm-radius-lg); overflow: hidden; border: 1px solid var(--tm-border); background: var(--tm-surface); }
+  @media (min-width: 700px) { .continuar { grid-template-columns: 260px 1fr; } }
+  .capa { min-height: 140px; display: grid; place-items: center; color: #fff; font-family: var(--tm-font-display); font-size: 2.6rem; }
+  .continuar .corpo { padding: 1.1rem 1.25rem; display: flex; flex-direction: column; gap: .5rem; }
+  .rotulo { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--tm-accent); }
+  .continuar h3 { font-size: 1.3rem; }
+  .barra { height: 6px; border-radius: 99px; background: var(--tm-surface-2); overflow: hidden; }
+  .barra i { display: block; height: 100%; background: var(--tm-good); }
+  .continuar .acoes { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .35rem; }
+
+  /* Semana */
+  .semana { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+  @media (min-width: 700px) { .semana { grid-template-columns: repeat(4, 1fr); } }
+  .num { padding: .8rem .95rem; border-radius: var(--tm-radius); background: var(--tm-surface); border: 1px solid var(--tm-border); }
+  .num b { display: block; font-family: var(--tm-font-display); font-size: 1.45rem; line-height: 1.15; }
+  .num span { font-size: .8rem; color: var(--tm-ink-muted); }
+  .dias { display: flex; gap: 4px; margin-top: .45rem; align-items: end; height: 26px; }
+  .dias i { flex: 1; border-radius: 3px; background: var(--tm-surface-2); }
+  .dias i.on { background: var(--tm-good); }
+
+  /* Cartões dos estudos */
+  .grade { display: grid; gap: 1rem; }
+  @media (min-width: 640px) { .grade { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .grade { grid-template-columns: repeat(3, 1fr); } }
+  .estudo { display: flex; flex-direction: column; border-radius: var(--tm-radius-lg); overflow: hidden; border: 1px solid var(--tm-border); background: var(--tm-surface); }
+  .estudo .faixa { height: 86px; display: flex; align-items: end; padding: .7rem 1rem; color: #fff; font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .estudo .corpo { padding: 1rem; display: flex; flex-direction: column; gap: .55rem; flex: 1; }
+  .estudo h3 { font-size: 1.08rem; }
+  .linha { display: flex; justify-content: space-between; font-size: .8rem; color: var(--tm-ink-muted); }
+  .proximo { font-size: .88rem; padding: .55rem .7rem; border-radius: var(--tm-radius); background: var(--tm-surface-2); }
+  .proximo small { display: block; font-size: .72rem; color: var(--tm-ink-muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .chip { font-size: .72rem; font-weight: 600; padding: .12rem .55rem; border-radius: 999px; border: 1px solid var(--tm-border); color: var(--tm-ink-muted); }
+  .chip.aviso { border-color: var(--tm-warn); color: var(--tm-warn); }
+  .estudo .rodape-card { margin-top: auto; padding-top: .35rem; display: flex; gap: .5rem; }
+  .estudo .rodape-card .btn { flex: 1; justify-content: center; font-size: .85rem; padding: .45rem .7rem; }
+
+  .vazio { text-align: center; padding: 2.5rem 1rem; border: 1px dashed var(--tm-border); border-radius: var(--tm-radius-lg); }
+
+  footer { border-top: 1px solid var(--tm-border); }
+  footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1.5rem; padding-top: 1.1rem; padding-bottom: 1.1rem; font-size: .82rem; color: var(--tm-ink-muted); }
+  footer .marca { font-size: .95rem; color: var(--tm-ink); }
+  footer .marca img { height: 22px; }
+  footer nav { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; }
+
+  /* Cores por curso (tema escolhido de cada um) */
+  .c-ia { background: linear-gradient(135deg, #1f4e5a, #2f7f86); }
+  .c-ingles { background: linear-gradient(135deg, #6b4f2a, #b08a4a); }
+  .c-redes { background: linear-gradient(135deg, #1c2b33, #3d9bd1); }
+</style>
+</head>
+<body>
+<header class="topo"><div class="wrap">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús</span>
+  <nav class="principal"><a href="#">Início</a><a href="#">Meu progresso</a><a href="#">Revisão</a><a href="#" class="ativo">Estudos pessoais</a></nav>
+  <span class="av" onclick="tema()" title="(protótipo) alterna o tema">AT</span>
+</div></header>
+
+<main class="wrap">
+  <div class="cab">
+    <div>
+      <h1>Estudos pessoais</h1>
+      <p class="muted" style="margin-top:.2rem">Só você vê esta página.</p>
+    </div>
+    <a href="12-anotacoes.html" class="btn">📝 Minhas anotações</a>
+  </div>
+
+  <div id="cheio" style="display:contents">
+    <section>
+      <div class="continuar">
+        <div class="capa c-redes">⌁</div>
+        <div class="corpo">
+          <p class="rotulo">Continuar de onde parou</p>
+          <h3>Portas TCP/UDP</h3>
+          <p class="muted" style="font-size:.9rem">Redes e Câmeras · Módulo 1 · parou no slide 6 de 14 · ontem</p>
+          <div class="barra"><i style="width:43%"></i></div>
+          <div class="acoes"><a href="#" class="btn forte">Continuar no slide 6 ▶</a><a href="#" class="btn">Ver o curso</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="secao">Esta semana</h2>
+      <div class="semana">
+        <div class="num"><b>2h 40min</b><span>de estudo</span>
+          <div class="dias" aria-label="Dias estudados"><i class="on" style="height:60%"></i><i class="on" style="height:100%"></i><i style="height:20%"></i><i class="on" style="height:40%"></i><i style="height:20%"></i><i class="on" style="height:80%"></i><i style="height:20%"></i></div>
+        </div>
+        <div class="num"><b>3</b><span>tópicos concluídos</span></div>
+        <div class="num"><b>4</b><span>dias seguidos estudando</span></div>
+        <div class="num"><b>2</b><span>pontos pra reforçar (tutor)</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="secao">Seus estudos</h2>
+      <div class="grade">
+        <article class="estudo">
+          <div class="faixa c-redes">Redes e Câmeras</div>
+          <div class="corpo">
+            <h3>Redes e Câmeras</h3>
+            <div class="linha"><span>3 de 12 tópicos</span><span>1h 50min</span></div>
+            <div class="barra"><i style="width:25%"></i></div>
+            <p class="proximo"><small>Próximo</small>T4 · Portas TCP/UDP</p>
+            <div class="chips"><span class="chip">📝 6 anotações</span><span class="chip">Prova T3 ✓</span></div>
+            <div class="rodape-card"><a href="#" class="btn forte">Continuar</a><a href="#" class="btn">Curso</a></div>
+          </div>
+        </article>
+        <article class="estudo">
+          <div class="faixa c-ingles">Inglês</div>
+          <div class="corpo">
+            <h3>Inglês do básico ao intermediário</h3>
+            <div class="linha"><span>5 de 10 tópicos</span><span>3h 05min</span></div>
+            <div class="barra"><i style="width:50%"></i></div>
+            <p class="proximo"><small>Próximo</small>Aula 3 · Tópico 2</p>
+            <div class="chips"><span class="chip aviso">Tutor: reforçar "past simple"</span><span class="chip">📝 11 anotações</span></div>
+            <div class="rodape-card"><a href="#" class="btn forte">Continuar</a><a href="#" class="btn">Curso</a></div>
+          </div>
+        </article>
+        <article class="estudo">
+          <div class="faixa c-ia">Engenharia de Agentes LLM</div>
+          <div class="corpo">
+            <h3>Engenharia de Agentes LLM</h3>
+            <div class="linha"><span>8 de 40 tópicos</span><span>4h 20min</span></div>
+            <div class="barra"><i style="width:20%"></i></div>
+            <p class="proximo"><small>Próximo</small>Aula 2 · Embeddings</p>
+            <div class="chips"><span class="chip aviso">Tutor: reforçar "context window"</span><span class="chip">📝 3 anotações</span></div>
+            <div class="rodape-card"><a href="#" class="btn forte">Continuar</a><a href="#" class="btn">Curso</a></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <section id="vazio" class="vazio" hidden>
+    <h2 style="font-size:1.2rem">Nenhum estudo começado ainda</h2>
+    <p class="muted" style="margin-top:.35rem">Abra um dos cursos abaixo e o seu progresso, tempo e anotações aparecem aqui.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús <span class="muted" style="font-family:var(--tm-font-body);font-weight:400;font-size:.8rem">· plataforma de formação bíblica</span></span>
+  <nav><a href="#">Início</a><a href="#">Meu progresso</a><a href="#">Revisão</a><a href="#">Estudos pessoais</a></nav>
+</div></footer>
+
+<script>
+  // Só pro protótipo
+  function tema() { const r = document.documentElement; r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; }
+  const e = location.hash.slice(1).split(",");
+  if (e.includes("escuro")) tema();
+  if (e.includes("vazio")) { document.getElementById("cheio").hidden = true; document.getElementById("vazio").hidden = false; }
+</script>
+</body>
+</html>

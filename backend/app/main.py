@@ -18,6 +18,7 @@ from app.routers import topico_tutor
 from app.routers import revisao
 from app.routers import governanca
 from app.routers import pessoas
+from app.routers import estudo
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
@@ -129,6 +130,7 @@ def create_app():
     app.include_router(revisao.router)
     app.include_router(governanca.router)
     app.include_router(pessoas.router)
+    app.include_router(estudo.router)
     app.include_router(pipeline.router)
     # test_ai.router NÃO é registrado em produção (achado de segurança 2026-09-23:
     # endpoints públicos sem autenticação, aceitando prompt livre — deixavam

@@ -14,6 +14,8 @@ export type MeuCurso = {
   /** true quando não está publicado e só aparece porque o usuário revisa */
   soRevisores: boolean;
   percent: number;
+  concluidos: number;
+  totalTopicos: number;
   /** próximo tópico a estudar, com módulo/aula/referência (pro "Continuar") */
   proximo: TopicoNo | null;
 };
@@ -28,7 +30,7 @@ export async function meusCursos(
   return Promise.all(
     doCatalogo.map(async (c): Promise<MeuCurso> => {
       const capaUrl = capaExiste(c.slug) ? caminhoCapa(c.slug) : null;
-      const fechado = { catalogo: c, capaUrl, aberto: false, soRevisores: false, percent: 0, proximo: null };
+      const fechado = { catalogo: c, capaUrl, aberto: false, soRevisores: false, percent: 0, concluidos: 0, totalTopicos: 0, proximo: null };
       if (!c.disponivel || c.courseId == null) return fechado;
 
       const arvore = await montarArvore(c.courseId, sessao.id, token).catch(() => null);
@@ -44,6 +46,8 @@ export async function meusCursos(
         aberto: true,
         soRevisores: !publicado,
         percent: arvore.resumo.percent,
+        concluidos: arvore.resumo.concluidos,
+        totalTopicos: arvore.resumo.totalTopicos,
         proximo: arvore.linhaDoTempo.find((t) => t.estado === "atual") ?? null,
       };
     }),

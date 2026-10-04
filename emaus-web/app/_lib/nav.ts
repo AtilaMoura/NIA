@@ -50,6 +50,7 @@ export function navRevisao(papel: Papel | null | undefined): ItemNav[] {
 // Itens do menu do avatar (Sair é tratado à parte).
 export const ITENS_AVATAR: ItemNav[] = [
   { href: "/perfil", rotulo: "Perfil", icone: "👤" },
+  { href: "/anotacoes", rotulo: "Minhas anotações", icone: "📝" },
   { href: "/preferencias", rotulo: "Preferências", icone: "⚙️" },
 ];
 

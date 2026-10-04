@@ -596,3 +596,50 @@ export function listPessoas(token: string | null | undefined) {
 export function getPessoa(userId: number, token: string | null | undefined) {
   return fetchJson<PessoaDetalhe>(`/pessoas/${userId}`, { headers: { Authorization: `Bearer ${token ?? ""}` } });
 }
+
+// ---- Área de estudo do próprio usuário (2026-10-04) ----
+
+export type AnotacaoMinha = {
+  topico_id: number;
+  topico_titulo: string;
+  course_id: number;
+  curso: string;
+  modulo_index: number;
+  modulo_titulo: string;
+  slide_index: number;
+  slide_titulo: string | null;
+  texto: string;
+  atualizado_em: string | null;
+};
+
+export type ResumoCursoEstudo = {
+  course_id: number;
+  tempo_s: number;
+  anotacoes: number;
+  concluidos_semana: number;
+  ultimo: {
+    topico_id: number;
+    titulo: string;
+    ultimo_slide: number | null;
+    total_slides: number | null;
+    atualizado_em: string | null;
+  } | null;
+  reforcar: string[];
+};
+
+export type ResumoEstudo = {
+  cursos: ResumoCursoEstudo[];
+  dias: { dia: string; segundos: number }[];
+  tempo_semana_s: number;
+  concluidos_semana: number;
+  sequencia_dias: number;
+};
+
+export function minhasAnotacoes(token: string | null | undefined) {
+  if (!token) return Promise.resolve<AnotacaoMinha[]>([]);
+  return fetchJson<AnotacaoMinha[]>("/estudo/anotacoes", { headers: { Authorization: `Bearer ${token}` } });
+}
+
+export function resumoEstudo(token: string | null | undefined) {
+  return fetchJson<ResumoEstudo>("/estudo/resumo", { headers: { Authorization: `Bearer ${token ?? ""}` } });
+}

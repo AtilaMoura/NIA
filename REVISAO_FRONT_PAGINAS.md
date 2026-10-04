@@ -27,6 +27,7 @@ Hoje `/criar-conta` só pede nome, e-mail e senha (mín. 6). Pedido: **campo "co
 mostrar erro "as senhas não conferem". Avaliar junto: regra de senha mais forte e mostrar a força.
 
 ### P2. "Esqueci minha senha" de verdade
+> 2026-10-04: decidido **por e-mail** + **entrar com Google**. Plano completo em `PLANO_ACESSO_E_PAGAMENTO.md` (local).
 Hoje o link só mostra o aviso "peça pro administrador" (decisão provisória de 2026-09-26).
 Pedido: fluxo real de recuperação. Precisa de **backend novo**:
 - token de redefinição com validade curta (tabela nova ou campo no `User`), uso único;
@@ -36,6 +37,7 @@ Pedido: fluxo real de recuperação. Precisa de **backend novo**:
 Alternativa intermediária, sem e-mail: admin gera um link de redefinição na área de revisão.
 
 ### P3. Matrícula: o curso só é "do aluno" quando ele decide fazer
+> 2026-10-04: + liberação manual pelo Master, assinatura mensal, próximo tópico só depois de passar na prova (60%, já existe) e questões diferentes ao refazer. Plano em `PLANO_ACESSO_E_PAGAMENTO.md` (local).
 Hoje, na `/inicio`, **todo curso publicado já aparece em "Seus cursos"** pra qualquer aluno.
 Pedido: o aluno escolhe o curso ("quero fazer este curso") e só então ele vira dele.
 Proposta:
@@ -63,7 +65,8 @@ Proposta:
 | 08 | `prototipos-front/08-perfil.html` | `/perfil` | ✅ aprovado e aplicado |
 | 09 | `prototipos-front/09-preferencias.html` | `/preferencias` | ✅ aprovado e aplicado |
 | 10 | `prototipos-front/10-pessoas.html` | `/revisao/pessoas` (+ rodapé logado) | ✅ aprovado e aplicado |
-| — | — | `/estudos` (Master) | versão funcional aplicada (mesmos cartões da /inicio); protótipo próprio a fazer |
+| 11 | `prototipos-front/11-estudos.html` | `/estudos` (Master) | ✅ aprovado e aplicado |
+| 12 | `prototipos-front/12-anotacoes.html` | `/anotacoes` (página nova) | ✅ aprovado e aplicado |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
 
@@ -493,4 +496,21 @@ e equipe) e quando/quanto tempo cada um estuda. O rodapé logado de produção e
 - **Histórico:** login e tempo só existem a partir do deploy — a página avisa.
 - Testado: 375/800/1280 sem estourar; aluno recebe 403; sinal repetido não soma; sinal real do
   render chegou e somou 60s (minuto de teste desfeito no banco local).
+
+### `/estudos` (redesign) e `/anotacoes` (nova) — 2026-10-04
+
+**Aplicado**
+- **`/anotacoes`** (todo usuário logado, só as próprias): anotações por curso → tópico → slide
+  com o título do slide, busca sem acento com realce, filtro por curso, selo "Dúvida" pras notas
+  salvas do tira-dúvida, "Abrir no slide" (`/topico/{id}?slide=N`) e "Copiar as anotações" do
+  tópico. Estudos pessoais só aparecem pro Master. Link "Minhas anotações" no menu do avatar.
+- **`/estudos`** (Master): "Continuar de onde parou" no slide exato, semana (tempo com barras
+  por dia, concluídos, dias seguidos, pontos de reforço do tutor) e um cartão por estudo
+  (tópicos X de Y, tempo, próximo tópico, reforço, nº de anotações).
+- **Backend:** `GET /estudo/anotacoes` e `GET /estudo/resumo` (router → `services/estudo_service.py`,
+  sempre do usuário logado). Tabela nova `tempo_estudo_dia` (criada pelo `create_all`): o mesmo
+  sinal de minuto do slide agora também soma no dia (horário de Brasília) — tempo por dia só
+  existe a partir de 2026-10-04.
+- Testado: 375/800/1280 sem estourar nas duas páginas; busca e realce; aluno não vê estudo
+  pessoal em /anotacoes e recebe 404 em /estudos; rotas sem login → 401; minuto de teste desfeito.
 
