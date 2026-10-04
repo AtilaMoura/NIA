@@ -1,0 +1,51 @@
+[
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: a cover composition showing one isometric security camera on the left sending video to a recorder on the right along two parallel paths: the upper path carries neatly ordered packet blocks with small return arrows, the lower path carries faster loose packet blocks, conveying two ways to deliver video. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico32-tcp-udp-video",
+    "arquivo": "t32-capa-tcp-udp.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: two delivery lanes between a security camera and a video recorder: the upper lane shows neatly ordered packet blocks with small return arrows going back to the camera, the lower lane shows faster loose packet blocks flying forward with no return arrows, one block missing in the gap. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico32-tcp-udp-video",
+    "arquivo": "t32-dois-jeitos.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: a row of packet blocks traveling from left to right in strict order, each with a small glowing check-mark-shaped return arrow going back to the sender; one block in the middle has a dashed outline showing it was lost and an identical copy being re-sent from the sender highlighted in amber. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico32-tcp-udp-video",
+    "arquivo": "t32-tcp-por-dentro.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: a split comparison: on the left a live video monitor showing a smooth image while a few packet blocks are dropped and fall away below; on the right the same monitor showing a frozen image with a small queue of packet blocks stopped behind one missing block, waiting. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico32-tcp-udp-video",
+    "arquivo": "t32-dilema.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: an isometric security monitor on a desk showing a stylized street scene where a band of the picture is smeared and blocky in muted grey, as if dragged, while the rest of the picture is clean; a few broken packet fragments float near the cable entering the monitor. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico32-tcp-udp-video",
+    "arquivo": "t32-imagem-fantasma.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: a stream of video packet blocks flowing from a camera, each block with a distinct colored band so their order is visible; one position in the sequence is an empty glowing outline marking the missing block, and the receiving recorder has a small magnifier icon noticing the gap. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico32-tcp-udp-video",
+    "arquivo": "t32-rtp-numerado.png"
+  },
+  {
+    "descricao": "Generate an image. Isometric flat-vector technical illustration, clean infographic style: two pipes from a camera to a recorder: on the left, a solid control pipe plus a separate thin side channel carrying loose video packets; on the right, a single thicker pipe that carries both the control line and the video packets nested inside it, passing through a wall-shaped barrier that blocks the loose side channel. Dark navy background (#1c2b33), cool blue (#3d9bd1) outlines, single warm amber accent (#f2a541). Flat geometric shapes, soft subtle drop shadows, thin precise outlines, uniform even lighting, no photorealism, high production quality like a professional network-documentation diagram. Landscape orientation, 16:9 widescreen. Avoid: any text, letters, numbers or pseudo-text, photorealistic people, generic clipart/corporate stock look, watermark, logos.",
+    "modulo": "redes",
+    "aula": "aula2",
+    "topico": "topico32-tcp-udp-video",
+    "arquivo": "t32-rtsp-embutido.png"
+  }
+]
