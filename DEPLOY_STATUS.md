@@ -8,7 +8,16 @@ capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://
 (backend) e `https://caminho-emaus.duckdns.org` (Emaús) em produção com HTTPS. O `A1.Flex`
 (VM maior) segue em retry automático via cron na VM 2, não bloqueia nada.
 
-## 🚀 Último deploy — 2026-09-28 (página Pessoas + rodapé)
+## 🚀 Último deploy — 2026-10-04 (estudos, anotações e teto de memória)
+
+Commits `408b4f7` (teto) e `0a7820b`. **VM 2 antes:** teto de memória nos containers (Emaús 450 MB, Caddy
+100 MB — `docker-compose.emaus.yml`), aplicado sem build. **VM 1:** backup em
+**`~/backups/antes_estudos_2026-10-04.dump`**, `git pull` + `up -d --build`; tabela nova
+`tempo_estudo_dia` criada no start. **VM 2:** `git pull` + `up -d --build` (não travou).
+Conferido: API 200, `/estudo/resumo` sem login → 401, site 200, `/anotacoes` sem login →
+/entrar. Tempo por dia só existe a partir deste deploy.
+
+## 🚀 Deploy anterior — 2026-09-28 (página Pessoas + rodapé)
 
 Commit `ca52316`. **VM 1:** backup antes em **`~/backups/antes_pessoas_2026-09-28.dump`**
 (pg_dump -Fc), `git pull` + `up -d --build`; no start criou `ultimo_sinal_em` em
@@ -17,7 +26,7 @@ Commit `ca52316`. **VM 1:** backup antes em **`~/backups/antes_pessoas_2026-09-2
 `/revisao/pessoas` sem login → redireciona pro /entrar. Login e tempo de estudo passam a ser
 gravados a partir deste deploy (não há histórico antes).
 
-## 🚀 Deploy anterior — 2026-09-27 (redesign do front do aluno)
+## 🚀 Deploy de 2026-09-27 (redesign do front do aluno)
 
 Commits `b3a445c` → `a54b779` (visitante, entrar/criar conta, início, curso, tópico/slides,
 prova, progresso, perfil, preferências). Feito nas 2 VMs, sem queda além dos segundos da troca
