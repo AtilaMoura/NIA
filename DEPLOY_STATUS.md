@@ -8,7 +8,18 @@ capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://
 (backend) e `https://caminho-emaus.duckdns.org` (Emaús) em produção com HTTPS. O `A1.Flex`
 (VM maior) segue em retry automático via cron na VM 2, não bloqueia nada.
 
-## 🚀 Último deploy — 2026-10-04 (estudos, anotações e teto de memória)
+## 🚀 Último deploy — 2026-10-05 (caderno da aula + regra Gemini → Groq)
+
+Commit `d444c17`. **VM 1:** backup em **`~/backups/antes_caderno_2026-10-05.dump`**, `git pull` +
+`up -d --build`; tabela nova `caderno_versoes`. ⚠️ **Corrida no start:** os 2 workers do uvicorn
+rodam o `create_all` ao mesmo tempo — com tabela NOVA, um deles morre com
+`UniqueViolation ... caderno_versoes_id_seq` e o backend fica com 1 worker só. Resolvido com
+`docker restart nia-backend-backend-1` (tabela já existia → os 2 subiram). **Depois de deploy com
+tabela nova: conferir 2× "Application startup complete" no log, senão reiniciar.**
+**VM 2:** `git pull` + `up -d --build` (não travou). Conferido: API 200, `/caderno/...` sem login →
+401, site 200, `/anotacoes/aula/57` sem login → /entrar.
+
+## 🚀 Deploy anterior — 2026-10-04 (estudos, anotações e teto de memória)
 
 Commits `408b4f7` (teto) e `0a7820b`. **VM 2 antes:** teto de memória nos containers (Emaús 450 MB, Caddy
 100 MB — `docker-compose.emaus.yml`), aplicado sem build. **VM 1:** backup em
@@ -17,7 +28,7 @@ Commits `408b4f7` (teto) e `0a7820b`. **VM 2 antes:** teto de memória nos conta
 Conferido: API 200, `/estudo/resumo` sem login → 401, site 200, `/anotacoes` sem login →
 /entrar. Tempo por dia só existe a partir deste deploy.
 
-## 🚀 Deploy anterior — 2026-09-28 (página Pessoas + rodapé)
+## 🚀 Deploy de 2026-09-28 (página Pessoas + rodapé)
 
 Commit `ca52316`. **VM 1:** backup antes em **`~/backups/antes_pessoas_2026-09-28.dump`**
 (pg_dump -Fc), `git pull` + `up -d --build`; no start criou `ultimo_sinal_em` em
