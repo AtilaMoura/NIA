@@ -77,6 +77,24 @@ def _ensure_colunas_extras(bind):
             conn.exec_driver_sql(s)
 
 
+# Trava do Postgres pras "migrations" do start (2026-10-05). Em produção o uvicorn
+# sobe 2 workers e os dois rodavam create_all juntos: com tabela NOVA, um deles
+# morria com UniqueViolation (..._id_seq) e o backend ficava com 1 worker só
+# (visto nos deploys de 2026-10-04 e 2026-10-05). Com a trava, o 2º worker espera
+# o 1º terminar e depois só confere que está tudo criado (tudo é idempotente).
+_TRAVA_MIGRACAO = 727_001
+
+
+def _migrar_com_trava():
+    with engine.connect() as trava:
+        trava.exec_driver_sql(f"SELECT pg_advisory_lock({_TRAVA_MIGRACAO})")
+        try:
+            models.Base.metadata.create_all(bind=engine)
+            _ensure_colunas_extras(engine)
+        finally:
+            trava.exec_driver_sql(f"SELECT pg_advisory_unlock({_TRAVA_MIGRACAO})")
+
+
 def create_app():
     app = FastAPI(
         title="NIA API",
@@ -105,8 +123,7 @@ def create_app():
     )
 
     # Importante para o SQLAlchemy registrar models
-    models.Base.metadata.create_all(bind=engine)
-    _ensure_colunas_extras(engine)
+    _migrar_com_trava()
 
     # Imagens de capa das aulas (buscadas na internet, sem direito autoral — ver
     # sessão do curso de obreiro) e outros arquivos estáticos servidos direto pelo backend.
