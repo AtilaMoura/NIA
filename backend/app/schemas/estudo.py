@@ -13,6 +13,9 @@ class AnotacaoMinha(BaseModel):
     curso: str
     modulo_index: int
     modulo_titulo: str
+    lesson_id: int
+    aula_index: int
+    aula_titulo: str
     slide_index: int
     slide_titulo: str | None = None
     texto: str

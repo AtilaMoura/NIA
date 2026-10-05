@@ -1,0 +1,97 @@
+/* Caderno da aula (2026-10-05, protótipo 13-caderno.html) — estilo do
+   "Resumo_Aula1_Atila.html": folha pontilhada, margem vermelha, títulos à mão,
+   post-its, correção em caneta vermelha. As cores (--c-*) vêm do tema do curso
+   (backend, docs/schema/temas.json) e são aplicadas em .cad-tema pelo componente. */
+
+.cad-tema {
+  --cad-mao: var(--cad-fonte-mao, "Caveat"), "Segoe Print", cursive;
+  --cad-mono: var(--cad-fonte-mono, "IBM Plex Mono"), ui-monospace, monospace;
+}
+
+.cad-caderno {
+  margin-top: 1rem;
+  border-radius: var(--tm-radius-lg);
+  border: 1px solid var(--c-border);
+  background-color: var(--c-bg);
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--c-ink) 8%, transparent) 1px, transparent 1.2px);
+  background-size: 24px 24px;
+  color: var(--c-ink);
+  overflow: hidden;
+}
+.cad-folha { position: relative; padding: 34px 20px 50px 44px; }
+.cad-folha::before { content: ""; position: absolute; top: 0; bottom: 0; left: 24px; width: 1px; background: var(--c-fix); opacity: .35; }
+.cad-data { font-family: var(--cad-mono); font-size: 12px; color: var(--c-faint); letter-spacing: .5px; }
+.cad-titulo { font-family: var(--cad-mao); font-weight: 700; font-size: clamp(40px, 9vw, 52px); color: var(--c-accent); margin: 4px 0 2px; line-height: 1; }
+.cad-sub { font-size: 14.5px; color: var(--c-dim); max-width: 52ch; margin: 0; }
+.cad-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+.cad-chip { font-family: var(--cad-mono); font-size: 11px; padding: 5px 9px 5px 8px; border-radius: 5px; border: 1px solid var(--c-border); background: var(--c-surface); color: var(--c-dim); display: inline-flex; align-items: center; gap: 5px; max-width: 100%; }
+.cad-chip > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cad-chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--c-accent); flex-shrink: 0; }
+.cad-chip.ok i { background: var(--c-accent2); }
+.cad-chip.ok { color: var(--c-ink); }
+
+.cad-secao { margin: 34px 0; }
+.cad-eyebrow { font-family: var(--cad-mono); font-size: 11px; color: var(--c-faint); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+.cad-h2 { font-family: var(--cad-mao); font-weight: 700; font-size: 32px; margin: 0 0 12px; line-height: 1.15; }
+.cad-p { margin: 10px 0; font-size: 15.5px; }
+.cad-tema strong { color: var(--c-accent); font-weight: 700; }
+
+.cad-nota { background: var(--c-surface); border: 1px solid var(--c-border); border-left: 3px solid var(--c-accent); border-radius: 6px; padding: 13px 15px; margin: 13px 0; font-size: 14.5px; white-space: pre-wrap; }
+.cad-nota.alt { border-left-color: var(--c-accent2); }
+.cad-rotulo { font-family: var(--cad-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--c-accent); margin-bottom: 5px; white-space: normal; }
+.cad-nota.alt .cad-rotulo { color: var(--c-accent2); }
+.cad-ref { font-style: italic; color: var(--c-dim); font-size: 13.5px; margin-top: 6px; }
+
+.cad-fix { background: var(--c-fix-soft); border: 1px dashed var(--c-fix); border-radius: 6px; padding: 13px 15px; margin: 15px 0; }
+.cad-fix-tag { font-family: var(--cad-mao); font-weight: 700; font-size: 20px; color: var(--c-fix); display: block; margin-bottom: 5px; transform: rotate(-1.5deg); }
+.cad-fix-era { color: var(--c-dim); text-decoration: line-through; text-decoration-color: var(--c-fix); font-size: 14px; }
+.cad-fix-agora { font-size: 15px; margin-top: 4px; }
+.cad-fix-agora strong { color: var(--c-fix); }
+.cad-fix-fonte { display: inline-block; margin-top: 7px; font-size: 12.5px; font-weight: 600; color: var(--c-fix); text-decoration: underline; text-underline-offset: 2px; }
+
+.cad-passos { margin: 14px 0; padding-left: 4px; }
+.cad-passo { display: grid; grid-template-columns: 26px 1fr; gap: 12px; padding: 9px 0; position: relative; }
+.cad-passo:not(:last-child)::after { content: ""; position: absolute; left: 12px; top: 32px; bottom: -9px; width: 1px; background: var(--c-border); }
+.cad-passo-n { width: 24px; height: 24px; border-radius: 50%; background: var(--c-surface2); border: 1px solid var(--c-border); color: var(--c-dim); font-family: var(--cad-mono); font-size: 11px; display: grid; place-items: center; }
+.cad-passo b { display: block; font-size: 14.5px; }
+.cad-passo span { font-size: 13.5px; color: var(--c-dim); }
+
+.cad-tbl { overflow-x: auto; margin: 14px 0; border-radius: 6px; border: 1px solid var(--c-border); background: var(--c-surface); }
+.cad-tbl table { width: 100%; min-width: 420px; border-collapse: collapse; font-size: 13.5px; }
+.cad-tbl th { background: var(--c-surface2); text-align: left; padding: 8px 11px; border-bottom: 1px solid var(--c-border); }
+.cad-tbl td { padding: 8px 11px; border-bottom: 1px solid var(--c-border-soft); color: var(--c-dim); vertical-align: top; }
+.cad-tbl tr:last-child td { border-bottom: 0; }
+
+.cad-margem { font-family: var(--cad-mao); font-weight: 500; font-size: 19px; color: var(--c-accent2); transform: rotate(-1deg); margin: 6px 0 6px 4px; }
+.cad-check { list-style: none; padding: 0; margin: 12px 0; }
+.cad-check li { display: flex; align-items: baseline; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--c-border-soft); font-size: 14.5px; }
+.cad-check li::before { content: ""; width: 14px; height: 14px; border: 1.5px solid var(--c-accent2); border-radius: 3px; flex-shrink: 0; transform: translateY(2px); }
+.cad-divisor { border: 0; border-top: 1px dashed var(--c-border); margin: 30px 0; }
+
+.cad-veredito { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 8px; padding: 18px; }
+.cad-carimbo { display: inline-block; font-family: var(--cad-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--c-accent2); color: var(--c-accent2); margin-bottom: 8px; }
+.cad-veredito h3 { font-family: var(--cad-mao); font-size: 24px; margin: 12px 0 2px; }
+.cad-veredito ul { margin: 2px 0 8px; padding-left: 20px; }
+.cad-veredito li { font-size: 14px; color: var(--c-dim); }
+.cad-rodape { padding: 12px 20px 14px 44px; border-top: 1px dashed var(--c-border); font-size: 12.5px; color: var(--c-faint); font-family: var(--cad-mono); }
+
+.cad-gerando { padding: 46px 20px; text-align: center; }
+.cad-gerando .cad-pena { font-family: var(--cad-mao); font-size: 30px; color: var(--c-accent); }
+.cad-linhas { margin: 18px auto 0; max-width: 420px; display: grid; gap: 10px; }
+.cad-linhas i { height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--c-surface2), var(--c-border-soft), var(--c-surface2)); background-size: 200% 100%; animation: cad-brilho 1.4s infinite linear; }
+.cad-linhas i:nth-child(2) { width: 85%; }
+.cad-linhas i:nth-child(3) { width: 70%; }
+@keyframes cad-brilho { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .cad-linhas i { animation: none; } }
+
+@media (max-width: 480px) {
+  .cad-folha { padding: 26px 14px 40px 34px; }
+  .cad-folha::before { left: 18px; }
+  .cad-rodape { padding-left: 34px; }
+}
+
+/* Imprimir / PDF: só o caderno */
+@media print {
+  header, footer, .cad-sem-impressao { display: none !important; }
+  .cad-caderno { border: 0; }
+}

@@ -67,6 +67,7 @@ Proposta:
 | 10 | `prototipos-front/10-pessoas.html` | `/revisao/pessoas` (+ rodapé logado) | ✅ aprovado e aplicado |
 | 11 | `prototipos-front/11-estudos.html` | `/estudos` (Master) | ✅ aprovado e aplicado |
 | 12 | `prototipos-front/12-anotacoes.html` | `/anotacoes` (página nova) | ✅ aprovado e aplicado |
+| 13 | `prototipos-front/13-caderno.html` | `/anotacoes/aula/{id}` (Caderno da aula, IA) | ✅ aprovado e aplicado |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
 
@@ -513,4 +514,24 @@ e equipe) e quando/quanto tempo cada um estuda. O rodapé logado de produção e
   existe a partir de 2026-10-04.
 - Testado: 375/800/1280 sem estourar nas duas páginas; busca e realce; aluno não vê estudo
   pessoal em /anotacoes e recebe 404 em /estudos; rotas sem login → 401; minuto de teste desfeito.
+
+### `/anotacoes/aula/{id}` — Caderno da aula (IA) — 2026-10-05
+
+**Pedido:** anotação no estilo do `Estudo IA/Resumo_Aula1_Atila.html`, no tema do curso, com a IA
+organizando e corrigindo — guardando a versão original e a organizada. Decidido: **por aula**.
+
+**Aplicado**
+- Página do caderno: seletor "Minhas notas | Caderno organizado"; caderno com títulos à mão
+  (Caveat), post-its, **correção em caneta vermelha** (era riscado + o certo + "ver no slide N"),
+  passos, tabela, lembrete de margem, "o que vou praticar" e veredito; cores do **tema do curso**
+  (claro/escuro/automático); "Atualizar caderno" e aviso quando anotou depois; Imprimir/PDF.
+- "Minhas anotações" agrupada por curso → aula → tópico, com o botão "📓 Caderno da aula".
+- **Backend:** `GET /caderno/aula/{id}` e `POST /caderno/aula/{id}/organizar` (router →
+  `services/caderno_service.py`). A IA (cadeia nova `caderno` em `services/modelos.py`, Gemini
+  primeiro) recebe as anotações + o texto dos slides anotados e devolve **só blocos JSON**
+  validados (`schemas/caderno.py`); links de correção só pra tópico/slide que existe na aula.
+  Tabela nova `caderno_versoes` (cada versão fica; nada apagado). Limite: **6 cadernos/dia** por pessoa.
+- Testado com IA de verdade: achou os 2 erros plantados (rei/sacerdote → slide 6; "dom que pedir"
+  → slide 4), versão 1 → 2 com o aviso; 375/800/1280 sem estourar; aluno sem notas vê o vazio e
+  recebe 400 ao organizar; aula de estudo pessoal → 404 pra aluno.
 

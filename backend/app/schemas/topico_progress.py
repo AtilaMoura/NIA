@@ -19,7 +19,7 @@ class AvaliarTopicoRequest(BaseModel):
 
     user_id: int
     resumo_texto: str
-    modelo: str = "groq"
+    modelo: str = "gemini"  # regra: Gemini primeiro (o endpoint usa a cadeia "correcao")
 
 
 class TopicoProgressOut(BaseModel):

@@ -976,3 +976,31 @@ class TempoEstudoDia(Base):
 
     def __repr__(self):
         return f"<TempoEstudoDia(user_id={self.user_id}, dia={self.dia}, segundos={self.segundos})>"
+
+
+# ------------------------------------------------------------
+# MODEL: CADERNO_VERSAO (2026-10-05)
+# ------------------------------------------------------------
+# "Caderno da aula": as anotações do aluno numa aula, organizadas e corrigidas
+# pela IA (protótipo 13-caderno.html). A versão ORIGINAL são as próprias
+# TopicoAnotacao (nunca alteradas); aqui fica cada versão organizada. Atualizar
+# cria uma versão nova — nada é apagado.
+
+class CadernoVersao(Base):
+    __tablename__ = "caderno_versoes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    lesson_id = Column(Integer, ForeignKey('lessons.id', ondelete='CASCADE'), nullable=False, index=True)
+    versao = Column(Integer, nullable=False)
+    conteudo = Column(JSONB, nullable=False)          # blocos validados (schemas/caderno.py), nunca HTML
+    anotacoes_usadas = Column(Integer, nullable=False, default=0)
+    modelo = Column(String(80))                        # quem gerou (ex.: gemini:gemini-3.5-flash)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'lesson_id', 'versao', name='uq_caderno_versao'),
+    )
+
+    def __repr__(self):
+        return f"<CadernoVersao(user_id={self.user_id}, lesson_id={self.lesson_id}, versao={self.versao})>"

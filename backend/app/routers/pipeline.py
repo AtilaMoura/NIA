@@ -55,7 +55,7 @@ class CriarCursoRequest(BaseModel):
     assunto: str
     nivel: str  # básico | intermediário | avançado | especialista
     objetivo: str = ""
-    modelo: str = "groq"
+    modelo: str = "gemini"  # regra: Gemini primeiro (Groq fica de reserva na cadeia)
 
 
 @router.post("/cursos")
@@ -127,7 +127,7 @@ async def criar_curso(data: CriarCursoRequest, db: Session = Depends(get_db)):
 
 class GerarLicaoRequest(BaseModel):
     modo: str = "comum"  # "comum" | "pro"
-    modelo: str = "groq"
+    modelo: str = "gemini"  # regra: Gemini primeiro (Groq fica de reserva na cadeia)
     perfil: str = "tech"  # "tech" | "teologia" — ver app/agents/perfis.py
 
 
@@ -376,7 +376,7 @@ async def gerar_licao(lesson_id: int, data: GerarLicaoRequest, db: Session = Dep
 class AvaliarResumoRequest(BaseModel):
     user_id: int
     resumo_texto: str
-    modelo: str = "groq"
+    modelo: str = "gemini"  # regra: Gemini primeiro (Groq fica de reserva na cadeia)
     perfil: str = "tech"  # "tech" | "teologia" — ver app/agents/perfis.py
 
 

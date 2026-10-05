@@ -37,13 +37,14 @@ def _slides(conteudo: str | None) -> list:
 
 
 def _info_topicos(db: Session, ids: set[int]) -> dict[int, tuple]:
-    """topico_id -> (titulo, content, course_id, curso, module_index, modulo, lesson_index, topico_index)"""
+    """topico_id -> (titulo, content, course_id, curso, module_index, modulo, lesson_index, topico_index, lesson_id, aula)"""
     if not ids:
         return {}
     linhas = (
         db.query(
             Topico.id, Topico.titulo, Topico.content, Course.id, Course.title,
             Module.module_index, Module.title, Lesson.lesson_index, Topico.topico_index,
+            Lesson.id, Lesson.title,
         )
         .join(Lesson, Topico.lesson_id == Lesson.id)
         .join(Module, Lesson.module_id == Module.id)
@@ -69,7 +70,7 @@ def minhas_anotacoes(db: Session, user_id: int) -> list[AnotacaoMinha]:
         i = info.get(n.topico_id)
         if not i:
             continue
-        titulo, conteudo, course_id, curso, mod_idx, modulo, aula_idx, top_idx = i
+        titulo, conteudo, course_id, curso, mod_idx, modulo, aula_idx, top_idx, lesson_id, aula = i
         slides = _slides(conteudo)
         slide = slides[n.slide_index] if 0 <= n.slide_index < len(slides) else None
         saida.append((
@@ -81,6 +82,9 @@ def minhas_anotacoes(db: Session, user_id: int) -> list[AnotacaoMinha]:
                 curso=curso,
                 modulo_index=mod_idx,
                 modulo_titulo=modulo,
+                lesson_id=lesson_id,
+                aula_index=aula_idx,
+                aula_titulo=aula,
                 slide_index=n.slide_index,
                 slide_titulo=slide.get("titulo") if isinstance(slide, dict) else None,
                 texto=n.texto,

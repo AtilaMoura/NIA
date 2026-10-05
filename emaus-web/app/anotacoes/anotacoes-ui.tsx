@@ -10,15 +10,19 @@ import { data } from "../_lib/pessoas";
 // "❓" (ver salvarDuvidaComoAnotacao no render) e ganha o selo "Dúvida".
 
 type GrupoTopico = { topicoId: number; titulo: string; modulo: string; notas: AnotacaoMinha[] };
-type GrupoCurso = { courseId: number; curso: string; topicos: GrupoTopico[] };
+type GrupoAula = { lessonId: number; titulo: string; modulo: string; topicos: GrupoTopico[] };
+type GrupoCurso = { courseId: number; curso: string; aulas: GrupoAula[] };
 
+// Curso → aula → tópico (a aula é a unidade do "Caderno da aula", 2026-10-05)
 function agrupar(lista: AnotacaoMinha[]): GrupoCurso[] {
   const cursos: GrupoCurso[] = [];
   for (const a of lista) {
     let c = cursos.find((x) => x.courseId === a.course_id);
-    if (!c) cursos.push((c = { courseId: a.course_id, curso: a.curso, topicos: [] }));
-    let t = c.topicos.find((x) => x.topicoId === a.topico_id);
-    if (!t) c.topicos.push((t = { topicoId: a.topico_id, titulo: a.topico_titulo, modulo: a.modulo_titulo, notas: [] }));
+    if (!c) cursos.push((c = { courseId: a.course_id, curso: a.curso, aulas: [] }));
+    let au = c.aulas.find((x) => x.lessonId === a.lesson_id);
+    if (!au) c.aulas.push((au = { lessonId: a.lesson_id, titulo: a.aula_titulo, modulo: a.modulo_titulo, topicos: [] }));
+    let t = au.topicos.find((x) => x.topicoId === a.topico_id);
+    if (!t) au.topicos.push((t = { topicoId: a.topico_id, titulo: a.topico_titulo, modulo: a.modulo_titulo, notas: [] }));
     t.notas.push(a);
   }
   return cursos;
@@ -138,7 +142,7 @@ export function ListaAnotacoes({ anotacoes }: { anotacoes: AnotacaoMinha[] }) {
   }
 
   const grupos = agrupar(filtradas);
-  const nTopicos = grupos.reduce((s, c) => s + c.topicos.length, 0);
+  const nTopicos = grupos.reduce((s, c) => s + c.aulas.reduce((x, a) => x + a.topicos.length, 0), 0);
 
   return (
     <>
@@ -184,42 +188,57 @@ export function ListaAnotacoes({ anotacoes }: { anotacoes: AnotacaoMinha[] }) {
           {termo ? (
             // Buscando: lista direta das notas que bateram, com o tópico no rótulo
             <div className="mt-3 divide-y divide-[var(--tm-border)] overflow-hidden rounded-[var(--tm-radius-lg)] border border-[var(--tm-border)] bg-[var(--tm-surface)]">
-              {c.topicos.flatMap((t) => t.notas).map((n) => (
+              {c.aulas.flatMap((a) => a.topicos).flatMap((t) => t.notas).map((n) => (
                 <Nota key={`${n.topico_id}-${n.slide_index}`} n={n} termo={termo} comTopico />
               ))}
             </div>
           ) : (
-            c.topicos.map((t, i) => {
-              const ultima = t.notas.map((n) => n.atualizado_em ?? "").sort().at(-1);
-              return (
-                <details
-                  key={t.topicoId}
-                  open={i === 0 && c === grupos[0]}
-                  className="group mt-3 overflow-hidden rounded-[var(--tm-radius-lg)] border border-[var(--tm-border)] bg-[var(--tm-surface)]"
-                >
-                  <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
-                    <span className="min-w-0 flex-1">
-                      <b className="block font-semibold">{t.titulo}</b>
-                      <small className="text-[.78rem] text-[var(--tm-ink-muted)]">
-                        {t.modulo} · {t.notas.length} {t.notas.length === 1 ? "anotação" : "anotações"}
-                        {ultima ? ` · última em ${data(ultima)}` : ""}
-                      </small>
-                    </span>
-                    <span aria-hidden className="text-[var(--tm-ink-muted)] transition-transform group-open:rotate-90">
-                      ›
-                    </span>
-                  </summary>
-                  <div className="divide-y divide-[var(--tm-border)] border-t border-[var(--tm-border)]">
-                    {t.notas.map((n) => (
-                      <Nota key={n.slide_index} n={n} termo="" comTopico={false} />
-                    ))}
-                  </div>
-                  <div className="flex justify-end border-t border-[var(--tm-border)] bg-[var(--tm-surface-2)] px-4 py-2.5">
-                    <CopiarTopico notas={t.notas} />
-                  </div>
-                </details>
-              );
-            })
+            c.aulas.map((au, ai) => (
+              <div key={au.lessonId} className="mt-4">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+                  <p className="m-0 text-[.8rem] font-bold uppercase tracking-[.08em] text-[var(--tm-ink-muted)]">
+                    {au.modulo} · {au.titulo}
+                  </p>
+                  <Link
+                    href={`/anotacoes/aula/${au.lessonId}`}
+                    className="rounded-full border border-[var(--tm-accent)] px-3 py-1 text-[.8rem] font-semibold text-[var(--tm-accent)] hover:bg-[var(--tm-accent)] hover:text-[var(--tm-bg)]"
+                  >
+                    📓 Caderno da aula
+                  </Link>
+                </div>
+                {au.topicos.map((t, i) => {
+                  const ultima = t.notas.map((n) => n.atualizado_em ?? "").sort().at(-1);
+                  return (
+                    <details
+                      key={t.topicoId}
+                      open={i === 0 && ai === 0 && c === grupos[0]}
+                      className="group mt-3 overflow-hidden rounded-[var(--tm-radius-lg)] border border-[var(--tm-border)] bg-[var(--tm-surface)]"
+                    >
+                      <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
+                        <span className="min-w-0 flex-1">
+                          <b className="block font-semibold">{t.titulo}</b>
+                          <small className="text-[.78rem] text-[var(--tm-ink-muted)]">
+                            {t.notas.length} {t.notas.length === 1 ? "anotação" : "anotações"}
+                            {ultima ? ` · última em ${data(ultima)}` : ""}
+                          </small>
+                        </span>
+                        <span aria-hidden className="text-[var(--tm-ink-muted)] transition-transform group-open:rotate-90">
+                          ›
+                        </span>
+                      </summary>
+                      <div className="divide-y divide-[var(--tm-border)] border-t border-[var(--tm-border)]">
+                        {t.notas.map((n) => (
+                          <Nota key={n.slide_index} n={n} termo="" comTopico={false} />
+                        ))}
+                      </div>
+                      <div className="flex justify-end border-t border-[var(--tm-border)] bg-[var(--tm-surface-2)] px-4 py-2.5">
+                        <CopiarTopico notas={t.notas} />
+                      </div>
+                    </details>
+                  );
+                })}
+              </div>
+            ))
           )}
         </section>
       ))}

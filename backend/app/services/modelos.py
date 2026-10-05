@@ -11,6 +11,11 @@ mas deram 503 na maioria das tentativas — e cada um tem só 20 pedidos/dia, co
 SEPARADA por modelo (docs/modelos/LIMITES_GEMINI.md). Revezando, a soma rende bem mais.
 Os modelos do Groq erraram raciocínio numérico, então ficam como segunda opinião.
 
+REGRA DO ATILA (2026-10-05): em TUDO, primeiro Gemini e depois Groq — toda cadeia
+começa pelos modelos Gemini e termina com Groq como reserva. Única exceção:
+"segunda_opiniao", que existe justamente pra ser OUTRO provedor (o processo híbrido
+compara Groq x Gemini); se ela começasse no Gemini, deixaria de ser segunda opinião.
+
 Trocar sem mexer em código: variável de ambiente NIA_MODELOS_<FUNCAO>, ex.
     NIA_MODELOS_CONTEUDO="gemini:gemini-3.7-flash,groq:qwen/qwen3.8-27b"
 
@@ -35,6 +40,8 @@ CADEIAS: dict[str, list[tuple[str, str]]] = {
         ("gemini", "gemini-2.5-flash"),
         ("gemini", "gemini-3.8-flash"),
         ("gemini", "gemma-4-31b-it"),
+        ("groq", "qwen/qwen3.8-27b"),
+        ("groq", "openai/gpt-oss-120b"),
     ],
     # Perguntas (QuizAgent) — mesma família, cotas separadas
     "quiz": [
@@ -42,8 +49,10 @@ CADEIAS: dict[str, list[tuple[str, str]]] = {
         ("gemini", "gemini-3.7-flash"),
         ("gemini", "gemini-2.5-flash"),
         ("gemini", "gemini-3.5-flash-lite"),
+        ("groq", "qwen/qwen3.8-27b"),
+        ("groq", "openai/gpt-oss-120b"),
     ],
-    # Segunda opinião do processo híbrido (outro provedor de propósito)
+    # Segunda opinião do processo híbrido (outro provedor de propósito — exceção à regra)
     "segunda_opiniao": [
         ("groq", "qwen/qwen3.8-27b"),
         ("groq", "openai/gpt-oss-120b"),
@@ -64,6 +73,15 @@ CADEIAS: dict[str, list[tuple[str, str]]] = {
         ("gemini", "gemini-2.5-flash"),
         ("gemini", "gemini-3.5-flash-lite"),
         ("gemini", "gemini-3.1-flash-lite"),
+        ("groq", "qwen/qwen3.8-27b"),
+    ],
+    # Caderno da aula (2026-10-05): organiza e CORRIGE as anotações do aluno contra o
+    # material — mesma prioridade da correção (fato importa mais que velocidade)
+    "caderno": [
+        ("gemini", "gemini-3.5-flash"),
+        ("gemini", "gemini-3.7-flash"),
+        ("gemini", "gemini-2.5-flash"),
+        ("gemini", "gemini-3.5-flash-lite"),
         ("groq", "qwen/qwen3.8-27b"),
     ],
     # Tutor ao vivo na plataforma (rápido, muitos pedidos/dia)

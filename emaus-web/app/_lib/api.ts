@@ -606,6 +606,9 @@ export type AnotacaoMinha = {
   curso: string;
   modulo_index: number;
   modulo_titulo: string;
+  lesson_id: number;
+  aula_index: number;
+  aula_titulo: string;
   slide_index: number;
   slide_titulo: string | null;
   texto: string;
@@ -642,4 +645,56 @@ export function minhasAnotacoes(token: string | null | undefined) {
 
 export function resumoEstudo(token: string | null | undefined) {
   return fetchJson<ResumoEstudo>("/estudo/resumo", { headers: { Authorization: `Bearer ${token ?? ""}` } });
+}
+
+// ---- Caderno da aula (2026-10-05) ----
+
+export type BlocoCaderno = {
+  tipo: "nota" | "nota_alt" | "correcao" | "passos" | "tabela" | "lembrete" | "paragrafo";
+  rotulo?: string | null;
+  texto?: string | null;
+  referencia?: string | null;
+  era?: string | null;
+  agora?: string | null;
+  topico_id?: number | null;
+  slide?: number | null;
+  itens?: { titulo: string; detalhe?: string | null }[];
+  colunas?: string[];
+  linhas?: string[][];
+};
+
+export type CadernoConteudo = {
+  subtitulo: string;
+  secoes: { titulo: string; blocos: BlocoCaderno[] }[];
+  pratica: string[];
+  veredito: { resumo: string; pontos: { titulo: string; detalhe: string }[] };
+};
+
+export type CadernoEstado = {
+  lesson_id: number;
+  aula: string;
+  aula_index: number;
+  modulo: string;
+  modulo_index: number;
+  course_id: number;
+  curso: string;
+  topicos: { id: number; titulo: string; concluido: boolean }[];
+  anotacoes: {
+    topico_id: number;
+    topico_titulo: string;
+    slide_index: number;
+    slide_titulo: string | null;
+    texto: string;
+    atualizado_em: string | null;
+  }[];
+  caderno: { versao: number; conteudo: CadernoConteudo; anotacoes_usadas: number; criado_em: string | null } | null;
+  novas_desde_caderno: number;
+  geracoes_restantes_hoje: number;
+  cores: { claro: Record<string, string>; escuro: Record<string, string> } | null;
+};
+
+export function getCaderno(lessonId: number, tema: string, token: string | null | undefined) {
+  return fetchJson<CadernoEstado>(`/caderno/aula/${lessonId}?tema=${encodeURIComponent(tema)}`, {
+    headers: { Authorization: `Bearer ${token ?? ""}` },
+  });
 }

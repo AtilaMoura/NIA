@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: caderno da aula</title>
+<!--
+  Protótipo 13 — /anotacoes/aula/{id}: o "Caderno da aula" organizado pela IA.
+  Inspirado no Resumo_Aula1_Atila.html (Estudo IA): títulos manuscritos, post-its em 2 cores,
+  correção em caneta vermelha (o que estava escrito riscado + o certo), passo a passo,
+  tabela, lembrete na margem, checklist e veredito com pontos pra reforçar.
+  - Por AULA (junta as anotações de todos os tópicos da aula).
+  - Duas versões salvas: "Minhas notas" (original, intocada) e "Caderno organizado" (IA).
+  - A IA lê as anotações + o conteúdo dos slides, organiza por assunto e corrige.
+    Cada correção tem "ver no slide N" pra conferir na fonte.
+  - Cores do TEMA DO CURSO: obreiro = trigo-maduro (padrão aqui), IA = azul-petróleo (#ia).
+  - Anotou mais depois? Aviso + "Atualizar caderno" (versão nova; a anterior fica guardada).
+  - "Imprimir / salvar PDF".
+  - A IA devolve BLOCOS (nota, correção, passos, tabela, lembrete, veredito) e o Emaús desenha —
+    nunca HTML vindo da IA.
+  Estados: #original, #gerando, #desatualizado, #ia (tema/curso de IA), #vazio, #escuro.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:opsz,wght@9..144,600&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Moldura do site (tokens do Emaús) ---------- */
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px;
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3; --tm-accent: #8a5a2b;
+    --tm-warn: #a35a1e;
+    /* ---------- Caderno: tema do curso (trigo-maduro = obreiro) ---------- */
+    --c-bg: #faf6ee; --c-dot: rgba(43,36,28,.08); --c-surface: #ffffff; --c-surface-2: #f3ece0;
+    --c-border: #e4d8c3; --c-border-soft: #ede4d0; --c-ink: #2b241c; --c-dim: #6b5f4f; --c-faint: #8a7a62;
+    --c-accent: #8a5a2b; --c-accent-soft: rgba(138,90,43,.14);
+    --c-accent-2: #3d5f6e; --c-accent-2-soft: rgba(61,95,110,.13);
+    --c-fix: #a3402f; --c-fix-soft: rgba(163,64,47,.10);
+  }
+  [data-curso="ia"] {
+    --c-bg: #eef3f4; --c-dot: rgba(19,38,43,.08); --c-surface: #ffffff; --c-surface-2: #e1eaec;
+    --c-border: #c5d4d8; --c-border-soft: #d5e1e4; --c-ink: #13262b; --c-dim: #43585e; --c-faint: #61747a;
+    --c-accent: #1c5d6b; --c-accent-soft: rgba(28,93,107,.14);
+    --c-accent-2: #a8620a; --c-accent-2-soft: rgba(168,98,10,.13);
+    --c-fix: #b23a2c; --c-fix-soft: rgba(178,58,44,.10);
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327; --tm-accent: #d79b5b; --tm-warn: #d08a4e;
+    --c-bg: #201a12; --c-dot: rgba(255,255,255,.05); --c-surface: #2a2219; --c-surface-2: #332a1e;
+    --c-border: #4a3d2a; --c-border-soft: #3a2f21; --c-ink: #f2e9d8; --c-dim: #c2b299; --c-faint: #8f7e64;
+    --c-accent: #d3924a; --c-accent-soft: rgba(211,146,74,.18);
+    --c-accent-2: #8fb6c4; --c-accent-2-soft: rgba(143,182,196,.14);
+    --c-fix: #e0736b; --c-fix-soft: rgba(224,115,107,.13);
+  }
+  [data-tm-theme="dark"][data-curso="ia"] {
+    --c-bg: #0f2027; --c-dot: rgba(255,255,255,.05); --c-surface: #152b33; --c-surface-2: #1b343d;
+    --c-border: #2a4752; --c-border-soft: #203a44; --c-ink: #eef3f1; --c-dim: #a6bcc0; --c-faint: #85a0a5;
+    --c-accent: #f2a541; --c-accent-soft: rgba(242,165,65,.18);
+    --c-accent-2: #6fb2d8; --c-accent-2-soft: rgba(111,178,216,.14);
+    --c-fix: #ff7a6b; --c-fix-soft: rgba(255,122,107,.14);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: "Source Sans 3", -apple-system, "Segoe UI", sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); width: 100%; }
+
+  header.topo { border-bottom: 1px solid var(--tm-border); }
+  header.topo .wrap { max-width: 1180px; display: flex; align-items: center; gap: 1rem; height: 56px; }
+  .marca { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.12rem; display: inline-flex; align-items: center; gap: .5rem; }
+  .marca img { height: 28px; }
+  .av { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); border: 1px solid var(--tm-border); color: var(--tm-accent); font-weight: 700; font-size: .78rem; cursor: pointer; }
+
+  main { flex: 1; padding: clamp(1.1rem, 3vw, 1.75rem) 0 3rem; }
+  .voltar { font-size: .85rem; font-weight: 600; color: var(--tm-ink-muted); }
+  .topo-pagina { margin-top: .8rem; display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: .9rem; }
+  .topo-pagina .onde { font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tm-accent); }
+  .topo-pagina h1 { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.4rem, 4vw, 1.75rem); margin: .1rem 0 0; }
+  .alternar { display: inline-flex; border: 1px solid var(--tm-border); border-radius: 999px; overflow: hidden; background: var(--tm-surface); }
+  .alternar button { border: 0; background: none; padding: .45rem .95rem; font-size: .86rem; color: var(--tm-ink-muted); white-space: nowrap; }
+  .alternar button[aria-pressed="true"] { background: var(--tm-accent); color: var(--tm-bg); font-weight: 600; }
+
+  .barra-acoes { margin-top: .9rem; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem; font-size: .82rem; color: var(--tm-ink-muted); }
+  .barra-acoes .btn { border: 1px solid var(--tm-border); background: var(--tm-surface); border-radius: 999px; padding: .38rem .85rem; font-size: .82rem; font-weight: 600; }
+  .barra-acoes .btn.forte { background: var(--tm-accent); border-color: var(--tm-accent); color: var(--tm-bg); }
+  .barra-acoes .esp { flex: 1; }
+  .aviso { margin-top: .9rem; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; padding: .7rem .95rem; border-radius: var(--tm-radius); border: 1px solid color-mix(in srgb, var(--tm-warn) 45%, transparent); background: color-mix(in srgb, var(--tm-warn) 8%, transparent); font-size: .88rem; }
+  .aviso b { color: var(--tm-warn); }
+
+  /* ================= O CADERNO ================= */
+  .caderno { margin-top: 1rem; border-radius: var(--tm-radius-lg); border: 1px solid var(--c-border); background: var(--c-bg); background-image: radial-gradient(circle, var(--c-dot) 1px, transparent 1.2px); background-size: 24px 24px; color: var(--c-ink); overflow: hidden; }
+  .folha { position: relative; padding: 34px 20px 50px 44px; }
+  .folha::before { content: ""; position: absolute; top: 0; bottom: 0; left: 24px; width: 1px; background: var(--c-fix); opacity: .35; }
+  .c-data { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--c-faint); letter-spacing: .5px; }
+  .c-titulo { font-family: "Caveat", cursive; font-weight: 700; font-size: clamp(40px, 9vw, 52px); color: var(--c-accent); margin: 4px 0 2px; line-height: 1; }
+  .c-sub { font-size: 14.5px; color: var(--c-dim); max-width: 52ch; margin: 0; }
+  .c-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+  .c-chip { font-family: "IBM Plex Mono", monospace; font-size: 11px; padding: 5px 9px 5px 8px; border-radius: 5px; border: 1px solid var(--c-border); background: var(--c-surface); color: var(--c-dim); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .c-chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--c-accent-2); flex-shrink: 0; }
+  .c-chip.pend i { background: var(--c-accent); }
+  .c-chip.pend { color: var(--c-faint); }
+
+  .c-secao { margin: 34px 0; }
+  .c-eyebrow { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--c-faint); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+  .c-h2 { font-family: "Caveat", cursive; font-weight: 700; font-size: 32px; margin: 0 0 12px; line-height: 1.15; }
+  .c-h2 span { color: var(--c-accent); }
+  .c-p { margin: 10px 0; font-size: 15.5px; }
+  .c-p.dim { color: var(--c-dim); font-size: 14.5px; }
+  .c-p strong, .nota strong { color: var(--c-accent); }
+  mark { background: var(--c-accent-2-soft); color: inherit; padding: 1px 4px; border-radius: 3px; }
+
+  .nota { background: var(--c-surface); border: 1px solid var(--c-border); border-left: 3px solid var(--c-accent); border-radius: 6px; padding: 13px 15px; margin: 13px 0; font-size: 14.5px; }
+  .nota.alt { border-left-color: var(--c-accent-2); }
+  .nota .rot { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--c-accent); margin-bottom: 5px; }
+  .nota.alt .rot { color: var(--c-accent-2); }
+  .nota .ref { font-family: "Source Sans 3", sans-serif; font-style: italic; color: var(--c-dim); font-size: 13.5px; margin-top: 6px; }
+
+  .fix { background: var(--c-fix-soft); border: 1px dashed var(--c-fix); border-radius: 6px; padding: 13px 15px; margin: 15px 0; }
+  .fix .tag { font-family: "Caveat", cursive; font-weight: 700; font-size: 20px; color: var(--c-fix); display: block; margin-bottom: 5px; transform: rotate(-1.5deg); }
+  .fix .era { color: var(--c-dim); text-decoration: line-through; text-decoration-color: var(--c-fix); font-size: 14px; }
+  .fix .agora { font-size: 15px; margin-top: 4px; }
+  .fix .agora strong { color: var(--c-fix); }
+  .fix .fonte { margin-top: 7px; font-size: 12.5px; font-weight: 600; }
+  .fix .fonte a { color: var(--c-fix); text-decoration: underline; text-underline-offset: 2px; }
+
+  .passos { margin: 14px 0; padding-left: 4px; }
+  .passo { display: grid; grid-template-columns: 26px 1fr; gap: 12px; padding: 9px 0; position: relative; }
+  .passo:not(:last-child)::after { content: ""; position: absolute; left: 12px; top: 32px; bottom: -9px; width: 1px; background: var(--c-border); }
+  .passo .n { width: 24px; height: 24px; border-radius: 50%; background: var(--c-surface-2); border: 1px solid var(--c-border); color: var(--c-dim); font-family: "IBM Plex Mono", monospace; font-size: 11px; display: grid; place-items: center; }
+  .passo b { display: block; font-size: 14.5px; }
+  .passo span { font-size: 13.5px; color: var(--c-dim); }
+
+  .tbl { overflow-x: auto; margin: 14px 0; border-radius: 6px; border: 1px solid var(--c-border); background: var(--c-surface); }
+  table { width: 100%; min-width: 420px; border-collapse: collapse; font-size: 13.5px; }
+  th { background: var(--c-surface-2); text-align: left; padding: 8px 11px; border-bottom: 1px solid var(--c-border); }
+  td { padding: 8px 11px; border-bottom: 1px solid var(--c-border-soft); color: var(--c-dim); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td strong { color: var(--c-ink); }
+
+  .margem { font-family: "Caveat", cursive; font-weight: 500; font-size: 19px; color: var(--c-accent-2); transform: rotate(-1deg); margin: 6px 0 6px 4px; }
+  .check { list-style: none; padding: 0; margin: 12px 0; }
+  .check li { display: flex; align-items: baseline; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--c-border-soft); font-size: 14.5px; }
+  .check li::before { content: ""; width: 14px; height: 14px; border: 1.5px solid var(--c-accent-2); border-radius: 3px; flex-shrink: 0; transform: translateY(2px); }
+  .divisor { border: 0; border-top: 1px dashed var(--c-border); margin: 30px 0; }
+
+  .veredito { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 8px; padding: 18px; }
+  .veredito .carimbo { display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--c-accent-2); color: var(--c-accent-2); margin-bottom: 8px; }
+  .veredito h3 { font-family: "Caveat", cursive; font-size: 24px; margin: 12px 0 2px; }
+  .veredito ul { margin: 2px 0 8px; padding-left: 20px; }
+  .veredito li { font-size: 14px; color: var(--c-dim); }
+  .rodape-caderno { padding: 12px 20px 14px 44px; border-top: 1px dashed var(--c-border); font-size: 12.5px; color: var(--c-faint); font-family: "IBM Plex Mono", monospace; }
+
+  /* Gerando */
+  .gerando { padding: 46px 20px; text-align: center; }
+  .gerando .pena { font-family: "Caveat", cursive; font-size: 30px; color: var(--c-accent); }
+  .linhas { margin: 18px auto 0; max-width: 420px; display: grid; gap: 10px; }
+  .linhas i { height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--c-surface-2), var(--c-border-soft), var(--c-surface-2)); background-size: 200% 100%; animation: brilho 1.4s infinite linear; }
+  .linhas i:nth-child(2) { width: 85%; } .linhas i:nth-child(3) { width: 70%; }
+  @keyframes brilho { to { background-position: -200% 0; } }
+  @media (prefers-reduced-motion: reduce) { .linhas i { animation: none; } }
+
+  /* Minhas notas (original) */
+  .original { margin-top: 1rem; }
+  .orig-topico { margin-top: .9rem; border-radius: var(--tm-radius-lg); border: 1px solid var(--tm-border); background: var(--tm-surface); overflow: hidden; }
+  .orig-topico h3 { margin: 0; padding: .8rem 1rem; font-size: 1rem; border-bottom: 1px solid var(--tm-border); background: var(--tm-surface-2); }
+  .orig-nota { padding: .75rem 1rem; border-top: 1px solid var(--tm-border); }
+  .orig-nota:first-of-type { border-top: 0; }
+  .orig-nota .onde { font-size: .78rem; color: var(--tm-ink-muted); }
+  .orig-nota .onde b { color: var(--tm-accent); }
+  .orig-nota p { margin: .25rem 0 0; white-space: pre-wrap; }
+
+  .vazio { margin-top: 1rem; text-align: center; padding: 2.5rem 1rem; border: 1px dashed var(--tm-border); border-radius: var(--tm-radius-lg); }
+
+  footer { border-top: 1px solid var(--tm-border); }
+  footer .wrap { max-width: 1180px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 1.5rem; padding-top: 1.1rem; padding-bottom: 1.1rem; font-size: .82rem; color: var(--tm-ink-muted); }
+
+  @media (max-width: 480px) { .folha { padding: 26px 14px 40px 34px; } .folha::before { left: 18px; } .rodape-caderno { padding-left: 34px; } }
+  /* Imprimir: só o caderno */
+  @media print { header.topo, footer, .voltar, .topo-pagina .alternar, .barra-acoes, .aviso { display: none !important; } .caderno { border: 0; } body { background: #fff; } }
+</style>
+</head>
+<body>
+<header class="topo"><div class="wrap">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús</span>
+  <span class="av" onclick="tema()" title="(protótipo) alterna o tema">RL</span>
+</div></header>
+
+<main class="wrap">
+  <a href="12-anotacoes.html" class="voltar">← Minhas anotações</a>
+
+  <div class="topo-pagina">
+    <div>
+      <p class="onde" id="onde">Formação do Obreiro I · Módulo 1 · Aula 1</p>
+      <h1 id="tituloAula">Um Povo de Sacerdotes</h1>
+    </div>
+    <div class="alternar" role="group" aria-label="Versão">
+      <button type="button" data-v="original" aria-pressed="false">Minhas notas</button>
+      <button type="button" data-v="caderno" aria-pressed="true">Caderno organizado</button>
+    </div>
+  </div>
+
+  <div class="barra-acoes" id="barraCaderno">
+    <span id="status">✦ Organizado pela IA em 05/10 às 14:20 · a partir de 9 anotações · versão 2</span>
+    <span class="esp"></span>
+    <button type="button" class="btn">↻ Atualizar caderno</button>
+    <button type="button" class="btn" onclick="print()">Imprimir / PDF</button>
+  </div>
+
+  <div class="aviso" id="avisoNovo" hidden>
+    <span><b>Você anotou 2 coisas novas</b> depois que este caderno foi organizado.</span>
+    <button type="button" class="btn" style="border:1px solid var(--tm-warn);background:var(--tm-warn);color:var(--tm-bg);border-radius:999px;padding:.35rem .85rem;font-weight:600;font-size:.82rem">↻ Atualizar caderno</button>
+  </div>
+
+  <!-- ============ CADERNO (OBREIRO) ============ -->
+  <article class="caderno" id="cadernoObreiro">
+    <div class="folha">
+      <div class="c-data">05 · 10 · 2026 — caderno da Aula 1</div>
+      <h2 class="c-titulo">Minhas anotações</h2>
+      <p class="c-sub">Um povo de sacerdotes — reorganizadas por assunto, com o que precisei corrigir.</p>
+      <div class="c-chips">
+        <span class="c-chip"><i></i>1 · Sacerdócio de todos os crentes</span>
+        <span class="c-chip"><i></i>2 · Dons espirituais</span>
+        <span class="c-chip pend"><i></i>3 · Vocação e ofícios</span>
+      </div>
+
+      <section class="c-secao">
+        <div class="c-eyebrow">Assunto 1</div>
+        <h3 class="c-h2">Todo crente <span>é</span> sacerdote</h3>
+        <div class="nota">
+          <div class="rot">A ideia central</div>
+          Pedro escreve pra igreja inteira, não só pros líderes: todos são <strong>sacerdócio santo</strong> e oferecem sacrifícios espirituais.
+          <div class="ref">“…vós também, quais pedras vivas, sois edificados casa espiritual…” — 1Pe 2.5</div>
+        </div>
+        <div class="nota alt">
+          <div class="rot">Acesso direto</div>
+          Não preciso de intermediário humano pra chegar a Deus — o caminho foi aberto por Cristo (Hb 10.19-20).
+        </div>
+        <div class="fix">
+          <span class="tag">correção</span>
+          <div class="era">“o véu rasgou de baixo pra cima quando Jesus morreu”</div>
+          <div class="agora">Foi de <strong>cima para baixo</strong> (Mt 27.51) — o texto destaca que a abertura veio de Deus, não de mão humana.</div>
+          <div class="fonte"><a href="#">ver no slide 6 ▶</a></div>
+        </div>
+        <div class="margem">→ sacerdócio = acesso + responsabilidade de servir</div>
+      </section>
+
+      <hr class="divisor">
+
+      <section class="c-secao">
+        <div class="c-eyebrow">Assunto 2</div>
+        <h3 class="c-h2">Sacrifícios <span>espirituais</span> hoje</h3>
+        <div class="passos">
+          <div class="passo"><span class="n">1</span><div><b>O corpo como sacrifício vivo</b><span>Rm 12.1 — a vida inteira entregue, não só o culto.</span></div></div>
+          <div class="passo"><span class="n">2</span><div><b>Louvor</b><span>Hb 13.15 — “fruto de lábios que confessam o seu nome”.</span></div></div>
+          <div class="passo"><span class="n">3</span><div><b>Fazer o bem e repartir</b><span>Hb 13.16 — serviço prático também é sacrifício.</span></div></div>
+        </div>
+      </section>
+
+      <hr class="divisor">
+
+      <section class="c-secao">
+        <div class="c-eyebrow">Assunto 3</div>
+        <h3 class="c-h2">Dons <span>≠</span> talentos</h3>
+        <div class="tbl"><table>
+          <tr><th>Dom espiritual</th><th>Talento natural</th></tr>
+          <tr><td><strong>Dado pelo Espírito</strong> pra edificar a igreja (1Co 12.7)</td><td>Habilidade de nascimento ou treino</td></tr>
+          <tr><td>Serve ao corpo, não a mim</td><td>Pode servir a qualquer fim</td></tr>
+        </table></div>
+        <div class="fix">
+          <span class="tag">correção — essa eu confundi</span>
+          <div class="era">“cada um recebe o dom que pedir”</div>
+          <div class="agora">Os dons são distribuídos <strong>como o Espírito quer</strong> (1Co 12.11). Posso buscar com zelo (1Co 12.31), mas quem decide a distribuição é Ele.</div>
+          <div class="fonte"><a href="#">ver no slide 4 do tópico 2 ▶</a></div>
+        </div>
+      </section>
+
+      <hr class="divisor">
+
+      <section class="c-secao">
+        <div class="c-eyebrow">Pra levar</div>
+        <h3 class="c-h2">O que eu vou praticar</h3>
+        <ul class="check">
+          <li>Orar pela igreja sem esperar “ser líder” pra isso</li>
+          <li>Reler 1Pe 2.4-10 durante a semana</li>
+          <li>Perguntar ao meu líder onde posso servir</li>
+        </ul>
+      </section>
+
+      <hr class="divisor">
+
+      <section class="c-secao">
+        <div class="c-eyebrow">Revisão</div>
+        <h3 class="c-h2">Veredito <span>da aula</span></h3>
+        <div class="veredito">
+          <span class="carimbo">2 pontos pra reforçar</span>
+          <p class="c-p">Boas anotações sobre o sacerdócio e o acesso a Deus. Dois detalhes voltaram errados e valem uma segunda leitura.</p>
+          <h3>A direção do véu</h3>
+          <ul><li>De cima para baixo — o sentido do texto depende disso.</li></ul>
+          <h3>Quem distribui os dons</h3>
+          <ul><li>O Espírito, “como quer”. Buscar com zelo não é escolher.</li></ul>
+        </div>
+      </section>
+    </div>
+    <div class="rodape-caderno">Organizado pela IA a partir das suas anotações e do conteúdo dos slides. Confira as correções na fonte.</div>
+  </article>
+
+  <!-- ============ CADERNO (IA) — mostra o tema do curso mudando ============ -->
+  <article class="caderno" id="cadernoIa" hidden>
+    <div class="folha">
+      <div class="c-data">05 · 10 · 2026 — caderno da Aula 1</div>
+      <h2 class="c-titulo">Minhas anotações</h2>
+      <p class="c-sub">LLM aplicado ao agente — reorganizadas, com as correções que encontrei junto.</p>
+      <div class="c-chips">
+        <span class="c-chip"><i></i>1 · O que é um LLM</span>
+        <span class="c-chip"><i></i>2 · Tokens</span>
+        <span class="c-chip"><i></i>3 · Context window</span>
+        <span class="c-chip pend"><i></i>4 · Geração de resposta</span>
+      </div>
+      <section class="c-secao">
+        <div class="c-eyebrow">Assunto 1</div>
+        <h3 class="c-h2">Token <span>e</span> context window</h3>
+        <div class="nota"><div class="rot">Token</div>Fragmento de palavra — é essa unidade (não a palavra) que entra na LLM.</div>
+        <div class="fix">
+          <span class="tag">correção</span>
+          <div class="era">“uma palavra comprida vira mais tokens”</div>
+          <div class="agora">Não é o <strong>tamanho</strong> — é a <strong>raridade</strong>. Palavra longa e comum fica em 1-2 tokens; curta e rara pode virar vários.</div>
+          <div class="fonte"><a href="#">ver no slide 5 do tópico 2 ▶</a></div>
+        </div>
+        <div class="nota alt"><div class="rot">Context window</div>Conta <mark>tudo</mark>: entrada, histórico <strong>e</strong> a saída do modelo.</div>
+        <div class="margem">→ nunca mando o histórico bruto inteiro</div>
+      </section>
+    </div>
+    <div class="rodape-caderno">Organizado pela IA a partir das suas anotações e do conteúdo dos slides. Confira as correções na fonte.</div>
+  </article>
+
+  <!-- ============ GERANDO ============ -->
+  <article class="caderno" id="gerando" hidden>
+    <div class="gerando">
+      <div class="pena">organizando o seu caderno…</div>
+      <p class="c-p dim" style="margin-top:4px">Lendo 9 anotações e o conteúdo dos 3 tópicos da aula. Leva uns 20 segundos.</p>
+      <div class="linhas"><i></i><i></i><i></i></div>
+    </div>
+  </article>
+
+  <!-- ============ MINHAS NOTAS (ORIGINAL) ============ -->
+  <section class="original" id="original" hidden>
+    <p style="margin:0;font-size:.85rem;color:var(--tm-ink-muted)">Exatamente como você escreveu — a IA nunca altera esta versão.</p>
+    <div class="orig-topico">
+      <h3>Sacerdócio de Todos os Crentes</h3>
+      <div class="orig-nota"><p class="onde"><b>Slide 3</b> · Pedras vivas, casa espiritual</p><p>pedro fala pra igreja toda nao so pros lideres. sacerdocio santo = todo mundo oferece sacrificio espiritual</p></div>
+      <div class="orig-nota"><p class="onde"><b>Slide 6</b> · O véu rasgado</p><p>o veu rasgou de baixo pra cima quando Jesus morreu, acesso livre</p></div>
+      <div class="orig-nota"><p class="onde"><b>Slide 9</b> · Sacrifícios espirituais hoje</p><p>rm 12.1 corpo sacrificio vivo. hb 13 louvor e fazer o bem</p></div>
+    </div>
+    <div class="orig-topico">
+      <h3>Dons Espirituais</h3>
+      <div class="orig-nota"><p class="onde"><b>Slide 4</b> · Quem distribui</p><p>cada um recebe o dom que pedir??</p></div>
+      <div class="orig-nota"><p class="onde"><b>Slide 7</b> · Dom x talento</p><p>dom é pra edificar a igreja, talento é natural</p></div>
+    </div>
+  </section>
+
+  <!-- ============ VAZIO ============ -->
+  <section class="vazio" id="vazio" hidden>
+    <h2 style="font-family:Fraunces,Georgia,serif;font-size:1.2rem;margin:0">Nada anotado nesta aula ainda</h2>
+    <p style="margin:.4rem 0 0;color:var(--tm-ink-muted)">Anote nos slides (botão ✍️) e depois volte aqui pra organizar tudo num caderno.</p>
+  </section>
+</main>
+
+<footer><div class="wrap"><span>Emaús · plataforma de formação bíblica</span><span>Início · Meu progresso</span></div></footer>
+
+<script>
+  // Só pro protótipo
+  const r = document.documentElement;
+  function tema() { r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; }
+  const $ = (id) => document.getElementById(id);
+  let versao = "caderno";
+  function mostrar(v) {
+    versao = v;
+    document.querySelectorAll("[data-v]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === v));
+    $("original").hidden = v !== "original";
+    $("barraCaderno").hidden = v !== "caderno";
+    $(r.dataset.curso === "ia" ? "cadernoIa" : "cadernoObreiro").hidden = v !== "caderno";
+  }
+  document.querySelectorAll("[data-v]").forEach((b) => b.addEventListener("click", () => mostrar(b.dataset.v)));
+  const e = location.hash.slice(1).split(",");
+  if (e.includes("escuro")) tema();
+  if (e.includes("ia")) {
+    r.dataset.curso = "ia";
+    $("cadernoObreiro").hidden = true; $("cadernoIa").hidden = false;
+    $("onde").textContent = "Engenharia de Agentes LLM · Módulo 1 · Aula 1";
+    $("tituloAula").textContent = "Fundamentos do LLM";
+  }
+  if (e.includes("original")) mostrar("original");
+  if (e.includes("desatualizado")) $("avisoNovo").hidden = false;
+  if (e.includes("gerando")) { $("cadernoObreiro").hidden = true; $("gerando").hidden = false; $("status").textContent = "✦ Organizando…"; }
+  if (e.includes("vazio")) { ["cadernoObreiro", "barraCaderno"].forEach((id) => $(id).hidden = true); document.querySelector(".alternar").hidden = true; $("vazio").hidden = false; }
+</script>
+</body>
+</html>
