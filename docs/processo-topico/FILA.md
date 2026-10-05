@@ -7,7 +7,7 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 
 | ordem | topico_id | curso | módulo / aula | título | status | falta |
 |---|---|---|---|---|---|---|
-| 1 | 33 | Redes (11) | M1 · NAT, Firewall e DNS | NAT (Network Address Translation) | pendente | |
+| 1 | 33 | Redes (11) | M1 · NAT, Firewall e DNS | NAT (Network Address Translation) | parcial | áudio: 5/21 com voz (geração parada por falta de memória do PC em 2026-10-05). Narrações já revisadas em `backend/_audio_topico33.json` — retomar com `_gerar_audio_topico.py 33 11 voz` → mp3 → conferir → scp → aplicar prod |
 | 2 | 69 | Obreiro I (8) | M2 · A Bíblia como Autoridade | A Palavra acima da tradição (Mc 7:6-13) | pendente | |
 
 ## Já feitos (processo novo)
