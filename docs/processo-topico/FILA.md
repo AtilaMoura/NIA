@@ -7,19 +7,18 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 
 | ordem | topico_id | curso | módulo / aula | título | status | falta |
 |---|---|---|---|---|---|---|
-| 1 | 69 | Obreiro I (8) | M2 · A Bíblia como Autoridade | A Palavra acima da tradição (Mc 7:6-13) | pendente | |
-| 2 | 34 | Redes (11) | M1 · NAT, Firewall e DNS | Firewall — bloqueio de entrada vs. saída | pendente | |
-| 3 | 22 | IA (5) | Aula 2 · Transformers por dentro | Self-Attention: Query, Key, Value | pendente | |
-| 4 | 70 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Como os 66 livros se formaram (Lc 24:44) ⚠️ cânon 66×73 — nota de neutralidade | pendente | |
-| 5 | 35 | Redes (11) | M1 · NAT, Firewall e DNS | DNS e DDNS | pendente | |
-| 6 | 23 | IA (5) | Aula 2 · Transformers por dentro | Causal Masking + Multi-Head Attention | pendente | |
-| 7 | 71 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Antigo Testamento: criação, aliança, reino e exílio (Gn 12:1-3) | pendente | |
-| 8 | 36 | Redes (11) | M2 · Port Forwarding | Como funciona o redirecionamento de porta | pendente | |
-| 9 | 24 | IA (5) | Aula 2 · Transformers por dentro | Dentro do bloco Transformer | pendente | |
-| 10 | 72 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Novo Testamento: Cristo, igreja e consumação (Hb 1:1-2) | pendente | |
-| 11 | 37 | Redes (11) | M2 · Port Forwarding | Riscos de expor porta na internet | pendente | |
-| 12 | 25 | IA (5) | Aula 2 · Transformers por dentro | Dos logits ao desempenho — KV Cache, Prefill/Decode | pendente | |
-| 13 | 73 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Cristo em toda a Escritura (Lc 24:27) | pendente | |
+| 1 | 34 | Redes (11) | M1 · NAT, Firewall e DNS | Firewall — bloqueio de entrada vs. saída | pendente | |
+| 2 | 22 | IA (5) | Aula 2 · Transformers por dentro | Self-Attention: Query, Key, Value | pendente | |
+| 3 | 70 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Como os 66 livros se formaram (Lc 24:44) ⚠️ cânon 66×73 — nota de neutralidade | pendente | |
+| 4 | 35 | Redes (11) | M1 · NAT, Firewall e DNS | DNS e DDNS | pendente | |
+| 5 | 23 | IA (5) | Aula 2 · Transformers por dentro | Causal Masking + Multi-Head Attention | pendente | |
+| 6 | 71 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Antigo Testamento: criação, aliança, reino e exílio (Gn 12:1-3) | pendente | |
+| 7 | 36 | Redes (11) | M2 · Port Forwarding | Como funciona o redirecionamento de porta | pendente | |
+| 8 | 24 | IA (5) | Aula 2 · Transformers por dentro | Dentro do bloco Transformer | pendente | |
+| 9 | 72 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Novo Testamento: Cristo, igreja e consumação (Hb 1:1-2) | pendente | |
+| 10 | 37 | Redes (11) | M2 · Port Forwarding | Riscos de expor porta na internet | pendente | |
+| 11 | 25 | IA (5) | Aula 2 · Transformers por dentro | Dos logits ao desempenho — KV Cache, Prefill/Decode | pendente | |
+| 12 | 73 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Cristo em toda a Escritura (Lc 24:27) | pendente | |
 
 ## Já feitos (processo novo)
 | topico_id | curso | título | data |
@@ -31,3 +30,4 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 21 | IA | Positional Encoding | 2026-10-05 |
 | 68 | Obreiro I | Suficiência das Escrituras (2Pe 1:19-21) | 2026-10-05 |
 | 33 | Redes | NAT (Network Address Translation) — áudio terminado depois | 2026-10-05 |
+| 69 | Obreiro I | A Palavra acima da tradição (Mc 7:6-13) — fecha a Aula 60 | 2026-10-06 |
