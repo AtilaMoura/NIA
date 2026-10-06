@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { AcoesTopico } from "./topico-ui";
-import { THEME_TOPICO, TEMA_POR_CURSO } from "../../_lib/config";
+import { temaDoCurso } from "../../_lib/tema";
 import { getSessao, getToken } from "../../_lib/sessao";
 import { papelPodeRevisar } from "../../_lib/papel";
 import { CATALOGO, tituloCurto } from "../../_lib/catalogo";
@@ -88,7 +88,7 @@ export default async function TopicoPage({
   const modulo = aula ? modules.find((m) => m.id === aula.module_id) ?? null : null;
   if (!modulo) notFound();
   const CURSO_ID = modulo.course_id;
-  const tema = TEMA_POR_CURSO[CURSO_ID] ?? THEME_TOPICO;
+  const tema = await temaDoCurso(CURSO_ID, tokenSessao);
 
   const ordenados = [...irmaos].sort((a, b) => a.topico_index - b.topico_index);
   const posicao = ordenados.findIndex((t) => t.id === topico.id);

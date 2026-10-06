@@ -5,7 +5,7 @@ import { CabecalhoApp } from "../../../_ui/CabecalhoApp";
 import { Rodape } from "../../../_ui/Rodape";
 import { getCaderno, getUser, listLessons, listModules } from "../../../_lib/api";
 import { getSessao, getToken } from "../../../_lib/sessao";
-import { TEMA_POR_CURSO, THEME_TOPICO } from "../../../_lib/config";
+import { temaDoCurso } from "../../../_lib/tema";
 import { Caderno } from "./caderno-ui";
 import { Caveat, IBM_Plex_Mono } from "next/font/google";
 
@@ -33,7 +33,7 @@ export default async function CadernoPage({ params }: { params: Promise<{ lesson
   const modulo = aula ? modulos.find((m) => m.id === aula.module_id) : undefined;
   if (!modulo) notFound();
 
-  const tema = TEMA_POR_CURSO[modulo.course_id] ?? THEME_TOPICO;
+  const tema = await temaDoCurso(modulo.course_id, token);
   const [usuario, estado] = await Promise.all([
     getUser(sessao.id, token).catch(() => null),
     getCaderno(lessonId, tema, token).catch(() => null),

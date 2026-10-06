@@ -14,6 +14,8 @@ export type Course = {
   cover_image_url: string | null;
   /** 'privado' = estudo pessoal; o backend só devolve se a pessoa pode ver (2026-10-06) */
   visibilidade: "publico" | "privado";
+  /** paleta/estilo do curso; `tema_slides` = tema do render (ver _lib/tema.ts) */
+  identidade_visual?: { tema_slides?: string } & Record<string, unknown>;
 };
 
 export type Module = {
