@@ -1,4 +1,4 @@
-# Especificação — Vendas na Internet (estudo privado da Amanda)
+# Especificação — Vendas na Internet (curso privado)
 
 Segue a [BASE](BASE.md). Curso criado em 2026-10-06, **privado** (só o Master e quem ele liberar
 em Pessoas veem). Grade aprovada pelo Atila: 6 módulos × 2 aulas × 2 tópicos = 24 tópicos
@@ -6,7 +6,7 @@ em Pessoas veem). Grade aprovada pelo Atila: 6 módulos × 2 aulas × 2 tópicos
 
 - **Course.id:** local 12 · produção: conferir na saída do script de criação (o 12 de produção é
   o Obreiro II — não confundir).
-- **Aluna:** já usa redes sociais; objetivo **virar profissional** (gestora de tráfego).
+- **Aluno:** já usa redes sociais; objetivo **virar profissional** de gestão de tráfego. Texto neutro (sem nome, "gestor(a)/profissional", nunca "a aluna").
 - **Canais:** Meta Ads, orgânico + WhatsApp, TikTok Ads (Google fora).
 - **Prática:** cada tópico termina com tarefa usando o **Emaús** como caso real, com passo a passo
   nas ferramentas. **Sem verba de anúncio:** campanha montada até antes de publicar, números
