@@ -42,7 +42,7 @@ aspas, respostas-modelo — 60 trechos) comparado com a lista do dossiê. Fora d
 
 ## 6. Rascunhos (Gemini/Groq) — o que NÃO entrou
 
-Gemini (`gemini-2.5-flash`): 39 palavras fora da lista fechada (doctor, office, kitchen, "asked" no passado, "It's 3 o'clock"…) — nada entrou; versão final escrita do dossiê. Groq: não tinha terminado na publicação.
+Gemini (`gemini-2.5-flash`): 39 palavras fora da lista fechada (doctor, office, kitchen, "asked" no passado, "It's 3 o'clock"…) — nada entrou; versão final escrita do dossiê. Groq (`qwen3.8-27b`, chegou depois da publicação): 33 palavras fora da lista (doctor, meeting, results, "to join us" — verbo de ação no infinitivo, assunto do T10) — nada entrou.
 
 ## 7. Pedagogia e estrutura
 - Novo: negativa completa, respostas curtas, idade, Reflexão "💭 Pra pensar" + Resumo, 2 abertas
