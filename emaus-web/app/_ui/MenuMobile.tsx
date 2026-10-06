@@ -7,6 +7,7 @@ import { Avatar } from "./Avatar";
 import { Chip } from "./Chip";
 import { INFO_PAPEL, type Papel } from "../_lib/papel";
 import { ITENS_AVATAR, NAV_DESLOGADO, navRevisao, navPrincipal } from "../_lib/nav";
+import { useTemEstudos } from "./useTemEstudos";
 
 // Menu do mobile: hambúrguer + painel deslizante. Mesma navegação do desktop.
 export function MenuMobile({ nome, papel }: { nome?: string | null; papel?: Papel | null }) {
@@ -42,7 +43,8 @@ export function MenuMobile({ nome, papel }: { nome?: string | null; papel?: Pape
     }
   }
 
-  const principal = logado ? navPrincipal(papel) : NAV_DESLOGADO;
+  const temEstudos = useTemEstudos(logado);
+  const principal = logado ? navPrincipal(papel, temEstudos) : NAV_DESLOGADO;
   const naRevisao = pathname.startsWith("/revisao");
 
   // Item de menu com ícone num quadrado suave — redesign 2026-09-21 (ver

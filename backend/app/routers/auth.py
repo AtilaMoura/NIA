@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.core.security import create_access_token, verify_password, hash_password, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.core.auth import get_current_user
+from app.services import acesso_service
 from app.schemas.auth import TopicoTokenRequest, AvaliacaoTokenRequest, UserLogin, UserRegister, Token, UserMe, TrocarSenha
 from app.database import get_db
 
@@ -68,9 +69,12 @@ def emitir_topico_token(
     """
     if not db.query(Topico).filter(Topico.id == data.topico_id).first():
         raise HTTPException(404, "Tópico not found")
+    # Sem acesso ao curso, sem token — e sem token o iframe não salva nem chama o tutor
+    acesso_service.exigir_estudo_topico(db, current_user, data.topico_id)
 
+    escopo = "topico_leitura" if data.somente_leitura else "topico_respostas"
     access_token = create_access_token(
-        {"sub": str(current_user.id), "topico_id": data.topico_id, "scope": "topico_respostas"},
+        {"sub": str(current_user.id), "topico_id": data.topico_id, "scope": escopo},
         expires_delta=timedelta(hours=2),
     )
     return Token(access_token=access_token)
@@ -90,6 +94,7 @@ def emitir_avaliacao_token(
     avaliacao = db.query(Avaliacao).filter(Avaliacao.id == data.avaliacao_id).first()
     if not avaliacao:
         raise HTTPException(404, "Avaliação not found")
+    acesso_service.exigir_estudo_avaliacao(db, current_user, data.avaliacao_id)
 
     # GATING: verifica se o usuário concluiu o conteúdo do tópico
     topico_progress = (

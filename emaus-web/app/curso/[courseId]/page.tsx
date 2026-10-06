@@ -4,12 +4,11 @@ import { notFound, redirect } from "next/navigation";
 import { CabecalhoApp } from "../../_ui/CabecalhoApp";
 import { Rodape } from "../../_ui/Rodape";
 import { LinkBotao } from "../../_ui/Botao";
-import { TEOLOGIA_COURSE_IDS } from "../../_lib/config";
 import { getCourse, getUser } from "../../_lib/api";
 import { montarArvore } from "../../_lib/arvore";
 import { getSessao, getToken } from "../../_lib/sessao";
-import { papelPodeRevisar, papelVeEstudosPessoais } from "../../_lib/papel";
-import { CATALOGO, caminhoCapa, cursoPessoal, tituloCurto } from "../../_lib/catalogo";
+import { papelPodeRevisar } from "../../_lib/papel";
+import { CATALOGO, caminhoCapa, tituloCurto } from "../../_lib/catalogo";
 import { capaExiste } from "../../_lib/capas";
 import { CapaCurso } from "../../_ui/CapaCurso";
 import { ArvoreCursoUI } from "./arvore-ui";
@@ -27,16 +26,12 @@ export async function generateMetadata({
   params: Promise<{ courseId: string }>;
 }): Promise<Metadata> {
   const { courseId } = await params;
-  // Não vazar o nome de um estudo pessoal no título da aba pra quem não é Master
-  if (cursoPessoal(Number(courseId))) {
-    const sessao = await getSessao();
-    if (!papelVeEstudosPessoais(sessao?.role)) return { title: "Página não encontrada" };
-  }
+  // Quem não pode ver o curso recebe 404 do backend — nem o nome vaza na aba
+  const curso = await getCourse(Number(courseId), await getToken()).catch(() => null);
+  if (!curso) return { title: "Página não encontrada" };
   // Mesmo título do topo da página (catálogo), não o nome antigo do banco
   const catalogo = CATALOGO.find((c) => c.courseId === Number(courseId));
-  if (catalogo) return { title: tituloCurto(catalogo) };
-  const curso = await getCourse(Number(courseId)).catch(() => null);
-  return { title: curso?.title ?? "Curso" };
+  return { title: catalogo ? tituloCurto(catalogo) : curso.title };
 }
 
 export default async function CursoPage({
@@ -46,20 +41,18 @@ export default async function CursoPage({
 }) {
   const { courseId: raw } = await params;
   const courseId = Number(raw);
-  if (!Number.isInteger(courseId) || !(TEOLOGIA_COURSE_IDS as readonly number[]).includes(courseId)) {
-    notFound();
-  }
+  if (!Number.isInteger(courseId)) notFound();
 
   const sessao = await getSessao();
   if (!sessao) redirect(`/entrar?next=/curso/${courseId}`);
-  // Estudo pessoal do Master: pra qualquer outro, é como se não existisse
-  if (cursoPessoal(courseId) && !papelVeEstudosPessoais(sessao.role)) notFound();
   const token = await getToken();
 
+  // Quem pode ver este curso é o backend que diz: sem acesso, 404 (2026-10-06)
   const [arvore, usuario] = await Promise.all([
-    montarArvore(courseId, sessao.id, token),
+    montarArvore(courseId, sessao.id, token).catch(() => null),
     getUser(sessao.id, token).catch(() => null),
   ]);
+  if (!arvore) notFound();
   const { curso, modulos, resumo, linhaDoTempo } = arvore;
   // Título/subtítulo/descrição/capa vêm do catálogo do Emaús (o banco guarda o
   // título antigo em alguns cursos); o banco é o fallback.
@@ -110,10 +103,10 @@ export default async function CursoPage({
           </p>
         )}
         <Link
-          href={cursoPessoal(courseId) ? "/estudos" : "/inicio"}
+          href={curso.visibilidade === "privado" ? "/estudos" : "/inicio"}
           className="self-start text-[.85rem] font-semibold text-[var(--tm-ink-muted)] hover:text-[var(--tm-accent)]"
         >
-          ← {cursoPessoal(courseId) ? "Estudos pessoais" : "Início"}
+          ← {curso.visibilidade === "privado" ? "Meus estudos" : "Início"}
         </Link>
 
         {/* Topo compacto (redesign 2026-09-27, protótipo 04-curso.html): capa menor

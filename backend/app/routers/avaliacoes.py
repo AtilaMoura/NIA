@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.models import Avaliacao, User
 from app.renderer.render import render_topico, carregar_temas
+from app.core.auth import usuario_do_token
+from app.services import acesso_service
 
 router = APIRouter(prefix="/avaliacoes", tags=["Avaliacoes"])
 
@@ -14,6 +16,7 @@ def render_avaliacao_endpoint(
     avaliacao_id: int,
     theme: str | None = Query(None, description="id do tema (ver docs/schema/temas.json); se omitido, usa a preferência do usuário ou o padrão"),
     user_id: int | None = Query(None, description="se informado, usa User.preferred_theme como fallback quando 'theme' não for passado"),
+    token: str | None = Query(None, description="token de escopo curto do iframe (ou de sessão) — exigido em curso privado/não publicado"),
     db: Session = Depends(get_db),
 ):
     """Renderiza a avaliação (prova final) usando o mesmo template de tópico.
@@ -22,6 +25,7 @@ def render_avaliacao_endpoint(
     avaliacao = db.query(Avaliacao).filter(Avaliacao.id == avaliacao_id).first()
     if not avaliacao:
         raise HTTPException(404, "Avaliação not found")
+    acesso_service.exigir_estudo_avaliacao(db, usuario_do_token(db, token, aceita_escopo_curto=True), avaliacao_id)
     if not avaliacao.is_approved:
         raise HTTPException(409, "Esta avaliação ainda não tem conteúdo aprovado.")
 

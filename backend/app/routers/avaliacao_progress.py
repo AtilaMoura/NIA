@@ -16,6 +16,7 @@ from app.database import get_db
 from app.services.tempo_estudo import registrar_sinal
 from app.models.models import Avaliacao, AvaliacaoProgress, Topico, TopicoProgress, User
 from app.core.auth import get_current_user, get_avaliacao_resposta_user_id
+from app.services import acesso_service
 from app.schemas.topico_progress import ResultadoAvaliacaoOut, TempoEstudoOut
 from app.schemas.avaliacao_progress import (
     AvaliacaoProgressOut,
@@ -82,6 +83,7 @@ def upsert_avaliacao_progress(
         raise HTTPException(403, "Só é possível marcar progresso da própria conta.")
     if not db.query(Avaliacao).filter(Avaliacao.id == avaliacao_id).first():
         raise HTTPException(404, "Avaliação not found")
+    acesso_service.exigir_estudo_avaliacao(db, current_user, avaliacao_id)
     _verificar_gating_avaliacao(db, data.user_id, avaliacao_id)
 
     def _buscar_registro():

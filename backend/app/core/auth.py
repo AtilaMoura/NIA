@@ -7,6 +7,9 @@ from app.database import get_db
 from app.models.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+# Mesma coisa, mas sem 401 automático quando não vem token — pra rotas de leitura
+# que funcionam deslogado e só mudam o que mostram quando há login (2026-10-06).
+oauth2_scheme_opcional = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
@@ -15,6 +18,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
         if user_id is None:
             raise HTTPException(status_code=401, detail="Token inválido.")
+        # Token de escopo curto (o do <iframe>, que fica visível na URL) NÃO vale
+        # como sessão — só nos endpoints do próprio escopo (2026-10-06).
+        if payload.get("scope") is not None:
+            raise HTTPException(status_code=401, detail="Token não é de sessão.")
 
         user = db.query(User).filter(User.id == int(user_id)).first()
 
@@ -112,3 +119,31 @@ def get_topico_anotacao_user_id(
     if user_id is None:
         raise HTTPException(status_code=401, detail="Token inválido.")
     return int(user_id)
+
+
+def usuario_do_token(db: Session, token: str | None, aceita_escopo_curto: bool = False) -> User | None:
+    """Usuário dono do token, ou None se não veio token / token inválido — nunca
+    levanta erro (é pra rota que funciona deslogada). Por padrão só aceita token
+    de SESSÃO; `aceita_escopo_curto=True` aceita também o token do <iframe>
+    (topico_respostas/avaliacao_respostas), usado pelos /render — o iframe não
+    tem o token de sessão, só o curto que veio na própria URL."""
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError:
+        return None
+    if payload.get("scope") is not None and not aceita_escopo_curto:
+        return None
+    user_id = payload.get("sub")
+    if user_id is None:
+        return None
+    return db.query(User).filter(User.id == int(user_id)).first()
+
+
+def get_usuario_opcional(
+    token: str | None = Depends(oauth2_scheme_opcional), db: Session = Depends(get_db)
+) -> User | None:
+    """Dependência pras rotas de leitura (cursos, módulos, aulas, tópicos): sem
+    login devolve None e a rota mostra só o que é público."""
+    return usuario_do_token(db, token)

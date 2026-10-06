@@ -65,10 +65,10 @@ export async function montarArvore(
   token?: string | null,
 ): Promise<ArvoreCurso> {
   const [curso, modules, lessons, topicos, progresso, progressModulos] = await Promise.all([
-    getCourse(courseId),
-    listModules(),
-    listLessons(),
-    listTopicos(),
+    getCourse(courseId, token),
+    listModules(token),
+    listLessons(token),
+    listTopicos(undefined, token),
     listTopicoProgress(userId, token),
     listProgress().catch(() => []),
   ]);

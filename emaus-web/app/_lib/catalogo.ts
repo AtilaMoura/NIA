@@ -205,12 +205,6 @@ export function caminhoCapa(slug: string): string {
   return `/capas/${slug}.jpg`;
 }
 
-/** Estudo pessoal do Master (Inglês, Engenharia LLM, Redes…) — nunca aparece pra
- * aluno: fica fora da vitrine e da /inicio, e o acesso direto dá 404 (2026-09-27). */
-export function cursoPessoal(courseId: number): boolean {
-  return CATALOGO.some((c) => c.courseId === courseId && c.categoria === "Estudos pessoais");
-}
-
 // Título curto pra quando o completo não cabe (cartões, frases).
 const TITULO_CURTO: Record<string, string> = {
   "formacao-novo-obreiro": "Formação do Obreiro I",

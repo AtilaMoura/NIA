@@ -13,6 +13,7 @@ from app.database import get_db
 from app.services.tempo_estudo import registrar_sinal
 from app.models.models import Topico, TopicoProgress, User
 from app.core.auth import get_current_user, get_topico_resposta_user_id
+from app.services import acesso_service
 from app.schemas.topico_progress import (
     ResultadoAvaliacaoOut,
     TempoEstudoOut,
@@ -57,6 +58,7 @@ def upsert_topico_progress(
         raise HTTPException(403, "Só é possível marcar progresso da própria conta.")
     if not db.query(Topico).filter(Topico.id == topico_id).first():
         raise HTTPException(404, "Tópico not found")
+    acesso_service.exigir_estudo_topico(db, current_user, topico_id)
 
     def _buscar_registro():
         return (

@@ -5,9 +5,10 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.models import Avaliacao, Topico, Lesson, User
+from app.models.models import Avaliacao, Topico, Lesson, Module, User
 from app.renderer.render import render_topico, carregar_temas
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, get_usuario_opcional, usuario_do_token
+from app.services import acesso_service
 
 router = APIRouter(prefix="/topicos", tags=["Topicos"])
 
@@ -45,8 +46,19 @@ def _com_avaliacao_id(topicos: list[Topico], db: Session) -> list[Topico]:
 
 
 @router.get("/")
-def list_topicos(lesson_id: int | None = Query(None), db: Session = Depends(get_db)):
-    query = db.query(Topico)
+def list_topicos(
+    lesson_id: int | None = Query(None),
+    db: Session = Depends(get_db),
+    user: User | None = Depends(get_usuario_opcional),
+):
+    # (2026-10-06) só dos cursos que este usuário pode estudar (acesso_service)
+    ids = acesso_service.ids_cursos_estudaveis(db, user)
+    query = (
+        db.query(Topico)
+        .join(Lesson, Lesson.id == Topico.lesson_id)
+        .join(Module, Module.id == Lesson.module_id)
+        .filter(Module.course_id.in_(ids))
+    )
     if lesson_id is not None:
         query = query.filter(Topico.lesson_id == lesson_id)
     topicos = query.order_by(Topico.lesson_id, Topico.topico_index).all()
@@ -66,10 +78,11 @@ def create_topico(data: dict, db: Session = Depends(get_db), current_user: User 
 
 
 @router.get("/{topico_id}")
-def get_topico(topico_id: int, db: Session = Depends(get_db)):
+def get_topico(topico_id: int, db: Session = Depends(get_db), user: User | None = Depends(get_usuario_opcional)):
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
     if not topico:
         raise HTTPException(404, "Tópico not found")
+    acesso_service.exigir_estudo_topico(db, user, topico_id)
     return _com_avaliacao_id([topico], db)[0]
 
 
@@ -103,6 +116,7 @@ def render_topico_endpoint(
     topico_id: int,
     theme: str | None = Query(None, description="id do tema (ver docs/schema/temas.json); se omitido, usa a preferência do usuário ou o padrão"),
     user_id: int | None = Query(None, description="se informado, usa User.preferred_theme como fallback quando 'theme' não for passado"),
+    token: str | None = Query(None, description="token de escopo curto do iframe (ou de sessão) — exigido em curso privado/não publicado"),
     db: Session = Depends(get_db),
 ):
     """Mesma lógica de GET /lessons/{id}/render (Fase 4), um nível abaixo: o JSON
@@ -110,6 +124,8 @@ def render_topico_endpoint(
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
     if not topico:
         raise HTTPException(404, "Tópico not found")
+    # O iframe não tem a sessão — quem ele é vem do token curto da própria URL
+    acesso_service.exigir_estudo_topico(db, usuario_do_token(db, token, aceita_escopo_curto=True), topico_id)
     if not topico.content:
         raise HTTPException(409, "Este tópico ainda não tem conteúdo gerado.")
 

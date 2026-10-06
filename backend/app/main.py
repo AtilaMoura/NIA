@@ -20,6 +20,7 @@ from app.routers import governanca
 from app.routers import pessoas
 from app.routers import estudo
 from app.routers import caderno
+from app.routers import matriculas
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
@@ -71,6 +72,14 @@ def _ensure_colunas_extras(bind):
         # slide a cada minuto; esta coluna guarda o último pra não somar repetido.
         "ALTER TABLE topico_progress ADD COLUMN IF NOT EXISTS ultimo_sinal_em TIMESTAMPTZ",
         "ALTER TABLE avaliacao_progress ADD COLUMN IF NOT EXISTS ultimo_sinal_em TIMESTAMPTZ",
+        # Estudos privados por pessoa (2026-10-06): visibilidade do curso. A tabela
+        # `matriculas` é nova, o create_all cria.
+        "ALTER TABLE courses ADD COLUMN IF NOT EXISTS visibilidade VARCHAR(20) NOT NULL DEFAULT 'publico'",
+        "DO $$ BEGIN "
+        "IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'valid_visibilidade') THEN "
+        "ALTER TABLE courses ADD CONSTRAINT valid_visibilidade "
+        "CHECK (visibilidade IN ('publico', 'privado')); "
+        "END IF; END $$;",
     ]
     with bind.begin() as conn:
         for s in stmts:
@@ -148,6 +157,7 @@ def create_app():
     app.include_router(revisao.router)
     app.include_router(governanca.router)
     app.include_router(pessoas.router)
+    app.include_router(matriculas.router)
     app.include_router(estudo.router)
     app.include_router(caderno.router)
     app.include_router(pipeline.router)

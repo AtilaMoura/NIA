@@ -17,8 +17,5 @@ export const INFO_PAPEL: Record<Papel, { rotulo: string; tom: "info" | "aviso" |
   aluno: { rotulo: "Aluno", tom: "neutro" },
 };
 
-// Estudos pessoais (página /estudos e cursos da categoria "Estudos pessoais") são
-// só do Master — nem admin/professor veem.
-export function papelVeEstudosPessoais(papel: Papel | null | undefined): boolean {
-  return papel === "master";
-}
+// Estudos privados (página /estudos): quem vê é o BACKEND que decide (2026-10-06) —
+// o Master e quem ele liberou em Pessoas. Não existe mais regra de papel aqui.

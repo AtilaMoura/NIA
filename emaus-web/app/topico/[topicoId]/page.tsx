@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { AcoesTopico } from "./topico-ui";
-import { THEME_TOPICO, TEMA_POR_CURSO, TEOLOGIA_COURSE_IDS } from "../../_lib/config";
+import { THEME_TOPICO, TEMA_POR_CURSO } from "../../_lib/config";
 import { getSessao, getToken } from "../../_lib/sessao";
-import { papelPodeRevisar, papelVeEstudosPessoais } from "../../_lib/papel";
-import { CATALOGO, cursoPessoal, tituloCurto } from "../../_lib/catalogo";
+import { papelPodeRevisar } from "../../_lib/papel";
+import { CATALOGO, tituloCurto } from "../../_lib/catalogo";
 import { TelaAviso } from "../../_ui/TelaAviso";
 import { preferenciasDosSlides } from "../../_lib/preferencias-slides";
-import { topicoDeEstudoPessoal } from "../../_lib/meus-cursos";
 import {
-  getCourse,
   getTopico,
   getTopicoToken,
   listLessons,
@@ -20,20 +18,15 @@ import {
   type StatusTopico,
 } from "../../_lib/api";
 
-const CURSO_ID_FALLBACK = TEOLOGIA_COURSE_IDS[0];
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ topicoId: string }>;
 }): Promise<Metadata> {
   const { topicoId } = await params;
-  const topico = await getTopico(Number(topicoId)).catch(() => null);
-  // Não vazar o título de um estudo pessoal na aba de quem não é Master
-  if (topico && (await topicoDeEstudoPessoal(topico.lesson_id))) {
-    const sessao = await getSessao();
-    if (!papelVeEstudosPessoais(sessao?.role)) return { title: "Página não encontrada" };
-  }
+  // Sem acesso, o backend responde 404/403 — nem o título vaza na aba
+  const topico = await getTopico(Number(topicoId), await getToken()).catch(() => null);
+  if (!topico) return { title: "Página não encontrada" };
   return { title: topico?.titulo ?? "Tópico" };
 }
 
@@ -53,17 +46,32 @@ export default async function TopicoPage({
 
   const sessao = await getSessao();
   if (!sessao) redirect(`/entrar?next=/topico/${topicoId}`);
-
-  const topico = await getTopico(topicoId).catch(() => null);
-  if (!topico) notFound();
-
-  const emPreparacao = !topico.content || !topico.is_approved;
   const tokenSessao = await getToken();
 
+  // Quem pode abrir é o backend que decide (2026-10-06): 404 = sem acesso (ou não
+  // existe), 403 = curso ainda não publicado.
+  const topico = await getTopico(topicoId, tokenSessao).catch((e: Error) =>
+    e.message.startsWith("NIA 403") ? ("nao_publicado" as const) : null,
+  );
+  if (!topico) notFound();
+  if (topico === "nao_publicado") {
+    return (
+      <TelaAviso
+        voltarHref="/inicio"
+        voltarRotulo="Voltar ao início"
+        icone="🌱"
+        titulo="Este curso ainda está em preparação"
+        texto="Ele ainda não foi publicado. Volte em breve — enquanto isso, veja os cursos que já estão abertos."
+        acao={{ href: "/inicio", rotulo: "Ver os cursos abertos" }}
+      />
+    );
+  }
+
+  const emPreparacao = !topico.content || !topico.is_approved;
   const [lessons, modules, irmaos, progresso] = await Promise.all([
-    listLessons(),
-    listModules(),
-    listTopicos(topico.lesson_id),
+    listLessons(tokenSessao),
+    listModules(tokenSessao),
+    listTopicos(topico.lesson_id, tokenSessao),
     listTopicoProgress(sessao.id, tokenSessao),
   ]);
 
@@ -78,25 +86,10 @@ export default async function TopicoPage({
 
   const aula = lessons.find((l) => l.id === topico.lesson_id) ?? null;
   const modulo = aula ? modules.find((m) => m.id === aula.module_id) ?? null : null;
-  const CURSO_ID = modulo?.course_id ?? CURSO_ID_FALLBACK;
+  if (!modulo) notFound();
+  const CURSO_ID = modulo.course_id;
   const tema = TEMA_POR_CURSO[CURSO_ID] ?? THEME_TOPICO;
-  // Estudo pessoal do Master: pra qualquer outro, é como se não existisse
-  if (cursoPessoal(CURSO_ID) && !papelVeEstudosPessoais(sessao.role)) notFound();
 
-  // Curso não publicado: só quem revisa passa (o aluno vê "em preparação").
-  const curso = await getCourse(CURSO_ID).catch(() => null);
-  if (curso && curso.status !== "published" && !papelPodeRevisar(sessao.role)) {
-    return (
-      <TelaAviso
-        voltarHref="/inicio"
-        voltarRotulo="Voltar ao início"
-        icone="🌱"
-        titulo="Este curso ainda está em preparação"
-        texto="Ele ainda não foi publicado. Volte em breve — enquanto isso, veja os cursos que já estão abertos."
-        acao={{ href: "/inicio", rotulo: "Ver os cursos abertos" }}
-      />
-    );
-  }
   const ordenados = [...irmaos].sort((a, b) => a.topico_index - b.topico_index);
   const posicao = ordenados.findIndex((t) => t.id === topico.id);
   const proximo = ordenados

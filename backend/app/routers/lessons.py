@@ -5,9 +5,10 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models.models import Lesson, User
+from app.models.models import Lesson, Module, User
 from app.renderer.render import render_topico, carregar_temas
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, get_usuario_opcional, usuario_do_token
+from app.services import acesso_service
 
 router = APIRouter(prefix="/lessons", tags=["Lessons"])
 
@@ -24,8 +25,10 @@ def _exigir_admin(user: User):
 # filtrando por module_id/curso do lado do cliente — mesmo padrão sem filtro já
 # usado em list_modules/list_progress)
 @router.get("/")
-def list_lessons(db: Session = Depends(get_db)):
-    return db.query(Lesson).all()
+def list_lessons(db: Session = Depends(get_db), user: User | None = Depends(get_usuario_opcional)):
+    # (2026-10-06) só dos cursos que este usuário pode estudar
+    ids = acesso_service.ids_cursos_estudaveis(db, user)
+    return db.query(Lesson).join(Module, Module.id == Lesson.module_id).filter(Module.course_id.in_(ids)).all()
 
 
 # Criar lição (content é o JSON estruturado — ver docs/schema/ — guardado como texto)
@@ -42,10 +45,11 @@ def create_lesson(data: dict, db: Session = Depends(get_db), current_user: User 
 
 
 @router.get("/{lesson_id}")
-def get_lesson(lesson_id: int, db: Session = Depends(get_db)):
+def get_lesson(lesson_id: int, db: Session = Depends(get_db), user: User | None = Depends(get_usuario_opcional)):
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:
         raise HTTPException(404, "Lesson not found")
+    acesso_service.exigir_estudo_aula(db, user, lesson_id)
     return lesson
 
 
@@ -54,6 +58,7 @@ def render_lesson(
     lesson_id: int,
     theme: str | None = Query(None, description="id do tema (ver docs/schema/temas.json); se omitido, usa a preferência do usuário ou o padrão"),
     user_id: int | None = Query(None, description="se informado, usa User.preferred_theme como fallback quando 'theme' não for passado"),
+    token: str | None = Query(None, description="token de sessão ou de escopo curto — exigido em curso privado/não publicado"),
     db: Session = Depends(get_db),
 ):
     """
@@ -64,6 +69,7 @@ def render_lesson(
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:
         raise HTTPException(404, "Lesson not found")
+    acesso_service.exigir_estudo_aula(db, usuario_do_token(db, token, aceita_escopo_curto=True), lesson_id)
 
     theme_id = theme
     if not theme_id and user_id:

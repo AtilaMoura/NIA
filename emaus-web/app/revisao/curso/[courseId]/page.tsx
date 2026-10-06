@@ -14,7 +14,7 @@ export async function generateMetadata({
   params: Promise<{ courseId: string }>;
 }): Promise<Metadata> {
   const { courseId } = await params;
-  const curso = await getCourse(Number(courseId)).catch(() => null);
+  const curso = await getCourse(Number(courseId), await getToken()).catch(() => null);
   return { title: curso ? `Governança: ${curso.title}` : "Governança do curso" };
 }
 
@@ -31,10 +31,10 @@ export default async function GovernancaCursoPage({
   if (!sessao) redirect(`/entrar?next=/revisao/curso/${courseId}`);
   if (!papelPodeRevisar(sessao.role)) redirect("/inicio");
 
-  const curso = await getCourse(courseId).catch(() => null);
+  const token = await getToken();
+  const curso = await getCourse(courseId, token).catch(() => null);
   if (!curso) notFound();
 
-  const token = await getToken();
   const governanca = await getGovernancaCurso(courseId, token);
   if (!governanca) notFound();
 

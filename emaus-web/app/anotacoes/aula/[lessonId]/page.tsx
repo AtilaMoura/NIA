@@ -5,8 +5,6 @@ import { CabecalhoApp } from "../../../_ui/CabecalhoApp";
 import { Rodape } from "../../../_ui/Rodape";
 import { getCaderno, getUser, listLessons, listModules } from "../../../_lib/api";
 import { getSessao, getToken } from "../../../_lib/sessao";
-import { cursoPessoal } from "../../../_lib/catalogo";
-import { papelVeEstudosPessoais } from "../../../_lib/papel";
 import { TEMA_POR_CURSO, THEME_TOPICO } from "../../../_lib/config";
 import { Caderno } from "./caderno-ui";
 import { Caveat, IBM_Plex_Mono } from "next/font/google";
@@ -29,12 +27,11 @@ export default async function CadernoPage({ params }: { params: Promise<{ lesson
   if (!sessao) redirect(`/entrar?next=/anotacoes/aula/${lessonId}`);
   const token = await getToken();
 
-  // Curso da aula (pro tema e pra esconder estudo pessoal de quem não é Master)
-  const [aulas, modulos] = await Promise.all([listLessons(), listModules()]);
+  // Curso da aula (pro tema). Aula de curso sem acesso nem vem do backend → 404
+  const [aulas, modulos] = await Promise.all([listLessons(token), listModules(token)]);
   const aula = aulas.find((l) => l.id === lessonId);
   const modulo = aula ? modulos.find((m) => m.id === aula.module_id) : undefined;
   if (!modulo) notFound();
-  if (cursoPessoal(modulo.course_id) && !papelVeEstudosPessoais(sessao.role)) notFound();
 
   const tema = TEMA_POR_CURSO[modulo.course_id] ?? THEME_TOPICO;
   const [usuario, estado] = await Promise.all([

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 import type { Papel } from "../_lib/papel";
-import { navPrincipal } from "../_lib/nav";
+import { LinksRodape } from "./LinksRodape";
 
 // Rodapé único, numa linha só (2026-09-28, protótipo 10-pessoas.html): logo +
 // assinatura à esquerda, links à direita. Logado mostra os links da barra
@@ -13,12 +13,10 @@ export function Rodape({
   papel?: Papel | null;
   logado?: boolean;
 } = {}) {
-  const itens = logado
-    ? navPrincipal(papel).map((i) => ({ href: i.href, rotulo: i.rotulo }))
-    : [
-        { href: "/entrar", rotulo: "Entrar" },
-        { href: "/criar-conta", rotulo: "Criar conta" },
-      ];
+  const itensVisitante = [
+    { href: "/entrar", rotulo: "Entrar" },
+    { href: "/criar-conta", rotulo: "Criar conta" },
+  ];
 
   // Visitante sem margem no topo: a página já termina numa faixa de fechamento
   return (
@@ -29,11 +27,15 @@ export function Rodape({
           <span className="text-[.78rem] text-[var(--tm-ink-muted)]">· plataforma de formação bíblica</span>
         </div>
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[.85rem] text-[var(--tm-ink-muted)]">
-          {itens.map((i) => (
-            <Link key={i.href} href={i.href} className="hover:text-[var(--tm-accent)]">
-              {i.rotulo}
-            </Link>
-          ))}
+          {logado ? (
+            <LinksRodape papel={papel} />
+          ) : (
+            itensVisitante.map((i) => (
+              <Link key={i.href} href={i.href} className="hover:text-[var(--tm-accent)]">
+                {i.rotulo}
+              </Link>
+            ))
+          )}
         </nav>
       </div>
     </footer>

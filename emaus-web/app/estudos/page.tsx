@@ -5,32 +5,30 @@ import { notFound, redirect } from "next/navigation";
 import { CabecalhoApp } from "../_ui/CabecalhoApp";
 import { Rodape } from "../_ui/Rodape";
 import { CapaCurso } from "../_ui/CapaCurso";
-import { getUser, resumoEstudo, type ResumoCursoEstudo, type ResumoEstudo } from "../_lib/api";
+import { getUser, meusEstudos, resumoEstudo, type ResumoCursoEstudo, type ResumoEstudo } from "../_lib/api";
 import { getSessao, getToken } from "../_lib/sessao";
-import { papelVeEstudosPessoais } from "../_lib/papel";
-import { meusCursos, type MeuCurso } from "../_lib/meus-cursos";
+import { cursosDosEstudos, type MeuCurso } from "../_lib/meus-cursos";
 import { duracao, quando } from "../_lib/pessoas";
 
-// Título dinâmico: pra quem não é Master, nem o nome da página aparece na aba
-export async function generateMetadata(): Promise<Metadata> {
-  const sessao = await getSessao();
-  return { title: papelVeEstudosPessoais(sessao?.role) ? "Estudos pessoais" : "Página não encontrada" };
-}
+export const metadata: Metadata = { title: "Meus estudos" };
 
-// Estudos pessoais do Master (redesign 2026-10-04, protótipo 11-estudos.html):
-// painel de quem está aprendendo — continuar no slide exato, a semana (tempo por
-// dia, sequência, concluídos, reforço) e um cartão por estudo com próximo tópico,
-// tempo e anotações. Tempo por dia só existe a partir de 2026-10-04.
+// Meus estudos (redesign 2026-10-04, protótipo 11-estudos.html): painel de quem
+// está aprendendo — continuar no slide exato, a semana (tempo por dia, sequência,
+// concluídos, reforço) e um cartão por estudo com próximo tópico, tempo e
+// anotações. Tempo por dia só existe a partir de 2026-10-04.
+// Desde 2026-10-06 vale pra qualquer pessoa: a lista de estudos vem do backend
+// (o Master vê todos; os outros, só os que ele liberou). Sem nenhum, 404.
 export default async function EstudosPage() {
   const sessao = await getSessao();
   if (!sessao) redirect("/entrar?next=/estudos");
-  // Pra quem não é Master, a página não existe
-  if (!papelVeEstudosPessoais(sessao.role)) notFound();
   const token = await getToken();
+
+  const estudos = await meusEstudos(token).catch(() => []);
+  if (estudos.length === 0) notFound();
 
   const [usuario, cursos, resumo] = await Promise.all([
     getUser(sessao.id, token).catch(() => null),
-    meusCursos("Estudos pessoais", sessao, token),
+    cursosDosEstudos(estudos, sessao, token),
     resumoEstudo(token).catch((): ResumoEstudo | null => null),
   ]);
   const abertos = cursos.filter((c) => c.aberto);
@@ -54,8 +52,10 @@ export default async function EstudosPage() {
       <main className="mx-auto flex w-full max-w-[1100px] flex-col gap-[clamp(1.5rem,4vw,2.25rem)] px-[clamp(1rem,4vw,2rem)] pb-14 pt-[clamp(1.25rem,4vw,2.25rem)]">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="m-0 text-[clamp(1.5rem,4vw,1.9rem)]">Estudos pessoais</h1>
-            <p className="m-0 mt-1 text-[var(--tm-ink-muted)]">Só você vê esta página.</p>
+            <h1 className="m-0 text-[clamp(1.5rem,4vw,1.9rem)]">Meus estudos</h1>
+            <p className="m-0 mt-1 text-[var(--tm-ink-muted)]">
+              {sessao.role === "master" ? "Você controla quem vê cada estudo em Pessoas." : "Estudos liberados só pra você."}
+            </p>
           </div>
           <Link
             href="/anotacoes"
@@ -93,7 +93,7 @@ export default async function EstudosPage() {
         <section>
           <h2 className="m-0 mb-3 text-[1.15rem]">Seus estudos</h2>
           <div className="grid gap-4 min-[640px]:grid-cols-2 min-[1000px]:grid-cols-3">
-            {abertos.map((c) => (
+            {cursos.map((c) => (
               <CartaoEstudo key={c.catalogo.slug} curso={c} resumo={doCurso(c)} />
             ))}
           </div>
@@ -190,6 +190,12 @@ function CartaoEstudo({ curso, resumo }: { curso: MeuCurso; resumo: ResumoCursoE
           <span>{duracao(resumo?.tempo_s ?? 0)}</span>
         </p>
         <Barra percent={curso.percent} />
+        {/* Só o Master recebe esta lista do backend */}
+        {curso.liberadoPara.length > 0 && (
+          <p className="m-0 text-[.78rem] text-[var(--tm-ink-muted)]">
+            Liberado também para: {curso.liberadoPara.map((p) => p.name ?? `#${p.id}`).join(", ")}
+          </p>
+        )}
         {proximo && (
           <p className="m-0 rounded-[var(--tm-radius)] bg-[var(--tm-surface-2)] px-3 py-2 text-[.88rem]">
             <small className="block text-[.72rem] text-[var(--tm-ink-muted)]">Próximo</small>

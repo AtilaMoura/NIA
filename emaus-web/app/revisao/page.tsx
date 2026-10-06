@@ -6,19 +6,25 @@ import { Chip } from "../_ui/Chip";
 import { Rodape } from "../_ui/Rodape";
 import { TEOLOGIA_COURSE_IDS } from "../_lib/config";
 import { CATALOGO } from "../_lib/catalogo";
+import { listCourses } from "../_lib/api";
 import { getSessao, getToken } from "../_lib/sessao";
 import { papelPodeRevisar } from "../_lib/papel";
 import { montarFilaRevisao, type StatusRevisao } from "../_lib/revisao";
 
-const CURSO_ID_PADRAO = TEOLOGIA_COURSE_IDS[0];
-
-// Cursos navegáveis na fila de revisão — mesma lista de `TEOLOGIA_COURSE_IDS`, com
-// título pra mostrar no seletor (achado pelo catálogo, que já tem os títulos certos).
-function cursosDisponiveis() {
-  return (TEOLOGIA_COURSE_IDS as readonly number[]).map((id) => ({
-    id,
-    titulo: CATALOGO.find((c) => c.courseId === id)?.titulo ?? `Curso ${id}`,
-  }));
+// Cursos navegáveis na fila de revisão: os que o BACKEND devolve pra esta pessoa
+// (estudo privado só pro Master — 2026-10-06), dentro do escopo do Emaús
+// (`TEOLOGIA_COURSE_IDS` + estudos privados novos). Título pelo catálogo, que já
+// tem os nomes certos.
+async function cursosDisponiveis(token: string | null) {
+  const doBackend = await listCourses(token).catch(() => []);
+  const ordem = (id: number) => {
+    const i = (TEOLOGIA_COURSE_IDS as readonly number[]).indexOf(id);
+    return i === -1 ? 1000 + id : i;
+  };
+  return doBackend
+    .filter((c) => (TEOLOGIA_COURSE_IDS as readonly number[]).includes(c.id) || c.visibilidade === "privado")
+    .sort((a, b) => ordem(a.id) - ordem(b.id))
+    .map((c) => ({ id: c.id, titulo: CATALOGO.find((k) => k.courseId === c.id)?.titulo ?? c.title }));
 }
 
 export const metadata: Metadata = { title: "Área de revisão" };
@@ -39,13 +45,13 @@ export default async function RevisaoPage({
   if (!papelPodeRevisar(sessao.role)) redirect("/inicio");
 
   const { curso: cursoParam } = await searchParams;
-  const cursos = cursosDisponiveis();
+  const token = await getToken();
+  const cursos = await cursosDisponiveis(token);
   const CURSO_ID =
     Number(cursoParam) && cursos.some((c) => c.id === Number(cursoParam))
       ? Number(cursoParam)
-      : CURSO_ID_PADRAO;
+      : cursos[0]?.id ?? TEOLOGIA_COURSE_IDS[0];
 
-  const token = await getToken();
   const { curso, topicos } = await montarFilaRevisao(CURSO_ID, token);
 
   const porAula: { aula: string; modulo: string; topicos: typeof topicos }[] = [];

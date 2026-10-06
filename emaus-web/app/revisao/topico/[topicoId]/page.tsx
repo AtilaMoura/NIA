@@ -7,6 +7,7 @@ import { getSessao, getToken } from "../../../_lib/sessao";
 import { papelPodeRevisar } from "../../../_lib/papel";
 import {
   getTopico,
+  getTopicoToken,
   listLessons,
   listModules,
   listTopicoComments,
@@ -21,7 +22,7 @@ export async function generateMetadata({
   params: Promise<{ topicoId: string }>;
 }): Promise<Metadata> {
   const { topicoId } = await params;
-  const topico = await getTopico(Number(topicoId)).catch(() => null);
+  const topico = await getTopico(Number(topicoId), await getToken()).catch(() => null);
   return { title: topico ? `Revisar: ${topico.titulo}` : "Revisar tópico" };
 }
 
@@ -38,7 +39,8 @@ export default async function RevisaoTopicoPage({
   if (!sessao) redirect(`/entrar?next=/revisao/topico/${topicoId}`);
   if (!papelPodeRevisar(sessao.role)) redirect("/inicio");
 
-  const topico = await getTopico(topicoId).catch(() => null);
+  const token = await getToken();
+  const topico = await getTopico(topicoId, token).catch(() => null);
   if (!topico) notFound();
   if (!topico.content) {
     return (
@@ -51,12 +53,12 @@ export default async function RevisaoTopicoPage({
     );
   }
 
-  const token = await getToken();
-  const [lessons, modules, comentarios, checklists] = await Promise.all([
-    listLessons(),
-    listModules(),
+  const [lessons, modules, comentarios, checklists, leituraToken] = await Promise.all([
+    listLessons(token),
+    listModules(token),
     listTopicoComments(topicoId, token),
     listChecklistsTopico(topicoId, token),
+    token ? getTopicoToken(token, topicoId, true).catch(() => undefined) : undefined,
   ]);
   const aula = lessons.find((l) => l.id === topico.lesson_id) ?? null;
   const modulo = aula ? modules.find((m) => m.id === aula.module_id) ?? null : null;
@@ -82,7 +84,7 @@ export default async function RevisaoTopicoPage({
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <iframe
-          src={topicoRenderUrl(topico.id, { userId: ALUNO_USER_ID, theme: tema, contexto: "revisao" })}
+          src={topicoRenderUrl(topico.id, { userId: ALUNO_USER_ID, theme: tema, contexto: "revisao", leituraToken })}
           title={topico.titulo}
           className="min-h-[45dvh] w-full flex-1 border-0"
           allow="fullscreen"

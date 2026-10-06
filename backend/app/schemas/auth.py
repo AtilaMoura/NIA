@@ -40,6 +40,9 @@ class Token(BaseModel):
 
 class TopicoTokenRequest(BaseModel):
     topico_id: int
+    # True = token que só ABRE o render (revisão, 2026-10-06): não salva resposta,
+    # slide nem tempo — o escopo 'topico_leitura' não é aceito nesses endpoints.
+    somente_leitura: bool = False
 
 
 class AvaliacaoTokenRequest(BaseModel):

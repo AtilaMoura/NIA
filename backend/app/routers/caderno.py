@@ -9,6 +9,7 @@ from app.database import get_db
 from app.models.models import User
 from app.schemas.caderno import CadernoEstado
 from app.services.caderno_service import estado, organizar
+from app.services import acesso_service
 
 router = APIRouter(prefix="/caderno", tags=["Caderno"])
 
@@ -20,6 +21,7 @@ def ver_caderno(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    acesso_service.exigir_estudo_aula(db, current_user, lesson_id)
     return estado(db, current_user.id, lesson_id, tema)
 
 
@@ -30,5 +32,6 @@ async def organizar_caderno(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    acesso_service.exigir_estudo_aula(db, current_user, lesson_id)
     await organizar(db, current_user.id, lesson_id)
     return estado(db, current_user.id, lesson_id, tema)

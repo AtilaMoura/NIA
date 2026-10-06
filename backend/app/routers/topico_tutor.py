@@ -21,7 +21,8 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import get_topico_resposta_user_id
 from app.database import get_db
-from app.models.models import Topico, TopicoDuvida, TopicoReforco
+from app.models.models import Topico, TopicoDuvida, TopicoReforco, User
+from app.services import acesso_service
 from app.schemas.topico_tutor import (
     CorrigirRequest,
     CorrigirResponse,
@@ -76,6 +77,8 @@ async def corrigir_exercicio(
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
     if not topico:
         raise HTTPException(404, "Tópico not found")
+    # Token curto vale 2h — se o Master pausou o acesso nesse meio-tempo, a IA já para aqui
+    acesso_service.exigir_estudo_topico(db, db.get(User, user_id), topico_id)
 
     pergunta = _buscar_pergunta(topico, data.question_id)
     if not pergunta:
@@ -157,6 +160,8 @@ async def tirar_duvida(
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
     if not topico:
         raise HTTPException(404, "Tópico not found")
+    # Token curto vale 2h — se o Master pausou o acesso nesse meio-tempo, a IA já para aqui
+    acesso_service.exigir_estudo_topico(db, db.get(User, user_id), topico_id)
 
     # Chat (2026-09-23): tópico inteiro como referência + slide atual em foco
     # (ver contexto_topico.py pro teto de tamanho).

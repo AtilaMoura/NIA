@@ -4,8 +4,6 @@ import { CabecalhoApp } from "../_ui/CabecalhoApp";
 import { Rodape } from "../_ui/Rodape";
 import { getUser, minhasAnotacoes } from "../_lib/api";
 import { getSessao, getToken } from "../_lib/sessao";
-import { cursoPessoal } from "../_lib/catalogo";
-import { papelVeEstudosPessoais } from "../_lib/papel";
 import { ListaAnotacoes } from "./anotacoes-ui";
 
 export const metadata: Metadata = { title: "Minhas anotações" };
@@ -18,12 +16,11 @@ export default async function AnotacoesPage() {
   if (!sessao) redirect("/entrar?next=/anotacoes");
   const token = await getToken();
 
-  const [usuario, todas] = await Promise.all([
+  // O backend só devolve anotação de curso que a pessoa ainda abre (2026-10-06)
+  const [usuario, anotacoes] = await Promise.all([
     getUser(sessao.id, token).catch(() => null),
     minhasAnotacoes(token).catch(() => []),
   ]);
-  // Estudos pessoais só aparecem pro Master (mesma regra das outras páginas)
-  const anotacoes = papelVeEstudosPessoais(sessao.role) ? todas : todas.filter((a) => !cursoPessoal(a.course_id));
 
   return (
     <>

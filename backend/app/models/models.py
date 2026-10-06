@@ -123,6 +123,11 @@ class Course(Base):
     status = Column(String(50), default='draft')
     is_public = Column(Boolean, default=False)
 
+    # Visibilidade (2026-10-06): 'publico' = aparece pra todos (formação bíblica);
+    # 'privado' = estudo pessoal, só o Master e quem tem Matricula ativa veem.
+    # Quem decide é o backend (services/acesso_service.py) — o front só mostra.
+    visibilidade = Column(String(20), nullable=False, default='publico', server_default='publico')
+
     # Governança de publicação (FASE 5b do front Emaús) — quem precisa aprovar antes de
     # `status` virar 'published'. Ver routers/governanca.py pra regra de cálculo.
     aprovacao_master_basta = Column(Boolean, nullable=False, default=False)
@@ -154,6 +159,7 @@ class Course(Base):
     __table_args__ = (
         CheckConstraint("level IN ('básico', 'intermediário', 'avançado', 'especialista')", name='valid_level'),
         CheckConstraint("status IN ('draft', 'published', 'archived')", name='valid_status'),
+        CheckConstraint("visibilidade IN ('publico', 'privado')", name='valid_visibilidade'),
         CheckConstraint('duration_hours > 0', name='valid_duration'),
         CheckConstraint('ai_quality_score >= 0 AND ai_quality_score <= 10', name='valid_quality_score'),
     )
@@ -1004,3 +1010,36 @@ class CadernoVersao(Base):
 
     def __repr__(self):
         return f"<CadernoVersao(user_id={self.user_id}, lesson_id={self.lesson_id}, versao={self.versao})>"
+
+
+# ------------------------------------------------------------
+# MODEL: MATRICULA (2026-10-06 — Fase A do PLANO_ACESSO_E_PAGAMENTO.md)
+# ------------------------------------------------------------
+# Quem tem acesso a qual curso. Começa pelos estudos privados liberados pelo
+# Master (origem 'master'); escolha do aluno e assinatura usam a mesma tabela
+# depois. 1 linha por (usuário, curso). Nunca apaga: tirar o acesso = status
+# 'pausada' (ou 'cancelada'), liberar de novo = volta pra 'ativa'.
+
+class Matricula(Base):
+    __tablename__ = "matriculas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    course_id = Column(Integer, ForeignKey('courses.id', ondelete='CASCADE'), nullable=False, index=True)
+
+    origem = Column(String(20), nullable=False)                 # escolha | master | assinatura
+    status = Column(String(20), nullable=False, default='ativa')  # ativa | pausada | cancelada
+    liberada_por = Column(Integer, ForeignKey('users.id', ondelete='SET NULL'))  # quem liberou/pausou por último
+    valida_ate = Column(DateTime(timezone=True))                 # só assinatura (NULL = sem prazo)
+
+    criada_em = Column(DateTime(timezone=True), server_default=func.now())
+    atualizada_em = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'course_id', name='uq_matricula_user_course'),
+        CheckConstraint("origem IN ('escolha', 'master', 'assinatura')", name='valid_matricula_origem'),
+        CheckConstraint("status IN ('ativa', 'pausada', 'cancelada')", name='valid_matricula_status'),
+    )
+
+    def __repr__(self):
+        return f"<Matricula(user_id={self.user_id}, course_id={self.course_id}, status={self.status})>"

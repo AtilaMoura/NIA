@@ -22,7 +22,7 @@ export default async function ProgressoPage() {
 
   const [usuario, { cursos, provas, resumo }] = await Promise.all([
     getUser(sessao.id, token).catch(() => null),
-    progressoDoAluno(sessao.id, sessao.role, token),
+    progressoDoAluno(sessao.id, token),
   ]);
 
   const numeros = [

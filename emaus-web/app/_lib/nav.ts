@@ -2,7 +2,7 @@
 // e no rodapé. A barra principal é IGUAL em toda tela e só cresce se o usuário for
 // revisor. A sub-nav da revisão só aparece dentro de /revisao/*.
 
-import { papelPodeRevisar, papelVeEstudosPessoais, type Papel } from "./papel";
+import { papelPodeRevisar, type Papel } from "./papel";
 
 // "icone" é opcional (emoji) — só o menu mobile usa hoje (redesign 2026-09-21, ver
 // PLANO_REDESIGN_EMAUS.md Fase 5); a barra desktop ignora o campo.
@@ -15,7 +15,9 @@ export function hrefMarca(logado: boolean): string {
 
 // Barra principal — mesma ordem sempre. Sem "Cursos" (2026-09-26): logado, "/"
 // redireciona pra /inicio, que já é a vitrine de cursos do aluno.
-export function navPrincipal(papel: Papel | null | undefined): ItemNav[] {
+// `temEstudos` vem do backend (useTemEstudos → /api/estudos): quem tem algum estudo
+// privado liberado (o Master sempre tem os dele) ganha o link "Meus estudos".
+export function navPrincipal(papel: Papel | null | undefined, temEstudos = false): ItemNav[] {
   const base: ItemNav[] = [
     { href: "/inicio", rotulo: "Início", icone: "🏠" },
     { href: "/progresso", rotulo: "Meu progresso", icone: "📈" },
@@ -23,9 +25,9 @@ export function navPrincipal(papel: Papel | null | undefined): ItemNav[] {
   if (papel && papelPodeRevisar(papel)) {
     base.push({ href: "/revisao", rotulo: "Revisão", icone: "🗂️" });
   }
-  // Estudos pessoais do Master saíram da /inicio (2026-09-27) e têm página própria
-  if (papelVeEstudosPessoais(papel)) {
-    base.push({ href: "/estudos", rotulo: "Estudos pessoais", icone: "📓" });
+  // Estudos privados saíram da /inicio (2026-09-27) e têm página própria
+  if (temEstudos) {
+    base.push({ href: "/estudos", rotulo: "Meus estudos", icone: "📓" });
   }
   return base;
 }

@@ -26,6 +26,7 @@ from app.models.models import (
     Progress, RevisaoTopico, Topico, TopicoProgress, TopicoResposta, User,
 )
 from app.core.auth import get_current_user
+from app.services import acesso_service
 from app.agents.pipeline import gerar_estrutura_curso, gerar_e_revisar_topico
 from app.agents.tutor_agent import TutorAgent
 from app.agents.contexto_topico import carregar_content, montar_contexto_duvida
@@ -651,6 +652,7 @@ async def avaliar_resumo_topico(
     topico = db.query(Topico).filter(Topico.id == topico_id).first()
     if not topico:
         raise HTTPException(404, "Tópico não encontrado")
+    acesso_service.exigir_estudo_topico(db, current_user, topico_id)
     if not topico.content or not topico.is_approved:
         raise HTTPException(400, "Este tópico ainda não está disponível para avaliação.")
 
@@ -739,6 +741,7 @@ async def avaliar_resumo_avaliacao(
     avaliacao = db.query(Avaliacao).filter(Avaliacao.id == avaliacao_id).first()
     if not avaliacao:
         raise HTTPException(404, "Avaliação não encontrada")
+    acesso_service.exigir_estudo_avaliacao(db, current_user, avaliacao_id)
     if not avaliacao.conteudo or not avaliacao.is_approved:
         raise HTTPException(400, "Esta avaliação ainda não está disponível para avaliação.")
 

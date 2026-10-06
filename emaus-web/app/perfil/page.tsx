@@ -26,7 +26,7 @@ export default async function PerfilPage() {
 
   const [usuario, { cursos, resumo }] = await Promise.all([
     getUser(sessao.id, token).catch(() => null),
-    progressoDoAluno(sessao.id, sessao.role, token),
+    progressoDoAluno(sessao.id, token),
   ]);
   const nome = usuario?.name ?? "Aluno";
   const criadoEm = typeof usuario?.created_at === "string" ? new Date(usuario.created_at) : null;

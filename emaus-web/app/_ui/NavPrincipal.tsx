@@ -9,6 +9,7 @@ import {
   itemAtivo,
   navPrincipal,
 } from "../_lib/nav";
+import { useTemEstudos } from "./useTemEstudos";
 
 // Barra de navegação do desktop. Idêntica em toda tela; só ganha "Revisão" se o
 // usuário for revisor. Dentro de /revisao/* aparece uma 2ª linha com a sub-nav.
@@ -20,7 +21,8 @@ export function NavPrincipal({
   logado: boolean;
 }) {
   const pathname = usePathname();
-  const itens = logado ? navPrincipal(papel) : NAV_DESLOGADO;
+  const temEstudos = useTemEstudos(logado);
+  const itens = logado ? navPrincipal(papel, temEstudos) : NAV_DESLOGADO;
   const naRevisao = pathname.startsWith("/revisao");
 
   return (

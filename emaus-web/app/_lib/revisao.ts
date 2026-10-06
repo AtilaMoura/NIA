@@ -24,10 +24,10 @@ export type FilaRevisao = {
 
 export async function montarFilaRevisao(courseId: number, token: string | null): Promise<FilaRevisao> {
   const [curso, modules, lessons, topicos, comentarios] = await Promise.all([
-    getCourse(courseId),
-    listModules(),
-    listLessons(),
-    listTopicos(),
+    getCourse(courseId, token),
+    listModules(token),
+    listLessons(token),
+    listTopicos(undefined, token),
     listTopicoComments(undefined, token),
   ]);
 

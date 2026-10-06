@@ -12,6 +12,8 @@ export type Course = {
   duration_hours: number;
   ai_quality_score: number | null;
   cover_image_url: string | null;
+  /** 'privado' = estudo pessoal; o backend só devolve se a pessoa pode ver (2026-10-06) */
+  visibilidade: "publico" | "privado";
 };
 
 export type Module = {
@@ -224,29 +226,32 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 // ---- Catálogo / conteúdo ----
-export function listCourses() {
-  return fetchJson<Course[]>("/courses/");
+// Leitura com o token da sessão (2026-10-06): quem decide o que cada pessoa vê é o
+// backend (curso privado só pro Master e pra quem ele liberou; curso não publicado
+// só pra quem revisa). Sem token, o backend devolve só o que é público.
+export function listCourses(token?: string | null) {
+  return fetchJson<Course[]>("/courses/", comAuth(token));
 }
 
-export function getCourse(id: number) {
-  return fetchJson<Course>(`/courses/${id}`);
+export function getCourse(id: number, token?: string | null) {
+  return fetchJson<Course>(`/courses/${id}`, comAuth(token));
 }
 
-export function listModules() {
-  return fetchJson<Module[]>("/modules/");
+export function listModules(token?: string | null) {
+  return fetchJson<Module[]>("/modules/", comAuth(token));
 }
 
-export function listLessons() {
-  return fetchJson<Lesson[]>("/lessons/");
+export function listLessons(token?: string | null) {
+  return fetchJson<Lesson[]>("/lessons/", comAuth(token));
 }
 
-export function listTopicos(lessonId?: number) {
+export function listTopicos(lessonId?: number, token?: string | null) {
   const q = lessonId != null ? `?lesson_id=${lessonId}` : "";
-  return fetchJson<Topico[]>(`/topicos/${q}`);
+  return fetchJson<Topico[]>(`/topicos/${q}`, comAuth(token));
 }
 
-export function getTopico(id: number) {
-  return fetchJson<Topico>(`/topicos/${id}`);
+export function getTopico(id: number, token?: string | null) {
+  return fetchJson<Topico>(`/topicos/${id}`, comAuth(token));
 }
 
 export function topicoRenderUrl(
@@ -257,6 +262,7 @@ export function topicoRenderUrl(
     contexto?: "revisao";
     pdf?: boolean;
     respostasToken?: string;
+    leituraToken?: string;
     avaliacaoInicial?: AvaliacaoTutor | null;
     concluido?: boolean;
     temProximo?: boolean;
@@ -283,6 +289,9 @@ export function topicoRenderUrl(
   // Token de escopo curto (getTopicoToken) — sem ele o render não salva resposta
   // de exercício nenhuma (fica só no estado da página, como sempre foi).
   if (opts.respostasToken) params.set("token", opts.respostasToken);
+  // Token que só abre o render (revisão) — o backend exige token em curso privado
+  // ou não publicado, mas este não deixa salvar nada (2026-10-06)
+  else if (opts.leituraToken) params.set("token", opts.leituraToken);
   // Avisa o render que este Tópico tem Prova separada (2026-09-22) — o slide
   // "Resultado" usa isso pra oferecer o botão "Fazer a prova" quando o aluno
   // domina o conteúdo, além de "Próximo tópico".
@@ -350,11 +359,11 @@ export function getUser(id: number, token: string | null | undefined) {
 // pro <iframe> do render — 2026-09-09. Chamado só server-side, com o token de
 // sessão de verdade (getToken() em _lib/sessao.ts, nunca vai pro cliente). O
 // token curto devolvido aqui é o único que entra na URL do iframe.
-export async function getTopicoToken(token: string, topicoId: number) {
+export async function getTopicoToken(token: string, topicoId: number, somenteLeitura = false) {
   const { access_token } = await fetchJson<{ access_token: string }>("/auth/topico-token", {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ topico_id: topicoId }),
+    body: JSON.stringify({ topico_id: topicoId, somente_leitura: somenteLeitura }),
   });
   return access_token;
 }
@@ -555,6 +564,11 @@ export function despublicarCurso(courseId: number) {
   return chamarMesmaOrigem<GovernancaCurso>("/api/revisao/curso-publicar", "PUT", { courseId });
 }
 
+// Liberar / pausar um estudo privado pra uma pessoa (só Master — o backend confere).
+export function mudarLiberacaoEstudo(userId: number, courseId: number, status: "ativa" | "pausada") {
+  return chamarMesmaOrigem<LiberacaoEstudo>("/api/revisao/liberacao", "PUT", { userId, courseId, status });
+}
+
 // ---- Pessoas (só Master, 2026-09-28) ----
 
 export type PessoaResumo = {
@@ -645,6 +659,39 @@ export function minhasAnotacoes(token: string | null | undefined) {
 
 export function resumoEstudo(token: string | null | undefined) {
   return fetchJson<ResumoEstudo>("/estudo/resumo", { headers: { Authorization: `Bearer ${token ?? ""}` } });
+}
+
+// ---- Estudos privados por pessoa (2026-10-06) ----
+// O backend devolve só os estudos que esta pessoa abre (Master: todos, com quem
+// mais tem cada um liberado). O front não filtra nada.
+
+export type PessoaCurta = { id: number; name: string | null };
+
+export type EstudoMeu = {
+  course_id: number;
+  titulo: string;
+  descricao: string | null;
+  cover_image_url: string | null;
+  liberado_para: PessoaCurta[];
+};
+
+export function meusEstudos(token: string | null | undefined) {
+  if (!token) return Promise.resolve<EstudoMeu[]>([]);
+  return fetchJson<EstudoMeu[]>("/estudo/meus-estudos", comAuth(token));
+}
+
+export type LiberacaoEstudo = {
+  course_id: number;
+  titulo: string;
+  /** null = nunca liberado pra esta pessoa */
+  status: "ativa" | "pausada" | "cancelada" | null;
+  atualizada_em: string | null;
+};
+
+// Só o Master — o backend confere (403 pros outros).
+export function liberacoesDaPessoa(userId: number, token: string | null | undefined) {
+  if (!token) return Promise.resolve<LiberacaoEstudo[]>([]);
+  return fetchJson<LiberacaoEstudo[]>(`/matriculas/pessoa/${userId}`, comAuth(token));
 }
 
 // ---- Caderno da aula (2026-10-05) ----

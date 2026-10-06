@@ -1,9 +1,8 @@
 import { CATALOGO, caminhoCapa, type CursoCatalogo } from "./catalogo";
 import { capaExiste } from "./capas";
 import { montarArvore, type ArvoreCurso } from "./arvore";
-import { listAvaliacaoProgress, type AvaliacaoProgress } from "./api";
-import type { Papel } from "./papel";
-import { papelVeEstudosPessoais } from "./papel";
+import { listAvaliacaoProgress, meusEstudos, type AvaliacaoProgress } from "./api";
+import { catalogoDoEstudo } from "./meus-cursos";
 
 // Progresso de TODOS os cursos em que o aluno já estudou algo (redesign 2026-09-27,
 // protótipo 07-progresso.html) — antes a /progresso era fixa no 1º curso do código.
@@ -22,16 +21,15 @@ export type ResumoGeral = {
 
 export async function progressoDoAluno(
   userId: number,
-  papel: Papel,
   token: string | null,
 ): Promise<{ cursos: ProgressoCurso[]; provas: Map<number, AvaliacaoProgress>; resumo: ResumoGeral }> {
-  // Estudos pessoais só entram pro Master (mesma regra da /inicio e da /estudos)
-  const candidatos = CATALOGO.filter(
-    (c) =>
-      c.disponivel &&
-      c.courseId != null &&
-      (c.categoria !== "Estudos pessoais" || papelVeEstudosPessoais(papel)),
-  );
+  // Quem vê o quê é o backend (2026-10-06): curso sem acesso volta 404 e cai fora
+  // no montarArvore abaixo. Estudos privados fora do catálogo vêm da lista do backend.
+  const doCatalogo = CATALOGO.filter((c) => c.disponivel && c.courseId != null);
+  const estudosNovos = (await meusEstudos(token).catch(() => []))
+    .filter((e) => !doCatalogo.some((c) => c.courseId === e.course_id))
+    .map(catalogoDoEstudo);
+  const candidatos = [...doCatalogo, ...estudosNovos];
 
   const [arvores, progressoProvas] = await Promise.all([
     Promise.all(candidatos.map((c) => montarArvore(c.courseId!, userId, token).catch(() => null))),

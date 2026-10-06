@@ -13,7 +13,8 @@ from app.schemas.courses import (
     ModuleGenerateResponse
 )
 from app.agents.orchestrator import Orchestrator
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, get_usuario_opcional
+from app.services import acesso_service
 from datetime import datetime
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
@@ -41,14 +42,16 @@ def create_course(data: dict, db: Session = Depends(get_db), current_user: User 
     db.refresh(course)
     return course
 
+# Leitura (2026-10-06): curso privado só aparece pro Master e pra quem foi
+# liberado (ver services/acesso_service.py) — sem login, só os públicos.
 @router.get("/")
-def list_courses(db: Session = Depends(get_db)):
-    return db.query(Course).all()
+def list_courses(db: Session = Depends(get_db), user: User | None = Depends(get_usuario_opcional)):
+    return acesso_service.cursos_visiveis(db, user)
 
 @router.get("/{course_id}")
-def get_course(course_id: int, db: Session = Depends(get_db)):
+def get_course(course_id: int, db: Session = Depends(get_db), user: User | None = Depends(get_usuario_opcional)):
     course = db.query(Course).filter(Course.id == course_id).first()
-    if not course:
+    if not course or not acesso_service.pode_ver_curso(db, user, course):
         raise HTTPException(404, "Course not found")
     return course
 

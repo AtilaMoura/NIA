@@ -6,7 +6,8 @@ import { Avatar } from "../../../_ui/Avatar";
 import { Chip } from "../../../_ui/Chip";
 import { Rodape } from "../../../_ui/Rodape";
 import { getSessao, getToken } from "../../../_lib/sessao";
-import { getPessoa, type TopicoDaPessoa } from "../../../_lib/api";
+import { getPessoa, liberacoesDaPessoa, type TopicoDaPessoa } from "../../../_lib/api";
+import { EstudosDaPessoa } from "./estudos-ui";
 import { data, dataHora, duracao, quando, ROTULO_PAPEL } from "../../../_lib/pessoas";
 
 export const metadata: Metadata = { title: "Pessoa" };
@@ -23,7 +24,10 @@ export default async function PessoaPage({ params }: { params: Promise<{ userId:
   if (sessao.role !== "master") redirect("/revisao/alunos");
 
   const token = await getToken();
-  const pessoa = await getPessoa(userId, token).catch(() => null);
+  const [pessoa, liberacoes] = await Promise.all([
+    getPessoa(userId, token).catch(() => null),
+    liberacoesDaPessoa(userId, token).catch(() => []),
+  ]);
   if (!pessoa) notFound();
 
   // Agrupa por curso, na ordem que o backend já devolve (curso → módulo → aula → tópico)
@@ -82,6 +86,8 @@ export default async function PessoaPage({ params }: { params: Promise<{ userId:
             </div>
           ))}
         </div>
+
+        <EstudosDaPessoa userId={pessoa.id} iniciais={liberacoes} />
 
         {cursos.length === 0 && (
           <p className="mt-6 text-[.9rem] text-[var(--tm-ink-muted)]">Ainda não abriu nenhum tópico.</p>
