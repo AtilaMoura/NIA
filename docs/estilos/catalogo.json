@@ -39,6 +39,11 @@
       "id": "c5",
       "nome": "IA / Agentes LLM",
       "course_id": 5
+    },
+    {
+      "id": "c-vendas",
+      "nome": "Vendas na Internet (Amanda)",
+      "course_id": null
     }
   ],
   "estilos": [

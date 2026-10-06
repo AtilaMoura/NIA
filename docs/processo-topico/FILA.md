@@ -19,6 +19,7 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 10 | 37 | Redes (11) | M2 · Port Forwarding | Riscos de expor porta na internet | pendente | |
 | 11 | 25 | IA (5) | Aula 2 · Transformers por dentro | Dos logits ao desempenho — KV Cache, Prefill/Decode | pendente | |
 | 12 | 73 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Cristo em toda a Escritura (Lc 24:27) | pendente | |
+| 13 | ? (prod) · 66 (local) | Vendas (privado) | M1 · O mercado digital | T1 Modelos de negócio online: curso, assinatura, serviço e afiliado | em andamento | estilo/tema no catálogo (doc c-vendas) → imagens → id de produção + NIA_EMAIL/NIA_SENHA pra publicar → áudio |
 
 ## Já feitos (processo novo)
 | topico_id | curso | título | data |
