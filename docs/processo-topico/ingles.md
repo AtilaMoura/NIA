@@ -58,3 +58,28 @@ em explicação de conceito. Histórico: `estudo-ingles/PASSO_A_PASSO.md`, `estu
 
 - Atila aprova pelo `/revisao/topico/{id}`; não seguir pro próximo tópico antes disso
   (evita retrabalho em série, lição do T1).
+
+## Revisar tópico antigo no padrão novo (roteiro aprovado pelo Atila em 2026-10-06)
+
+Vale pra T9, T10, T11, T27 (Aula 1 "To be & verbos normais") e qualquer tópico de Inglês feito
+antes do processo novo. **Um tópico por vez, com revisão do Atila entre eles.** Mesmo id/URL.
+
+1. **Backup** do conteúdo atual: `backend/_backup_topico<N>_<data>.json` (nunca apagar).
+2. **Dossiê** `fontes/ingles/topico<N>-<slug>.md`: fontes de instituição (Cambridge Dictionary
+   Grammar, British Council LearnEnglish, English Grammar Profile — nível A1/A2, Cambridge IPA pra
+   pronúncia); **lista FECHADA** de formas/palavras do tópico; armadilhas reais do português com
+   fonte (ex.: ser×estar, idade com "be", o erro "I am work" do diagnóstico).
+3. **Conteúdo** `backend/_criar_topico<N>_ingles.py`: mantém o que já funciona; acrescenta o que o
+   padrão novo pede (Reflexão "💭 Pra pensar" + Resumo, `imagem_capa`, `fluxo`, ≥1 tf/classify/
+   associar + 2 abertas). **Não invadir** o tópico seguinte (ex.: T9 não ensina verbo normal/don't
+   — é do T10; nem he/she/it + s — Aula 2). **Manter os ids de pergunta** que continuam iguais (as
+   respostas salvas do Atila ficam ligadas ao id — `TopicoResposta`).
+4. **Auditoria palavra por palavra**: nenhuma palavra fora da lista; toda pergunta só com o que já
+   foi ensinado ATÉ aquele ponto do curso (lição do T4/T27: "she plays" antes do "-s").
+5. **Imagens novas** no estilo `flat-escuro-latao` (catálogo): `scripts/imagens_ingles_topico<N>.json`.
+6. **Publicar** local + produção (PUT com `is_approved=true`), conferir 200.
+7. **Áudio: narração em PORTUGUÊS por bloco** (decisão 2026-10-06 — igual Redes/Obreiro/IA). Os
+   exemplos em inglês continuam na voz en-US dos cards (`vocab`/`ditado`), não na narração.
+   Revisar cada narração: pronúncia de palavra inglesa no meio do português, nenhuma frase longa
+   em inglês (a voz pt-BR lê errado), nada de abreviação.
+8. FILA + memória + commit local.
