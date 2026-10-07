@@ -9,6 +9,7 @@ import {
   listLessons,
   listTopicos,
   listTopicoProgress,
+  listAvaliacaoProgress,
   listProgress,
   type Course,
   type VeredictoTutor,
@@ -27,6 +28,9 @@ export type TopicoNo = {
   // id da Avaliacao (prova) vinculada, só quando aprovada — null = sem prova
   // pra este tópico (2026-09-19). A prova só libera quando estado==="concluido".
   avaliacaoId: number | null;
+  // Situação da prova pro aluno (2026-10-07): "feita" = aprovado; "refazer" = fez e
+  // não passou (o backend abre rodada nova); null = ainda não fez ou não tem prova.
+  prova: "feita" | "refazer" | null;
   // preenchidos só na linhaDoTempo (contexto pra exibir fora da árvore)
   moduloTitulo?: string;
   aulaTitulo?: string;
@@ -64,16 +68,19 @@ export async function montarArvore(
   userId: number = ALUNO_USER_ID,
   token?: string | null,
 ): Promise<ArvoreCurso> {
-  const [curso, modules, lessons, topicos, progresso, progressModulos] = await Promise.all([
+  const [curso, modules, lessons, topicos, progresso, progressoProvas, progressModulos] = await Promise.all([
     getCourse(courseId, token),
     listModules(token),
     listLessons(token),
     listTopicos(undefined, token),
     listTopicoProgress(userId, token),
+    // Se falhar, a árvore abre do mesmo jeito — só não mostra a situação da prova
+    listAvaliacaoProgress(userId, token).catch(() => []),
     listProgress().catch(() => []),
   ]);
 
   const progressoPorTopico = new Map(progresso.map((p) => [p.topico_id, p]));
+  const provaPorAvaliacao = new Map(progressoProvas.map((p) => [p.avaliacao_id, p]));
   const statusPorTopico = new Map(progresso.map((p) => [p.topico_id, p.status]));
 
   const tempoTotalMin = progressModulos
@@ -126,6 +133,7 @@ export async function montarArvore(
             estado = "disponivel";
           }
           const prog = progressoPorTopico.get(t.id);
+          const provaProg = t.avaliacao_id != null ? provaPorAvaliacao.get(t.avaliacao_id) : undefined;
           return {
             id: t.id,
             titulo: t.titulo,
@@ -137,6 +145,13 @@ export async function montarArvore(
             concluido_em: prog?.concluido_em ?? null,
             tutor_veredito: prog?.tutor_veredito ?? null,
             avaliacaoId: t.avaliacao_id,
+            // "reforco" vem antes: mesma leitura do /progresso ("Prova: revisar")
+            prova:
+              provaProg?.tutor_veredito === "reforco"
+                ? "refazer"
+                : provaProg?.status === "concluido"
+                  ? "feita"
+                  : null,
           };
         });
         return { id: l.id, titulo: l.title, lesson_index: l.lesson_index, topicos: topicosNo };

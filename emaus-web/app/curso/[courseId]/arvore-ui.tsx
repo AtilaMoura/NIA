@@ -10,6 +10,20 @@ import { contarModulo, type ModuloNo } from "../../_lib/arvore";
 // "Próximo" no tópico atual e módulos em preparação compactos.
 
 type Estado = ModuloNo["aulas"][number]["topicos"][number]["estado"];
+type Prova = ModuloNo["aulas"][number]["topicos"][number]["prova"];
+
+// Chip da prova liberada: aprovado (verde), precisa refazer (laranja) ou ainda não feita.
+const CHIP_PROVA: Record<NonNullable<Prova> | "nao_feita", { texto: string; classe: string }> = {
+  feita: {
+    texto: "✓ Prova feita",
+    classe: "border-[color-mix(in_srgb,var(--tm-good)_55%,transparent)] text-[var(--tm-good)]",
+  },
+  refazer: {
+    texto: "↺ Refazer prova",
+    classe: "border-[color-mix(in_srgb,var(--tm-warn)_55%,transparent)] text-[var(--tm-warn)]",
+  },
+  nao_feita: { texto: "📝 Prova", classe: "border-[var(--tm-accent)] text-[var(--tm-accent)]" },
+};
 
 // Círculo de status: ✓ cheio (concluído), anel accent com halo (atual), anel neutro
 // (disponível — o curso nunca trava tópico, é só apresentação).
@@ -40,12 +54,14 @@ function LinhaTopico({
   referencia,
   estado,
   avaliacaoId,
+  prova,
 }: {
   id: number;
   titulo: string;
   referencia: string | null;
   estado: Estado;
   avaliacaoId: number | null;
+  prova: Prova;
 }) {
   if (estado === "em_preparacao") {
     return (
@@ -69,9 +85,9 @@ function LinhaTopico({
     (estado === "concluido" ? (
       <Link
         href={`/topico/${id}/prova`}
-        className={`${CHIP} border-[var(--tm-accent)] text-[var(--tm-accent)] hover:bg-[var(--tm-surface-2)]`}
+        className={`${CHIP} ${CHIP_PROVA[prova ?? "nao_feita"].classe} hover:bg-[var(--tm-surface-2)]`}
       >
-        📝 Prova
+        {CHIP_PROVA[prova ?? "nao_feita"].texto}
       </Link>
     ) : (
       <span
@@ -202,6 +218,7 @@ function Modulo({ modulo, aberto, aoAlternar }: { modulo: ModuloNo; aberto: bool
                     referencia={t.referencia_biblica}
                     estado={t.estado}
                     avaliacaoId={t.avaliacaoId}
+                    prova={t.prova}
                   />
                 ))
               )}
