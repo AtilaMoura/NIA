@@ -8,7 +8,7 @@
 validação recusa banco pequeno (422), sem login 401, rodada fixa ao recarregar, rodada 2 com 0
 repetidas e todos os assuntos, a correção recalcula o mesmo conjunto, prova antiga (17) abre igual.
 **Não testado:** a chamada real da correção por IA (gasta cota do Gemini). Fica pro piloto.
-**Falta:** deploy, e depois o piloto no T33 NAT na produção.
+**Deploy feito 2026-10-07** (VM1, `176e786`, backup `~/backups/antes_prova_banco_2026-10-07.sql.gz`). **Falta:** o piloto no T33 NAT na produção.
 
 ## 1. Como funciona hoje (verificado no código, 2026-10-07)
 
