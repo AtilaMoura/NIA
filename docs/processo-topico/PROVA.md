@@ -123,3 +123,21 @@ Depois do C1–C6, deploy normal (`DEPLOY.md`), com backup do banco antes.
 - **Prova de aula e de módulo** (junta vários tópicos). O `PLANO_AVALIACAO_SEPARADA.md` já tinha
   deixado isso fora de escopo.
 - **Anotação na prova** liberada por curso (depende da página de configuração).
+
+## 9. Pendências (anotadas 2026-10-07, aguardando o Atila liberar)
+
+1. **Equilíbrio do sorteio por assunto.** A aberta obrigatória (`tipos_minimos`) entra antes do
+   rodízio e o rodízio não conta com ela → rodada sai 2/1/3 ou 3/1/2 por assunto em vez de 2/2/2
+   (visto no T33 e no T66). Correção: em `prova_service._sortear`, escolher sempre o assunto com
+   menos perguntas já sorteadas.
+2. **Correção da prova lenta (~3 min no T66, 2026-10-07 16:42→16:45).** Duas causas, vistas no log:
+   - **503 "modelo sobrecarregado"** no gemini-3.5-flash e no 3.7-flash (lado do Google, passageiro).
+   - **"Resposta não é JSON válido"** no 2.5-flash e no 3.5-flash-lite (este em 4 s, então não é
+     corte por tamanho). `GeminiService.generate_json` pede JSON só no texto do prompt e **não liga o
+     modo JSON nativo** (`response_mime_type="application/json"`); aspas de citação bíblica dentro do
+     texto quebram o JSON. Afeta TODA chamada de IA que espera JSON, não só a prova.
+   Plano proposto: (a) ligar o modo JSON nativo no `generate_json`; (b) comparar os modelos com as
+   respostas reais da prova 38 (tempo, JSON válido, fidelidade ao gabarito, neutralidade) — ~8 pedidos
+   de cota; (c) reordenar a cadeia `correcao` em `app/services/modelos.py` — hoje 3.5 → 3.7 → 2.5 →
+   3.5-lite → 3.1-lite, **sem o 3.8 Flash nem o 3.6** (cota própria de 20/dia cada); (d) junto com o
+   item 1, testar no local e fazer um deploy só na VM1.

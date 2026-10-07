@@ -88,3 +88,8 @@ RPM = pedidos por minuto · TPM = tokens por minuto · RPD = pedidos por dia.
 Groq (consultado via API no mesmo dia): `openai/gpt-oss-120b`, `openai/gpt-oss-20b`,
 `qwen/qwen3.8-27b`, `whisper-large-v3(-turbo)`, `canopylabs/orpheus-v1-english` (voz em inglês).
 Limites do Groq não estão aqui — o teto conhecido é ~8.000 tokens/min por pedido no gpt-oss-120b.
+
+## Pendência (2026-10-07)
+
+A cadeia `correcao` (`app/services/modelos.py`) não usa o 3.8 Flash nem o 3.6 Flash, e o
+`generate_json` não liga o modo JSON nativo do Gemini — ver `docs/processo-topico/PROVA.md` §9.
