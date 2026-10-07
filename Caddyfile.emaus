@@ -13,8 +13,37 @@
 
 # --- Emaús (Next 16) ---
 {$SITE_EMAUS} {
-	# Log de acesso (2026-10-07): sem ele a investigação da invasão ficou cega
-	log
+	# Log de acesso (2026-10-07): sem ele a investigação da invasão ficou cega.
+	# Vai pra arquivo numa pasta da VM (./logs/caddy no compose), pra não se perder
+	# em redeploy. Rotação: 10 MB por arquivo, guarda 30 dias.
+	log {
+		output file /var/log/caddy/acesso.log {
+			roll_size 10MiB
+			roll_keep 30
+			roll_keep_for 720h
+		}
+	}
+
+	# Cabeçalhos de segurança (OWASP Secure Headers).
+	header {
+		# 1 ano, sem preload/includeSubDomains: o domínio é um subdomínio do DuckDNS
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		# O Emaús não usa localização, câmera nem microfone
+		Permissions-Policy "geolocation=(), camera=(), microphone=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		# Valendo já: ninguém embute o Emaús em iframe (clickjacking)
+		Content-Security-Policy "frame-ancestors 'none'"
+		# CSP completa só em modo aviso (não bloqueia nada, acusa no console do
+		# navegador). nia-api = tópico e prova em iframe, imagens e áudio da API.
+		# Sem violação por alguns dias → juntar com a de cima e tirar o Report-Only.
+		# 'unsafe-inline' fica: o Next injeta script inline; tirar exige nonce
+		# (renderização dinâmica em toda página).
+		Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://nia-api.duckdns.org; media-src 'self' blob: https://nia-api.duckdns.org; font-src 'self' data:; connect-src 'self' https://nia-api.duckdns.org; frame-src https://nia-api.duckdns.org; object-src 'none'; base-uri 'self'; form-action 'self'"
+		-X-Powered-By
+		-Server
+	}
 
 	# Escudo contra React2Shell (CVE-2025-55182/66478) e falhas parecidas, que
 	# chegam por Server Action (cabeçalho Next-Action). O Emaús NÃO usa Server

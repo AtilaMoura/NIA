@@ -31,6 +31,12 @@ services:
     # Emaús usa ~80 MB.
     mem_limit: 450m
     memswap_limit: 700m
+    # Log no journald da VM (2026-10-07): sobrevive à recriação do container.
+    # Ler: journalctl CONTAINER_TAG=emaus  (o `docker logs` continua funcionando)
+    logging:
+      driver: journald
+      options:
+        tag: emaus
     networks: [internal]
 
   # ---------- Proxy reverso + HTTPS automático ----------
@@ -47,6 +53,8 @@ services:
       ACME_EMAIL: ${ACME_EMAIL}
     volumes:
       - ./Caddyfile.emaus:/etc/caddy/Caddyfile:ro
+      # Log de acesso fora do container (não se perde em redeploy)
+      - ./logs/caddy:/var/log/caddy
       - caddy_data:/data
       - caddy_config:/config
     networks: [internal]
