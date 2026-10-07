@@ -1,7 +1,14 @@
 # Prova do tópico: regras gerais, regras por curso e o comando /criar-provas-topicos
 
-**Status:** APROVADA pelo Atila (2026-10-07, respostas na seção 7). Código C1–C6 ainda não feito.
-Pedido de origem: `curso de obreiro/anotação.md` (2026-10-07). Histórico: `PLANO_AVALIACAO_SEPARADA.md`.
+**Status:** APROVADA pelo Atila (2026-10-07). **Código C1–C4 + C6 feitos e testados no local**
+(sem deploy): `app/services/prova_service.py` (sorteio, nota, gravar), `app/schemas/avaliacao.py`,
+`validar_prova()` em `app/renderer/validate.py`, rotas `GET/PUT /avaliacoes/topico/{topico_id}`
+(Master), render e correção usando as perguntas sorteadas. Comando `.claude/commands/criar-provas-topicos.md`
++ script `backend/_publicar_prova.py`. Teste local (tópico 33, prova de teste desativada depois):
+validação recusa banco pequeno (422), sem login 401, rodada fixa ao recarregar, rodada 2 com 0
+repetidas e todos os assuntos, a correção recalcula o mesmo conjunto, prova antiga (17) abre igual.
+**Não testado:** a chamada real da correção por IA (gasta cota do Gemini). Fica pro piloto.
+**Falta:** deploy, e depois o piloto no T33 NAT na produção.
 
 ## 1. Como funciona hoje (verificado no código, 2026-10-07)
 
@@ -19,7 +26,7 @@ Pedido de origem: `curso de obreiro/anotação.md` (2026-10-07). Histórico: `PL
 | **Refazer** | só abre rodada nova; **as perguntas são as MESMAS** | `avaliacao_progress.py:219` |
 | Tutor de dúvidas | **já fica escondido na prova** | `topico.html.j2:1667` |
 | Anotação | **já fica escondida na prova** | `topico.html.j2:1533` |
-| Tema | o render da prova usa o tema do usuário ou "vidro-fume", e **não o tema do curso** (o tópico já usa o do curso desde `f2621f5`) | `avaliacoes.py` |
+| Tema | o Emaús já manda o tema do curso pro render da prova (`f2621f5`, `emaus-web/app/topico/[topicoId]/prova/page.tsx`) | ok |
 
 ## 2. Regras gerais (valem pra todo curso)
 
@@ -42,7 +49,7 @@ Pedido de origem: `curso de obreiro/anotação.md` (2026-10-07). Histórico: `PL
    futuro:** liberar por curso quando o curso permitir.
 7. **Correção por IA no fim continua** (é ela que corrige as abertas), sempre com o gabarito na mão.
 8. **Nota mínima por curso** (seção 3), guardada na própria prova. Não precisa de coluna nova.
-9. **Tema da prova = tema do curso**, igual ao tópico (corrige o item da tabela acima).
+9. **Tema da prova = tema do curso**, igual ao tópico (já é assim).
 
 ## 3. Regras por curso (aprovadas 2026-10-07)
 
@@ -78,7 +85,7 @@ Arquivo `.claude/commands/criar-provas-topicos.md`, no mesmo espírito do `/cria
 | C2 | **Validador da prova**: tipos, gabarito, explicação, ids únicos, banco ≥ rodada, distribuição possível | `app/renderer/validate.py` |
 | C3 | **Sorteio por rodada** (pessoa + prova + rodada → conjunto fixo), usado no render, nas respostas e na correção | service de avaliação |
 | C4 | **Nota mínima** lida da prova (com 60% de padrão pras antigas) | `pipeline.py` (correção) |
-| C5 | Render da prova com o **tema do curso** | `avaliacoes.py` |
+| C5 | ~~Render da prova com o tema do curso~~: já existia (o Emaús manda o tema) | — |
 | C6 | Teste ponta a ponta local: criar banco → fazer rodada 1 → refazer → perguntas mudam → correção com nota do curso | local, depois produção |
 
 Depois do C1–C6, deploy normal (`DEPLOY.md`), com backup do banco antes.

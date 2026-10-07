@@ -125,6 +125,97 @@ def validar_topico(content: dict) -> list[str]:
     return problemas
 
 
+_TIPOS_PERGUNTA = {"mc", "tf", "classify", "associar", "lacuna", "open", "ditado"}
+
+
+def _problemas_da_pergunta(p: dict) -> list[str]:
+    """Campos obrigatórios por tipo (docs/schema/schema-conteudo-topico.md → Pergunta)."""
+    pid, tipo = p.get("id") or "?", p.get("tipo")
+    erros = []
+    if tipo not in _TIPOS_PERGUNTA:
+        return [f"Pergunta '{pid}': tipo '{tipo}' não existe."]
+    if not (p.get("enunciado") or "").strip():
+        erros.append(f"Pergunta '{pid}': sem enunciado.")
+    if not (p.get("assunto") or "").strip():
+        erros.append(f"Pergunta '{pid}': sem 'assunto' (o sorteio equilibra por assunto).")
+    if tipo == "open":
+        if not (p.get("resposta_modelo") or "").strip():
+            erros.append(f"Pergunta '{pid}' (open): sem resposta_modelo — a correção precisa do gabarito.")
+    elif not (p.get("explicacao") or "").strip():
+        erros.append(f"Pergunta '{pid}': sem explicação.")
+    if tipo == "mc":
+        opcoes = p.get("opcoes") or []
+        idx = p.get("correta_idx")
+        if len(opcoes) < 2:
+            erros.append(f"Pergunta '{pid}' (mc): precisa de 2+ opções.")
+        if not isinstance(idx, int) or not (0 <= idx < len(opcoes)):
+            erros.append(f"Pergunta '{pid}' (mc): correta_idx fora das opções.")
+    elif tipo == "tf" and not isinstance(p.get("correta_bool"), bool):
+        erros.append(f"Pergunta '{pid}' (tf): correta_bool precisa ser true/false.")
+    elif tipo in ("classify", "associar"):
+        valores = {o.get("valor") for o in p.get("rotulos_opcoes") or []}
+        itens = p.get("itens") or []
+        if len(valores) < 2 or not itens:
+            erros.append(f"Pergunta '{pid}' ({tipo}): precisa de 2+ rotulos_opcoes e de itens.")
+        ids_itens = [i.get("id") for i in itens]
+        if len(set(ids_itens)) != len(ids_itens):
+            erros.append(f"Pergunta '{pid}' ({tipo}): id de item repetido.")
+        for i in itens:
+            if i.get("correta") not in valores:
+                erros.append(f"Pergunta '{pid}' ({tipo}): item '{i.get('id')}' com 'correta' fora dos valores.")
+    elif tipo in ("lacuna", "ditado"):
+        if not p.get("respostas_aceitas"):
+            erros.append(f"Pergunta '{pid}' ({tipo}): sem respostas_aceitas.")
+        if tipo == "ditado" and not (p.get("frase_audio") or "").strip():
+            erros.append(f"Pergunta '{pid}' (ditado): sem frase_audio.")
+    return erros
+
+
+def validar_prova(conteudo: dict) -> list[str]:
+    """Checagem da prova no padrão novo (banco + sorteio, docs/processo-topico/PROVA.md).
+    Lista vazia = pode publicar."""
+    problemas = []
+    banco = conteudo.get("banco") or []
+    if not banco:
+        return ["Prova sem 'banco' de perguntas."]
+    if not conteudo.get("intro") or not conteudo.get("resultado"):
+        problemas.append("Prova sem 'intro' ou sem 'resultado'.")
+
+    por_rodada = conteudo.get("por_rodada")
+    if not isinstance(por_rodada, int) or por_rodada < 1:
+        problemas.append("'por_rodada' precisa ser um número inteiro >= 1.")
+    elif len(banco) < 2 * por_rodada:
+        problemas.append(
+            f"Banco com {len(banco)} perguntas pra rodada de {por_rodada}: precisa de pelo menos "
+            f"{2 * por_rodada} pra a rodada seguinte trazer perguntas novas."
+        )
+    nota = conteudo.get("nota_minima")
+    if not isinstance(nota, (int, float)) or not (0 < nota <= 1):
+        problemas.append("'nota_minima' precisa ser uma fração entre 0 e 1 (ex.: 0.7).")
+
+    ids = [p.get("id") for p in banco]
+    for qid in sorted({i for i in ids if ids.count(i) > 1}, key=str):
+        problemas.append(f"id de pergunta '{qid}' repetido no banco.")
+    vistos = {}
+    for p in banco:
+        problemas.extend(_problemas_da_pergunta(p))
+        enunciado = " ".join((p.get("enunciado") or "").lower().split())
+        if enunciado and enunciado in vistos:
+            problemas.append(f"Enunciado repetido entre '{vistos[enunciado]}' e '{p.get('id')}'.")
+        vistos.setdefault(enunciado, p.get("id"))
+
+    for tipo, qtd in (conteudo.get("tipos_minimos") or {}).items():
+        tem = sum(1 for p in banco if p.get("tipo") == tipo)
+        if tem < 2 * qtd:
+            problemas.append(
+                f"tipos_minimos pede {qtd} '{tipo}' por rodada, mas o banco só tem {tem} "
+                f"(precisa de {2 * qtd} pra variar entre rodadas)."
+            )
+    if isinstance(por_rodada, int) and sum((conteudo.get("tipos_minimos") or {}).values()) > por_rodada:
+        problemas.append("tipos_minimos soma mais perguntas do que cabem na rodada.")
+    return problemas
+
+
 if __name__ == "__main__":
     import json
     import sys

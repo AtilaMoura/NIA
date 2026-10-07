@@ -26,7 +26,7 @@ from app.models.models import (
     Progress, RevisaoTopico, Topico, TopicoProgress, TopicoResposta, User,
 )
 from app.core.auth import get_current_user
-from app.services import acesso_service
+from app.services import acesso_service, prova_service
 from app.agents.pipeline import gerar_estrutura_curso, gerar_e_revisar_topico
 from app.agents.tutor_agent import TutorAgent
 from app.agents.contexto_topico import carregar_content, montar_contexto_duvida
@@ -558,10 +558,11 @@ def _formatar_nota(nota: float) -> str:
     return f"{nota:g}".replace(".", ",")
 
 
-def _diagnostico(modo: str, aprovado: bool, nota: float, total: int, n_revisar: int) -> str:
+def _diagnostico(modo: str, aprovado: bool, nota: float, total: int, n_revisar: int,
+                 minima: float = NOTA_MINIMA_PROVA) -> str:
     placar = f"{_formatar_nota(nota)} de {total}"
     if modo == "prova" and not aprovado:
-        minimo = _formatar_nota(NOTA_MINIMA_PROVA * total)
+        minimo = _formatar_nota(minima * total)
         return f"Você fez {placar} — precisa de {minimo} pra passar. Releia a revisão e refaça a prova."
     if not n_revisar:
         return f"Você fez {placar}. Acertou tudo!"
@@ -726,7 +727,8 @@ async def avaliar_resumo_avaliacao(
     current_user: User = Depends(get_current_user),
 ):
     """Fim da PROVA (reescrito 2026-09-23). Cada pergunta vale 1 (parcial 0,5);
-    passa com >= 60% (3 de 5):
+    passa com a nota mínima da prova (padrão novo: regra do curso, PROVA.md;
+    provas antigas: 60%, 3 de 5):
     - passou: prova concluída + revisão do que errou/acertou em parte;
     - não passou: revisão do que errou + "revisão de tudo" do tópico, a
       dificuldade fica no histórico (AlunoDificuldade) e a prova é reiniciada
@@ -770,10 +772,11 @@ async def avaliar_resumo_avaliacao(
     # data.modelo — o padrão "groq" mandava pra qwen/gpt-oss, que erram fato (2026-10-01)
     agente = TutorAgent(servico("correcao"))
 
-    # Mesmo formato de slide que o render da prova monta (routers/avaliacoes.py).
+    # Mesmo formato de slide que o render da prova monta (routers/avaliacoes.py) — e as
+    # MESMAS perguntas: no padrão novo, as sorteadas pra esta pessoa nesta rodada.
     slides_prova = [
         {"tipo": "avaliacao_pergunta", "secao": "Avaliação Final", "pergunta": p}
-        for p in (avaliacao.conteudo or {}).get("perguntas", [])
+        for p in prova_service.perguntas_da_rodada(avaliacao.conteudo, avaliacao.id, data.user_id, rodada)
     ]
     respostas = {
         r.question_id: {"resposta": r.resposta_dada, "correta": r.correta}
@@ -791,7 +794,9 @@ async def avaliar_resumo_avaliacao(
     except Exception as e:
         raise _erro_de_correcao(e)
 
-    aprovado = correcao["nota"] >= NOTA_MINIMA_PROVA * correcao["total"]
+    # Nota mínima da própria prova (regra do curso, PROVA.md); 60% nas antigas
+    minima = prova_service.nota_minima(avaliacao.conteudo)
+    aprovado = correcao["nota"] >= minima * correcao["total"]
     revisao_completa = None
     if not aprovado and topico:
         revisao_completa = await _revisao_completa_do_topico(db, agente, topico, content_topico, perfil)
@@ -808,7 +813,7 @@ async def avaliar_resumo_avaliacao(
         "revisao_dificuldades": correcao["revisao_dificuldades"],
         "revisao_completa": revisao_completa,
         "rodada": rodada,
-        "resumo_diagnostico": _diagnostico("prova", aprovado, correcao["nota"], correcao["total"], n_revisar),
+        "resumo_diagnostico": _diagnostico("prova", aprovado, correcao["nota"], correcao["total"], n_revisar, minima),
     }
 
     agora = datetime.now(timezone.utc)
