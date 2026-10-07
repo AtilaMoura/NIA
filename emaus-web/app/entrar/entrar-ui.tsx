@@ -16,8 +16,10 @@ export function EntrarForm() {
   const [avisoSenha, setAvisoSenha] = useState(false);
   const [perfisDev, setPerfisDev] = useState<{ id: string; rotulo: string }[] | null>(null);
 
-  // Botões de login rápido só existem em dev — a rota devolve 404 em produção.
+  // Botões de login rápido só existem em dev — em produção nem pergunta (a rota
+  // devolveria 404 e sujaria o console).
   useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
     fetch("/api/sessao/dev")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => setPerfisDev(d?.perfis ?? null))

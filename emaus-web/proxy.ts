@@ -1,12 +1,13 @@
 // Guarda de sessão (FASE 1). Só olha os cookies httpOnly — a validação de verdade do
 // token continua sendo o backend (get_current_user) a cada chamada de /auth/me nas
-// páginas. Isso aqui é só o gate rápido de rota, roda no Edge.
+// páginas. Isso aqui é só o gate rápido de rota. No Next 16 o arquivo se chama proxy.ts
+// (antes middleware.ts) e roda no Node.
 
 import { NextRequest, NextResponse } from "next/server";
 
 const PUBLICAS = ["/", "/entrar", "/criar-conta"];
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (PUBLICAS.includes(pathname)) return NextResponse.next();
