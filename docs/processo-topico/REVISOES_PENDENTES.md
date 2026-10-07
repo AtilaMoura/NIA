@@ -23,6 +23,10 @@ Tópicos publicados ANTES do processo novo (`BASE.md`, 2026-09-30) precisam pass
 | **IA / Agentes LLM** | **T13–T20** | ⏳ pendente | Conferir contra a apostila (`Estudo IA/aula 0N.md`) e papers. T20 (Embeddings) saiu do Groq com correção manual. Imagens no estilo antigo — trocar pro estilo escolhido (isométrico claro). Tema mudou pra vinho-ouro |
 | **Inglês** | **T9 → T10 → T11 → T27** | ✅ Aula 1 revisada — T9 ✅ T10 ✅ T11 ✅ (2026-10-06) · T27 ✅ (2026-10-07). T6/T7/T8 GUARDADOS no curso 14 (2026-10-07) — revisar quando voltarem pra grade, ver `ingles.md` → Guardados | Roteiro aprovado em `ingles.md` → "Revisar tópico antigo no padrão novo". Decidido: narração em PT por bloco (2026-10-06). Um por vez, com revisão do Atila entre eles |
 
+**Prova junto com a revisão (decisão do Atila, 2026-10-07):** todo tópico revisado aqui ganha a
+prova no padrão novo (banco de perguntas + sorteio, regra do curso) com `/criar-provas-topicos`,
+inclusive os 18 que já têm prova antiga. Regras: [PROVA.md](PROVA.md).
+
 ## Achados do Redes que valem pros outros cursos
 - O **resumo** costuma repetir a afirmação errada do corpo — revisar os dois.
 - Exemplo com dado real (IP, telefone, nome) → trocar por dado de documentação/fictício explícito.

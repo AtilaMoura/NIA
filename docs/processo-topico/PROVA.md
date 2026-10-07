@@ -1,6 +1,6 @@
 # Prova do tópico: regras gerais, regras por curso e o comando /criar-provas-topicos
 
-**Status:** PROPOSTA pra aprovação do Atila (2026-10-07). Nada de código mudado ainda.
+**Status:** APROVADA pelo Atila (2026-10-07, respostas na seção 7). Código C1–C6 ainda não feito.
 Pedido de origem: `curso de obreiro/anotação.md` (2026-10-07). Histórico: `PLANO_AVALIACAO_SEPARADA.md`.
 
 ## 1. Como funciona hoje (verificado no código, 2026-10-07)
@@ -44,7 +44,7 @@ Pedido de origem: `curso de obreiro/anotação.md` (2026-10-07). Histórico: `PL
 8. **Nota mínima por curso** (seção 3), guardada na própria prova. Não precisa de coluna nova.
 9. **Tema da prova = tema do curso**, igual ao tópico (corrige o item da tabela acima).
 
-## 3. Regras por curso (PROPOSTA, o Atila ajusta)
+## 3. Regras por curso (aprovadas 2026-10-07)
 
 | Curso | O que a prova cobra | Tipos de pergunta | Banco / rodada | Nota mínima | Particularidade |
 |---|---|---|---|---|---|
@@ -93,11 +93,21 @@ Depois do C1–C6, deploy normal (`DEPLOY.md`), com backup do banco antes.
 5. As outras 13 provas que faltam, uma por vez, com revisão. Depois disso, o `/criar-topico`
    ganha um passo final: "criar a prova com `/criar-provas-topicos`".
 
-## 7. Perguntas pro Atila
+## 7. Decisões do Atila (2026-10-07)
 
-1. **Nota mínima** por curso (seção 3): 70% pra Inglês/Redes/IA e 60% pra Obreiro/Vendas está bom?
-2. **Tamanho**: banco de 18–24 com rodada de 6–8 perguntas está bom?
-3. **Refazer**: liberado na hora, ou com espera (ex.: só no dia seguinte) e/ou limite de tentativas?
-4. **Prova de aula ou de módulo** (juntando vários tópicos): entra agora ou fica pra depois?
-5. **As 18 provas antigas**: refazemos no padrão novo (com banco) quando o tópico for revisado, ou
-   deixamos como estão?
+1. **Nota mínima:** como na seção 3 (70% Inglês/Redes/IA, 60% Obreiro/Vendas).
+2. **Tamanho:** banco de 18–24, rodada de 6–8. Aprovado.
+3. **Refazer:** **liberado na hora**, sem espera e sem limite, por enquanto.
+4. **Prova de aula/módulo:** **fica pra depois** (ver seção 8).
+5. **As 18 provas antigas:** **refazer no padrão novo** junto com a revisão do tópico. Todo tópico
+   que não passou pelo processo novo precisa ser revisado pra ficar 100%, e a prova vai junto.
+   Regra registrada no `REVISOES_PENDENTES.md`.
+
+## 8. Anotado pro futuro (não fazer agora)
+
+- **Página de configuração por curso** (Master), pra alterar sem mexer em código: nota mínima,
+  regra de refazer (espera, limite de tentativas), anotação liberada ou não na prova, tutor na prova.
+  Até ela existir, os valores ficam na própria prova (nota) e no padrão (refazer liberado).
+- **Prova de aula e de módulo** (junta vários tópicos). O `PLANO_AVALIACAO_SEPARADA.md` já tinha
+  deixado isso fora de escopo.
+- **Anotação na prova** liberada por curso (depende da página de configuração).
