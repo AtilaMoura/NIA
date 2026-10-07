@@ -13,6 +13,16 @@
 
 # --- Emaús (Next 16) ---
 {$SITE_EMAUS} {
+	# Log de acesso (2026-10-07): sem ele a investigação da invasão ficou cega
+	log
+
+	# Escudo contra React2Shell (CVE-2025-55182/66478) e falhas parecidas, que
+	# chegam por Server Action (cabeçalho Next-Action). O Emaús NÃO usa Server
+	# Actions (nenhum "use server" no código), então nada legítimo usa isso.
+	# Atacado de verdade em 2026-10-07. Mantém mesmo depois de atualizar o Next.
+	@server_action header Next-Action *
+	respond @server_action "Proibido" 403
+
 	reverse_proxy emaus:3000
 	encode zstd gzip
 }
