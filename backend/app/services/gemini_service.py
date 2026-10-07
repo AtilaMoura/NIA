@@ -19,6 +19,8 @@ from typing import Optional
 from google import genai
 from google.genai import types
 
+PISO_TOKENS_JSON = 8192  # ver generate_json
+
 
 class GeminiService:
     """
@@ -56,7 +58,8 @@ class GeminiService:
         self,
         prompt: str,
         temperature: float = 0.7,
-        max_tokens: int = 4000
+        max_tokens: int = 4000,
+        json_mode: bool = False,
     ) -> str:
         """
         Gera texto usando Gemini
@@ -65,6 +68,9 @@ class GeminiService:
             prompt: O prompt/pergunta para a IA
             temperature: Criatividade (0.0 = preciso, 1.0 = criativo)
             max_tokens: Tamanho máximo da resposta
+            json_mode: liga o modo JSON nativo do Gemini (response_mime_type) — a
+                resposta sai sempre como JSON válido. Só nos modelos "gemini-*": o
+                Gemma pela mesma API não tem garantia desse modo, segue só pelo prompt.
 
         Returns:
             str: Texto gerado pela IA
@@ -76,6 +82,7 @@ class GeminiService:
                 config=types.GenerateContentConfig(
                     temperature=temperature,
                     max_output_tokens=max_tokens,
+                    response_mime_type="application/json" if json_mode and self.model_name.startswith("gemini") else None,
                 ),
             )
             return response.text
@@ -157,10 +164,18 @@ class GeminiService:
 IMPORTANTE: Retorne APENAS um JSON válido, sem texto adicional, sem markdown.
 Não use ```json, apenas o JSON puro."""
 
+        # Modo JSON nativo (2026-10-07): sem ele, uma aspa de citação dentro do texto
+        # (ex.: versículo no Obreiro) quebrava o JSON — a correção da prova 38 caiu em
+        # "Resposta não é JSON válido" em 2 modelos seguidos (PENDENCIAS.md, item 6).
+        # Piso de tokens (2026-10-07): nos modelos que "pensam" (2.5 Flash e os 3.x), o
+        # pensamento conta dentro do max_output_tokens. Com o teto de 2200 da correção, o
+        # 2.5 Flash devolvia o JSON cortado no meio mesmo no modo JSON. Só se paga o que
+        # for gerado, então um piso folgado não custa nada a mais.
         response = await self.generate(
             prompt=full_prompt,
             temperature=temperature,
-            max_tokens=max_tokens
+            max_tokens=max(max_tokens, PISO_TOKENS_JSON),
+            json_mode=True,
         )
 
         response = re.sub(r'```json\n?', '', response)

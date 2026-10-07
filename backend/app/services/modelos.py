@@ -67,12 +67,19 @@ CADEIAS: dict[str, list[tuple[str, str]]] = {
     # Correção do fim do tópico e da prova (nota + revisão do aluno). Antes caía no Groq
     # (rota com modelo="groq" por padrão) — e o Groq foi quem mais errou fato no teste
     # comparativo; num caso real (T66, 2026-10-01) inventou detalhe bíblico na revisão.
+    # Reordenada 2026-10-07 (PENDENCIAS.md item 6): a prova 38 levou ~3 min porque os
+    # Flash maiores davam 503 (até 44 s cada) e o JSON quebrava. Com o modo JSON nativo,
+    # o 3.5 Flash Lite corrigiu as respostas reais do Atila igual à produção em 19 s
+    # (_comparar_modelos_correcao.py) e tem 500/dia → vai primeiro; os Flash maiores
+    # (agora com 3.8 e 3.6, cota própria de 20/dia cada) ficam de reserva.
     "correcao": [
-        ("gemini", "gemini-3.5-flash"),
-        ("gemini", "gemini-3.7-flash"),
-        ("gemini", "gemini-2.5-flash"),
         ("gemini", "gemini-3.5-flash-lite"),
+        ("gemini", "gemini-3.8-flash"),
         ("gemini", "gemini-3.1-flash-lite"),
+        ("gemini", "gemini-3.7-flash"),
+        ("gemini", "gemini-3.6-flash"),
+        ("gemini", "gemini-3.5-flash"),
+        ("gemini", "gemini-2.5-flash"),
         ("groq", "qwen/qwen3.8-27b"),
     ],
     # Caderno da aula (2026-10-05): organiza e CORRIGE as anotações do aluno contra o

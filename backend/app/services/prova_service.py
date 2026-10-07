@@ -77,22 +77,27 @@ def _sortear(banco: list[dict], n: int, tipos_minimos: dict, evitar: set[str], r
             if len(escolhidas) < n:
                 escolher(p)
 
-    # 2. Rodízio entre assuntos, variando o tipo de pergunta
+    # 2. Equilíbrio entre assuntos, variando o tipo de pergunta. A cada passo entra o
+    # assunto com MENOS perguntas já escolhidas — inclusive as do passo 1 (antes era
+    # um rodízio cego, e a aberta obrigatória deixava a rodada 2/1/3 em vez de 2/2/2;
+    # achado no piloto T33/T66, 2026-10-07). Empate: a ordem sorteada dos assuntos.
     assuntos = sorted({p.get("assunto") or "" for p in banco})
     rng.shuffle(assuntos)
     while len(escolhidas) < n:
-        progrediu = False
-        for assunto in assuntos:
-            if len(escolhidas) >= n:
-                break
+        contagem = {a: 0 for a in assuntos}
+        for p in escolhidas:
+            contagem[p.get("assunto") or ""] += 1
+        escolheu = False
+        for assunto in sorted(assuntos, key=lambda a: contagem[a]):  # sort estável
             cands = candidatas(lambda q, a=assunto: (q.get("assunto") or "") == a)
             if not cands:
                 continue
             tipos_ja = {p.get("tipo") for p in escolhidas}
             cands.sort(key=lambda q: (q["id"] in evitar, q.get("tipo") in tipos_ja))  # sort estável
             escolher(cands[0])
-            progrediu = True
-        if not progrediu:
+            escolheu = True
+            break
+        if not escolheu:
             break
 
     # Mantém a ordem em que o banco foi escrito (segue a ordem do tópico)
