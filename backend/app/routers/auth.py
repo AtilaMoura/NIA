@@ -9,7 +9,12 @@ from app.services import acesso_service
 from app.schemas.auth import TopicoTokenRequest, AvaliacaoTokenRequest, UserLogin, UserRegister, Token, UserMe, TrocarSenha
 from app.database import get_db
 
+from app.core import limite_login
+
 router = APIRouter(prefix="/auth", tags=["Auth"])
+
+# Hash de uma senha qualquer, só pra gastar o mesmo tempo quando o e-mail não existe
+_HASH_FALSO = hash_password("senha-que-nao-existe")
 
 @router.post("/register", response_model=Token)
 def register(data: UserRegister, db: Session = Depends(get_db)):
@@ -122,13 +127,21 @@ def emitir_avaliacao_token(
 def login(data: UserLogin, db: Session = Depends(get_db)):
     # data.email já vem em minúsculas (schema); func.lower cobre contas antigas
     # que tenham sido salvas com maiúscula antes dessa normalização.
+    if limite_login.bloqueado(data.email):
+        raise HTTPException(status_code=429, detail="Muitas tentativas. Tente de novo em alguns minutos.")
+
     user = db.query(User).filter(func.lower(User.email) == data.email).first()
 
-    if not user:
-        raise HTTPException(status_code=400, detail="Usuário não encontrado.")
+    # Mesma resposta (texto, código e tempo) pra e-mail que não existe e pra senha
+    # errada — senão dá pra descobrir quais e-mails têm conta. Por isso a checagem
+    # de senha roda sempre, contra um hash de mentira quando não há usuário.
+    hash_guardado = (user.password_hash if user else None) or _HASH_FALSO
+    senha_ok = verify_password(data.password, hash_guardado)
+    if not user or not user.password_hash or not senha_ok:
+        limite_login.registrar_erro(data.email)
+        raise HTTPException(status_code=401, detail="E-mail ou senha incorretos.")
 
-    if not verify_password(data.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Senha incorreta.")
+    limite_login.limpar(data.email)
 
     # Último acesso (página Pessoas do Master, 2026-09-28) — antes nunca era gravado
     user.last_login = func.now()

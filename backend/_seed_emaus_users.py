@@ -7,6 +7,7 @@ Senha de teste igual pra todos, propositalmente simples (é ambiente local/dev, 
 dado sensível de verdade) — dá pro botão de "login rápido" do /entrar logar sem o
 usuário digitar nada.
 """
+import os
 import sys
 from pathlib import Path
 
@@ -35,6 +36,10 @@ PERFIS = [
 
 
 def main():
+    # A senha de teste é pública (está neste repositório): criar essas contas na
+    # produção abriria uma porta. O compose de produção define AMBIENTE=producao.
+    if os.environ.get("AMBIENTE") == "producao":
+        sys.exit("Seed de contas de teste NÃO roda em produção (AMBIENTE=producao).")
     db = SessionLocal()
     try:
         criados, existentes = [], []

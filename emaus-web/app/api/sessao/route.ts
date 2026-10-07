@@ -33,7 +33,8 @@ export async function POST(req: NextRequest) {
     const detalhe = await loginRes.json().catch(() => ({}));
     return NextResponse.json(
       { erro: detalhe.detail ?? "E-mail ou senha inválidos." },
-      { status: 401 },
+      // 429 = muitas tentativas naquela conta (limite do backend); o resto vira 401
+      { status: loginRes.status === 429 ? 429 : 401 },
     );
   }
   const { access_token: token } = await loginRes.json();
