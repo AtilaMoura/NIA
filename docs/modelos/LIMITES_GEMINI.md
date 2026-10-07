@@ -89,7 +89,9 @@ Groq (consultado via API no mesmo dia): `openai/gpt-oss-120b`, `openai/gpt-oss-2
 `qwen/qwen3.8-27b`, `whisper-large-v3(-turbo)`, `canopylabs/orpheus-v1-english` (voz em inglês).
 Limites do Groq não estão aqui — o teto conhecido é ~8.000 tokens/min por pedido no gpt-oss-120b.
 
-## Pendência (2026-10-07)
+## Ajuste de 2026-10-07 (resolvido)
 
-A cadeia `correcao` (`app/services/modelos.py`) não usa o 3.8 Flash nem o 3.6 Flash, e o
-`generate_json` não liga o modo JSON nativo do Gemini — ver `docs/processo-topico/PROVA.md` §9.
+`generate_json` passou a usar o modo JSON nativo nos modelos `gemini-*` (Gemma segue só pelo prompt)
+com piso de 8192 tokens; a cadeia `correcao` começa pelo 3.5 Flash Lite e ganhou 3.8 e 3.6 Flash de
+reserva. Observado no teste: o id "gemini-3-flash" responde 404 na API (o nome real ainda é
+desconhecido) e os Flash maiores deram 503 seguidos na tarde de 2026-10-07.

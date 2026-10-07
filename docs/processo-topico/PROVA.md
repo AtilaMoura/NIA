@@ -124,7 +124,7 @@ Depois do C1–C6, deploy normal (`DEPLOY.md`), com backup do banco antes.
   deixado isso fora de escopo.
 - **Anotação na prova** liberada por curso (depende da página de configuração).
 
-## 9. Pendências (anotadas 2026-10-07, aguardando o Atila liberar)
+## 9. Pendências (anotadas 2026-10-07) — ✅ RESOLVIDAS no mesmo dia, commit `7eb7393` (detalhes em PENDENCIAS.md, Feitas 6 e 7)
 
 1. **Equilíbrio do sorteio por assunto.** A aberta obrigatória (`tipos_minimos`) entra antes do
    rodízio e o rodízio não conta com ela → rodada sai 2/1/3 ou 3/1/2 por assunto em vez de 2/2/2
