@@ -46,6 +46,38 @@ e `curso de obreiro/anotação para IA.md`.
 - [ ] Reflexão + Resumo presentes (faltaram no T3 original)
 - [ ] `is_approved=true` = só estrutural; revisão doutrinária humana é à parte
 
+## Slides "O que as tradições cristãs dizem" (formato novo, 2026-10-07)
+
+> Status: **piloto no T66 aguardando aprovação do Atila** (rascunho em
+> `backend/_topico66_tradicoes_rascunho.json`). Depois de aprovado, vale pra T67, T68, T69 e
+> todo tópico novo que tiver divergência entre tradições.
+
+O formato antigo (parágrafo + citações soltas + uma "nota de neutralidade" com tudo junto)
+ficou confuso: as citações (`quote`) não têm áudio, então a narração pulava direto pra
+divergência; os nomes dos documentos apareciam sem explicação; cada item juntava várias ideias.
+
+**São dois slides, um depois do outro:**
+
+1. **"O que as tradições cristãs dizem"** — apresenta quem fala.
+   - `paragrafo` de abertura (1-3 frases): a pergunta do tópico e o que todas têm em comum.
+   - Um `box` `def` **por tradição**, com `itens` nesta ordem:
+     `Quem é:` (1 linha — que igreja, que documento, ano) · `O que diz:` (em palavras simples) ·
+     `Nas palavras dela:` (citação **curta, até ~25 palavras**, com a referência).
+     Rótulo: `📜 <Tradição> — <Documento> (<ano>)`. Nunca usar `quote` aqui (fica sem áudio).
+2. **"Onde concordam e onde divergem"**
+   - `box` `app` `✅ Onde concordam` — só o que as fontes citadas sustentam.
+   - Um `box` `def` **por divergência** (`⚖️ Diferença N — <pergunta simples>`), com `itens`:
+     um item por posição + um último `Em resumo:`. **Uma ideia por item.**
+   - `box` `summary` `🤝 Este curso não toma partido` (conhecer as posições + conversar com o pastor).
+
+**Regras de texto:** todo nome de documento, pessoa ou termo técnico (inerrância, magistério,
+cessacionista…) é explicado **na mesma frase** em que aparece. Nada de citação nova de memória:
+só o que está no dossiê do tópico (`fontes/obreiro/`) — o formato muda, as fontes não.
+
+**Regras de áudio (narração):** explica como professor — quem está falando, o que quis dizer,
+por que importa — em vez de ler o texto. Não lê o rótulo da caixa. Até ~30 s (~75 palavras)
+por bloco. Números e anos por extenso. Cada narração tem que fazer sentido sozinha.
+
 ## Passo 6 — Imagens
 
 - Estilo: **ilustração editorial bíblica contemporânea, semi-realista, cinematográfica**
