@@ -48,7 +48,7 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | topico_id | curso | título | data |
 |---|---|---|---|
 | 31 | Redes | Portas TCP/UDP (554, 1935, 80, 443) | 2026-10-01 |
-| 66 | Obreiro I | Inspiração: a Escritura soprada por Deus | 2026-10-01 |
+| 66 | Obreiro I | Inspiração: a Escritura soprada por Deus · **prova 38 no padrão novo (18/6, 60%) em 2026-10-07** | 2026-10-01 |
 | 32 | Redes | TCP vs UDP aplicado a vídeo (1º via /criar-topico) | 2026-10-03 |
 | 67 | Obreiro I | Confiabilidade da Palavra (Sl 19:7-11) | 2026-10-05 |
 | 21 | IA | Positional Encoding | 2026-10-05 |
