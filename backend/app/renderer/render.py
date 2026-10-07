@@ -111,7 +111,9 @@ def _perguntas_para_ordem(secao: str, pergunta: dict) -> list[dict]:
     }]
 
 
-def render_topico(content: dict, theme_id: str = "vidro-fume") -> str:
+def render_topico(content: dict, theme_id: str = "vidro-fume", relembrar: dict | None = None) -> str:
+    """relembrar (opcional, só no render do TÓPICO — a prova chama sem ele): resumo
+    do tópico anterior pro slide "Relembrando" logo depois da capa (PLANO_RELEMBRANDO.md)."""
     temas = carregar_temas()
     if theme_id not in temas:
         raise ValueError(
@@ -127,6 +129,7 @@ def render_topico(content: dict, theme_id: str = "vidro-fume") -> str:
     return template.render(
         content=content,
         tema=tema,
+        relembrar=relembrar,
         question_order_json=json.dumps(question_order, ensure_ascii=False),
         open_total=open_total,
         cores_dark_json=json.dumps(cores_dark, ensure_ascii=False) if cores_dark else None,

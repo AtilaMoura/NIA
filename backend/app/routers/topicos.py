@@ -24,6 +24,61 @@ def _exigir_admin(user: User):
         raise HTTPException(403, "Só master ou admin podem criar/editar/apagar tópicos.")
 
 
+def _caixa_resumo(content: dict) -> dict | None:
+    """A caixa "📌 Resumo" do slide "Reflexão e resumo" (padrão do processo novo,
+    docs/processo-topico/BASE.md): bloco box com variante summary. A última vence."""
+    achada = None
+    for slide in content.get("slides") or []:
+        for bloco in slide.get("blocos") or []:
+            if bloco.get("tipo") == "box" and (
+                bloco.get("variante") == "summary" or str(bloco.get("label") or "").startswith("📌")
+            ) and (bloco.get("itens") or bloco.get("texto")):
+                achada = bloco
+    return achada
+
+
+def _relembrar_anterior(db: Session, topico: Topico) -> dict | None:
+    """Slide "Relembrando" (2026-10-07, PLANO_RELEMBRANDO.md): resumo + áudio do
+    tópico ANTERIOR do mesmo curso (ordem módulo → aula → tópico, só aprovados).
+    Nada é gerado: reaproveita a caixa "📌" e o audio_url que o anterior já tem.
+    None quando não há anterior (1º do curso) ou ele não tem resumo (tópico antigo)."""
+    atual = (
+        db.query(Module.course_id, Module.module_index, Lesson.lesson_index)
+        .join(Lesson, Lesson.module_id == Module.id)
+        .filter(Lesson.id == topico.lesson_id)
+        .first()
+    )
+    if not atual:
+        return None
+    chave_atual = (atual.module_index, atual.lesson_index, topico.topico_index, topico.id)
+    candidatos = (
+        db.query(Topico.id, Topico.lesson_id, Topico.titulo, Module.module_index, Lesson.lesson_index, Topico.topico_index)
+        .join(Lesson, Topico.lesson_id == Lesson.id)
+        .join(Module, Lesson.module_id == Module.id)
+        .filter(Module.course_id == atual.course_id, Topico.is_approved.is_(True), Topico.id != topico.id)
+        .all()
+    )
+    anteriores = [c for c in candidatos if (c.module_index, c.lesson_index, c.topico_index, c.id) < chave_atual]
+    if not anteriores:
+        return None
+    anterior = max(anteriores, key=lambda c: (c.module_index, c.lesson_index, c.topico_index, c.id))
+    conteudo = db.query(Topico.content).filter(Topico.id == anterior.id).scalar()
+    try:
+        caixa = _caixa_resumo(json.loads(conteudo or ""))
+    except json.JSONDecodeError:
+        return None
+    if not caixa:
+        return None
+    return {
+        "titulo": anterior.titulo,
+        "outra_aula": anterior.lesson_id != topico.lesson_id,
+        "label": caixa.get("label") or "📌 Resumo",
+        "itens": caixa.get("itens") or [],
+        "texto": caixa.get("texto") or "",
+        "audio_url": caixa.get("audio_url"),
+    }
+
+
 # Nível novo (2026-08-26): Lesson passa a representar a AULA; cada aula pode
 # ter vários Tópicos, cada um com seu próprio conteúdo/geração/revisão —
 # mesmo padrão de CRUD+render que já existia em lessons.py, um nível abaixo.
@@ -117,6 +172,7 @@ def render_topico_endpoint(
     theme: str | None = Query(None, description="id do tema (ver docs/schema/temas.json); se omitido, usa a preferência do usuário ou o padrão"),
     user_id: int | None = Query(None, description="se informado, usa User.preferred_theme como fallback quando 'theme' não for passado"),
     token: str | None = Query(None, description="token de escopo curto do iframe (ou de sessão) — exigido em curso privado/não publicado"),
+    contexto: str | None = Query(None, description="'revisao' = tela de revisão do conteúdo (sem o slide Relembrando)"),
     db: Session = Depends(get_db),
 ):
     """Mesma lógica de GET /lessons/{id}/render (Fase 4), um nível abaixo: o JSON
@@ -145,5 +201,7 @@ def render_topico_endpoint(
     except (TypeError, json.JSONDecodeError):
         raise HTTPException(500, "Topico.content não é um JSON válido do schema de tópico.")
 
-    html = render_topico(content, theme_id)
+    # Na revisão o slide a mais deslocaria os comentários por slide (slide_index) — fica de fora.
+    relembrar = None if contexto == "revisao" else _relembrar_anterior(db, topico)
+    html = render_topico(content, theme_id, relembrar=relembrar)
     return HTMLResponse(content=html)

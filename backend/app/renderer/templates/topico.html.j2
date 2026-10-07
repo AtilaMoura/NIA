@@ -377,6 +377,8 @@
   .box-app { border-left: 2px solid var(--accent); } .box-app .box-label { color: var(--accent); }
   .box-error { border-left: 2px solid var(--bad); } .box-error .box-label { color: var(--bad); }
   .box-summary { border-left: 2px solid var(--violet); } .box-summary .box-label { color: var(--violet); }
+  .relembrando-kicker { font-family: var(--font-label); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--violet); margin-bottom: 6px; }
+  .relembrando-sub { color: var(--text-muted); font-size: 14px; margin: 0 0 6px; }
   .box-instr { border-left: 2px solid var(--blue); font-size: 13.5px; } .box-instr .box-label { color: var(--blue); }
   .prompt-texto { white-space: pre-line; font-family: var(--font-label); font-size: 12.5px; background: rgba(0,0,0,.12); padding: 10px 12px; border-radius: 6px; margin: 8px 0; }
   .prompt-nota { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
@@ -1020,6 +1022,32 @@
 
     </div>
   </div>
+  {% if loop.first and relembrar %}
+  {# Slide "Relembrando" (2026-10-07, PLANO_RELEMBRANDO.md): resumo + áudio do tópico
+     anterior, montado no render (routers/topicos.py) — NÃO existe no content. Por isso
+     data-extra: o JS converte o número na tela ↔ número no conteúdo (paraConteudo/paraTela). #}
+  <div class="slide" data-section="Relembrando" data-tipo="relembrando" data-extra="1">
+    <div class="slide-inner">
+      <div class="relembrando-kicker">↩ Relembrando {{ 'a aula anterior' if relembrar.outra_aula else 'o tópico anterior' }}</div>
+      <h1 class="title">{{ relembrar.titulo }}</h1>
+      <p class="relembrando-sub">Antes de começar, um minuto pra lembrar o que você já viu.</p>
+      <div class="box box-summary">
+        <div class="box-label">{{ relembrar.label }}</div>
+        {% if relembrar.itens %}
+        <ul style="margin:4px 0; padding-left:20px;">
+          {% for item in relembrar.itens %}<li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        {{ relembrar.texto }}
+        {% endif %}
+      </div>
+      {% if relembrar.audio_url %}
+      <button type="button" class="bloco-audio" data-audio-url="{{ relembrar.audio_url }}">🎧 Ouvir o resumo</button>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
 {% endfor %}
 </div>
 
@@ -1160,7 +1188,7 @@ function salvarSlideRemoto(idx) {
   fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
-    body: JSON.stringify({ indice: idx }),
+    body: JSON.stringify({ indice: paraConteudo(idx) }),
   }).catch(function (e) { console.error('falha ao salvar slide atual', e); });
 }
 
@@ -1317,7 +1345,7 @@ function botaoReverSlide(n) {
       // O slide é do TÓPICO, não da prova — o pai abre o tópico nele.
       try { window.parent.postMessage({ tipo: 'emaus:navegar', destino: 'topico-slide', slide: n }, '*'); } catch (e) {}
     } else if (n - 1 < slides.length) {
-      showSlide(n - 1);
+      showSlide(paraTela(n - 1));
     }
   });
   return b;
@@ -1594,7 +1622,7 @@ var anotacaoLista = document.getElementById('anotacaoLista');
 if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO === 'avaliacao') {
   anotacaoFab.hidden = true;
 } else {
-  function slideIndexAtual() { return current; }
+  function slideIndexAtual() { return paraConteudo(current); }
 
   function atualizarTextoAnotacaoAtual() {
     anotacaoTextoAtual.value = anotacoesPorSlide[slideIndexAtual()] || '';
@@ -1624,14 +1652,14 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO === 'avaliacao') {
       btn.className = 'anotacao-lista-item';
       var rotuloSlide = document.createElement('div');
       rotuloSlide.className = 'anotacao-lista-item-slide';
-      rotuloSlide.textContent = 'Slide ' + (idx + 1);
+      rotuloSlide.textContent = 'Slide ' + (paraTela(idx) + 1);
       var textoEl = document.createElement('div');
       textoEl.className = 'anotacao-lista-item-texto';
       textoEl.textContent = anotacoesPorSlide[idx];
       btn.appendChild(rotuloSlide);
       btn.appendChild(textoEl);
       btn.addEventListener('click', function () {
-        showSlide(idx);
+        showSlide(paraTela(idx));
         trocarAbaAnotacao('anotar');
       });
       li.appendChild(btn);
@@ -1748,10 +1776,10 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
         anotacoesPorSlide[slideIdx] = novo;
         if (typeof atualizarFabIndicador === 'function') atualizarFabIndicador();
         // Painel ✍️ aberto no mesmo slide: mostra o texto novo na hora.
-        if (typeof atualizarTextoAnotacaoAtual === 'function' && !anotacaoPainel.hidden && current === slideIdx) {
+        if (typeof atualizarTextoAnotacaoAtual === 'function' && !anotacaoPainel.hidden && paraConteudo(current) === slideIdx) {
           atualizarTextoAnotacaoAtual();
         }
-        btn.textContent = '✔ Salvo nas anotações do slide ' + (slideIdx + 1);
+        btn.textContent = '✔ Salvo nas anotações do slide ' + (paraTela(slideIdx) + 1);
       })
       .catch(function (e) {
         btn.disabled = false;
@@ -1767,7 +1795,7 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
     if (autor === 'aluno' && typeof slideIdx === 'number') {
       var rotulo = document.createElement('span');
       rotulo.className = 'duvida-msg-slide';
-      rotulo.textContent = 'Slide ' + (slideIdx + 1);
+      rotulo.textContent = 'Slide ' + (paraTela(slideIdx) + 1);
       el.appendChild(rotulo);
     }
     el.appendChild(document.createTextNode(texto));
@@ -1837,7 +1865,7 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
     if (!pergunta || duvidaPerguntarBtn.disabled) return;
     if (!RESPOSTAS_ATIVO) { duvidaStatus.textContent = 'Faça login pra tirar dúvida.'; return; }
     pergunta = pergunta.slice(0, DUVIDA_MAX);
-    var slideIdx = current;
+    var slideIdx = paraConteudo(current);
     adicionarMensagem('aluno', pergunta, slideIdx);
     duvidaTexto.value = '';
     duvidaContador.textContent = '0/' + DUVIDA_MAX;
@@ -2056,7 +2084,7 @@ window.addEventListener('message', function (e) {
   var d = e.data;
   if (!d) return;
   if (d.tipo === 'emaus:ir-slide' && typeof d.indice === 'number') {
-    showSlide(d.indice);
+    showSlide(paraTela(d.indice));
   } else if (d.tipo === 'emaus:avaliacao-resultado') {
     // O pai só manda veredito/resumo — a revisão completa (cartões) vem da
     // rota /resultado; se falhar, cai no resultado simples de antes.
@@ -2629,6 +2657,19 @@ document.querySelectorAll('textarea[data-open]').forEach(function (ta) {
 
 const slides = Array.from(document.querySelectorAll('.slide'));
 let current = 0;
+// Slide "Relembrando" (2026-10-07, PLANO_RELEMBRANDO.md): montado no render e marcado com
+// data-extra, NÃO existe no content. Tudo que vai pro banco ou vem dele (slide salvo, anotação,
+// dúvida do tutor, "Rever no slide N", comentários da revisão) usa o número do CONTEÚDO;
+// `current`/showSlide usam o da TELA. O extra conta como a capa (o slide antes dele).
+const EXTRA_IDX = slides.findIndex(function (s) { return s.dataset.extra === '1'; });
+function paraConteudo(i) {
+  if (EXTRA_IDX < 0 || i < EXTRA_IDX) return i;
+  return i === EXTRA_IDX ? EXTRA_IDX - 1 : i - 1;
+}
+function paraTela(i) {
+  if (EXTRA_IDX < 0 || i < EXTRA_IDX) return i;
+  return i + 1;
+}
 
 function checkGate(slideEl) {
   if (!slideEl || !slideEl.dataset.gate) return;
@@ -2705,7 +2746,7 @@ function showSlide(idx) {
     if (window.parent && window.parent !== window) {
       window.parent.postMessage({
         tipo: 'emaus:slide',
-        indice: idx,
+        indice: paraConteudo(idx),
         total: slides.length,
         secao: slideEl.dataset.section || '',
         temImagem: !!slideEl.querySelector('img'),
@@ -2888,14 +2929,14 @@ document.addEventListener('fullscreenchange', syncFullscreenUI);
 // de RESPOSTAS_ATIVO (revisão/uso avulso sempre abre no início, como antes).
 function abrirSlideInicial() {
   var slidePedido = parseInt(new URLSearchParams(window.location.search).get('slide'), 10);
-  if (slidePedido >= 1 && slidePedido <= slides.length) { showSlide(slidePedido - 1); return; }
+  if (slidePedido >= 1 && slidePedido <= slides.length) { showSlide(paraTela(slidePedido - 1)); return; }
   if (!RESPOSTAS_ATIVO) { showSlide(0); return; }
   fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
     headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
   })
     .then(function (r) { return r.ok ? r.json() : {}; })
     .then(function (d) {
-      var idx = d && typeof d.ultimo_slide === 'number' ? d.ultimo_slide : 0;
+      var idx = d && typeof d.ultimo_slide === 'number' ? paraTela(d.ultimo_slide) : 0;
       if (idx < 0 || idx >= slides.length) idx = 0;
       showSlide(idx);
     })

@@ -49,7 +49,12 @@ Padrão mínimo de estrutura de todo tópico:
 2. Slides de conteúdo divididos por assunto, cada um com uma ideia central.
 3. **Checkpoints** espalhados (`checkpoint_apos`), tipos variados — nunca tudo `mc`.
 4. **Reflexão** (perguntas abertas, sem gate, ligando com o tópico anterior).
-5. **Resumo do Tópico** (bullets) antes da avaliação.
+5. **Resumo do Tópico** (bullets) antes da avaliação — bloco `box` com `variante: "summary"` e
+   rótulo começando com "📌". **Esse resumo + o áudio dele viram o slide "↩ Relembrando" do tópico
+   SEGUINTE** (montado no render, logo depois da capa — 2026-10-07, `routers/topicos.py`
+   `_relembrar_anterior`). Por isso: cada bullet tem que se sustentar sozinho (nada de "como vimos
+   acima"), e a narração do áudio não pode depender do resto do slide. Tópico sem essa caixa não
+   gera o "Relembrando" no seguinte.
 6. Avaliação final: pelo menos 1 `tf`/`classify` e 2 `open`.
 
 Regras de bloco que valem pra todo curso:
