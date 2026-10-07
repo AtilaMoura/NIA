@@ -53,5 +53,5 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 67 | Obreiro I | Confiabilidade da Palavra (Sl 19:7-11) | 2026-10-05 |
 | 21 | IA | Positional Encoding | 2026-10-05 |
 | 68 | Obreiro I | Suficiência das Escrituras (2Pe 1:19-21) | 2026-10-05 |
-| 33 | Redes | NAT (Network Address Translation) — áudio terminado depois | 2026-10-05 |
+| 33 | Redes | NAT (Network Address Translation) — áudio terminado depois · **prova 37 no padrão novo (18/6, 70%) em 2026-10-07** | 2026-10-05 |
 | 69 | Obreiro I | A Palavra acima da tradição (Mc 7:6-13) — fecha a Aula 60 | 2026-10-06 |

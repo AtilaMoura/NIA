@@ -8,7 +8,12 @@
 validação recusa banco pequeno (422), sem login 401, rodada fixa ao recarregar, rodada 2 com 0
 repetidas e todos os assuntos, a correção recalcula o mesmo conjunto, prova antiga (17) abre igual.
 **Não testado:** a chamada real da correção por IA (gasta cota do Gemini). Fica pro piloto.
-**Deploy feito 2026-10-07** (VM1, `176e786`, backup `~/backups/antes_prova_banco_2026-10-07.sql.gz`). **Falta:** o piloto no T33 NAT na produção.
+**Deploy feito 2026-10-07** (VM1, `176e786`, backup `~/backups/antes_prova_banco_2026-10-07.sql.gz`). **Piloto publicado 2026-10-07:** T33 NAT → avaliação 37 (banco 18, rodada 6, 70%), auditoria
+`fontes/redes/topico33-prova-auditoria.md`. **Falta:** o Atila fazer a prova (testa também a correção
+por IA). **Defeito achado no piloto:** a aberta obrigatória (`tipos_minimos`) entra antes do rodízio e
+o rodízio não conta com ela → rodada pode sair 2/1/3 por assunto em vez de 2/2/2 (cobre todos, mas
+desequilibrado). Correção proposta: no rodízio, escolher sempre o assunto com menos perguntas já
+sorteadas (`prova_service._sortear`) — precisa de código + deploy, aguardando o Atila.
 
 ## 1. Como funciona hoje (verificado no código, 2026-10-07)
 
