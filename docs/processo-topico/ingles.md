@@ -8,6 +8,9 @@ em explicação de conceito. Histórico: `estudo-ingles/PASSO_A_PASSO.md`, `estu
 - **Estrutura:** uma aula POR FONTE (música, vídeo…), dividida por PARTE da fonte
   (trecho do vídeo / movimento da música), não por skill.
 - **Nível do Atila:** básico — explicação em português, exemplos em inglês.
+- **Grade:** [GRADE_INGLES.md](GRADE_INGLES.md) (aprovada 2026-10-07, A1 → B1, ~121 tópicos). Ler a
+  grade antes do dossiê: ela diz o que o tópico ensina, o que veio antes e o que é **proibido**
+  (assunto de tópico seguinte). A lista fechada de palavras de cada dossiê soma no "o que eu já sei".
 
 ## Passo 1 — Fonte
 
@@ -83,3 +86,20 @@ antes do processo novo. **Um tópico por vez, com revisão do Atila entre eles.*
    Revisar cada narração: pronúncia de palavra inglesa no meio do português, nenhuma frase longa
    em inglês (a voz pt-BR lê errado), nada de abreviação.
 8. FILA + memória + commit local.
+
+## Guardados (2026-10-07) — NÃO perder de vista
+
+O módulo 33 "Primeiros 30 dias" saiu do curso 9 e foi pro curso **14 "Inglês — Guardados"**
+(privado, rascunho, sem ninguém liberado: só o Master vê). Nada foi apagado; provas e respostas
+continuam ligadas aos tópicos. Backup: `backend/_backup_ingles_modulo33_2026-10-07.json`.
+Script: `backend/_guardar_ingles_modulo33.py`.
+
+| Aula | Tópico | Prova | Destino previsto |
+|---|---|---|---|
+| 84 My Way (música do mês) | T6 | sim | Atila decide depois se fica essa música ou outra |
+| 85 Falando sobre o meu dia — Parte 1 | T7 | 27 | Módulo do **passado (A2)** como prática de escuta; a técnica "You mean…? / Exactly" pode ir pro Módulo 0 (língua de sala de aula) |
+| 86 Inglês para prompts & tecnologia | T8 | 28 | Módulo **opcional pós-A2** ou curso próprio "Inglês para tecnologia" |
+
+Trazer de volta: `PUT /modules/33 {"course_id": 9}` (módulo inteiro) ou
+`PUT /lessons/<id> {"module_id": <módulo do curso 9>}` (uma aula). Ao montar a grade, cada
+aula guardada tem que aparecer no mapa no lugar previsto acima.
