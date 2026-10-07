@@ -10,7 +10,7 @@ diz o que ACRESCENTA ou SUBSTITUI aqui:
 | Inglês | 9 | [ingles.md](ingles.md) |
 | Redes e Câmeras | 11 | [redes.md](redes.md) |
 | Engenharia de Agentes LLM (IA) | 5 | [ia.md](ia.md) |
-| Vendas na Internet (privado) | local 12 · prod ? | [vendas.md](vendas.md) |
+| Vendas na Internet (privado) | 13 (local 12) | [vendas.md](vendas.md) |
 
 Comum a todos: [FONTES_GUIA.md](FONTES_GUIA.md) (o que buscar de fonte e o dossiê).
 

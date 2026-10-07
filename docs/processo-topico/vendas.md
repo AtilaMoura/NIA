@@ -4,16 +4,16 @@ Segue a [BASE](BASE.md). Curso criado em 2026-10-06, **privado** (só o Master e
 em Pessoas veem). Grade aprovada pelo Atila: 6 módulos × 2 aulas × 2 tópicos = 24 tópicos
 (`backend/_criar_curso_vendas_internet.py`).
 
-- **Course.id:** local 12 · produção: conferir na saída do script de criação (o 12 de produção é
-  o Obreiro II — não confundir).
+- **Course.id:** local 12 · **produção 13** (o 12 de produção é o Obreiro II — não confundir).
+  T1 = tópico 170 em produção (66 no local).
 - **Aluno:** já usa redes sociais; objetivo **virar profissional** de gestão de tráfego. Texto neutro (sem nome, "gestor(a)/profissional", nunca "a aluna").
 - **Canais:** Meta Ads, orgânico + WhatsApp, TikTok Ads (Google fora).
 - **Prática:** cada tópico termina com tarefa usando o **Emaús** como caso real, com passo a passo
   nas ferramentas. **Sem verba de anúncio:** campanha montada até antes de publicar, números
   simulados.
 - **Inclui:** criativos básicos (copy, roteiro, Canva, CapCut) e módulo de carreira.
-- **Tema e estilo de imagem:** escolha do Atila no catálogo visual, doc `c-vendas` (id fixo, não
-  depende do Course.id). Pasta de imagens: `backend/static/course-images/vendas/`.
+- **Tema e estilo de imagem:** catálogo visual, doc `c-vendas`: ★ sketchnote (+ cinematico-realista,
+  line-art), tema **menta-grafite** — gravado em `courses.identidade_visual.tema_slides`. Pasta de imagens: `backend/static/course-images/vendas/`.
 - **Perfil do tutor/geração:** `PERFIL_VENDAS` montado dentro de `backend/_gerar_tNN_vendas.py`
   (o processo de tópico não mexe em `app/agents/perfis.py`). O tutor ao vivo em produção usa o
   perfil padrão até alguém criar o perfil no app (tarefa de código, separada).
