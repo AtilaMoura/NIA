@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: correção das questões</title>
+<!--
+  Protótipo 15 — como a questão mostra "acertei / errei" + a explicação (PLANO_FEEDBACK_CORRECAO.md).
+  Perguntas REAIS do T11 de Inglês "Prática: to be x verbo normal" (tópico id 11), com respostas inventadas.
+  - Faixa de veredito com texto (não só cor): "✓ Você acertou" / "✗ Não foi dessa vez" / "◐ Quase".
+  - Lacuna/ditado: "Você escreveu" × "Resposta certa" (antes não aparecia a certa).
+  - Explicação vira "Por quê", na cor do veredito.
+  - Barra lateral verde/vermelha na questão inteira (dá pra ver de relance voltando o slide).
+  Estados pela URL: (vazio) novo com destaque palavra a palavra · #simples novo sem o destaque ·
+  #hoje como está hoje · #escuro (combina: #simples,escuro).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-accent-soft: #f1e3cf;
+    --tm-good: #3f7f3a; --tm-bad: #b2412c; --tm-warn: #a8661b;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-accent-soft: #3a2c1c;
+    --tm-good: #79b660; --tm-bad: #e57a62; --tm-warn: #e0a252;
+  }
+  :root {
+    /* Derivados: fundo suave e texto com contraste nos dois temas */
+    --good-soft: color-mix(in srgb, var(--tm-good) 14%, var(--tm-surface));
+    --bad-soft: color-mix(in srgb, var(--tm-bad) 13%, var(--tm-surface));
+    --warn-soft: color-mix(in srgb, var(--tm-warn) 14%, var(--tm-surface));
+    --good-text: color-mix(in srgb, var(--tm-good) 78%, var(--tm-ink));
+    --bad-text: color-mix(in srgb, var(--tm-bad) 82%, var(--tm-ink));
+    --warn-text: color-mix(in srgb, var(--tm-warn) 80%, var(--tm-ink));
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  main { max-width: 700px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+  h1 { font-family: var(--tm-font-display); font-size: 1.45rem; margin: 0 0 .25rem; }
+  .sub { color: var(--tm-ink-muted); font-size: .9rem; margin: 0 0 1.25rem; }
+  .modo { display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--tm-accent); margin-bottom: .4rem; }
+
+  /* ---------- Questão ---------- */
+  .q { position: relative; background: var(--tm-surface); border: 1px solid var(--tm-border); border-radius: var(--tm-radius); padding: 1rem 1rem 1rem 1.15rem; margin: 0 0 1rem; overflow: hidden; }
+  .q::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: transparent; }
+  .q.acertou::before { background: var(--tm-good); }
+  .q.errou::before { background: var(--tm-bad); }
+  .q.quase::before { background: var(--tm-warn); }
+  .q-tipo { font-size: .7rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--tm-ink-muted); display: flex; justify-content: space-between; gap: .5rem; }
+  .q-selo { letter-spacing: .04em; text-transform: none; font-size: .78rem; padding: 1px 9px; border-radius: 99px; }
+  .acertou .q-selo { background: var(--good-soft); color: var(--good-text); }
+  .errou .q-selo { background: var(--bad-soft); color: var(--bad-text); }
+  .quase .q-selo { background: var(--warn-soft); color: var(--warn-text); }
+  .q-texto { font-weight: 600; margin: .35rem 0 .7rem; }
+
+  /* Campo de lacuna/ditado já respondido */
+  .campo { position: relative; }
+  .campo input { width: 100%; font: inherit; padding: .65rem 2.4rem .65rem .8rem; border-radius: 10px; border: 2px solid var(--tm-border); background: var(--tm-surface-2); color: var(--tm-ink); }
+  .campo .ic { position: absolute; right: .75rem; top: 50%; transform: translateY(-50%); font-weight: 700; }
+  .acertou .campo input { border-color: var(--tm-good); background: var(--good-soft); }
+  .errou .campo input { border-color: var(--tm-bad); background: var(--bad-soft); }
+  .acertou .campo .ic { color: var(--good-text); }
+  .errou .campo .ic { color: var(--bad-text); }
+  .ouvir { display: inline-block; font-size: .82rem; padding: .35rem .8rem; border-radius: 99px; border: 1px solid var(--tm-border); margin-bottom: .55rem; }
+
+  /* Múltipla escolha */
+  .opt { display: flex; gap: .6rem; align-items: center; padding: .6rem .75rem; margin: .4rem 0; border-radius: 10px; border: 1px solid var(--tm-border); background: var(--tm-surface-2); }
+  .opt .letra { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--tm-border); font-size: .75rem; font-weight: 700; color: var(--tm-ink-muted); }
+  .opt .tag { margin-left: auto; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+  .opt.certa { border: 2px solid var(--tm-good); background: var(--good-soft); }
+  .opt.certa .letra { background: var(--tm-good); border-color: var(--tm-good); color: #fff; }
+  .opt.certa .tag { color: var(--good-text); }
+  .opt.sua { border: 2px solid var(--tm-bad); background: var(--bad-soft); }
+  .opt.sua .letra { background: var(--tm-bad); border-color: var(--tm-bad); color: #fff; }
+  .opt.sua .tag { color: var(--bad-text); }
+  .opt.apagada { opacity: .55; }
+
+  /* Classificação */
+  .item { display: flex; justify-content: space-between; align-items: center; gap: .6rem; padding: .5rem 0; border-bottom: 1px solid var(--tm-border); flex-wrap: wrap; font-size: .95rem; }
+  .item:last-child { border-bottom: 0; }
+  .item .bts { display: flex; gap: .35rem; }
+  .item .bt { font-size: .78rem; padding: .25rem .6rem; border-radius: 8px; border: 1px solid var(--tm-border); color: var(--tm-ink-muted); }
+  .item .bt.certa { border: 2px solid var(--tm-good); background: var(--good-soft); color: var(--good-text); font-weight: 700; }
+  .item .bt.sua { border: 2px solid var(--tm-bad); background: var(--bad-soft); color: var(--bad-text); font-weight: 700; }
+  .item.errado { background: var(--bad-soft); margin: 0 -.5rem; padding: .5rem; border-radius: 8px; }
+
+  /* ---------- Veredito (o bloco novo) ---------- */
+  .vd { margin-top: .8rem; border-radius: 12px; border: 1px solid; overflow: hidden; animation: entra .3s ease both; }
+  @keyframes entra { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .vd { animation: none; } }
+  .acertou .vd { border-color: color-mix(in srgb, var(--tm-good) 45%, transparent); }
+  .errou .vd { border-color: color-mix(in srgb, var(--tm-bad) 45%, transparent); }
+  .quase .vd { border-color: color-mix(in srgb, var(--tm-warn) 45%, transparent); }
+  .vd-titulo { padding: .55rem .85rem; font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: .5rem; }
+  .acertou .vd-titulo { background: var(--good-soft); color: var(--good-text); }
+  .errou .vd-titulo { background: var(--bad-soft); color: var(--bad-text); }
+  .quase .vd-titulo { background: var(--warn-soft); color: var(--warn-text); }
+  .vd-corpo { padding: .7rem .85rem .8rem; background: var(--tm-surface); }
+  .comp { display: grid; grid-template-columns: max-content 1fr; gap: .3rem .75rem; margin: 0 0 .7rem; font-size: .95rem; }
+  .comp dt { color: var(--tm-ink-muted); font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding-top: .15rem; }
+  .comp dd { margin: 0; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .92rem; }
+  .comp dd.certa { color: var(--good-text); font-weight: 700; }
+  @media (max-width: 420px) { .comp { grid-template-columns: 1fr; gap: .1rem; } .comp dd { margin-bottom: .45rem; } }
+  /* Destaque palavra a palavra */
+  del { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--bad-text); background: var(--bad-soft); border-radius: 4px; padding: 0 3px; }
+  ins { text-decoration: none; color: var(--good-text); background: var(--good-soft); border-radius: 4px; padding: 0 3px; font-weight: 700; }
+  .pq { font-size: .95rem; }
+  .pq b { display: block; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--tm-ink-muted); margin-bottom: .15rem; }
+  .acertou .vd-corpo .comp { display: none; } /* acertou: não precisa comparar */
+
+  /* ---------- Modos ---------- */
+  .hoje-so { display: none; }
+  body.simples del, body.simples ins { all: unset; }
+  /* "Como está hoje": borda na cor de destaque, sem veredito, explicação neutra */
+  body.hoje .hoje-so { display: block; }
+  body.hoje .novo-so, body.hoje .vd, body.hoje .q-selo { display: none; }
+  body.hoje .q::before { display: none; }
+  body.hoje .acertou .campo input { border-color: var(--tm-accent); background: var(--tm-surface-2); }
+  body.hoje .errou .campo input { background: var(--tm-surface-2); }
+  body.hoje .campo .ic { display: none; }
+  body.hoje .item.errado { background: none; margin: 0; padding: .5rem 0; }
+  .exp-antiga { margin-top: .7rem; background: var(--tm-accent-soft); border-left: 2px solid var(--tm-accent); padding: .6rem .75rem; font-size: .9rem; border-radius: 10px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="modo" id="modo"></div>
+  <h1>Prática: to be x verbo normal</h1>
+  <p class="sub">Inglês · Módulo 2 · Tópico 11 — perguntas reais, respostas de exemplo</p>
+
+  <!-- 1. Lacuna — ERROU -->
+  <section class="q errou">
+    <div class="q-tipo">Complete a lacuna <span class="q-selo">✗ Errou</span></div>
+    <div class="q-texto">Reescreva a frase errada, corrigida: "I am live in Brazil."</div>
+    <div class="campo"><input disabled value="I am living in Brazil"><span class="ic">✗</span></div>
+    <div class="vd">
+      <div class="vd-titulo">✗ Não foi dessa vez</div>
+      <div class="vd-corpo">
+        <dl class="comp">
+          <dt>Você escreveu</dt><dd>I <del>am living</del> in Brazil</dd>
+          <dt>Resposta certa</dt><dd class="certa">I <ins>live</ins> in Brazil.</dd>
+        </dl>
+        <div class="pq"><b>Por quê</b>Verbo normal ("live") fica sozinho, sem "am": "I live in Brazil".</div>
+      </div>
+    </div>
+    <div class="exp-antiga hoje-so">Verbo normal ("live") fica sozinho, sem "am": "I live in Brazil".</div>
+  </section>
+
+  <!-- 2. Lacuna — ACERTOU -->
+  <section class="q acertou">
+    <div class="q-tipo">Complete a lacuna <span class="q-selo">✓ Acertou</span></div>
+    <div class="q-texto">Traduza pro inglês: "Eu não trabalho em casa."</div>
+    <div class="campo"><input disabled value="I don't work at home."><span class="ic">✓</span></div>
+    <div class="vd">
+      <div class="vd-titulo">✓ Você acertou</div>
+      <div class="vd-corpo">
+        <div class="pq"><b>Por quê</b>"Trabalhar" é verbo normal → negativa com "don't": "I don't work at home".</div>
+      </div>
+    </div>
+    <div class="exp-antiga hoje-so">"Trabalhar" é verbo normal → negativa com "don't": "I don't work at home".</div>
+  </section>
+
+  <!-- 3. Ditado — ERROU (duas palavras) -->
+  <section class="q errou">
+    <div class="q-tipo">Ouça e escreva <span class="q-selo">✗ Errou</span></div>
+    <div class="q-texto">Ouça a frase e escreva exatamente o que ouviu.</div>
+    <span class="ouvir">🔊 Ouvir a frase</span>
+    <div class="campo"><input disabled value="We are developer, but we doesn't work at home."><span class="ic">✗</span></div>
+    <div class="vd">
+      <div class="vd-titulo">✗ Faltou pouco — 2 palavras diferentes</div>
+      <div class="vd-corpo">
+        <dl class="comp">
+          <dt>Você escreveu</dt><dd>We are <del>developer</del>, but we <del>doesn't</del> work at home.</dd>
+          <dt>Resposta certa</dt><dd class="certa">We are <ins>developers</ins>, but we <ins>don't</ins> work at home.</dd>
+        </dl>
+        <div class="pq"><b>Por quê</b>"We are developers" (to be: o que somos) + "we don't work at home" (verbo normal na negativa, com don't).</div>
+      </div>
+    </div>
+    <div class="exp-antiga hoje-so">"We are developers" (to be: o que somos) + "we don't work at home" (verbo normal na negativa, com don't).</div>
+  </section>
+
+  <!-- 4. Múltipla escolha — ERROU -->
+  <section class="q errou">
+    <div class="q-tipo">Múltipla escolha <span class="q-selo">✗ Errou</span></div>
+    <div class="q-texto">Qual das frases está 100% correta?</div>
+    <div class="opt apagada"><span class="letra">A</span>They am students.</div>
+    <div class="opt certa"><span class="letra">B</span>They study English.<span class="tag">✓ Correta</span></div>
+    <div class="opt sua"><span class="letra">C</span>They is study English.<span class="tag">✗ Sua resposta</span></div>
+    <div class="opt apagada"><span class="letra">D</span>They am study English.</div>
+    <div class="vd">
+      <div class="vd-titulo">✗ Não foi dessa vez — a certa é a B</div>
+      <div class="vd-corpo">
+        <div class="pq"><b>Por quê</b>"They" + verbo normal ("study") sozinho, sem to be junto.</div>
+      </div>
+    </div>
+    <div class="exp-antiga hoje-so">"They" + verbo normal ("study") sozinho, sem to be junto.</div>
+  </section>
+
+  <!-- 5. Múltipla escolha — ACERTOU -->
+  <section class="q acertou">
+    <div class="q-tipo">Múltipla escolha <span class="q-selo">✓ Acertou</span></div>
+    <div class="q-texto">Qual frase está 100% correta?</div>
+    <div class="opt apagada"><span class="letra">A</span>I am study every day.</div>
+    <div class="opt certa"><span class="letra">B</span>I study every day.<span class="tag">✓ Sua resposta</span></div>
+    <div class="opt apagada"><span class="letra">C</span>I studies every day.</div>
+    <div class="opt apagada"><span class="letra">D</span>I am studies every day.</div>
+    <div class="vd">
+      <div class="vd-titulo">✓ Você acertou</div>
+      <div class="vd-corpo">
+        <div class="pq"><b>Por quê</b>Verbo normal ("study") fica sozinho com "I", sem "am" e sem "-s" no final (o "-s" só entra com he/she/it, na próxima aula).</div>
+      </div>
+    </div>
+    <div class="exp-antiga hoje-so">Verbo normal ("study") fica sozinho com "I", sem "am" e sem "-s" no final (o "-s" só entra com he/she/it, na próxima aula).</div>
+  </section>
+
+  <!-- 6. Classificação — QUASE (5 de 6) -->
+  <section class="q quase">
+    <div class="q-tipo">Classificação <span class="q-selo">◐ 5 de 6</span></div>
+    <div class="q-texto">Classifique cada frase:</div>
+    <div class="item"><span>I am work in technology.</span><span class="bts"><span class="bt">Certa</span><span class="bt certa">✓ Errada</span></span></div>
+    <div class="item"><span>We don't drink tea.</span><span class="bts"><span class="bt certa">✓ Certa</span><span class="bt">Errada</span></span></div>
+    <div class="item errado"><span>I don't tired.</span><span class="bts"><span class="bt sua">✗ Certa</span><span class="bt certa">✓ Errada</span></span></div>
+    <div class="item"><span>They are at home.</span><span class="bts"><span class="bt certa">✓ Certa</span><span class="bt">Errada</span></span></div>
+    <div class="item"><span>You are live in Brazil.</span><span class="bts"><span class="bt">Certa</span><span class="bt certa">✓ Errada</span></span></div>
+    <div class="item"><span>I'm not hungry.</span><span class="bts"><span class="bt certa">✓ Certa</span><span class="bt">Errada</span></span></div>
+    <div class="vd">
+      <div class="vd-titulo">◐ Quase: 5 de 6 — reveja "I don't tired."</div>
+      <div class="vd-corpo">
+        <div class="pq"><b>Por quê</b>Erradas: to be junto com verbo normal ("I am work", "You are live") e don't com estado ("I don't tired"). Certas: cada um no seu lugar.</div>
+      </div>
+    </div>
+    <div class="exp-antiga hoje-so">Erradas: to be junto com verbo normal ("I am work", "You are live") e don't com estado ("I don't tired"). Certas: cada um no seu lugar.</div>
+  </section>
+</main>
+<script>
+  // Estados pela URL: #simples, #hoje, #escuro (combináveis com vírgula)
+  const estado = location.hash.slice(1).split(",");
+  if (estado.includes("escuro")) document.documentElement.dataset.tmTheme = "dark";
+  if (estado.includes("simples")) document.body.classList.add("simples");
+  if (estado.includes("hoje")) document.body.classList.add("hoje");
+  document.getElementById("modo").textContent =
+    estado.includes("hoje") ? "Como está hoje" :
+    estado.includes("simples") ? "Novo · sem destaque palavra a palavra" : "Novo · com destaque palavra a palavra";
+</script>
+</body>
+</html>

@@ -19,6 +19,7 @@ O endpoint (routers/pipeline.py) decide o que fazer com o resultado: salvar
 dificuldades e termos, gerar a "revisão de tudo", reiniciar a prova.
 """
 
+import difflib
 import re
 import unicodedata
 
@@ -84,6 +85,43 @@ def palavra_com_erro_de_grafia(resposta: str, aceitas: list[str]) -> str | None:
         if len(certa) >= 4 and not gramatical and not longa.startswith(curta) and _distancia(errada, certa) <= 2:
             return certa
     return None
+
+
+def frase_certa_para_exibir(resposta: str, aceitas: list[str], exibir: str | None = None) -> str:
+    """Frase certa pra mostrar ao aluno ao lado do que ele escreveu (2026-10-07,
+    PLANO_FEEDBACK_CORRECAO.md). Mesma regra do fraseCertaParaExibir() do render:
+    usa `resposta_exibir` do material se houver; senão a aceita mais parecida
+    com a resposta dele (as aceitas ficam em minúsculas, "i live in brazil."),
+    copiando a grafia dele nas palavras que batem e com maiúscula no início e
+    no "I" sozinho do inglês."""
+    if exibir:
+        return exibir
+    if not aceitas:
+        return ""
+    sua = (resposta or "").split()
+    sua_norm = [normalizar_resposta(t) for t in sua]
+
+    def acertos(aceita: str) -> int:
+        alvo = [normalizar_resposta(t) for t in aceita.split()]
+        return sum(b.size for b in difflib.SequenceMatcher(a=sua_norm, b=alvo, autojunk=False).get_matching_blocks())
+
+    melhor = max(aceitas, key=acertos)
+    # A 1ª palavra dele fica de fora: a maiúscula ali é só começo de frase.
+    grafia = {}
+    for t, n in list(zip(sua, sua_norm))[1:]:
+        if n:
+            grafia.setdefault(n, t)
+    tokens = []
+    for t in melhor.split():
+        n = normalizar_resposta(t)
+        original = grafia.get(n)
+        if original and normalizar_resposta(original) == n and original.lower() != original:
+            # Copia só as maiúsculas dele; a pontuação continua a da aceita.
+            t = "".join(c.upper() if i < len(original) and original[i].isupper() else c for i, c in enumerate(t))
+        tokens.append(t)
+    frase = " ".join(tokens)
+    frase = re.sub(r"(^|[\s\"(])i(?=['’\s.,!?]|$)", r"\1I", frase)
+    return frase[:1].upper() + frase[1:]
 
 
 def _perguntas_dos_slides(slides: list[dict]) -> list[dict]:
@@ -175,6 +213,11 @@ async def corrigir_e_revisar(agente, slides: list[dict], respostas: dict, materi
             item = {"id": p["id"], "tipo": tipo, "enunciado": p.get("enunciado", ""),
                     "sua_resposta": texto or "(não respondida)", "explicacao": p.get("explicacao") or "",
                     "resposta_certa": p.get("resposta_modelo") or (aceitas[0] if aceitas else "")}
+            if tipo in ("lacuna", "ditado"):
+                # Pro relatório comparar palavra por palavra com o que ele escreveu
+                # (o resposta_certa pode virar o "ponto certo" em texto da IA).
+                item["frase_certa"] = frase_certa_para_exibir(texto, aceitas, p.get("resposta_exibir"))
+                item["resposta_certa"] = p.get("resposta_modelo") or item["frase_certa"]
             if not texto:
                 item["classificacao"] = "errada"
             elif tipo != "open" and normalizar_resposta(texto) in {normalizar_resposta(a) for a in aceitas}:

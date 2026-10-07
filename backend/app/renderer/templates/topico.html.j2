@@ -198,7 +198,7 @@
       {% endfor %}
     </div>
     {% elif p.tipo == 'lacuna' %}
-    <div class="lacuna-wrap gate-item" data-qid="{{ p.id }}" data-answers='{{ p.respostas_aceitas | tojson }}'>
+    <div class="lacuna-wrap gate-item" data-qid="{{ p.id }}" data-answers='{{ p.respostas_aceitas | tojson }}'{% if p.resposta_exibir %} data-exibir="{{ p.resposta_exibir }}"{% endif %}>
       <input type="text" class="lacuna-input" placeholder="{{ p.placeholder or 'Digite sua resposta' }}">
       <button class="register-btn lacuna-check-btn">Corrigir</button>
     </div>
@@ -210,7 +210,7 @@
     <div class="explanation" data-exp="{{ p.id }}-modelo">{{ p.resposta_modelo }}</div>
     {% endif %}
     {% elif p.tipo == 'ditado' %}
-    <div class="ditado-wrap gate-item" data-qid="{{ p.id }}" data-answers='{{ p.respostas_aceitas | tojson }}'>
+    <div class="ditado-wrap gate-item" data-qid="{{ p.id }}" data-answers='{{ p.respostas_aceitas | tojson }}'{% if p.resposta_exibir %} data-exibir="{{ p.resposta_exibir }}"{% endif %}>
       <button type="button" class="vocab-listen ditado-play" data-say="{{ p.frase_audio }}" aria-label="Ouvir a frase" title="Ouvir a frase (pode repetir quantas vezes precisar)">🔊 Ouvir a frase</button>
       <input type="text" class="lacuna-input ditado-input" placeholder="{{ p.placeholder or 'Escreva exatamente o que você ouviu' }}">
       <button class="register-btn ditado-check-btn">Corrigir</button>
@@ -260,6 +260,9 @@
     --good-soft: color-mix(in srgb, var(--good) 16%, var(--surface-2));
     --good-text: color-mix(in srgb, var(--good) 72%, var(--text));
     --bad-text: color-mix(in srgb, var(--bad) 80%, var(--text));
+    /* "Quase" (acertou parte) em laranja — 2026-10-07, PLANO_FEEDBACK_CORRECAO.md */
+    --warn-soft: color-mix(in srgb, var(--amber) 16%, var(--surface-2));
+    --warn-text: color-mix(in srgb, var(--amber) 78%, var(--text));
     --font-display: {{ tema.fontFamilyDisplay | default(tema.fontFamily) | safe }};
     --font-label: {{ tema.fontFamilyLabel | default(tema.fontFamily) | safe }};
   }
@@ -506,6 +509,45 @@
   .explanation { display: none; margin-top: 10px; background: var(--accent-soft); border-left: 2px solid var(--accent); padding: 11px 13px; font-size: 13.5px; color: var(--text); border-radius: var(--radius); }
   .explanation.show { display: block; animation: slideIn .3s ease both; }
 
+  /* Veredito da questão (2026-10-07, PLANO_FEEDBACK_CORRECAO.md / protótipo 15):
+     acertou/errou/quase sempre com TEXTO (não só cor), "Você escreveu × Resposta
+     certa" palavra a palavra e a explicação como "Por quê", na cor do resultado. */
+  .question.q-acertou { box-shadow: inset 4px 0 0 var(--good); }
+  .question.q-errou { box-shadow: inset 4px 0 0 var(--bad); }
+  .question.q-quase { box-shadow: inset 4px 0 0 var(--amber); }
+  .q-selo { font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .q-acertou .q-selo { background: var(--good-soft); color: var(--good-text); }
+  .q-errou .q-selo { background: var(--bad-soft); color: var(--bad-text); }
+  .q-quase .q-selo { background: var(--warn-soft); color: var(--warn-text); }
+  .veredito { margin-top: 12px; border-radius: var(--radius); border: 1px solid; overflow: hidden; animation: slideIn .3s ease both; }
+  .vd-acertou { border-color: color-mix(in srgb, var(--good) 45%, transparent); }
+  .vd-errou { border-color: color-mix(in srgb, var(--bad) 45%, transparent); }
+  .vd-quase { border-color: color-mix(in srgb, var(--amber) 45%, transparent); }
+  .vd-titulo { padding: 9px 13px; font-weight: 700; font-size: 14.5px; }
+  .vd-acertou .vd-titulo { background: var(--good-soft); color: var(--good-text); }
+  .vd-errou .vd-titulo { background: var(--bad-soft); color: var(--bad-text); }
+  .vd-quase .vd-titulo { background: var(--warn-soft); color: var(--warn-text); }
+  .vd-corpo { padding: 11px 13px 12px; background: var(--surface); }
+  .vd-corpo:empty { display: none; }
+  .vd-comp { display: grid; grid-template-columns: max-content 1fr; gap: 5px 12px; margin: 0 0 10px; font-size: 14px; }
+  .vd-comp:last-child { margin-bottom: 0; }
+  .vd-comp dt { font-family: var(--font-label); font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); padding-top: 3px; }
+  .vd-comp dd { margin: 0; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13.5px; line-height: 1.6; color: var(--text); }
+  .vd-comp dd.vd-certa { color: var(--good-text); font-weight: 700; }
+  @media (max-width: 420px) { .vd-comp { grid-template-columns: 1fr; gap: 1px; } .vd-comp dd { margin-bottom: 7px; } }
+  .vd-comp del { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--bad-text); background: var(--bad-soft); border-radius: 4px; padding: 0 3px; }
+  .vd-comp ins { text-decoration: none; color: var(--good-text); background: var(--good-soft); border-radius: 4px; padding: 0 3px; }
+  .veredito .explanation { display: block; margin: 0; padding: 0; background: none; border: 0; border-radius: 0; animation: none; }
+  .veredito .explanation::before, .rev-porque::before { content: 'Por quê'; display: block; font-family: var(--font-label); font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 3px; }
+  /* Campo já corrigido: o texto dele continua legível (o disabled do navegador apagava) */
+  .lacuna-wrap.acertou .lacuna-input, .lacuna-wrap.errou .lacuna-input,
+  .ditado-wrap.acertou .lacuna-input, .ditado-wrap.errou .lacuna-input { color: var(--text); -webkit-text-fill-color: var(--text); opacity: 1; }
+  .lacuna-wrap.acertou .lacuna-input { border-color: var(--good); background: var(--good-soft); }
+  .lacuna-wrap.errou .lacuna-input, .ditado-wrap.errou .lacuna-input { border-color: var(--bad); background: var(--bad-soft); }
+  .ditado-wrap.acertou .lacuna-input { border-color: var(--good); background: var(--good-soft); }
+  .opt-btn.opt-off { opacity: .55; }
+  .classify-item.item-errado { background: var(--bad-soft); border-radius: var(--radius); padding-left: 8px; padding-right: 8px; }
+
   .gate-hint { font-size: 12px; color: var(--amber); margin-top: 8px; display: none; }
   .gate-hint.show { display: block; }
 
@@ -644,11 +686,13 @@
   .rev-parcial .rev-tag { color: var(--amber); }
   .rev-pergunta { font-weight: 600; font-size: 14.5px; line-height: 1.45; color: var(--text); margin-bottom: 10px; }
   .rev-rotulo { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 3px; }
-  .rev-sua { border-radius: var(--radius); padding: 9px 11px; background: var(--surface); border: 1px dashed var(--border); margin-bottom: 8px; }
-  .rev-sua .rev-rotulo { color: var(--text-dim); }
-  .rev-sua-texto { font-size: 13px; color: var(--text-muted); font-style: italic; white-space: pre-line; }
-  .rev-certo { border-radius: var(--radius); padding: 10px 12px; background: var(--accent-soft); margin-bottom: 8px; font-size: 14px; line-height: 1.55; color: var(--text); white-space: pre-line; }
-  .rev-certo .rev-rotulo { color: var(--accent); }
+  /* Relatório no mesmo visual do veredito (2026-10-07): sua resposta em vermelho, certo em verde */
+  .rev-sua { border-radius: var(--radius); padding: 9px 11px; background: var(--bad-soft); border: 1px solid color-mix(in srgb, var(--bad) 35%, transparent); margin-bottom: 8px; }
+  .rev-sua .rev-rotulo { color: var(--bad-text); }
+  .rev-sua-texto { font-size: 13.5px; color: var(--text); white-space: pre-line; }
+  .rev-comp { border-radius: var(--radius); padding: 10px 12px; background: var(--surface); border: 1px solid var(--border-soft); margin: 0 0 8px; }
+  .rev-certo { border-radius: var(--radius); padding: 10px 12px; background: var(--good-soft); margin-bottom: 8px; font-size: 14px; line-height: 1.55; color: var(--text); white-space: pre-line; }
+  .rev-certo .rev-rotulo { color: var(--good-text); }
   .rev-explicacao { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px; }
   .rev-exemplo { display: flex; gap: 8px; font-size: 13px; line-height: 1.5; color: var(--text); margin-bottom: 6px; }
   .rev-link { background: none; border: none; padding: 4px 0 0; font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--accent); cursor: pointer; }
@@ -663,7 +707,7 @@
   .rev-bloco-regra { border-radius: var(--radius); padding: 10px 12px; background: var(--accent-soft); font-size: 14px; line-height: 1.55; color: var(--text); margin-bottom: 10px; }
   .rev-bloco-exemplos { list-style: none; margin: 0; padding: 0; }
   .rev-bloco-exemplos li { position: relative; padding: 4px 0 4px 22px; font-size: 13.5px; line-height: 1.5; color: var(--text); }
-  .rev-bloco-exemplos li::before { content: '✓'; position: absolute; left: 2px; color: var(--accent); font-weight: 700; }
+  .rev-bloco-exemplos li::before { content: '✓'; position: absolute; left: 2px; color: var(--good-text); font-weight: 700; }
   .rev-termos { display: grid; grid-template-columns: 1fr; gap: 8px; }
   @media (min-width: 560px) { .rev-termos { grid-template-columns: 1fr 1fr; } }
   .rev-termo { border: 1px solid var(--border-soft); border-radius: var(--radius); background: var(--surface-2); padding: 10px 12px; }
@@ -1293,19 +1337,36 @@ function cartaoRevisao(item, idx) {
   topo.appendChild(criarEl('span', 'rev-tag', ROTULO_CLASSIFICACAO[item.classificacao] || ''));
   c.appendChild(topo);
   c.appendChild(criarEl('div', 'rev-pergunta', item.enunciado));
-  if (item.sua_resposta) {
+  // Lacuna/ditado respondida: mesma comparação palavra a palavra do exercício
+  // (2026-10-07, PLANO_FEEDBACK_CORRECAO.md). frase_certa vem do backend.
+  var comparou = false;
+  if (item.frase_certa && item.sua_resposta && item.sua_resposta !== '(não respondida)') {
+    var d = compararPalavras(item.sua_resposta, item.frase_certa);
+    var comp = criarEl('dl', 'vd-comp rev-comp');
+    comp.appendChild(criarEl('dt', null, 'Você escreveu'));
+    var ddSua = criarEl('dd');
+    ddSua.innerHTML = palavrasMarcadas(d.a, d.okA, 'del');
+    comp.appendChild(ddSua);
+    comp.appendChild(criarEl('dt', null, 'Resposta certa'));
+    var ddCerta = criarEl('dd', 'vd-certa');
+    ddCerta.innerHTML = palavrasMarcadas(d.b, d.okB, 'ins');
+    comp.appendChild(ddCerta);
+    c.appendChild(comp);
+    comparou = true;
+  } else if (item.sua_resposta) {
     var sua = criarEl('div', 'rev-sua');
-    sua.appendChild(criarEl('div', 'rev-rotulo', 'Você respondeu'));
+    sua.appendChild(criarEl('div', 'rev-rotulo', '✗ Você respondeu'));
     sua.appendChild(criarEl('div', 'rev-sua-texto', item.sua_resposta));
     c.appendChild(sua);
   }
-  if (item.resposta_certa) {
+  // Com a comparação, o "ponto certo" só aparece se a IA escreveu algo além da frase.
+  if (item.resposta_certa && !(comparou && normalizarResposta(item.resposta_certa) === normalizarResposta(item.frase_certa))) {
     var certo = criarEl('div', 'rev-certo');
-    certo.appendChild(criarEl('div', 'rev-rotulo', '✔ O ponto certo'));
+    certo.appendChild(criarEl('div', 'rev-rotulo', '✓ O ponto certo'));
     certo.appendChild(criarEl('div', null, item.resposta_certa));
     c.appendChild(certo);
   }
-  if (item.explicacao) c.appendChild(criarEl('div', 'rev-explicacao', item.explicacao));
+  if (item.explicacao) c.appendChild(criarEl('div', 'rev-explicacao rev-porque', item.explicacao));
   if (item.exemplo) c.appendChild(blocoExemplo(item.exemplo));
   if (item.slide) c.appendChild(botaoReverSlide(item.slide));
   return c;
@@ -1844,11 +1905,11 @@ function montarPerguntaReforcoHTML(p) {
     html += '<button type="button" class="tf-btn" data-v="verdadeiro">Verdadeiro</button>';
     html += '<button type="button" class="tf-btn" data-v="falso">Falso</button></div>';
   } else if (p.tipo === 'lacuna') {
-    html += '<div class="lacuna-wrap" data-answers="' + escapeAttr(JSON.stringify(p.respostas_aceitas || [])) + '">';
+    html += '<div class="lacuna-wrap" data-answers="' + escapeAttr(JSON.stringify(p.respostas_aceitas || [])) + '"' + (p.resposta_exibir ? ' data-exibir="' + escapeAttr(p.resposta_exibir) + '"' : '') + '>';
     html += '<input type="text" class="lacuna-input" placeholder="' + escapeAttr(p.placeholder || 'Digite sua resposta') + '">';
     html += '<button type="button" class="register-btn lacuna-check-btn">Corrigir</button></div>';
   } else if (p.tipo === 'ditado') {
-    html += '<div class="ditado-wrap" data-answers="' + escapeAttr(JSON.stringify(p.respostas_aceitas || [])) + '">';
+    html += '<div class="ditado-wrap" data-answers="' + escapeAttr(JSON.stringify(p.respostas_aceitas || [])) + '"' + (p.resposta_exibir ? ' data-exibir="' + escapeAttr(p.resposta_exibir) + '"' : '') + '>';
     html += '<button type="button" class="vocab-listen ditado-play" data-say="' + escapeAttr(p.frase_audio) + '">🔊 Ouvir a frase</button>';
     html += '<input type="text" class="lacuna-input ditado-input" placeholder="' + escapeAttr(p.placeholder || 'Escreva exatamente o que você ouviu') + '">';
     html += '<button type="button" class="register-btn ditado-check-btn">Corrigir</button></div>';
@@ -1878,11 +1939,17 @@ function wireReforcoPergunta(container, p, reforcoId) {
       btn.addEventListener('click', function () {
         if (opts.dataset.answered) return;
         opts.dataset.answered = '1';
-        var isCorrect = parseInt(btn.dataset.i, 10) === correctIdx;
+        var escolhaIdx = parseInt(btn.dataset.i, 10);
+        var isCorrect = escolhaIdx === correctIdx;
+        // Antes: classList.add('') nas outras opções lançava erro e parava aqui —
+        // sem cores, sem explicação e a resposta do reforço não era salva.
         opts.querySelectorAll('.opt-btn').forEach(function (b, i) {
-          b.classList.add(i === correctIdx ? 'correct' : (b === btn ? 'incorrect' : ''));
+          b.disabled = true;
+          if (i === correctIdx) b.classList.add('correct');
+          else if (b === btn) b.classList.add('incorrect');
         });
         if (exp) exp.classList.add('show');
+        vereditoMC(opts, escolhaIdx, correctIdx);
         enviarRespostaReforco(reforcoId, parseInt(btn.dataset.i, 10), isCorrect);
       });
     });
@@ -1894,8 +1961,12 @@ function wireReforcoPergunta(container, p, reforcoId) {
         if (row.dataset.answered) return;
         row.dataset.answered = '1';
         var isCorrect = btn.dataset.v === correctVal;
+        row.querySelectorAll('.tf-btn').forEach(function (b) { b.disabled = true; });
+        var correctBtn = row.querySelector('[data-v="' + correctVal + '"]');
+        if (correctBtn) correctBtn.classList.add('correct');
         if (!isCorrect) btn.classList.add('incorrect');
         if (exp) exp.classList.add('show');
+        vereditoTF(row, btn.dataset.v, correctVal);
         enviarRespostaReforco(reforcoId, btn.dataset.v, isCorrect);
       });
     });
@@ -1924,8 +1995,9 @@ function wireReforcoPergunta(container, p, reforcoId) {
       var isCorrect = aceitas.indexOf(normalizarResposta(valor)) !== -1;
       input.disabled = true;
       btn.disabled = true;
-      input.style.borderColor = isCorrect ? 'var(--accent)' : 'var(--bad)';
+      btn.classList.add('done');
       if (exp) exp.classList.add('show');
+      vereditoFrase(wrap, valor, isCorrect);
       enviarRespostaReforco(reforcoId, valor, isCorrect);
     });
   }
@@ -2025,6 +2097,7 @@ document.querySelectorAll('.opts').forEach(function (optsEl) {
       if (!isCorrect) btn.classList.add('incorrect');
       ensureQ(qid).correct = isCorrect;
       if (exp) exp.classList.add('show');
+      vereditoMC(optsEl, chosenIdx, correctIdx);
       salvarRespostaRemota(qid, optsEl.closest('.slide').dataset.gate, 'mc', chosenIdx, isCorrect);
       checkGate(optsEl.closest('.slide'));
       updateStatsLive();
@@ -2049,6 +2122,7 @@ document.querySelectorAll('.tf-row').forEach(function (row) {
       if (!isCorrect) btn.classList.add('incorrect');
       ensureQ(qid).correct = isCorrect;
       if (exp) exp.classList.add('show');
+      vereditoTF(row, btn.dataset.v, correctVal);
       salvarRespostaRemota(qid, row.closest('.slide').dataset.gate, 'tf', btn.dataset.v, isCorrect);
       checkGate(row.closest('.slide'));
       updateStatsLive();
@@ -2073,10 +2147,12 @@ document.querySelectorAll('[data-gate-group]').forEach(function (group) {
         const isCorrect = btn.dataset.v === correctVal;
         if (!isCorrect) btn.classList.add('incorrect');
         ensureQ(qid).correct = isCorrect;
+        if (isCorrect) item.dataset.ok = '1';
         const allAnswered = group.querySelectorAll('.classify-item:not([data-answered])').length === 0;
         if (allAnswered) {
           const exp = document.querySelector('[data-exp="' + groupId + '"]');
           if (exp) exp.classList.add('show');
+          vereditoClassify(group);
         }
         salvarRespostaRemota(qid, item.closest('.slide').dataset.gate, groupTipo, btn.dataset.v, isCorrect);
         checkGate(item.closest('.slide'));
@@ -2108,6 +2184,184 @@ function normalizarResposta(s) {
     .replace(/[.,!?;:"]/g, ' ')
     .replace(/\s+/g, ' ').trim();
 }
+
+// Veredito da questão (2026-10-07, PLANO_FEEDBACK_CORRECAO.md) — um lugar só pra
+// mostrar acertou/errou/quase em todo tipo de pergunta, nos 3 caminhos: ao
+// responder, ao restaurar resposta salva e no reforço do tutor. Antes a lacuna/
+// ditado só mudava a borda (e o acerto na cor de destaque) e a resposta certa
+// não aparecia; a explicação era a mesma caixa neutra acertando ou errando.
+var LETRAS_OPCAO = 'ABCDEFGHIJ';
+var TITULO_VEREDITO = { acertou: '✓ Você acertou', errou: '✗ Não foi dessa vez', quase: '◐ Quase' };
+var SELO_VEREDITO = { acertou: '✓ Acertou', errou: '✗ Errou', quase: '◐ Quase' };
+
+// Comparação palavra a palavra (maior subsequência comum, com a mesma
+// normalização da correção): okA/okB marcam as palavras que batem em cada lado.
+function compararPalavras(sua, certa) {
+  var a = String(sua || '').split(/\s+/).filter(Boolean);
+  var b = String(certa || '').split(/\s+/).filter(Boolean);
+  var na = a.map(normalizarResposta), nb = b.map(normalizarResposta);
+  var L = [];
+  for (var i = 0; i <= a.length; i++) L.push(new Array(b.length + 1).fill(0));
+  for (var x = a.length - 1; x >= 0; x--) {
+    for (var y = b.length - 1; y >= 0; y--) {
+      L[x][y] = na[x] === nb[y] ? L[x + 1][y + 1] + 1 : Math.max(L[x + 1][y], L[x][y + 1]);
+    }
+  }
+  var okA = [], okB = [], p = 0, q = 0;
+  while (p < a.length && q < b.length) {
+    if (na[p] === nb[q]) { okA[p] = okB[q] = true; p++; q++; }
+    else if (L[p + 1][q] >= L[p][q + 1]) p++;
+    else q++;
+  }
+  return { a: a, b: b, okA: okA, okB: okB, iguais: L[0][0] };
+}
+
+function palavrasMarcadas(palavras, ok, tag) {
+  return palavras.map(function (t, k) {
+    return ok[k] ? escapeHtml(t) : '<' + tag + '>' + escapeHtml(t) + '</' + tag + '>';
+  }).join(' ');
+}
+
+// Frase certa pra mostrar: as aceitas ficam em minúsculas ("i live in brazil."),
+// então usa `resposta_exibir` do material se houver; senão a aceita mais parecida
+// com o que ele escreveu, copiando as maiúsculas dele nas palavras que batem,
+// maiúscula no início e no "I" sozinho. Mesma regra do frase_certa_para_exibir()
+// do backend (agents/revisao_avaliacao.py), usado no relatório final.
+function fraseCertaParaExibir(resposta, aceitas, exibir) {
+  if (exibir) return exibir;
+  if (!aceitas || !aceitas.length) return '';
+  var melhor = aceitas[0], maior = -1;
+  aceitas.forEach(function (ac) {
+    var n = compararPalavras(resposta, ac).iguais;
+    if (n > maior) { maior = n; melhor = ac; }
+  });
+  var grafia = {};
+  // A 1ª palavra dele fica de fora: a maiúscula ali é só começo de frase
+  // (copiar dava "but We don't" no meio da frase certa).
+  String(resposta || '').split(/\s+/).filter(Boolean).slice(1).forEach(function (t) {
+    var n = normalizarResposta(t);
+    if (n && !(n in grafia)) grafia[n] = t;
+  });
+  var frase = melhor.split(/\s+/).filter(Boolean).map(function (t) {
+    var original = grafia[normalizarResposta(t)];
+    if (!original || original.toLowerCase() === original) return t;
+    return t.split('').map(function (c, i) {
+      return i < original.length && original[i] !== original[i].toLowerCase() ? c.toUpperCase() : c;
+    }).join('');
+  }).join(' ');
+  frase = frase.replace(/(^|[\s"(])i(?=['’\s.,!?]|$)/g, '$1I');
+  return frase.charAt(0).toUpperCase() + frase.slice(1);
+}
+
+// info: { titulo, selo, sua, certa } — sua/certa só em lacuna/ditado errado.
+function mostrarVeredito(questionEl, estado, info) {
+  if (!questionEl) return;
+  info = info || {};
+  questionEl.classList.remove('q-acertou', 'q-errou', 'q-quase');
+  questionEl.classList.add('q-' + estado);
+
+  var meta = questionEl.querySelector('.q-meta');
+  var selo = meta && meta.querySelector('.q-selo');
+  if (meta && !selo) { selo = criarEl('span', 'q-selo'); meta.appendChild(selo); }
+  if (selo) selo.textContent = info.selo || SELO_VEREDITO[estado];
+
+  var qid = questionEl.dataset.qid;
+  var vd = null;
+  for (var i = 0; i < questionEl.children.length; i++) {
+    if (questionEl.children[i].classList.contains('veredito')) vd = questionEl.children[i];
+  }
+  if (!vd) {
+    vd = criarEl('div', 'veredito');
+    vd.appendChild(criarEl('div', 'vd-titulo'));
+    var corpo = criarEl('div', 'vd-corpo');
+    vd.appendChild(corpo);
+    // A explicação da própria questão (não a resposta-modelo da aberta) vira o "Por quê".
+    var exp = null;
+    questionEl.querySelectorAll('.explanation').forEach(function (e) { if (e.dataset.exp === qid) exp = e; });
+    if (exp) {
+      exp.parentNode.insertBefore(vd, exp);
+      corpo.appendChild(exp);
+      exp.classList.add('show');
+    } else {
+      questionEl.appendChild(vd);
+    }
+  }
+  vd.className = 'veredito vd-' + estado;
+  vd.querySelector('.vd-titulo').textContent = info.titulo || TITULO_VEREDITO[estado];
+
+  var corpoEl = vd.querySelector('.vd-corpo');
+  var antiga = corpoEl.querySelector('.vd-comp');
+  if (antiga) antiga.remove();
+  if (estado !== 'acertou' && info.certa) {
+    var d = compararPalavras(info.sua, info.certa);
+    var comp = criarEl('dl', 'vd-comp');
+    comp.appendChild(criarEl('dt', null, 'Você escreveu'));
+    var ddSua = criarEl('dd');
+    ddSua.innerHTML = palavrasMarcadas(d.a, d.okA, 'del');
+    comp.appendChild(ddSua);
+    comp.appendChild(criarEl('dt', null, 'Resposta certa'));
+    var ddCerta = criarEl('dd', 'vd-certa');
+    ddCerta.innerHTML = palavrasMarcadas(d.b, d.okB, 'ins');
+    comp.appendChild(ddCerta);
+    corpoEl.insertBefore(comp, corpoEl.firstChild);
+  }
+}
+
+function vereditoMC(optsEl, escolhaIdx, correctIdx) {
+  optsEl.querySelectorAll('.opt-btn').forEach(function (b, i) {
+    if (i !== correctIdx && i !== escolhaIdx) b.classList.add('opt-off');
+  });
+  var ok = escolhaIdx === correctIdx;
+  mostrarVeredito(optsEl.closest('.question'), ok ? 'acertou' : 'errou',
+    ok ? {} : { titulo: '✗ Não foi dessa vez — a certa é a ' + LETRAS_OPCAO.charAt(correctIdx) });
+}
+
+function vereditoTF(row, escolha, correctVal) {
+  var ok = escolha === correctVal;
+  mostrarVeredito(row.closest('.question'), ok ? 'acertou' : 'errou',
+    ok ? {} : { titulo: '✗ Não foi dessa vez — a certa é ' + (correctVal === 'verdadeiro' ? 'Verdadeiro' : 'Falso') });
+}
+
+function vereditoFrase(wrap, valor, isCorrect) {
+  wrap.classList.remove('acertou', 'errou');
+  wrap.classList.add(isCorrect ? 'acertou' : 'errou');
+  var certa = fraseCertaParaExibir(valor, JSON.parse(wrap.dataset.answers || '[]'), wrap.dataset.exibir);
+  var info = { sua: valor, certa: certa };
+  if (!isCorrect && certa) {
+    var d = compararPalavras(valor, certa);
+    var dif = Math.max(d.a.length, d.b.length) - d.iguais;
+    if (dif > 0 && dif <= 2) info.titulo = '✗ Faltou pouco — ' + dif + (dif === 1 ? ' palavra diferente' : ' palavras diferentes');
+  }
+  mostrarVeredito(wrap.closest('.question'), isCorrect ? 'acertou' : 'errou', info);
+}
+
+// Classificação/associação: só depois de todos os itens. Mesma régua da nota
+// do relatório (revisao_avaliacao.py): tudo certo = acertou; metade ou mais = quase.
+function vereditoClassify(group) {
+  if (group.querySelectorAll('.classify-item:not([data-answered])').length) return;
+  var itens = group.querySelectorAll('.classify-item');
+  var certos = 0, errados = [];
+  itens.forEach(function (it) {
+    if (it.dataset.ok === '1') { certos++; return; }
+    it.classList.add('item-errado');
+    var label = it.querySelector('.classify-label');
+    if (label) errados.push(label.textContent.trim());
+  });
+  var total = itens.length;
+  var placar = certos + ' de ' + total;
+  var estado = certos === total ? 'acertou' : (certos * 2 >= total ? 'quase' : 'errou');
+  var titulo;
+  if (estado === 'quase') {
+    titulo = '◐ Quase: ' + placar + (errados.length === 1 ? ' — reveja "' + errados[0] + '"' : ' — reveja as marcadas em vermelho');
+  } else if (estado === 'errou') {
+    titulo = '✗ ' + placar + ' certas — as respostas certas estão em verde';
+  }
+  mostrarVeredito(group.closest('.question'), estado, {
+    titulo: titulo,
+    selo: estado === 'acertou' ? '✓ ' + placar : (estado === 'quase' ? '◐ ' : '✗ ') + placar,
+  });
+}
+
 document.querySelectorAll('.lacuna-wrap').forEach(function (wrap) {
   const qid = wrap.dataset.qid;
   const aceitas = JSON.parse(wrap.dataset.answers || '[]').map(normalizarResposta);
@@ -2124,9 +2378,9 @@ document.querySelectorAll('.lacuna-wrap').forEach(function (wrap) {
     input.disabled = true;
     btn.disabled = true;
     btn.classList.add('done');
-    input.style.borderColor = isCorrect ? 'var(--accent)' : 'var(--bad)';
     ensureQ(qid).correct = isCorrect;
     if (exp) exp.classList.add('show');
+    vereditoFrase(wrap, valor, isCorrect);
     salvarRespostaRemota(qid, wrap.closest('.slide').dataset.gate, 'lacuna', valor, isCorrect);
     checkGate(wrap.closest('.slide'));
     updateStatsLive();
@@ -2152,10 +2406,10 @@ document.querySelectorAll('.ditado-wrap').forEach(function (wrap) {
     input.disabled = true;
     btn.disabled = true;
     btn.classList.add('done');
-    input.style.borderColor = isCorrect ? 'var(--accent)' : 'var(--bad)';
     ensureQ(qid).correct = isCorrect;
     salvarRespostaRemota(qid, wrap.closest('.slide').dataset.gate, 'ditado', valor, isCorrect);
     if (exp) exp.classList.add('show');
+    vereditoFrase(wrap, valor, isCorrect);
     checkGate(wrap.closest('.slide'));
     updateStatsLive();
   });
@@ -2176,6 +2430,7 @@ function restaurarMC(qid, escolhaSalva) {
   ensureQ(qid).correct = escolhaSalva === correctIdx;
   const exp = optsEl.closest('.question').querySelector('.explanation');
   if (exp) exp.classList.add('show');
+  vereditoMC(optsEl, escolhaSalva, correctIdx);
 }
 function restaurarTF(qid, escolhaSalva) {
   const row = document.querySelector('.tf-row[data-qid="' + qid + '"]');
@@ -2193,6 +2448,7 @@ function restaurarTF(qid, escolhaSalva) {
   ensureQ(qid).correct = escolhaSalva === correctVal;
   const exp = row.closest('.question').querySelector('.explanation');
   if (exp) exp.classList.add('show');
+  vereditoTF(row, escolhaSalva, correctVal);
 }
 function restaurarClassify(qid, escolhaSalva) {
   const item = document.querySelector('.classify-item[data-qid="' + qid + '"]');
@@ -2208,12 +2464,14 @@ function restaurarClassify(qid, escolhaSalva) {
     if (chosenBtn) chosenBtn.classList.add('incorrect');
   }
   ensureQ(qid).correct = escolhaSalva === correctVal;
+  if (escolhaSalva === correctVal) item.dataset.ok = '1';
   const group = item.closest('[data-gate-group]');
   if (group) {
     const allAnswered = group.querySelectorAll('.classify-item:not([data-answered])').length === 0;
     if (allAnswered) {
       const exp = document.querySelector('[data-exp="' + group.dataset.gateGroup + '"]');
       if (exp) exp.classList.add('show');
+      vereditoClassify(group);
     }
   }
 }
@@ -2229,10 +2487,10 @@ function restaurarLacunaOuDitado(qid, valorSalvo, seletorWrap, seletorInput, sel
   input.disabled = true;
   btn.disabled = true;
   btn.classList.add('done');
-  input.style.borderColor = isCorrect ? 'var(--accent)' : 'var(--bad)';
   ensureQ(qid).correct = isCorrect;
   const exp = wrap.closest('.question').querySelector('.explanation');
   if (exp) exp.classList.add('show');
+  vereditoFrase(wrap, valorSalvo, isCorrect);
 }
 function restaurarOpen(qid, textoSalvo) {
   const textarea = document.querySelector('textarea[data-open="' + qid + '"]');
