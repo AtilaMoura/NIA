@@ -89,6 +89,17 @@ export const CATALOGO: CursoCatalogo[] = [
     disponivel: true,
   },
   {
+    slug: "vendas-internet",
+    titulo: "Vendas na Internet: do post ao primeiro cliente",
+    subtitulo: "Estudo pessoal — do orgânico aos anúncios, rumo à gestão de tráfego",
+    descricao:
+      "Como se ganha dinheiro na internet e como trabalhar com isso: modelos de negócio, assinatura, funil, oferta e copy, página de vendas, Instagram orgânico e WhatsApp, criativos no Canva e CapCut, Meta Ads e TikTok Ads passo a passo, métricas, e a carreira em gestão de tráfego — com o Emaús como caso real em cada tarefa.",
+    tom: "oliveira",
+    categoria: "Estudos pessoais",
+    courseId: 13,
+    disponivel: true,
+  },
+  {
     slug: "panorama-da-biblia",
     titulo: "Panorama da Bíblia",
     subtitulo: "A história que une os 66 livros",
