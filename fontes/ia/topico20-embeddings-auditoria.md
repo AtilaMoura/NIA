@@ -132,3 +132,18 @@ Todas olhadas uma a uma: sem letras nem números.
 | t20-banco | ok |
 | t20-vies | **refeita** — a 1ª saiu escura, com painéis de gráfico e folhas riscadas; cena simplificada |
 | t20-busca | ok — `alt` ajustado (a imagem destaca 4 pontos, não 3) |
+
+## 10. Áudio (30 blocos, MP3)
+
+- Narrações: 14 das 29 geradas foram reescritas antes da voz — vetor e números grandes lidos como
+  dígitos soltos, "GPT-2 da Hugging Face" (a doc é da Hugging Face, o modelo não), afirmação a mais
+  sobre o ELMo, "vai aparecer" no lugar de "pode aparecer", abertura sem sentido no 1º bloco, nomes
+  de modelo de API soletrados. A narração do Resumo (s13 b1) foi escrita à mão: a etapa `narracao`
+  foi interrompida antes dela. Registro em `backend/_revisar_narracao_topico20.py`.
+- Voz: `gemini-3.8-flash-tts`, 30/30.
+- Cortes corrigidos sem gastar voz (o começo da fala seguinte tinha ficado no fim do arquivo
+  anterior): s10-b1→s10-b3 ("Jura…" de Jurafsky), s5-b2→s5-b3, s2-b2→s2-b3. O conferidor só
+  acusou o s10-b3; os outros dois foram achados lendo o fim de cada transcrição.
+- `_conferir_audio.py 20 5`: 0 com problema. "Legenda Adriana Zanotto" no fim do s4-b1 e "e aí" no
+  fim do s2-b2 são invenções do Whisper sobre silêncio (o tempo indicado passa do fim do arquivo).
+- Produção: 38 mídias (30 MP3 + 8 imagens) respondendo 200; diagnóstico sem ✗.
