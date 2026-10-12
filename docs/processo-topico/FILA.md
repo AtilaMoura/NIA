@@ -7,7 +7,7 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 
 | ordem | topico_id | curso | módulo / aula | título | status | falta |
 |---|---|---|---|---|---|---|
-| 1 | 34 | Redes (11) | M1 · NAT, Firewall e DNS | Firewall — bloqueio de entrada vs. saída | pendente | |
+| 1 | 34 | Redes (11) | M1 · NAT, Firewall e DNS | Firewall — bloqueio de entrada vs. saída | feito | |
 | 2 | 22 | IA (5) | Aula 2 · Transformers por dentro | Self-Attention: Query, Key, Value | pendente | |
 | 3 | 70 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Como os 66 livros se formaram (Lc 24:44) ⚠️ cânon 66×73 — nota de neutralidade | pendente | |
 | 4 | 194 | Inglês (9) | M0 · Quando eu não entendo | "Sorry, I don't understand", "Can you repeat that?", "More slowly, please" | pendente | |
@@ -55,3 +55,4 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 68 | Obreiro I | Suficiência das Escrituras (2Pe 1:19-21) | 2026-10-05 |
 | 33 | Redes | NAT (Network Address Translation) — áudio terminado depois · **prova 37 no padrão novo (18/6, 70%) em 2026-10-07** | 2026-10-05 |
 | 69 | Obreiro I | A Palavra acima da tradição (Mc 7:6-13) — fecha a Aula 60 | 2026-10-06 |
+| 34 | Redes | Firewall — bloqueio de entrada vs. saída (16 slides, 8 imagens, 32 áudios) | 2026-10-11 |
