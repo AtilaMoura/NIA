@@ -110,7 +110,16 @@ CADEIA_VOZ: list[str] = [
 # Modelo que estourou a cota do dia (429) fica fora da fila por um tempo,
 # pra não gastar uma tentativa nele a cada pedido.
 _PAUSA_COTA_S = 15 * 60
+# Modelo sobrecarregado (503 "alta demanda") ou que estourou o tempo sai da fila por
+# pouco tempo (2026-10-13): a correção faz até 3 chamadas seguidas no mesmo envio e
+# cada uma batia de novo nos mesmos modelos em 503 — foi o que deu ~3 min na prova 38.
+_PAUSA_SOBRECARGA_S = 2 * 60
 _pausados: dict[str, float] = {}
+
+# Tempo máximo de espera por modelo (Gemini), por função. O padrão do GeminiService é
+# 90 s; na correção o aluno está esperando na tela e o normal é 19-30 s
+# (_comparar_modelos_correcao.py, 2026-10-07) — passou de 45 s, vai pro próximo modelo.
+TIMEOUT_MS: dict[str, int] = {"correcao": 45_000}
 
 
 def _cadeia(funcao: str) -> list[tuple[str, str]]:
@@ -133,8 +142,26 @@ def _estourou_cota(erro: Exception) -> bool:
     return "429" in msg or "resource_exhausted" in msg or "quota" in msg
 
 
-def _criar(prov: str, modelo: str):
+def _sobrecarregado(erro: Exception) -> bool:
+    msg = str(erro).lower()
+    # O GeminiService embrulha o erro original; o timeout do httpx vem com mensagem vazia,
+    # então olha também o tipo da causa.
+    causa = type(erro.__context__).__name__.lower() if erro.__context__ else ""
+    sinais = ("503", "unavailable", "overloaded", "504", "deadline", "timed out", "timeout")
+    return any(s in msg for s in sinais) or "timeout" in causa
+
+
+def _pausa_por(erro: Exception) -> int:
+    """Segundos fora da fila depois desta falha (0 = não pausa)."""
+    if _estourou_cota(erro):
+        return _PAUSA_COTA_S
+    return _PAUSA_SOBRECARGA_S if _sobrecarregado(erro) else 0
+
+
+def _criar(prov: str, modelo: str, funcao: str = ""):
     if prov == "gemini":
+        if funcao in TIMEOUT_MS:
+            return GeminiService(model_name=modelo, timeout_ms=TIMEOUT_MS[funcao])
         return GeminiService(model_name=modelo)
     if prov == "groq":
         return GroqService(model=modelo)
@@ -154,7 +181,7 @@ class ServicoComReserva:
     def _servico(self, prov: str, modelo: str):
         chave = f"{prov}:{modelo}"
         if chave not in self._instancias:
-            self._instancias[chave] = _criar(prov, modelo)
+            self._instancias[chave] = _criar(prov, modelo, self.funcao)
         return self._instancias[chave]
 
     def __getattr__(self, nome: str):
@@ -188,10 +215,11 @@ class ServicoComReserva:
                     return resposta
                 except Exception as e:
                     ultimo_erro = e
-                    if _estourou_cota(e):
-                        _pausados[chave] = agora + _PAUSA_COTA_S
+                    if pausa := _pausa_por(e):
+                        _pausados[chave] = time.time() + pausa
                     print(f"[modelos:{self.funcao}] {chave} falhou ({str(e)[:120]}) — tentando o próximo")
-            raise ultimo_erro or RuntimeError(f"Nenhum modelo disponível para '{self.funcao}'")
+            # "503" na mensagem: o endpoint da correção trata como sobrecarga passageira
+            raise ultimo_erro or RuntimeError(f"503: todos os modelos de '{self.funcao}' estão em pausa")
 
         return chamar
 
