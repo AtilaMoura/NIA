@@ -9,7 +9,7 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 |---|---|---|---|---|---|---|
 | 1 | 34 | Redes (11) | M1 · NAT, Firewall e DNS | Firewall — bloqueio de entrada vs. saída | feito | |
 | 2 | 22 | IA (5) | Aula 2 · Transformers por dentro | Self-Attention: Query, Key, Value | feito | |
-| 3 | 70 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Como os 66 livros se formaram (Lc 24:44) ⚠️ cânon 66×73 — nota de neutralidade | pendente | |
+| 3 | 70 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Como os 66 livros se formaram (Lc 24:44) ⚠️ cânon 66×73 — nota de neutralidade | feito | |
 | 4 | 194 | Inglês (9) | M0 · Quando eu não entendo | "Sorry, I don't understand", "Can you repeat that?", "More slowly, please" | pendente | |
 | 5 | 35 | Redes (11) | M1 · NAT, Firewall e DNS | DNS e DDNS | pendente | |
 | 6 | 23 | IA (5) | Aula 2 · Transformers por dentro | Causal Masking + Multi-Head Attention | pendente | |
@@ -57,3 +57,4 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 69 | Obreiro I | A Palavra acima da tradição (Mc 7:6-13) — fecha a Aula 60 | 2026-10-06 |
 | 34 | Redes | Firewall — bloqueio de entrada vs. saída (16 slides, 8 imagens, 32 áudios) | 2026-10-11 |
 | 22 | IA | Self-Attention: Query, Key, Value (17 slides, 8 imagens, 35 áudios) | 2026-10-12 |
+| 70 | Obreiro I | Como os 66 livros se formaram (Lc 24:44) — abre a Aula 58 (17 slides, 8 imagens, 36 áudios); leitura do teólogo/pastor recomendada | 2026-10-13 |
