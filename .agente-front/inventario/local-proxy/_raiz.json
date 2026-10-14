@@ -1,0 +1,184 @@
+{
+  "rota": "/",
+  "url": "http://127.0.0.1:4390/",
+  "quando": "2026-10-07T20:29:51.030Z",
+  "status": 200,
+  "urlFinal": "/",
+  "titulo": "Emaús — cursos de formação bíblica",
+  "idioma": "pt-BR",
+  "itens": [
+    {
+      "tipo": "a",
+      "nome": "Emaús — início",
+      "href": "/",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Cursos",
+      "href": "/#cursos",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Como funciona",
+      "href": "/#como-funciona",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "button",
+      "nome": "Mudar para o modo escuro",
+      "href": "",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Entrar",
+      "href": "/entrar",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Criar conta",
+      "href": "/criar-conta",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Criar conta grátis",
+      "href": "/criar-conta",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Já tenho conta →",
+      "href": "/entrar",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Aberto Formação do Obreiro I Firmados na Palavra O chamado do obreiro, a Bíblia como autoridade e como lê-la, a doutrina",
+      "href": "/curso/8",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Criar conta grátis",
+      "href": "/criar-conta",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Entrar",
+      "href": "/entrar",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Criar conta",
+      "href": "/criar-conta",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    }
+  ],
+  "formularios": [],
+  "titulos": [
+    {
+      "nivel": "H1",
+      "texto": "Estudar a Bíblia até o coração arder."
+    },
+    {
+      "nivel": "H2",
+      "texto": "Como funciona"
+    },
+    {
+      "nivel": "H3",
+      "texto": "Escolha um curso"
+    },
+    {
+      "nivel": "H3",
+      "texto": "Estude tópico a tópico"
+    },
+    {
+      "nivel": "H3",
+      "texto": "O tutor acompanha"
+    },
+    {
+      "nivel": "H2",
+      "texto": "Cursos em destaque"
+    },
+    {
+      "nivel": "H3",
+      "texto": "Formação do Obreiro I"
+    },
+    {
+      "nivel": "H3",
+      "texto": "Panorama da Bíblia"
+    },
+    {
+      "nivel": "H3",
+      "texto": "Como Estudar a Bíblia"
+    },
+    {
+      "nivel": "H2",
+      "texto": "Comece hoje. É de graça."
+    }
+  ],
+  "acessibilidade": [],
+  "rolagemHorizontal360": false,
+  "chamadasApi": [
+    "GET /",
+    "GET /criar-conta",
+    "GET /curso/8",
+    "GET /entrar"
+  ],
+  "errosConsole": [],
+  "falhasRede": []
+}

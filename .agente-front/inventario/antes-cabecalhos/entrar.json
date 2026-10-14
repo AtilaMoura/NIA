@@ -1,0 +1,128 @@
+{
+  "rota": "/entrar",
+  "url": "https://caminho-emaus.duckdns.org/entrar",
+  "quando": "2026-10-07T19:34:28.309Z",
+  "status": 200,
+  "urlFinal": "/entrar",
+  "titulo": "Entrar · Emaús",
+  "idioma": "pt-BR",
+  "itens": [
+    {
+      "tipo": "a",
+      "nome": "Emaús — início",
+      "href": "/",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "← Voltar ao início",
+      "href": "/",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "input:email",
+      "nome": "E-mail",
+      "href": "",
+      "nomeCampo": "email",
+      "obrigatorio": true,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "button",
+      "nome": "Esqueceu a senha?",
+      "href": "",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "input:password",
+      "nome": "Senha",
+      "href": "",
+      "nomeCampo": "password",
+      "obrigatorio": true,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "button",
+      "nome": "Mostrar senha",
+      "href": "",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "button",
+      "nome": "Entrar",
+      "href": "",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Criar conta grátis",
+      "href": "/criar-conta",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    }
+  ],
+  "formularios": [
+    {
+      "acao": "",
+      "metodo": "get",
+      "campos": [
+        {
+          "nome": "email",
+          "tipo": "email",
+          "rotulo": "E-mail"
+        },
+        {
+          "nome": "password",
+          "tipo": "password",
+          "rotulo": "Senha"
+        }
+      ]
+    }
+  ],
+  "titulos": [
+    {
+      "nivel": "H1",
+      "texto": "Bem-vindo de volta"
+    }
+  ],
+  "acessibilidade": [],
+  "rolagemHorizontal360": false,
+  "chamadasApi": [
+    "GET /",
+    "GET /api/sessao/dev",
+    "GET /criar-conta"
+  ],
+  "errosConsole": [
+    "Failed to load resource: the server responded with a status of 404 ()"
+  ],
+  "falhasRede": [
+    "404 fetch /api/sessao/dev"
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "rota": "/criar-conta",
+  "url": "https://caminho-emaus.duckdns.org/criar-conta",
+  "quando": "2026-10-07T20:44:24.557Z",
+  "status": 200,
+  "urlFinal": "/criar-conta",
+  "titulo": "Criar conta · Emaús",
+  "idioma": "pt-BR",
+  "itens": [
+    {
+      "tipo": "a",
+      "nome": "Emaús — início",
+      "href": "/",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "← Voltar ao início",
+      "href": "/",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "input:text",
+      "nome": "Seu nome",
+      "href": "",
+      "nomeCampo": "name",
+      "obrigatorio": true,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "input:email",
+      "nome": "E-mail",
+      "href": "",
+      "nomeCampo": "email",
+      "obrigatorio": true,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "input:password",
+      "nome": "Crie uma senhaPelo menos 6 caracteres.",
+      "href": "",
+      "nomeCampo": "password",
+      "obrigatorio": true,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "button",
+      "nome": "Mostrar senha",
+      "href": "",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "input:password",
+      "nome": "Confirme a senha",
+      "href": "",
+      "nomeCampo": "confirmar-senha",
+      "obrigatorio": true,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "button",
+      "nome": "Criar conta",
+      "href": "",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    },
+    {
+      "tipo": "a",
+      "nome": "Entrar",
+      "href": "/entrar",
+      "nomeCampo": "",
+      "obrigatorio": false,
+      "desabilitado": false,
+      "visivel": true,
+      "semNome": false
+    }
+  ],
+  "formularios": [
+    {
+      "acao": "",
+      "metodo": "get",
+      "campos": [
+        {
+          "nome": "name",
+          "tipo": "text",
+          "rotulo": "Seu nome"
+        },
+        {
+          "nome": "email",
+          "tipo": "email",
+          "rotulo": "E-mail"
+        },
+        {
+          "nome": "password",
+          "tipo": "password",
+          "rotulo": "Crie uma senhaPelo menos 6 caracteres."
+        },
+        {
+          "nome": "confirmar-senha",
+          "tipo": "password",
+          "rotulo": "Confirme a senha"
+        }
+      ]
+    }
+  ],
+  "titulos": [
+    {
+      "nivel": "H1",
+      "texto": "Criar sua conta"
+    }
+  ],
+  "acessibilidade": [],
+  "rolagemHorizontal360": false,
+  "chamadasApi": [
+    "GET /",
+    "GET /entrar"
+  ],
+  "errosConsole": [],
+  "falhasRede": []
+}

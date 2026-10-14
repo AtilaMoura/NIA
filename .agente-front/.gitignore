@@ -1,0 +1,5 @@
+# .gitignore da pasta .agente-front/ do projeto
+# Sessão de login salva pelo login.mjs — é segredo
+estado-login*.json
+# Prints pesam; guardar só se o dono pedir
+inventario/*/prints/

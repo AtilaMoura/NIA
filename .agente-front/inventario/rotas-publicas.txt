@@ -1,0 +1,3 @@
+/
+/entrar
+/criar-conta

@@ -51,6 +51,12 @@ Proposta:
   `nia-emaus-pagamento-acesso-curso`): a matrícula é o mesmo registro que um dia pode exigir
   pagamento ou liberação manual.
 
+### P4. Página "Minhas anotações" confusa demais (2026-10-06)
+Pedido do Atila: `/anotacoes` está **muito confusa** — precisa ficar **mais direta**. Ainda não
+analisado em detalhe; pontos prováveis pra rever no protótipo: muitos níveis empilhados
+(curso → aula → tópico → slide), botão do caderno disputando com a lista, tópicos fechados
+escondendo as notas, busca/filtro no topo antes do conteúdo. Fazer protótipo novo antes de mexer.
+
 ## Protótipos
 
 | Nº | Arquivo | Página | Status |
@@ -68,6 +74,7 @@ Proposta:
 | 11 | `prototipos-front/11-estudos.html` | `/estudos` (Master) | ✅ aprovado e aplicado |
 | 12 | `prototipos-front/12-anotacoes.html` | `/anotacoes` (página nova) | ✅ aprovado e aplicado |
 | 13 | `prototipos-front/13-caderno.html` | `/anotacoes/aula/{id}` (Caderno da aula, IA) | ✅ aprovado e aplicado |
+| 14 | `prototipos-front/14-matricula.html` | `/inicio`, `/curso/{id}` sem matrícula, Pessoas (Fase A: matrícula + liberação) | ⏳ aguardando aprovação |
 
 **Legenda de status:** ⬜ não revisada · 🔍 revisando · 📝 revisada (melhorias anotadas) · ✅ melhorias aplicadas
 

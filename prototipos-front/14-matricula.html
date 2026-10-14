@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emaús — protótipo: matrícula e liberação</title>
+<!--
+  Protótipo 14 — Fase A do PLANO_ACESSO_E_PAGAMENTO.md (matrícula + liberação pelo Master).
+  NOMES FICTÍCIOS (repo público).
+  Decisões: só o curso "Emaús" é livre (D10); os outros abrem com liberação do Master (agora)
+  ou assinatura/cupom (fases seguintes); quem já estudava ganha matrícula automática (D12).
+  Telas (pelo # da URL):
+   (padrão)  /inicio do aluno: "Seus cursos" = só matriculados (com a origem: grátis, liberado,
+             assinatura) + "Cursos disponíveis" com o botão certo pra cada tipo.
+   #novo     /inicio de aluno sem matrícula: escolha do 1º curso.
+   #curso    /curso/{id} de curso PAGO sem matrícula: apresentação + "Pedir acesso".
+   #pedido   mesma tela depois do pedido: "aguardando liberação".
+   #livre    /curso/{id} do curso livre: apresentação + "Quero fazer este curso" (confirmação).
+   #pessoas  Master: pedidos de acesso na página Pessoas + "Liberar curso" no detalhe da pessoa.
+   #escuro
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tm-radius: 14px; --tm-radius-lg: 20px; --tm-pill: 999px;
+    --tm-font-display: "Fraunces", Georgia, serif;
+    --tm-font-body: "Source Sans 3", -apple-system, "Segoe UI", sans-serif;
+    --tm-shadow: 0 1px 2px rgba(43,36,28,.06), 0 8px 24px rgba(43,36,28,.06);
+    --tm-bg: #faf6ee; --tm-surface: #ffffff; --tm-surface-2: #f3ece0;
+    --tm-ink: #2b241c; --tm-ink-muted: #6b5f4f; --tm-border: #e4d8c3;
+    --tm-accent: #8a5a2b; --tm-accent-2: #b8763a; --tm-good: #4f7a3a; --tm-warn: #a35a1e;
+    --tm-verse-bg: #fbf3e0; --tm-verse-border: #c9a24a;
+  }
+  [data-tm-theme="dark"] {
+    --tm-bg: #1b1610; --tm-surface: #241d15; --tm-surface-2: #2e261c;
+    --tm-ink: #f1e7d6; --tm-ink-muted: #b0a184; --tm-border: #3c3327;
+    --tm-accent: #d79b5b; --tm-accent-2: #e3ac6a; --tm-good: #7fae62; --tm-warn: #d08a4e;
+    --tm-verse-bg: #2a2114; --tm-verse-border: #7a5f2e;
+    --tm-shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--tm-bg); color: var(--tm-ink); font-family: var(--tm-font-body); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-family: var(--tm-font-display); font-weight: 600; margin: 0; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  img { display: block; max-width: 100%; }
+  [hidden] { display: none !important; }
+  .muted { color: var(--tm-ink-muted); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
+
+  header { border-bottom: 1px solid var(--tm-border); }
+  header .wrap { display: flex; align-items: center; gap: 1.25rem; height: 56px; }
+  .marca { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--tm-font-display); font-weight: 600; font-size: 1.12rem; }
+  .marca img { height: 28px; }
+  nav.principal { display: none; gap: .2rem; font-size: .85rem; white-space: nowrap; }
+  nav.principal a { padding: .35rem .75rem; border-radius: var(--tm-pill); color: var(--tm-ink-muted); }
+  nav.principal a.ativo { background: var(--tm-surface-2); color: var(--tm-ink); font-weight: 600; }
+  @media (min-width: 760px) { nav.principal { display: flex; } }
+  .av { margin-left: auto; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); border: 1px solid var(--tm-border); color: var(--tm-accent); font-weight: 700; font-size: .78rem; cursor: pointer; }
+
+  main { padding: clamp(1.4rem, 4vw, 2.4rem) 0 4rem; }
+  .tela { display: flex; flex-direction: column; gap: clamp(1.6rem, 4.5vw, 2.4rem); }
+  h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); }
+  .titulo-secao { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: .85rem; }
+  .titulo-secao h2 { font-size: 1.15rem; }
+  .titulo-secao small { font-size: .82rem; color: var(--tm-ink-muted); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; font-weight: 600; font-size: .9rem; padding: .62rem 1.15rem; border-radius: var(--tm-pill); background: var(--tm-accent); color: var(--tm-bg); border: 1px solid var(--tm-accent); white-space: nowrap; }
+  .btn.claro { background: var(--tm-surface); color: var(--tm-ink); border-color: var(--tm-border); }
+  .btn.claro:hover { border-color: var(--tm-accent); }
+  .btn.cheio { width: 100%; }
+  .btn[disabled] { opacity: .65; cursor: default; }
+  .chip { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; font-weight: 700; padding: .12rem .55rem; border-radius: var(--tm-pill); border: 1px solid var(--tm-border); color: var(--tm-ink-muted); white-space: nowrap; }
+  .chip.gratis { border-color: var(--tm-good); color: var(--tm-good); }
+  .chip.liberado { border-color: var(--tm-accent); color: var(--tm-accent); }
+  .chip.aguardando { border-color: var(--tm-warn); color: var(--tm-warn); }
+  .barra { flex: 1; height: 6px; border-radius: 99px; background: var(--tm-surface-2); overflow: hidden; }
+  .barra i { display: block; height: 100%; background: var(--tm-good); }
+  .progresso { display: flex; align-items: center; gap: .7rem; font-size: .8rem; color: var(--tm-ink-muted); }
+
+  /* Cartões de curso */
+  .grade { display: grid; gap: 1.05rem; grid-template-columns: 1fr; }
+  @media (min-width: 560px) { .grade { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .grade { grid-template-columns: repeat(3, 1fr); } }
+  .curso { display: flex; flex-direction: column; overflow: hidden; background: var(--tm-surface); border: 1px solid var(--tm-border); border-radius: var(--tm-radius-lg); box-shadow: var(--tm-shadow); }
+  .curso .capa { position: relative; aspect-ratio: 16/9; background: linear-gradient(135deg, #8a5a2b, #d9a441); }
+  .curso .capa img { width: 100%; height: 100%; object-fit: cover; }
+  .curso .capa .tag { position: absolute; left: .7rem; top: .7rem; }
+  .curso .capa .tag .chip { background: rgba(27,22,16,.72); color: #f6eee0; border-color: transparent; }
+  .curso .corpo { padding: .95rem 1.05rem 1.1rem; display: flex; flex-direction: column; gap: .4rem; flex: 1; }
+  .curso h3 { font-size: 1.03rem; line-height: 1.3; }
+  .curso .desc { font-size: .86rem; color: var(--tm-ink-muted); }
+  .curso .pe { margin-top: auto; padding-top: .55rem; display: flex; flex-direction: column; gap: .5rem; }
+  .curso .info { display: flex; flex-wrap: wrap; gap: .35rem .6rem; font-size: .78rem; color: var(--tm-ink-muted); }
+
+  /* Continuar */
+  .continuar { display: grid; overflow: hidden; background: var(--tm-surface); border: 1px solid var(--tm-border); border-radius: var(--tm-radius-lg); box-shadow: var(--tm-shadow); }
+  .continuar .capa { aspect-ratio: 16/7; } .continuar .capa img { width: 100%; height: 100%; object-fit: cover; }
+  .continuar .corpo { padding: 1.1rem 1.25rem 1.25rem; display: flex; flex-direction: column; gap: .4rem; }
+  .sobre { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--tm-accent); }
+  @media (min-width: 700px) { .continuar { grid-template-columns: 300px 1fr; } .continuar .capa { aspect-ratio: auto; min-height: 180px; } .continuar .corpo { padding: 1.4rem 1.7rem; justify-content: center; } }
+
+  .boasvindas { background: var(--tm-surface-2); border: 1px dashed var(--tm-border); border-radius: var(--tm-radius-lg); padding: 1.2rem 1.35rem; }
+  .boasvindas p { font-size: .95rem; }
+
+  /* Apresentação do curso (sem matrícula) */
+  .hero { display: grid; gap: 1.4rem; align-items: start; }
+  @media (min-width: 860px) { .hero { grid-template-columns: 1fr 340px; } }
+  .hero .capa { border-radius: var(--tm-radius-lg); overflow: hidden; aspect-ratio: 16/8; border: 1px solid var(--tm-border); }
+  .hero .capa img { width: 100%; height: 100%; object-fit: cover; }
+  .hero h1 { margin-top: .9rem; }
+  .hero .subt { font-weight: 600; color: var(--tm-accent); margin-top: .15rem; }
+  .hero .texto { margin-top: .7rem; color: var(--tm-ink-muted); }
+  .fatos { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: .45rem; }
+  .fatos span { font-size: .82rem; padding: .3rem .7rem; border-radius: var(--tm-pill); background: var(--tm-surface-2); }
+  .caixa { position: sticky; top: 1rem; background: var(--tm-surface); border: 1px solid var(--tm-border); border-radius: var(--tm-radius-lg); padding: 1.15rem; box-shadow: var(--tm-shadow); display: flex; flex-direction: column; gap: .7rem; }
+  .caixa .preco { font-family: var(--tm-font-display); font-size: 1.35rem; }
+  .caixa small { font-size: .8rem; color: var(--tm-ink-muted); }
+  .caixa ul { margin: 0; padding-left: 1.1rem; font-size: .88rem; color: var(--tm-ink-muted); }
+  .aviso-ok { border-radius: var(--tm-radius); border: 1px solid var(--tm-warn); background: color-mix(in srgb, var(--tm-warn) 8%, transparent); padding: .7rem .85rem; font-size: .88rem; }
+  .aviso-ok b { color: var(--tm-warn); }
+  .modulos { border: 1px solid var(--tm-border); border-radius: var(--tm-radius-lg); background: var(--tm-surface); overflow: hidden; }
+  .modulo { display: grid; grid-template-columns: 34px 1fr auto; gap: .8rem; align-items: center; padding: .8rem 1rem; border-top: 1px solid var(--tm-border); }
+  .modulo:first-child { border-top: 0; }
+  .modulo .n { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); font-weight: 700; font-size: .85rem; color: var(--tm-accent); }
+  .modulo b { display: block; font-size: .95rem; }
+  .modulo small { font-size: .8rem; color: var(--tm-ink-muted); }
+  .modulo .cad { font-size: .85rem; color: var(--tm-ink-muted); }
+
+  /* Confirmação (modal) */
+  .veu { position: fixed; inset: 0; background: rgba(20,16,10,.45); display: grid; place-items: center; padding: 1rem; z-index: 20; }
+  .dialogo { width: min(440px, 100%); background: var(--tm-surface); border-radius: var(--tm-radius-lg); padding: 1.3rem; box-shadow: 0 20px 60px rgba(0,0,0,.25); display: flex; flex-direction: column; gap: .75rem; }
+  .dialogo h2 { font-size: 1.2rem; }
+  .dialogo .acoes { display: flex; gap: .55rem; justify-content: flex-end; flex-wrap: wrap; margin-top: .25rem; }
+
+  /* Master: pedidos + liberar */
+  .pedidos { border: 1px solid var(--tm-warn); border-radius: var(--tm-radius-lg); background: color-mix(in srgb, var(--tm-warn) 6%, var(--tm-surface)); overflow: hidden; }
+  .pedidos h2 { font-size: 1.05rem; padding: .9rem 1.1rem .2rem; }
+  .pedido { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; padding: .8rem 1.1rem; border-top: 1px solid color-mix(in srgb, var(--tm-warn) 25%, transparent); }
+  .pedido .quem { flex: 1; min-width: 200px; font-size: .92rem; }
+  .pedido .quem small { display: block; color: var(--tm-ink-muted); font-size: .78rem; }
+  .pedido .acoes { display: flex; gap: .45rem; }
+  .pedido .btn { padding: .42rem .85rem; font-size: .84rem; }
+  .card { border: 1px solid var(--tm-border); border-radius: var(--tm-radius-lg); background: var(--tm-surface); overflow: hidden; }
+  .card h2 { font-size: 1.05rem; padding: .9rem 1.1rem; border-bottom: 1px solid var(--tm-border); }
+  .mat { display: grid; grid-template-columns: 1fr auto; gap: .4rem 1rem; align-items: center; padding: .8rem 1.1rem; border-top: 1px solid var(--tm-border); }
+  .mat:first-of-type { border-top: 0; }
+  .mat b { display: block; font-size: .95rem; }
+  .mat small { color: var(--tm-ink-muted); font-size: .8rem; }
+  .mat .lado { display: flex; gap: .45rem; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .liberar { display: flex; flex-wrap: wrap; gap: .55rem; padding: .9rem 1.1rem; border-top: 1px solid var(--tm-border); background: var(--tm-surface-2); }
+  .liberar select { flex: 1; min-width: 200px; padding: .5rem .75rem; border-radius: var(--tm-pill); border: 1px solid var(--tm-border); background: var(--tm-surface); font: inherit; font-size: .9rem; }
+  .pessoa-topo { display: flex; align-items: center; gap: .9rem; }
+  .pessoa-topo .ini { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--tm-surface-2); color: var(--tm-accent); font-weight: 700; }
+
+  footer { border-top: 1px solid var(--tm-border); }
+  footer .wrap { padding-top: 1.1rem; padding-bottom: 1.2rem; font-size: .8rem; color: var(--tm-ink-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <span class="marca"><img src="../emaus-web/public/marca/final/logo1-simbolo.png" alt="">Emaús</span>
+  <nav class="principal" id="nav"><a href="#" class="ativo">Início</a><a href="#">Meu progresso</a></nav>
+  <span class="av" onclick="tema()" title="(protótipo) alterna o tema" id="avatar">JS</span>
+</div></header>
+
+<main class="wrap">
+
+  <!-- ================= /inicio (aluno com matrícula) ================= -->
+  <div class="tela" id="t-inicio">
+    <div><h1>Bom te ver de volta, Joana</h1><p class="muted" style="margin-top:.2rem">Continue de onde parou.</p></div>
+
+    <section>
+      <div class="titulo-secao"><h2>Continuar estudando</h2></div>
+      <article class="continuar">
+        <div class="capa"><img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt=""></div>
+        <div class="corpo">
+          <p class="sobre">Formação do Obreiro I · Módulo 1</p>
+          <h3 style="font-size:1.2rem">Dons Espirituais</h3>
+          <div class="progresso" style="margin-top:.4rem"><span class="barra"><i style="width:18%"></i></span> 18% do curso</div>
+          <div style="margin-top:.7rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap"><a href="#" class="btn">Continuar →</a><a href="#" style="font-size:.85rem;font-weight:600;color:var(--tm-accent)">Ver o curso</a></div>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <div class="titulo-secao"><h2>Seus cursos</h2><small>2 cursos</small></div>
+      <div class="grade">
+        <a href="#" class="curso">
+          <div class="capa"><img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt=""></div>
+          <div class="corpo">
+            <h3>Formação do Obreiro I — Firmados na Palavra</h3>
+            <div class="pe">
+              <div class="info"><span class="chip liberado">Liberado pelo administrador</span></div>
+              <div class="progresso"><span class="barra"><i style="width:18%"></i></span> 18%</div>
+            </div>
+          </div>
+        </a>
+        <a href="#" class="curso">
+          <div class="capa" style="background:linear-gradient(135deg,#3f4a24,#7d8a4a)"></div>
+          <div class="corpo">
+            <h3>Emaús — Caminhando com Jesus</h3>
+            <div class="pe">
+              <div class="info"><span class="chip gratis">Gratuito</span></div>
+              <div class="progresso"><span class="barra"><i style="width:0%"></i></span> Ainda não começou</div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="titulo-secao"><h2>Cursos disponíveis</h2><small>Escolha o próximo</small></div>
+      <div class="grade">
+        <article class="curso">
+          <div class="capa"><img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt="" style="filter:hue-rotate(-15deg) saturate(.85)"></div>
+          <div class="corpo">
+            <h3>Formação do Obreiro II — Enviados para Servir</h3>
+            <p class="desc">Continuação da parte I: o serviço na prática, liderança e cuidado com o povo.</p>
+            <div class="pe">
+              <div class="info"><span>🔒 Precisa de liberação</span><span>7 módulos</span></div>
+              <a href="#curso" class="btn claro cheio" onclick="ir('curso')">Ver o curso</a>
+            </div>
+          </div>
+        </article>
+        <article class="curso">
+          <div class="capa"><img src="../emaus-web/public/capas/panorama-da-biblia.jpg" alt=""><span class="tag"><span class="chip">Em breve</span></span></div>
+          <div class="corpo">
+            <h3>Panorama da Bíblia</h3>
+            <p class="desc">A história da Bíblia do Gênesis ao Apocalipse, livro a livro.</p>
+            <div class="pe"><div class="info"><span>Em preparação</span></div><button class="btn claro cheio" disabled>Avise-me quando abrir</button></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= /inicio (aluno novo, sem matrícula) ================= -->
+  <div class="tela" id="t-novo" hidden>
+    <div><h1>Que bom ter você aqui, Joana</h1><p class="muted" style="margin-top:.2rem">Escolha o curso pra começar.</p></div>
+    <div class="boasvindas"><p><b>Comece pelo Emaús — Caminhando com Jesus.</b> <span class="muted">É gratuito e é a porta de entrada da plataforma. Os outros cursos abrem com liberação.</span></p></div>
+    <section>
+      <div class="titulo-secao"><h2>Cursos disponíveis</h2></div>
+      <div class="grade">
+        <article class="curso">
+          <div class="capa" style="background:linear-gradient(135deg,#3f4a24,#7d8a4a)"><span class="tag"><span class="chip">Gratuito</span></span></div>
+          <div class="corpo">
+            <h3>Emaús — Caminhando com Jesus</h3>
+            <p class="desc">Os primeiros passos da fé, no caminho de Emaús (Lucas 24).</p>
+            <div class="pe"><div class="info"><span>3 módulos</span><span>~4 h</span></div><a href="#livre" class="btn cheio" onclick="ir('livre')">Quero fazer este curso</a></div>
+          </div>
+        </article>
+        <article class="curso">
+          <div class="capa"><img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt=""></div>
+          <div class="corpo">
+            <h3>Formação do Obreiro I — Firmados na Palavra</h3>
+            <p class="desc">Fundamentos bíblicos pra quem serve na igreja.</p>
+            <div class="pe"><div class="info"><span>🔒 Precisa de liberação</span><span>7 módulos</span></div><a href="#curso" class="btn claro cheio" onclick="ir('curso')">Ver o curso</a></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= /curso/{id} sem matrícula (pago) ================= -->
+  <div class="tela" id="t-curso" hidden>
+    <a href="#" onclick="ir('inicio')" class="muted" style="font-size:.85rem;font-weight:600">← Início</a>
+    <div class="hero">
+      <div>
+        <div class="capa"><img src="../emaus-web/public/capas/formacao-novo-obreiro.jpg" alt="" style="filter:hue-rotate(-15deg) saturate(.85)"></div>
+        <h1>Formação do Obreiro II</h1>
+        <p class="subt">Enviados para Servir</p>
+        <p class="texto">A continuação da parte I. O serviço na prática: liderança servidora, cuidado com as pessoas, ensino e a vida de quem serve — sempre a partir do texto bíblico.</p>
+        <div class="fatos"><span>7 módulos</span><span>52 tópicos</span><span>Prova em cada tópico</span><span>Tutor por IA</span></div>
+      </div>
+      <aside class="caixa" id="caixaPago">
+        <p class="preco">🔒 Curso com liberação</p>
+        <small>Este curso abre quando o administrador libera pra você. Em breve também por assinatura.</small>
+        <ul><li>Acesso a todos os módulos</li><li>Tutor por IA e caderno de anotações</li><li>Seu progresso salvo</li></ul>
+        <button class="btn cheio" onclick="ir('pedido')">Pedir acesso</button>
+        <small>O administrador recebe o seu pedido e você é avisado aqui quando liberar.</small>
+      </aside>
+      <aside class="caixa" id="caixaPedido" hidden>
+        <p class="preco">⏳ Pedido enviado</p>
+        <div class="aviso-ok"><b>Aguardando liberação.</b> Você pediu em 06/10 às 14:20. Assim que o administrador liberar, o curso aparece em "Seus cursos".</div>
+        <button class="btn claro cheio">Cancelar pedido</button>
+      </aside>
+    </div>
+    <section>
+      <div class="titulo-secao"><h2>O que tem no curso</h2></div>
+      <div class="modulos">
+        <div class="modulo"><span class="n">1</span><div><b>O serviço que Jesus ensinou</b><small>8 tópicos</small></div><span class="cad">🔒</span></div>
+        <div class="modulo"><span class="n">2</span><div><b>Liderar servindo</b><small>7 tópicos</small></div><span class="cad">🔒</span></div>
+        <div class="modulo"><span class="n">3</span><div><b>Cuidar das pessoas</b><small>8 tópicos</small></div><span class="cad">🔒</span></div>
+        <div class="modulo"><span class="n">…</span><div><b>+ 4 módulos</b><small>29 tópicos</small></div><span class="cad"></span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= /curso/{id} sem matrícula (livre) ================= -->
+  <div class="tela" id="t-livre" hidden>
+    <a href="#" onclick="ir('novo')" class="muted" style="font-size:.85rem;font-weight:600">← Início</a>
+    <div class="hero">
+      <div>
+        <div class="capa" style="background:linear-gradient(135deg,#3f4a24,#7d8a4a)"></div>
+        <h1>Emaús — Caminhando com Jesus</h1>
+        <p class="subt">Os primeiros passos da fé</p>
+        <p class="texto">Como os dois discípulos no caminho de Emaús: entender as Escrituras com Jesus, passo a passo.</p>
+        <div class="fatos"><span>3 módulos</span><span>12 tópicos</span><span>Gratuito</span></div>
+      </div>
+      <aside class="caixa">
+        <p class="preco">Gratuito</p>
+        <small>Comece agora — sem pagamento.</small>
+        <button class="btn cheio" onclick="document.getElementById('veu').hidden=false">Quero fazer este curso</button>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ================= Master: Pessoas ================= -->
+  <div class="tela" id="t-pessoas" hidden>
+    <div><h1>Pessoas</h1><p class="muted" style="margin-top:.2rem">Quem está estudando, desde quando e quanto.</p></div>
+    <section class="pedidos">
+      <h2>Pedidos de acesso (2)</h2>
+      <div class="pedido">
+        <div class="quem"><b>Joana Souza</b> quer fazer <b>Formação do Obreiro II</b><small>pediu hoje às 14:20 · aluna desde 26/09 · 3 tópicos concluídos</small></div>
+        <div class="acoes"><button class="btn">Liberar</button><button class="btn claro">Recusar</button></div>
+      </div>
+      <div class="pedido">
+        <div class="quem"><b>Rafael Lima</b> quer fazer <b>Formação do Obreiro I</b><small>pediu ontem às 21:05 · aluno desde 02/10</small></div>
+        <div class="acoes"><button class="btn">Liberar</button><button class="btn claro">Recusar</button></div>
+      </div>
+    </section>
+
+    <div class="pessoa-topo"><span class="ini">JS</span><div><h2 style="font-size:1.3rem">Joana Souza <span class="chip">Aluna</span></h2><p class="muted" style="font-size:.88rem">joana@exemplo.com · cadastro 26/09</p></div></div>
+
+    <section class="card">
+      <h2>Cursos da pessoa</h2>
+      <div class="mat">
+        <div><b>Formação do Obreiro I</b><small>Liberado por você em 06/10 · 3 de 26 tópicos</small></div>
+        <div class="lado"><span class="chip liberado">Liberado</span><button class="btn claro" style="padding:.38rem .8rem;font-size:.82rem">Pausar</button></div>
+      </div>
+      <div class="mat">
+        <div><b>Emaús — Caminhando com Jesus</b><small>Matriculou-se sozinha em 26/09 · gratuito</small></div>
+        <div class="lado"><span class="chip gratis">Gratuito</span></div>
+      </div>
+      <div class="mat">
+        <div><b>Formação do Obreiro II</b><small>Pediu acesso hoje às 14:20</small></div>
+        <div class="lado"><span class="chip aguardando">Aguardando</span><button class="btn" style="padding:.38rem .8rem;font-size:.82rem">Liberar</button></div>
+      </div>
+      <div class="liberar">
+        <select aria-label="Curso pra liberar"><option>Liberar outro curso…</option><option>Panorama da Bíblia (em preparação)</option></select>
+        <button class="btn">Liberar</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Confirmação da matrícula -->
+<div class="veu" id="veu" hidden>
+  <div class="dialogo" role="dialog" aria-modal="true" aria-labelledby="dlgT">
+    <h2 id="dlgT">Começar “Emaús — Caminhando com Jesus”?</h2>
+    <p class="muted" style="font-size:.92rem">O curso vai para “Seus cursos” e o seu progresso fica salvo. Você pode estudar no seu ritmo.</p>
+    <div class="acoes"><button class="btn claro" onclick="document.getElementById('veu').hidden=true">Agora não</button><button class="btn" onclick="document.getElementById('veu').hidden=true;ir('inicio')">Começar o curso</button></div>
+  </div>
+</div>
+
+<footer><div class="wrap"><span>Emaús · plataforma de formação bíblica</span><span>Início · Meu progresso</span></div></footer>
+
+<script>
+  // Só pro protótipo
+  function tema() { const r = document.documentElement; r.dataset.tmTheme = r.dataset.tmTheme === "dark" ? "light" : "dark"; }
+  const telas = ["inicio", "novo", "curso", "livre", "pessoas"];
+  function ir(t) {
+    const tela = t === "pedido" ? "curso" : t;
+    telas.forEach((x) => document.getElementById("t-" + x).hidden = x !== tela);
+    document.getElementById("caixaPago").hidden = t === "pedido";
+    document.getElementById("caixaPedido").hidden = t !== "pedido";
+    const master = t === "pessoas";
+    document.getElementById("avatar").textContent = master ? "AT" : "JS";
+    document.getElementById("nav").innerHTML = master
+      ? '<a href="#">Início</a><a href="#">Meu progresso</a><a href="#" class="ativo">Revisão</a><a href="#">Estudos pessoais</a>'
+      : '<a href="#" class="ativo">Início</a><a href="#">Meu progresso</a>';
+    scrollTo(0, 0);
+  }
+  const e = location.hash.slice(1).split(",");
+  const alvo = e.find((x) => ["novo", "curso", "pedido", "livre", "pessoas"].includes(x));
+  if (alvo) ir(alvo);
+  if (e.includes("confirmar")) { ir("livre"); document.getElementById("veu").hidden = false; }
+  if (e.includes("escuro")) tema();
+</script>
+</body>
+</html>

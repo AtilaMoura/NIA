@@ -1,0 +1,35 @@
+[
+  {
+    "rota": "/",
+    "status": 200,
+    "urlFinal": "/",
+    "funcoes": 12,
+    "api": 4,
+    "a11yGraves": 0,
+    "errosConsole": 0,
+    "rolagem360": false,
+    "erro": ""
+  },
+  {
+    "rota": "/entrar",
+    "status": 200,
+    "urlFinal": "/entrar",
+    "funcoes": 8,
+    "api": 3,
+    "a11yGraves": 0,
+    "errosConsole": 1,
+    "rolagem360": false,
+    "erro": ""
+  },
+  {
+    "rota": "/criar-conta",
+    "status": 200,
+    "urlFinal": "/criar-conta",
+    "funcoes": 9,
+    "api": 2,
+    "a11yGraves": 0,
+    "errosConsole": 0,
+    "rolagem360": false,
+    "erro": ""
+  }
+]
