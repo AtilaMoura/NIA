@@ -61,7 +61,7 @@ Padrão de aula (o mesmo da Aula 1, que funcionou): tópicos de explicação →
 **M0. Sobrevivência na aula**
 *"Eu consigo pedir ajuda em inglês quando não entendo."*
 - Aula 1. Quando eu não entendo
-  1. "Sorry, I don't understand" · "Can you repeat that, please?" · "More slowly, please"
+  1. "Sorry, I don't understand" · "Can you repeat that, please?" · "Can you speak more slowly, please?" ✅ T194 (2026-10-14)
   2. "How do you say … in English?" · "What does … mean?" · "How do you spell …?" (+ o alfabeto)
   3. Prática: pedir ajuda numa conversa curta
 - Aula 2. Entendendo o professor (e a IA)
