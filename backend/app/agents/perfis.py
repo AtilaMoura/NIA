@@ -170,11 +170,70 @@ PERFIL_INGLES = PerfilDominio(
 )
 
 
+FIO_CONDUTOR_REDES = """
+Fio condutor pedagógico obrigatório desta área (nunca contradizer):
+Curso técnico de redes aplicadas a câmeras IP/CFTV, ancorado num projeto REAL de
+monitoramento (câmeras e NVRs de postes/prédios reais do próprio autor). Regras
+inegociáveis:
+- Fatos técnicos (número de porta, faixa de endereço, comportamento de protocolo,
+  sintaxe de comando/config) NUNCA podem ser inventados — são verificáveis, equivalente
+  aqui a "nunca citar fato de memória" nas outras áreas. Errar uma porta ou uma faixa de
+  IP não é estilo, é factualmente errado, e o aluno vai aplicar isso na prática de
+  verdade (câmera real, rede real).
+- Sempre que possível, ancorar o conceito num exemplo do projeto real (NVR/câmera
+  específica, com IP/config real já usado no material) em vez de um cenário genérico
+  hipotético — já é o padrão estabelecido no Tópico 1 (NVR de Piazza Fontana,
+  192.168.1.19). Reaproveitar esse mesmo projeto/dispositivos nos tópicos seguintes
+  sempre que fizer sentido, em vez de inventar um cenário novo a cada tópico.
+- Contrastar armadilhas comuns de quem está aprendendo (ex: confundir IP privado com
+  público, NAT com port forwarding, TCP com UDP pra streaming, ONVIF com RTSP puro)
+  sempre que o conceito permitir.
+- Nomear a camada/protocolo exato envolvido (ex: "isso acontece na camada de rede,
+  protocolo IP", não só "a rede decide sozinha") — mesmo espírito de "nomear o tempo
+  verbal" no perfil de inglês: sempre dizer QUAL mecanismo, nunca ficar no genérico.
+- Pra fluxo/processo (ex.: passo a passo de uma requisição, sequência de configuração),
+  use o bloco "fluxo" (campos: passos: [{texto, decisao: bool}]) — NÃO peça um
+  "diagrama" com svg_raw pra isso: SVG cru escrito por IA sai sem setas/conectores reais
+  e reprova na revisão estrutural (achado real, mesmo problema já visto nos cursos de
+  obreiro e inglês). "fluxo" desenha em HTML/CSS e nunca quebra.
+""".strip()
+
+EXEMPLO_CALIBRACAO_REDES = """
+Exemplo real do nível de detalhe esperado (Tópico 1, "O que é um endereço IP") — repare
+que ancora no dispositivo real do projeto (NVR, IP real) em vez de um exemplo genérico:
+
+{
+  "tipo": "box", "variante": "app", "label": "No nosso projeto",
+  "texto": "O NVR (gravador) das câmeras de Piazza Fontana tem o endereço 192.168.1.19
+  dentro da rede daquele prédio. Sempre que algum equipamento na mesma rede quer
+  'conversar' com o NVR — pra ver a imagem, configurar algo — é esse número que ele usa
+  pra achar o dispositivo certo."
+}
+
+PROIBIDO: usar um cenário genérico ("imagine uma câmera qualquer") quando o material já
+tem um dispositivo/IP real do projeto que poderia ser reaproveitado; inventar número de
+porta, faixa de IP ou comportamento de protocolo que não seja tecnicamente correto de
+verdade.
+""".strip()
+
+PERFIL_REDES = PerfilDominio(
+    id="redes",
+    contexto_curso=(
+        'curso técnico "Redes e Câmeras — Do IP ao Streaming" (estudo pessoal, redes '
+        "aplicadas a sistemas de câmera IP/CFTV: endereçamento, NAT, protocolos de "
+        "vídeo, ONVIF, media servers, nuvens de câmera, armazenamento e segurança)"
+    ),
+    fio_condutor=FIO_CONDUTOR_REDES,
+    exemplo_calibracao=EXEMPLO_CALIBRACAO_REDES,
+)
+
+
 PERFIS: dict[str, PerfilDominio] = {
     PERFIL_TECH.id: PERFIL_TECH,
     PERFIL_TEOLOGIA.id: PERFIL_TEOLOGIA,
     PERFIL_OBREIRO.id: PERFIL_OBREIRO,
     PERFIL_INGLES.id: PERFIL_INGLES,
+    PERFIL_REDES.id: PERFIL_REDES,
 }
 
 
