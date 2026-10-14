@@ -37,8 +37,16 @@ ssh -i $K $H 'set -e
   free -h | head -2
   cd ~/NIA
   echo "antes: $(git rev-parse --short HEAD)"
+  # A VM1 tem o serviço "frontend" comentado à mão no compose (fora do git). Guarda essa
+  # mudança, puxa e reaplica por cima. Só o compose: o Caddyfile.backend fica intocado
+  # (mexer nele troca o inode e o Caddy para de enxergar edições até reiniciar).
+  cp docker-compose.backend.yml ~/docker-compose.backend.yml.antes_login_seguro
+  git stash push -q docker-compose.backend.yml
   git pull --ff-only
-  echo "depois: $(git rev-parse --short HEAD)"'
+  git stash pop -q
+  echo "depois: $(git rev-parse --short HEAD)"
+  echo "mudanças locais mantidas na VM1:"; git status --short
+  docker compose -f docker-compose.backend.yml config -q && echo "compose válido"'
 
 echo "== 3/4 VM1: build e recriar só o backend"
 ssh -i $K $H 'cd ~/NIA && docker compose -f docker-compose.backend.yml up -d --build backend 2>&1 | tail -8'
