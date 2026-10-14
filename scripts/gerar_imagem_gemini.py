@@ -59,6 +59,31 @@ def carregar_json(caminho_json: str) -> list[dict]:
         return json.load(f)
 
 
+def fechar_dialogos(page, pasta_debug: Path) -> None:
+    """Fecha diálogos/avisos do Gemini (overlay do Angular CDK) que bloqueiam o
+    clique na caixa de prompt — ex. aviso de novidade que aparece de vez em quando."""
+    overlay = page.locator(".cdk-overlay-backdrop-showing, .cdk-overlay-pane")
+    for _ in range(3):
+        if overlay.count() == 0:
+            return
+        # Botões comuns de dispensar; se nenhum existir, tenta Escape
+        for nome in ("Fechar", "Close", "Agora não", "Not now", "Entendi", "Got it", "Dispensar", "Dismiss", "OK"):
+            botao = page.locator(".cdk-overlay-container").get_by_role("button", name=re.compile(f"^{nome}$", re.I))
+            if botao.count():
+                try:
+                    botao.first.click(timeout=2000)
+                    break
+                except Exception:
+                    pass
+        else:
+            page.keyboard.press("Escape")
+        page.wait_for_timeout(800)
+    if overlay.count():
+        pasta_debug.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(pasta_debug / "_debug_dialogo.png"))
+        print(f"[FASE 1] Diálogo continua aberto — screenshot em {pasta_debug / '_debug_dialogo.png'}")
+
+
 def fase1_gerar_imagem(page, prompt: str, pasta_debug: Path) -> bytes:
     """Abre o Gemini (conversa nova ou existente), manda o prompt, espera a imagem."""
     if GEMINI_CONVERSATION_URL:
@@ -68,6 +93,7 @@ def fase1_gerar_imagem(page, prompt: str, pasta_debug: Path) -> bytes:
         print("[FASE 1] Abrindo Gemini (conversa nova)...")
         page.goto("https://gemini.google.com/app", wait_until="domcontentloaded")
     page.wait_for_timeout(3000)
+    fechar_dialogos(page, pasta_debug)
 
     # Caixa de prompt
     try:
@@ -108,7 +134,9 @@ def fase1_gerar_imagem(page, prompt: str, pasta_debug: Path) -> bytes:
     print("[FASE 1] Esperando a imagem ser gerada (pode levar ~30-60s)...")
     imagem = None
 
-    for tentativa in range(24):  # ate ~2 minutos
+    # ate ~4 minutos (2026-10-01: com 2 min o Gemini web ainda estava desenhando e o
+    # script desistia — a imagem ficava pronta logo depois, desperdiçando a geração)
+    for tentativa in range(48):
         page.wait_for_timeout(5000)
 
         candidatos = page.locator("img").all()
@@ -143,13 +171,13 @@ def fase1_gerar_imagem(page, prompt: str, pasta_debug: Path) -> bytes:
         if imagem:
             break
 
-        print(f"  ainda esperando... ({tentativa + 1}/24)")
+        print(f"  ainda esperando... ({tentativa + 1}/48)")
 
     if imagem is None:
         pasta_debug.mkdir(parents=True, exist_ok=True)
         page.screenshot(path=str(pasta_debug / "_debug_sem_imagem.png"))
         raise RuntimeError(
-            "Nao achei nenhuma imagem gerada depois de ~2min. Screenshot de "
+            "Nao achei nenhuma imagem gerada depois de ~4min. Screenshot de "
             f"debug salvo em {pasta_debug / '_debug_sem_imagem.png'} — "
             "abre esse print pra ver o que a pagina mostrou."
         )

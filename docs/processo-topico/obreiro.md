@@ -76,7 +76,8 @@ só o que está no dossiê do tópico (`fontes/obreiro/`) — o formato muda, as
 
 **Regras de áudio (narração):** explica como professor — quem está falando, o que quis dizer,
 por que importa — em vez de ler o texto. Não lê o rótulo da caixa. Até ~30 s (~75 palavras)
-por bloco. Números e anos por extenso. Cada narração tem que fazer sentido sozinha.
+por bloco. Números e anos em algarismos, como na BASE (a voz lê certo). Cada narração tem que
+fazer sentido sozinha.
 
 ## Passo 6 — Imagens
 
