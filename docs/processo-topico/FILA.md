@@ -14,7 +14,7 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 5 | 35 | Redes (11) | M1 · NAT, Firewall e DNS | DNS e DDNS | pendente | |
 | 6 | 23 | IA (5) | Aula 2 · Transformers por dentro | Causal Masking + Multi-Head Attention | pendente | |
 | 7 | 71 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Antigo Testamento: criação, aliança, reino e exílio (Gn 12:1-3) | pendente | |
-| 8 | 195 | Inglês (9) | M0 · Quando eu não entendo | "How do you say…?", "What does … mean?", "How do you spell…?" e o alfabeto | pendente | |
+| 8 | 195 | Inglês (9) | M0 · Quando eu não entendo | "How do you say…?", "What does … mean?", "How do you spell…?" e o alfabeto | feito | |
 | 9 | 36 | Redes (11) | M2 · Port Forwarding | Como funciona o redirecionamento de porta | pendente | |
 | 10 | 24 | IA (5) | Aula 2 · Transformers por dentro | Dentro do bloco Transformer | pendente | |
 | 11 | 72 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Novo Testamento: Cristo, igreja e consumação (Hb 1:1-2) | pendente | |
@@ -59,3 +59,4 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 22 | IA | Self-Attention: Query, Key, Value (17 slides, 8 imagens, 35 áudios) | 2026-10-12 |
 | 70 | Obreiro I | Como os 66 livros se formaram (Lc 24:44) — abre a Aula 58 (17 slides, 8 imagens, 36 áudios); leitura do teólogo/pastor recomendada | 2026-10-13 |
 | 194 | Inglês | "Sorry, I don't understand", "Can you repeat that?", "Can you speak more slowly?" — 1º tópico do curso (M0); título ajustado: nenhuma fonte ensina "More slowly, please" solto (16 slides, 7 imagens, 15 áudios) | 2026-10-14 |
+| 195 | Inglês | "How do you say…?", "What does … mean?", "How do you spell…?" e o alfabeto — 2º tópico do M0 (17 slides, 7 imagens, 15 perguntas, 16 áudios); conferir de ouvido os 🔊 dos cards de letra ("Letter X") no navegador | 2026-10-28 |
