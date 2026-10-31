@@ -22,7 +22,7 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 13 | 37 | Redes (11) | M2 · Port Forwarding | Riscos de expor porta na internet | pendente | |
 | 14 | 25 | IA (5) | Aula 2 · Transformers por dentro | Dos logits ao desempenho — KV Cache, Prefill/Decode | pendente | |
 | 15 | 73 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Cristo em toda a Escritura (Lc 24:27) | pendente | |
-| 16 | 197 | Inglês (9) | M0 · Entendendo o professor | As instruções de todo exercício: read, listen, write, answer, choose, match, repeat | pendente | |
+| 16 | 197 | Inglês (9) | M0 · Entendendo o professor | As instruções de todo exercício: read, listen, write, answer, choose, match, repeat | feito | conferência humana: "Match the words and the pictures." é exemplo próprio e match = "ligar/combinar" não foi checado em dicionário (Oxford/Collins/M-W bloqueiam acesso automatizado); níveis CEFR dos 7 verbos não verificados |
 | 17 | 170 | Vendas (13, privado) | M1 · O mercado digital | T1 Modelos de negócio online: curso, assinatura, serviço e afiliado | parcial | áudio: 5/26 blocos com voz (cota TTS do dia, 2026-10-07). Continuar: `AUDIO_FONTE=prod python backend/_gerar_audio_topico.py 170 13 voz` (pula os prontos; narrações já revisadas) → mp3 → `_conferir_audio.py 170 13` → scp -r `static/audio/curso13` → aplicar prod |
 | 18 | 198 | Inglês (9) | M0 · Entendendo o professor | Confirmar o que entendeu: "You mean…? / Exactly" | pendente | |
 | 19 | 199 | Inglês (9) | M0 · Entendendo o professor | Juntando tudo: uma aula inteira em inglês simples | pendente | |
@@ -61,3 +61,4 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 194 | Inglês | "Sorry, I don't understand", "Can you repeat that?", "Can you speak more slowly?" — 1º tópico do curso (M0); título ajustado: nenhuma fonte ensina "More slowly, please" solto (16 slides, 7 imagens, 15 áudios) | 2026-10-14 |
 | 195 | Inglês | "How do you say…?", "What does … mean?", "How do you spell…?" e o alfabeto — 2º tópico do M0 (17 slides, 7 imagens, 15 perguntas, 16 áudios); conferir de ouvido os 🔊 dos cards de letra ("Letter X") no navegador | 2026-10-28 |
 | 196 | Inglês | Prática: pedir ajuda numa conversa curta — fecha a Aula 1 do M0 (16 slides, 7 imagens, 14 perguntas, 12 áudios; sem palavra nova, só diálogos com a lista fechada T194+T195) | 2026-10-31 |
+| 197 | Inglês | As instruções de todo exercício: read, listen, write, answer, choose, match, repeat — abre a Aula 2 do M0 (16 slides, 7 imagens, 14 perguntas, 15 áudios); fontes lidas: ELTeach, Cambridge Young Learners (Starters/Movers), British Council A1; "match" sem instrução literal nas fontes → ver coluna "falta" | 2026-10-31 |
