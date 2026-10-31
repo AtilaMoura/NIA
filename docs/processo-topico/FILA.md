@@ -18,7 +18,7 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 9 | 36 | Redes (11) | M2 · Port Forwarding | Como funciona o redirecionamento de porta | pendente | |
 | 10 | 24 | IA (5) | Aula 2 · Transformers por dentro | Dentro do bloco Transformer | pendente | |
 | 11 | 72 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Novo Testamento: Cristo, igreja e consumação (Hb 1:1-2) | pendente | |
-| 12 | 196 | Inglês (9) | M0 · Quando eu não entendo | Prática: pedir ajuda numa conversa curta | pendente | |
+| 12 | 196 | Inglês (9) | M0 · Quando eu não entendo | Prática: pedir ajuda numa conversa curta | feito | |
 | 13 | 37 | Redes (11) | M2 · Port Forwarding | Riscos de expor porta na internet | pendente | |
 | 14 | 25 | IA (5) | Aula 2 · Transformers por dentro | Dos logits ao desempenho — KV Cache, Prefill/Decode | pendente | |
 | 15 | 73 | Obreiro I (8) | M2 · Panorama Geral da Bíblia | Cristo em toda a Escritura (Lc 24:27) | pendente | |
@@ -60,3 +60,4 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 70 | Obreiro I | Como os 66 livros se formaram (Lc 24:44) — abre a Aula 58 (17 slides, 8 imagens, 36 áudios); leitura do teólogo/pastor recomendada | 2026-10-13 |
 | 194 | Inglês | "Sorry, I don't understand", "Can you repeat that?", "Can you speak more slowly?" — 1º tópico do curso (M0); título ajustado: nenhuma fonte ensina "More slowly, please" solto (16 slides, 7 imagens, 15 áudios) | 2026-10-14 |
 | 195 | Inglês | "How do you say…?", "What does … mean?", "How do you spell…?" e o alfabeto — 2º tópico do M0 (17 slides, 7 imagens, 15 perguntas, 16 áudios); conferir de ouvido os 🔊 dos cards de letra ("Letter X") no navegador | 2026-10-28 |
+| 196 | Inglês | Prática: pedir ajuda numa conversa curta — fecha a Aula 1 do M0 (16 slides, 7 imagens, 14 perguntas, 12 áudios; sem palavra nova, só diálogos com a lista fechada T194+T195) | 2026-10-31 |
