@@ -1,0 +1,51 @@
+[
+  {
+    "descricao": "Generate an image. Hand-drawn sketchnote style on a notebook page, black ink doodles with a few highlighter colours, arrows, boxes, simple icons, visual note-taking look; no readable text, no letters, no words, no logos. Scene: a crowd of many small person icons on the left, a magnifying glass picking out one person icon who is drawn larger with a simple face, a thinking cloud above and small icons floating around (a clock, a book, a phone), and an arrow from the crowd to that person. Use mint green and graphite grey as the highlighter accents. Keep the scene simple with few objects. Landscape orientation, 16:9 widescreen. Absolutely no words, letters, numbers, labels or handwriting anywhere — icons and arrows only; no signs, boards or boxes with any writing, no calendars with numbers, and no scribbles that look like handwriting.",
+    "arquivo": "t04-capa.png",
+    "modulo": "vendas",
+    "aula": "aula2",
+    "topico": "t04-publico-e-persona"
+  },
+  {
+    "descricao": "Generate an image. Hand-drawn sketchnote style on a notebook page, black ink doodles with a few highlighter colours, arrows, boxes, simple icons, visual note-taking look; no readable text, no letters, no words, no logos. Scene: a big circle full of small person icons, with five smaller nested segments inside it, each segment marked with a simple icon: a map pin, two people, a coin, a brain and footprints. Use mint green and graphite grey as the highlighter accents. Keep the scene simple with few objects. Landscape orientation, 16:9 widescreen. Absolutely no words, letters, numbers, labels or handwriting anywhere — icons and arrows only; no signs, boards or boxes with any writing, no calendars with numbers, and no scribbles that look like handwriting.",
+    "arquivo": "t04-publico.png",
+    "modulo": "vendas",
+    "aula": "aula2",
+    "topico": "t04-publico-e-persona"
+  },
+  {
+    "descricao": "Generate an image. Hand-drawn sketchnote style on a notebook page, black ink doodles with a few highlighter colours, arrows, boxes, simple icons, visual note-taking look; no readable text, no letters, no words, no logos. Scene: a single larger person figure with a simple face drawn in the center of a notebook page, with small icons around: a heart, a cloud with a question mark, a clock, a phone and a book, and a faded small crowd silhouette on the left side. Use mint green and graphite grey as the highlighter accents. Keep the scene simple with few objects. Landscape orientation, 16:9 widescreen. Absolutely no words, letters, numbers, labels or handwriting anywhere — icons and arrows only; no signs, boards or boxes with any writing, no calendars with numbers, and no scribbles that look like handwriting.",
+    "arquivo": "t04-persona.png",
+    "modulo": "vendas",
+    "aula": "aula2",
+    "topico": "t04-publico-e-persona"
+  },
+  {
+    "descricao": "Generate an image. Hand-drawn sketchnote style on a notebook page, black ink doodles with a few highlighter colours, arrows, boxes, simple icons, visual note-taking look; no readable text, no letters, no words, no logos. Scene: a person with a clipboard talking to a seated person with a notebook; a table beside them with a grid of empty squares, and four small icons (a phone, a briefcase, a handshake and a shopping cart) for the four question groups. Use mint green and graphite grey as the highlighter accents. Keep the scene simple with few objects. Landscape orientation, 16:9 widescreen. Absolutely no words, letters, numbers, labels or handwriting anywhere — icons and arrows only; no signs, boards or boxes with any writing, no calendars with numbers, and no scribbles that look like handwriting.",
+    "arquivo": "t04-pesquisa.png",
+    "modulo": "vendas",
+    "aula": "aula2",
+    "topico": "t04-publico-e-persona"
+  },
+  {
+    "descricao": "Generate an image. Hand-drawn sketchnote style on a notebook page, black ink doodles with a few highlighter colours, arrows, boxes, simple icons, visual note-taking look; no readable text, no letters, no words, no logos. Scene: a small open-book platform icon with a question mark floating above a row of empty chairs, a magnifying glass beside it, and a dotted outline of a person to show a hypothesis not yet filled. Use mint green and graphite grey as the highlighter accents. Keep the scene simple with few objects. Landscape orientation, 16:9 widescreen. Absolutely no words, letters, numbers, labels or handwriting anywhere — icons and arrows only; no signs, boards or boxes with any writing, no calendars with numbers, and no scribbles that look like handwriting.",
+    "arquivo": "t04-emaus.png",
+    "modulo": "vendas",
+    "aula": "aula2",
+    "topico": "t04-publico-e-persona"
+  },
+  {
+    "descricao": "Generate an image. Hand-drawn sketchnote style on a notebook page, black ink doodles with a few highlighter colours, arrows, boxes, simple icons, visual note-taking look; no readable text, no letters, no words, no logos. Scene: a padlock placed over a person silhouette icon, a megaphone on one side whose arrow is stopped by a shield, and a small checklist with checked squares on the other side; icons only, with no signs and no writing. Use mint green and graphite grey as the highlighter accents. Keep the scene simple with few objects. Landscape orientation, 16:9 widescreen. Absolutely no words, letters, numbers, labels or handwriting anywhere — icons and arrows only; no signs, boards or boxes with any writing, no calendars with numbers, and no scribbles that look like handwriting.",
+    "arquivo": "t04-sensivel.png",
+    "modulo": "vendas",
+    "aula": "aula2",
+    "topico": "t04-publico-e-persona"
+  },
+  {
+    "descricao": "Generate an image. Hand-drawn sketchnote style on a notebook page, black ink doodles with a few highlighter colours, arrows, boxes, simple icons, visual note-taking look; no readable text, no letters, no words, no logos. Scene: a woman at a desk drawing a persona card on a sheet of paper, with a list of empty checkbox squares beside it and a monitor showing a small open-book platform icon. Use mint green and graphite grey as the highlighter accents. Keep the scene simple with few objects. Landscape orientation, 16:9 widescreen. Absolutely no words, letters, numbers, labels or handwriting anywhere — icons and arrows only; no signs, boards or boxes with any writing, no calendars with numbers, and no scribbles that look like handwriting.",
+    "arquivo": "t04-voce-e-emaus.png",
+    "modulo": "vendas",
+    "aula": "aula2",
+    "topico": "t04-publico-e-persona"
+  }
+]
