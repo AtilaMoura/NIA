@@ -39,6 +39,7 @@ Erro **real** que o conferidor achou e eu corrigi: "inspiradas pelo Espírito Sa
 6. "ministro da rainha" (Etiópia) → o texto diz "superintendente de todos os seus tesouros": virou "responsável pelos tesouros da rainha dos etíopes".
 7. "inspiradas" → "inspirados" (ACF, 2Pe 1:21).
 8. Número "485 vezes" confirmado na página (e não de memória, como no T66).
+9. **Correção posterior (2026-11-10, publicada):** o card "Lucas pesquisou" e itens ligados atribuíam o 3º Evangelho a Lucas, mas o nome **não consta no texto lido** (é tradição). Agora: "o autor do Evangelho de Lucas" (card, associar, explicação, resposta-modelo) e a introdução do slide 7 diz "quatro exemplos de como escreveram" (antes "quatro deles", que chamava Lucas de escritor). Só o áudio desse bloco foi regenerado (s7 b0); os outros 28 ficaram como estavam.
 
 ## 3b. Rascunhos de IA (comparação)
 - **Gemini** (`_conteudo_conteudo_topico217.json`): 8 slides, **0 blocos de citação literal** (nenhum versículo copiado da ACF), 1 menção a
