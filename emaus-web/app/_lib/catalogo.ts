@@ -77,6 +77,18 @@ export const CATALOGO: CursoCatalogo[] = [
     courseId: 12,
     disponivel: true,
   },
+  // Curso da ACP – A Casa da Palavra (2026-11-10). Privado até o 1º tópico ficar pronto.
+  {
+    slug: "obreiro-acp",
+    titulo: "Obreiro ACP — Servir na Casa da Palavra",
+    subtitulo: "Formação do obreiro da ACP – A Casa da Palavra",
+    descricao:
+      "A Bíblia como base de cada aula: a fé que a ACP crê, o chamado e o perfil do diácono, o governo e o Estatuto, o culto e o serviço no templo, a oração e o cuidado com as pessoas, a família e a vida do obreiro.",
+    tom: "latao",
+    categoria: "Formação bíblica",
+    courseId: 15,
+    disponivel: true,
+  },
   {
     slug: "redes-cameras",
     titulo: "Redes e Câmeras — Do IP ao Streaming",
@@ -220,6 +232,7 @@ export function caminhoCapa(slug: string): string {
 const TITULO_CURTO: Record<string, string> = {
   "formacao-novo-obreiro": "Formação do Obreiro I",
   "formacao-obreiro-servico": "Formação do Obreiro II",
+  "obreiro-acp": "Obreiro ACP",
 };
 export function tituloCurto(c: CursoCatalogo): string {
   return TITULO_CURTO[c.slug] ?? c.titulo;
