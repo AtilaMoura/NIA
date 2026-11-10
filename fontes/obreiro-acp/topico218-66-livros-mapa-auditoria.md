@@ -65,5 +65,17 @@ e "aliança nova" são trechos curtos de Lc 22:20 e Jr 31:31, ambos lidos; o res
 `validar_topico()` → `[]` · render `trigo-maduro`: 189 KB, 0 `None` · ids únicos · `fluxo` (não `diagrama`) · capa com `imagem_capa` · Reflexão + Resumo (7 bullets autônomos para o "Relembrando" do T219) ·
 perguntas: mc 2, tf 2, classify 2, lacuna 1, associar 1, **open 2** ✅.
 
+## 8. Revisão de 2026-11-10 (auditoria pedida pelo Atila, tarefa NIA-T-019)
+Erros que a 1ª auditoria deixou passar, corrigidos no texto e republicados:
+1. **1 João omitida** em "de quem são as cartas": o aluno concluía que Hebreus era a única carta sem nome. Card virou "Primeira carta de João e Hebreus"; resumo e explicação do ck3_2 ajustados.
+2. **"Testamento vem de uma palavra grega"** → "traduz uma palavra grega" (a palavra portuguesa vem do latim; Jeremias escreveu em hebraico). Resumo: "também quer dizer aliança" (o "também" tinha caído); explicação do ck3_3 igual.
+3. **"A maior parte do NT são cartas"** → "a maioria dos livros do NT" (em volume de texto, Evangelhos + Atos passam da metade).
+4. **Maiores/menores**: a explicação não tinha fonte; entrou Agostinho (*Cidade de Deus* XVIII, 29, lido no texto literal da tradução NPNF) e a nota de Lamentações (5 capítulos, mas no grupo dos maiores, logo depois de Jeremias).
+5. Fontes: 2ª fonte independente para 39 / 27 / 21 cartas (Wikipédia pt e en); Pentateuco e Agostinho registrados no dossiê; Pró-Livro (não usado) saiu da lista.
+6. Áudio: narrações dos blocos alterados reescritas à mão e regeradas; as do resumo e da reflexão também (a IA tinha virado pergunta aberta em afirmação e tirado "evangelho = boa notícia").
+- **Fronteira (decisão do Atila):** At 17:11 (Bereia) é a passagem-base do 1º tópico da Aula 1.2; aqui aparece como exemplo curto. Mantido até decisão.
+
+`validar_topico()` → `[]`; render 0 `None`; mapa OK; citações: as mesmas 7 falsas-positivas de aspas, nenhuma citação em bloco falhou.
+
 ## Resultado
 **0 pendências de fato.** Segue para imagens, publicação e áudio.

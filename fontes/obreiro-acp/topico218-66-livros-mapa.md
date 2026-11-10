@@ -75,24 +75,26 @@ Hebreus não traz nome no texto → vai em "outras cartas" **sem dizer quem escr
 | 3 | Léxico | BLB Strong G2098 *euangélion*: "good tidings" (https://www.blueletterbible.org/lexicon/g2098/kjv/tr/0-1/) | 2026-11-10 (lida) | evangelho = boa notícia |
 | 4 | Léxico | BLB Strong G602 *apokálypsis*: "an uncovering… a disclosure of truth" (https://www.blueletterbible.org/lexicon/g602/kjv/tr/0-1/) | 2026-11-10 (lida) | apocalipse = revelação (o 1º versículo do livro já diz "Revelação de Jesus Cristo") |
 | 5 | Referência | Wikipédia (pt), "Cânone bíblico" (https://pt.wikipedia.org/wiki/C%C3%A2none_b%C3%ADblico): "Todas as grandes tradições cristãs aceitam os protocânone hebraico inteiramente… todas elas, com exceção dos protestantes, aceitam também os livros deuterocanônicos"; protestantes defendem o cânone da Bíblia hebraica e o católico para o NT (27 livros) | 2026-11-10 (lida) | **uma frase** sobre a Bíblia católica ter livros a mais no AT (sem número) |
-| 6 | Dado | Pró-Livro 2024 (já usado no T217) | — | não repetido |
+| 6 | Referência (independente) | Wikipédia (pt), "Antigo Testamento" (https://pt.wikipedia.org/wiki/Antigo_Testamento): "têm 46 livros na versão usada pelos católicos e 39 na dos protestantes"; Wikipédia (en), "Biblical canon" (https://en.wikipedia.org/wiki/Biblical_canon): NT "almost always containing 27 books: the four canonical gospels, Acts of the Apostles, 21 Epistles or letters and the Book of Revelation" | 2026-11-10 (lidas, texto literal) | 2ª fonte para 39, 27 e 21 cartas (66 = soma) |
+| 6b | Referência | Wikipédia (pt), "Pentateuco" (https://pt.wikipedia.org/wiki/Pentateuco): "literalmente 'cinco partes ou seções'" | 2026-11-10 (lida) | Pentateuco = "cinco partes" |
+| 6c | Clássico (domínio público) | Agostinho, *Cidade de Deus* XVIII, 29 (trad. NPNF, https://en.wikisource.org/wiki/Nicene_and_Post-Nicene_Fathers:_Series_I/Volume_II/City_of_God/Book_XVIII/Chapter_29): "who are called the minor from the brevity of their writings" / "the greater prophets because they published larger volumes" | 2026-11-10 (lida, texto literal em inglês; o latim não foi lido) | origem dos nomes "maiores"/"menores" (paráfrase atribuída) |
 | 7 | Caso real (bíblico) | At 17:11 — os de Bereia examinavam as Escrituras todos os dias | — | Estudar com método; o mapa ajuda a achar o livro |
 | 8 | Caso que deu errado (bíblico) | Mt 22:29 — "Errais, não conhecendo as Escrituras" | — | Quem não conhece a Bíblia erra; conhecer o mapa é o 1º passo |
 
-Tipos cobertos: primária, léxico, referência, caso real, caso que deu errado, dado (índice) — **6 de 8**; sem comentarista moderno neste tópico (o assunto é um mapa, não uma interpretação).
+Tipos cobertos: primária (texto e índice da ACF), léxico, referência independente (Wikipédia pt/en), clássico (Agostinho), caso real e caso que deu errado (ambos bíblicos) — sem comentarista moderno (o assunto é um mapa, não uma interpretação). Revisão 2026-11-10: o Pró-Livro saiu da lista (não era usado).
 **Fontes que não consegui ler:** SBB, Britannica, ag.org (403). Nada delas entra.
 
 ## Afirmações centrais
 
 | Afirmação | Fontes | Status |
 |---|---|---|
-| A Bíblia tem 66 livros: 39 no AT e 27 no NT | 1 | ok (índice da ACF) |
+| A Bíblia tem 66 livros: 39 no AT e 27 no NT | 1, 6 | ok (índice da ACF + Wikipédia pt/en) |
 | Ordem dos livros e agrupamentos (Lei 5, história 12, poesia 5, profetas maiores 5, menores 12; Evangelhos 4, Atos 1, cartas de Paulo 13, outras 8, Apocalipse 1) | 1 | ok — **grupos são de ensino**; o texto diz isso |
-| "Maiores" e "menores" = tamanho, não importância (183 x 67 capítulos) | 1 | ok — contagem feita no índice |
+| "Maiores" e "menores" = tamanho, não importância (183 x 67 capítulos); Lamentações (5 cap.) fica nos maiores, logo depois de Jeremias | 1, 6c | ok — contagem no índice + Agostinho |
 | Jesus falou da "lei de Moisés, profetas e Salmos" (Lc 24:44) | 1 | ok |
-| "Testamento" = aliança (Lc 22:20 "novo testamento"; Jr 31:31 "aliança nova"; Strong G1242) | 1, 2 | ok |
+| "Testamento" **traduz** o grego *diathḗkē*, que também quer dizer aliança (Lc 22:20 "novo testamento"; Jr 31:31 "aliança nova"; Strong G1242) | 1, 2 | ok — a palavra portuguesa vem do latim; Jeremias escreveu em hebraico, por isso o texto não diz que "testamento vem do grego" |
 | Evangelho = boa notícia; Apocalipse = revelação | 3, 4, 1 | ok |
-| As 13 cartas de Paulo começam com o nome dele; Hebreus não traz nome | 1 | ok (versículos lidos) |
+| As 13 cartas de Paulo começam com o nome dele; **1 João e Hebreus** não trazem nome; 2 e 3 João dizem "o presbítero" | 1 | ok (versículos lidos, inclusive 1Jo 1:1-3) |
 | Atos é o "segundo volume" do 3º Evangelho: ambos a Teófilo | 1 | ok — não afirma que "Lucas" escreveu (nome não consta no texto lido) |
 | Alguns livros têm 1 capítulo; Salmos tem 150 | 1 | ok |
 | Outras tradições (como a católica) têm mais livros no AT | 5 | ok — **1 frase**, sem número |
