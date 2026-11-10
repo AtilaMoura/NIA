@@ -68,3 +68,90 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 171 | Vendas | Assinatura × venda única: recorrência, churn e LTV — T2 do curso 13, fecha a Aula 1 do M1 (16 slides, 9 imagens sketchnote, 13 perguntas, 35 áudios); fontes lidas: Sebrae PE (e-book de retenção), Sebrae/PR, Conta Azul, Omie, Serasa, Salesforce, Mercado Pago Developers, FTC × Amazon, CDC/Decreto 7.962; números do exercício SIMULADOS; nenhum número de taxa/renda; Emaús só no que é verdade hoje (pagamento não construído, preço não decidido) | 2026-11-03 |
 | 172 | Vendas | Funil de venda: da atenção à permanência — T3 do curso 13, abre a Aula 2 do M1 (14 slides, 8 imagens sketchnote, 12 perguntas, 27 áudios); fontes lidas: Sebrae ×4 (PDF E-commerce, Sebrae SC, Comunidade Sebrae PR ×2, e-book Sebrae PE), Baymard, LGPD arts. 5º/6º/8º; números de conversão do exercício SIMULADOS; Emaús só no que é verdade hoje (página de visitante + "Criar conta grátis" existem; assinatura é só plano). McKinsey não lida → fora; tipos de fonte 5 de 8 | 2026-11-03 |
 | 173 | Vendas | Público e persona: quem assina o Emaús — T4 do curso 13, fecha a Aula 2 e o Módulo 1 (13 slides, 7 imagens sketchnote, 12 perguntas, 23 áudios); fontes lidas: Sebrae PE (guia de persona), Sebrae MG, Meta ×3 (anúncio 2021, blog de desenvolvedores, política de atributos pessoais 2024), LGPD arts. 5º II e 11; persona do Emaús = HIPÓTESE (sem dados de assinantes); convicção religiosa = dado sensível e a Meta proíbe afirmar/sugerir atributos → nada de segmentar por religião. A conferir por humano: lista de alunos × LGPD art. 11 §1º (advogado); regras de públicos personalizados da Meta (Módulo 4) | 2026-11-03 |
+| 200 | 217 | Obreiro ACP (15) | M1 · A Bíblia: o que é e como está organizada | O que é a Bíblia e quem a escreveu | feito | revisão do pastor/Adriano depois: posição da ACP sobre a Bíblia (Declaração de Fé pendente); número "cerca de 40 autores" fora por falta de fonte lida |
+| 201 | 218 | Obreiro ACP (15) | M1 · A Bíblia: o que é e como está organizada | Antigo e Novo Testamento: os 66 livros em um mapa | pendente | |
+| 202 | 219 | Obreiro ACP (15) | M1 · A Bíblia: o que é e como está organizada | Como achar qualquer versículo (livro, capítulo, versículo) | pendente | |
+| 203 | 220 | Obreiro ACP (15) | M1 · Como ler e entender a Palavra | Ler o texto no seu contexto | pendente | |
+| 204 | 221 | Obreiro ACP (15) | M1 · Como ler e entender a Palavra | Observar, entender, aplicar | pendente | |
+| 205 | 222 | Obreiro ACP (15) | M1 · Como ler e entender a Palavra | Erros comuns de quem está começando | pendente | |
+| 206 | 223 | Obreiro ACP (15) | M1 · O que a ACP crê: o essencial da fé | Um só Deus: Pai, Filho e Espírito Santo | pendente | |
+| 207 | 224 | Obreiro ACP (15) | M1 · O que a ACP crê: o essencial da fé | Jesus: cruz e ressurreição | pendente | |
+| 208 | 225 | Obreiro ACP (15) | M1 · O que a ACP crê: o essencial da fé | Salvação pela graça, arrependimento e novo nascimento | pendente | |
+| 209 | 226 | Obreiro ACP (15) | M1 · O que a ACP crê: o essencial da fé | Batismo nas águas | pendente | |
+| 210 | 227 | Obreiro ACP (15) | M1 · O que a ACP crê: o essencial da fé | Batismo no Espírito Santo: imersão, línguas e poder para servir | pendente | |
+| 211 | 228 | Obreiro ACP (15) | M2 · A origem do serviço | A necessidade que gerou o diaconato | pendente | |
+| 212 | 229 | Obreiro ACP (15) | M2 · A origem do serviço | Ministério da Palavra e ministério do serviço | pendente | |
+| 213 | 230 | Obreiro ACP (15) | M2 · A origem do serviço | O diácono como apoio e escudo do pastor | pendente | |
+| 214 | 231 | Obreiro ACP (15) | M2 · A origem do serviço | Servir com alegria e sem aparecer | pendente | |
+| 215 | 232 | Obreiro ACP (15) | M2 · O perfil do diácono | Caráter: sério, sem duplicidade, sem ganância | pendente | |
+| 216 | 233 | Obreiro ACP (15) | M2 · O perfil do diácono | Vida espiritual: mistério da fé com consciência limpa | pendente | |
+| 217 | 234 | Obreiro ACP (15) | M2 · O perfil do diácono | Casa em ordem | pendente | |
+| 218 | 235 | Obreiro ACP (15) | M2 · O perfil do diácono | O que a ACP exige para entrar no ministério | pendente | |
+| 219 | 236 | Obreiro ACP (15) | M2 · Chamado e sacerdócio de todos | Todo crente é sacerdote | pendente | |
+| 220 | 237 | Obreiro ACP (15) | M2 · Chamado e sacerdócio de todos | Chamado, dons e função no corpo | pendente | |
+| 221 | 238 | Obreiro ACP (15) | M2 · Chamado e sacerdócio de todos | Do altar vem a direção: o lugar do pastor e o lugar do obreiro | pendente | |
+| 222 | 239 | Obreiro ACP (15) | M3 · Conhecendo a ACP | Para que a igreja existe | pendente | |
+| 223 | 240 | Obreiro ACP (15) | M3 · Conhecendo a ACP | O ministério: Pastor, Evangelista, Missionário, Presbítero e Diácono | pendente | |
+| 224 | 241 | Obreiro ACP (15) | M3 · Conhecendo a ACP | A assembleia, a diretoria e os membros | pendente | |
+| 225 | 242 | Obreiro ACP (15) | M3 · Conhecendo a ACP | Deveres e direitos do membro | pendente | |
+| 226 | 243 | Obreiro ACP (15) | M3 · Autoridade, submissão e correção | Autoridade que vem de Deus | pendente | |
+| 227 | 244 | Obreiro ACP (15) | M3 · Autoridade, submissão e correção | Submeter-se sem bajular | pendente | |
+| 228 | 245 | Obreiro ACP (15) | M3 · Autoridade, submissão e correção | Ouvir repreensão | pendente | |
+| 229 | 246 | Obreiro ACP (15) | M3 · Autoridade, submissão e correção | Murmuração e divisão | pendente | |
+| 230 | 247 | Obreiro ACP (15) | M3 · Disciplina e perda de cargo | A disciplina na Bíblia | pendente | |
+| 231 | 248 | Obreiro ACP (15) | M3 · Disciplina e perda de cargo | As penas da ACP e o direito de defesa | pendente | |
+| 232 | 249 | Obreiro ACP (15) | M3 · Disciplina e perda de cargo | Quando eu sou tirado de um cargo: como reagir | pendente | |
+| 233 | 250 | Obreiro ACP (15) | M3 · Atas, reuniões e sigilo | O que é uma ata e por que registrar | pendente | |
+| 234 | 251 | Obreiro ACP (15) | M3 · Atas, reuniões e sigilo | Participar das reuniões e da assembleia | pendente | |
+| 235 | 252 | Obreiro ACP (15) | M3 · Atas, reuniões e sigilo | Sigilo sobre a igreja e sobre os irmãos | pendente | |
+| 236 | 253 | Obreiro ACP (15) | M4 · Compromisso com o culto: as ausências | Por que congregar | pendente | |
+| 237 | 254 | Obreiro ACP (15) | M4 · Compromisso com o culto: as ausências | Faltas do membro e do obreiro | pendente | |
+| 238 | 255 | Obreiro ACP (15) | M4 · Compromisso com o culto: as ausências | Escalado e não veio, ou veio e "sentou": avisar e substituir | pendente | |
+| 239 | 256 | Obreiro ACP (15) | M4 · Compromisso com o culto: as ausências | Cuidar de quem faltou | pendente | |
+| 240 | 257 | Obreiro ACP (15) | M4 · Recepção: do estacionamento ao banco | Acolher como Cristo acolheu | pendente | |
+| 241 | 258 | Obreiro ACP (15) | M4 · Recepção: do estacionamento ao banco | Estacionamento: ajudar, cumprimentar, "seja bem-vindo, fique à vontade" | pendente | |
+| 242 | 259 | Obreiro ACP (15) | M4 · Recepção: do estacionamento ao banco | Não deixar visita perdida no meio da igreja | pendente | |
+| 243 | 260 | Obreiro ACP (15) | M4 · Recepção: do estacionamento ao banco | Apresentação dos visitantes: o aperto de mão | pendente | |
+| 244 | 261 | Obreiro ACP (15) | M4 · Atenção, vigilância e segurança | Vigiar o rebanho | pendente | |
+| 245 | 262 | Obreiro ACP (15) | M4 · Atenção, vigilância e segurança | Nunca sozinho com quem não conhece: chamar outro obreiro | pendente | |
+| 246 | 263 | Obreiro ACP (15) | M4 · Atenção, vigilância e segurança | Perguntar a quem está no estacionamento se está bem | pendente | |
+| 247 | 264 | Obreiro ACP (15) | M4 · Atenção, vigilância e segurança | Cuidado com crianças, adolescentes e o patrimônio da igreja | pendente | |
+| 248 | 265 | Obreiro ACP (15) | M4 · A direção do culto | Decência e ordem: o dirigente e o pastor no altar | pendente | |
+| 249 | 266 | Obreiro ACP (15) | M4 · A direção do culto | Tempo de oportunidade: 5 minutos | pendente | |
+| 250 | 267 | Obreiro ACP (15) | M4 · A direção do culto | Objetivo da oração: enfermo, Palavra e dízimo | pendente | |
+| 251 | 268 | Obreiro ACP (15) | M4 · A direção do culto | Santa Ceia: preparo e reverência | pendente | |
+| 252 | 269 | Obreiro ACP (15) | M4 · Dízimos e ofertas no culto | O que a Bíblia ensina sobre dízimo e oferta | pendente | |
+| 253 | 270 | Obreiro ACP (15) | M4 · Dízimos e ofertas no culto | Recolher com honestidade, conferir em dupla | pendente | |
+| 254 | 271 | Obreiro ACP (15) | M4 · Dízimos e ofertas no culto | Para onde vai o dinheiro: a contabilidade da igreja | pendente | |
+| 255 | 272 | Obreiro ACP (15) | M5 · Orar por pessoas com autoridade | Por que orar pelos outros | pendente | |
+| 256 | 273 | Obreiro ACP (15) | M5 · Orar por pessoas com autoridade | A autoridade que Jesus deu | pendente | |
+| 257 | 274 | Obreiro ACP (15) | M5 · Orar por pessoas com autoridade | Repreender o maligno e expulsar demônios: como se faz na Bíblia | pendente | |
+| 258 | 275 | Obreiro ACP (15) | M5 · Orar por pessoas com autoridade | Limites: direção do pastor e encaminhar a médico e profissional | pendente | |
+| 259 | 276 | Obreiro ACP (15) | M5 · Vida de oração e jejum do obreiro | Orar como Jesus ensinou | pendente | |
+| 260 | 277 | Obreiro ACP (15) | M5 · Vida de oração e jejum do obreiro | Tempo a sós com Deus | pendente | |
+| 261 | 278 | Obreiro ACP (15) | M5 · Vida de oração e jejum do obreiro | Jejum: o que é e como fazer | pendente | |
+| 262 | 279 | Obreiro ACP (15) | M5 · Vida de oração e jejum do obreiro | Fazer a obra de Deus sem perder o Deus da obra | pendente | |
+| 263 | 280 | Obreiro ACP (15) | M5 · Visitação e cuidado com os necessitados | Visitar enfermos, idosos e hospitais | pendente | |
+| 264 | 281 | Obreiro ACP (15) | M5 · Visitação e cuidado com os necessitados | Cestas básicas e amparo a viúvas e órfãos | pendente | |
+| 265 | 282 | Obreiro ACP (15) | M5 · Visitação e cuidado com os necessitados | Visitar com discrição e oração | pendente | |
+| 266 | 283 | Obreiro ACP (15) | M5 · Visitação e cuidado com os necessitados | Quando encaminhar: os limites do obreiro | pendente | |
+| 267 | 284 | Obreiro ACP (15) | M6 · Casamento | O marido: amar e cuidar da esposa | pendente | |
+| 268 | 285 | Obreiro ACP (15) | M6 · Casamento | A esposa: respeitar e ajudar o marido | pendente | |
+| 269 | 286 | Obreiro ACP (15) | M6 · Casamento | Quando o casamento está em crise | pendente | |
+| 270 | 287 | Obreiro ACP (15) | M6 · Casamento | O solteiro: esperar sem parar a vida, com sabedoria | pendente | |
+| 271 | 288 | Obreiro ACP (15) | M6 · Os filhos | Criar os filhos na Palavra | pendente | |
+| 272 | 289 | Obreiro ACP (15) | M6 · Os filhos | Disciplina com amor | pendente | |
+| 273 | 290 | Obreiro ACP (15) | M6 · Os filhos | O obreiro que serve na igreja e não perde os filhos | pendente | |
+| 274 | 291 | Obreiro ACP (15) | M6 · As finanças do obreiro | Quem manda no meu dinheiro | pendente | |
+| 275 | 292 | Obreiro ACP (15) | M6 · As finanças do obreiro | Dízimo, oferta e voto: o que cada um é | pendente | |
+| 276 | 293 | Obreiro ACP (15) | M6 · As finanças do obreiro | Dívidas e contas em ordem | pendente | |
+| 277 | 294 | Obreiro ACP (15) | M6 · As finanças do obreiro | Contentamento e generosidade | pendente | |
+| 278 | 295 | Obreiro ACP (15) | M6 · Testemunho fora do templo | Sal e luz | pendente | |
+| 279 | 296 | Obreiro ACP (15) | M6 · Testemunho fora do templo | No trabalho e na rua | pendente | |
+| 280 | 297 | Obreiro ACP (15) | M6 · Testemunho fora do templo | Na fala e nas redes sociais | pendente | |
+| 281 | 298 | Obreiro ACP (15) | M7 · O que as igrejas enfrentam hoje | Cansaço, ativismo e orgulho | pendente | |
+| 282 | 299 | Obreiro ACP (15) | M7 · O que as igrejas enfrentam hoje | Grupos de WhatsApp, fofoca e divisão | pendente | |
+| 283 | 300 | Obreiro ACP (15) | M7 · O que as igrejas enfrentam hoje | Doutrinas da moda e falsos ensinos | pendente | |
+| 284 | 301 | Obreiro ACP (15) | M7 · O que as igrejas enfrentam hoje | Saúde mental, tristeza e quando buscar ajuda | pendente | |
+| 285 | 302 | Obreiro ACP (15) | M7 · Perseverar e crescer | Perseverar até o fim | pendente | |
+| 286 | 303 | Obreiro ACP (15) | M7 · Perseverar e crescer | Meu plano de serviço e quem me acompanha | pendente | |
