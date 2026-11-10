@@ -47,7 +47,8 @@ e "aliança nova" são trechos curtos de Lc 22:20 e Jr 31:31, ambos lidos; o res
 ## 4b. Rascunhos de IA (comparação)
 - **Gemini** (`_conteudo_conteudo_topico218.json`): 7 slides, **0 blocos de citação literal**, 1 menção ao número "73" (livros da Bíblia católica), que **não foi lido em fonte** e
   por isso ficou fora do texto final. Nada aproveitado.
-- **Groq** (`segunda_opiniao`): ainda estava rodando quando o tópico foi publicado; **não foi comparado**.
+- **Groq** (`segunda_opiniao`, terminou depois da publicação; comparado em seguida): 10 slides, só 1 bloco de citação literal, 1 menção a "tradições" (o curso não faz comparação).
+  **Nada foi aproveitado**; o texto publicado não mudou.
 - A versão final vem só do dossiê.
 
 ## 5. Continuidade e fronteira
