@@ -35,6 +35,8 @@ reconstituídas pelo script e conferidas por leitura.
 | Lc 24:44 | "…tudo o que de mim estava escrito na lei de Moisés, e nos profetas e nos Salmos." | partes do AT |
 | Lc 24:27 | "E, começando por Moisés, e por todos os profetas, explicava-lhes o que dele se achava em todas as Escrituras." | Cristo no centro |
 | Jo 5:39 | "Examinais as Escrituras, porque vós cuidais ter nelas a vida eterna, e são elas que de mim testificam;" | |
+| At 6:5 | "E este parecer contentou a toda a multidão, e elegeram Estêvão, homem cheio de fé e do Espírito Santo, e Filipe, e Prócoro, e Nicanor, e Timão, e Parmenas e Nicolau, prosélito de Antioquia;" | revisão 2026-11-10 |
+| At 21:8 | "…entrando em casa de Filipe, o evangelista, que era um dos sete, ficamos com ele." | revisão 2026-11-10: confirma que o Filipe de At 8 é um dos sete |
 | Jo 20:30-31 | "Jesus, pois, operou também em presença de seus discípulos muitos outros sinais, que não estão escritos neste livro. Estes, porém, foram escritos para que creiais que Jesus é o Cristo, o Filho de Deus, e para que, crendo, tenhais vida em seu nome." | para que serve |
 | Rm 15:4 | "Porque tudo o que dantes foi escrito, para nosso ensino foi escrito, para que pela paciência e consolação das Escrituras tenhamos esperança." | |
 | 1Co 2:13 | "…não com palavras que a sabedoria humana ensina, mas com as que o Espírito Santo ensina…" | |

@@ -68,3 +68,15 @@ perguntas: `mc`, `tf`, `associar`, `lacuna`, `classify`, **2 `open`** ✅.
 ## Resultado
 **0 pendências de fato.** Pode seguir para imagens e publicação. Itens para o pastor/Adriano (revisão posterior, não travam):
 (a) confirmar a posição da ACP sobre a Bíblia quando a Declaração de Fé chegar; (b) se querem o número "cerca de 40 autores" no texto (hoje fora, sem fonte lida).
+
+## Revisão de 2026-11-10 (auditoria pedida pelo Atila, tarefa NIA-T-021)
+Erros que a 1ª auditoria deixou passar, corrigidos no texto e republicados:
+1. **Filipe "um discípulo de Jesus"** → "um dos sete homens escolhidos para servir na igreja (At 6:5)". At 21:8 (ACF, lido) liga o Filipe de At 8 aos sete ("Filipe, o evangelista, que era um dos sete").
+2. **"Homens e mulheres reais (2Pe 1:21)"** → "pessoas reais". O versículo diz "homens santos de Deus", e o texto não citava nenhuma mulher.
+3. **"Os textos dos apóstolos eram lidos no mesmo nível"** → "as cartas de Paulo já eram tratadas como Escritura". 2Pe 3:15-16 fala só das cartas de Paulo.
+4. **CGADB "uma igreja pentecostal"** → "uma convenção que reúne igrejas pentecostais".
+5. **"Jesus disse aos que estudavam as Escrituras"** estava sem a referência. Agora o texto diz "aos que examinavam as Escrituras (Jo 5:39)", com o verbo do próprio versículo.
+6. **Áudio:** 5 narrações reescritas à mão e regeradas (s4b3, s5b1, s5b5, s9b3, s10b3). A do s5b1 tinha uma frase interpretativa que a IA acrescentou ("fundamental para entendermos a inspiração").
+7. A versão de leitura (HTML) estava desatualizada e foi regerada.
+
+`validar_topico()` → `[]`; render 0 `None`; áudio conferido (0 problemas); citações: as mesmas falsas-positivas de aspas, nenhuma citação em bloco falhou.

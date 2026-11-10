@@ -55,3 +55,9 @@ perguntas: associar 1, mc 1, tf 2, classify 1, lacuna 1, **open 2** ✅.
 
 ## Resultado
 **0 pendências de fato.** Segue para publicação e áudio.
+
+## Revisão de 2026-11-10 (auditoria pedida pelo Atila, tarefa NIA-T-021)
+1. **"Capítulo tem cerca de uma ou duas páginas"** saiu porque não tinha fonte e não vale para todos (o Sl 117 tem 2 versículos e o Sl 119 tem 176). A narração do quadro (s1b3) foi refeita.
+2. **Fica para o pastor/Adriano (não trava):** se entra 1 frase sobre a numeração diferente dos Salmos em Bíblias católicas. Só entra com fonte lida.
+
+`validar_topico()` → `[]`; render 0 `None`; áudio conferido (0 problemas).
