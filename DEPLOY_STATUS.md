@@ -8,7 +8,21 @@ capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://
 (backend) e `https://caminho-emaus.duckdns.org` (Emaús) em produção com HTTPS. O `A1.Flex`
 (VM maior) segue em retry automático via cron na VM 2, não bloqueia nada.
 
-## 📦 Próximo deploy — PREPARADO 2026-11-13 (revisão no tópico, NIA-T-026) · quem roda: Atila
+## 🚀 Último deploy — 2026-11-13 (revisão no tópico, NIA-T-026) · FEITO
+
+Feito pelo Claude a pedido do Atila, commit `a4c4ac6`. **VM 1:** backup em **`~/backups/antes_revisao_topico_2026-11-13.dump`**
+(585 KB), `git pull` + `up -d --build`; os 2 workers subiram ("startup complete" 2×), colunas e tabelas novas criadas
+(302 tópicos em `pendente`). 4 mp3 da NIA-T-027 por scp. **VM 2:** o `git pull` abortou porque `Caddyfile.emaus` e
+`docker-compose.emaus.yml` tinham edições à mão **iguais às do git** (só fim de linha diferente). Guardadas com
+`git stash` ("edicoes-manuais-vm2-antes-deploy-2026-11-13"), pull e build. O SSH caiu no meio do build, mas o build
+terminou: Next 16.3.8, rota `/api/revisao` presente. **A VM 2 agora bate com o git.** A VM 1 continua com
+`Caddyfile.backend` e `docker-compose.backend.yml` editados à mão (NIA-T-018).
+Conferido: API 200; `/topicos/219/revisao` sem login → 401 e com login → 200; render com `emaus:modo-revisor`
+e 0 `None`; site 200; `/api/revisao` (GET) → 405 (só POST); mp3 com o mesmo tamanho do local. A fila do
+`/revisar-topico` rodou em produção; as 2 anotações (T217 s7, T219 s4) foram marcadas como tratadas e a fila ficou com 0.
+Falta: o Atila testar na tela como master (📌 e caixa "Revisão deste tópico") e como aluno.
+
+## (roteiro usado) Deploy preparado 2026-11-13 (revisão no tópico, NIA-T-026)
 
 Commits `e3696b0` (código) e `ea0a03b` (docs do Obreiro ACP); a VM1 e o GitHub estão em `f9d0000`, o local
 21 commits à frente. Esses 21 commits não mexem em `Caddyfile.backend` nem em `docker-compose.backend.yml`
