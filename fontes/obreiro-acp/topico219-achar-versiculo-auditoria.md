@@ -61,3 +61,9 @@ perguntas: associar 1, mc 1, tf 2, classify 1, lacuna 1, **open 2** ✅.
 2. **Fica para o pastor/Adriano (não trava):** se entra 1 frase sobre a numeração diferente dos Salmos em Bíblias católicas. Só entra com fonte lida.
 
 `validar_topico()` → `[]`; render 0 `None`; áudio conferido (0 problemas).
+
+## Revisão de 2026-11-13 (anotação do Atila no s4, tarefa NIA-T-027)
+1. **s4b2:** "procure o capítulo 23" → "procure o Salmo 23 (em Salmos, cada salmo tem o seu número, que fica no lugar do capítulo)". Fonte: bibliaonline ACF sl/23 (título "Salmos 23", navegação "Capítulo 23"). Regra R2.
+2. **s2b2:** "Só o capítulo, como \"Sl 23\", indica o capítulo inteiro" → exemplo com "Lc 15" (todo o capítulo 15 de Lucas) + "Em Salmos, esse número é o do salmo: \"Sl 23\" é o Salmo 23 inteiro". Regra R2.
+3. **Narração s5b2:** "No evangelho de Lucas" → "No Evangelho segundo Lucas" (texto do bloco não mudou). Regra R1.
+Áudios s2b2, s4b2 e s5b2 refeitos e conferidos (semelhança 1,00, 0 palavras a mais). Backup: `backend/_topico219_backup_prod_20261113.json`. Render 0 `None`.

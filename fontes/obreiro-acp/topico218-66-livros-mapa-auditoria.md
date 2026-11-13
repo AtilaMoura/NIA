@@ -79,3 +79,7 @@ Erros que a 1ª auditoria deixou passar, corrigidos no texto e republicados:
 
 ## Resultado
 **0 pendências de fato.** Segue para imagens, publicação e áudio.
+
+## Revisão de 2026-11-13 (anotação do Atila no T219, tarefa NIA-T-027)
+1. **s3b4:** "Salmos, que é o livro com mais capítulos da Bíblia: são 150" → "Salmos, que reúne 150 salmos, cada um com o seu número". Fontes lidas: Wikipédia pt "Livro dos Salmos" ("É composto por 150 poemas e canções"); bibliaonline ACF sl/23 (título "Salmos 23"). O "mais capítulos" saiu porque nenhuma fonte lida confirma. Regra R2. Áudio do s3b4 refeito (conferido: semelhança 1,00).
+Backup: `backend/_topico218_backup_prod_20261113.json`. Render 0 `None`.

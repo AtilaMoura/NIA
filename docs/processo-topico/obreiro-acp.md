@@ -24,6 +24,19 @@ Estatuto: [estatuto-resumo.md](../../fontes/obreiro-acp/estatuto-resumo.md).
 7. **Foco no diácono** (At 6; 1Tm 3), curso para todos os obreiros.
 8. Guzik e clássicos: só paráfrase atribuída ([FONTES_GUIA.md](FONTES_GUIA.md)).
 
+## Regras vindas da revisão (valem para todo tópico novo e revisado)
+
+Cada correção pedida pelo Atila/pastor/Adriano que vale para o curso inteiro entra aqui e no histórico
+[CORRECOES_REVISAO.md](CORRECOES_REVISAO.md). Antes de publicar, buscar no tópico os casos de cada regra.
+
+- **R1 (2026-11-13): "Evangelho segundo Lucas"**, nunca "Evangelho de Lucas" (o evangelho é de Cristo;
+  Lucas o registrou). Vale para os quatro: segundo Mateus, Marcos, Lucas e João. Referência (Lc 1:3,
+  "Lucas 15") e citação continuam com o nome do livro. Vale também para a narração do áudio.
+- **R2 (2026-11-13): Salmos se contam por salmo, não por capítulo.** Dizer "Salmo 23", "procure o Salmo 23";
+  quando precisar explicar: "em Salmos, cada salmo tem o seu número, que fica no lugar do capítulo"
+  (fonte: bibliaonline ACF sl/23, título "Salmos 23"; Wikipédia pt, 150 salmos). Nunca "capítulo 23 de Salmos"
+  nem "Salmos é o livro com mais capítulos" (nenhuma fonte lida confirma).
+
 ## Temas sensíveis (limites escritos no texto)
 
 | Tema | Limite |

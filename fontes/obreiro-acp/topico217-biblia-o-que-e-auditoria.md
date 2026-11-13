@@ -80,3 +80,7 @@ Erros que a 1ª auditoria deixou passar, corrigidos no texto e republicados:
 7. A versão de leitura (HTML) estava desatualizada e foi regerada.
 
 `validar_topico()` → `[]`; render 0 `None`; áudio conferido (0 problemas); citações: as mesmas falsas-positivas de aspas, nenhuma citação em bloco falhou.
+
+## Revisão de 2026-11-13 (anotação do Atila, tarefa NIA-T-027)
+1. **"Evangelho de Lucas" → "Evangelho segundo Lucas"** (5 trechos: card do s7, exercício e explicação do s8, resposta modelo do s13). Decisão do Atila: o evangelho é de Cristo, Lucas o registrou. Regra R1 em `docs/processo-topico/obreiro-acp.md`. Blocos sem narração: nenhum áudio refeito neste tópico.
+Backup do conteúdo anterior: `backend/_topico217_backup_prod_20261113.json`. Render 0 `None`.
