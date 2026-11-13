@@ -8,6 +8,41 @@ capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://
 (backend) e `https://caminho-emaus.duckdns.org` (Emaús) em produção com HTTPS. O `A1.Flex`
 (VM maior) segue em retry automático via cron na VM 2, não bloqueia nada.
 
+## 📦 Próximo deploy — PREPARADO 2026-11-13 (revisão no tópico, NIA-T-026) · quem roda: Atila
+
+Commits `e3696b0` (código) e `ea0a03b` (docs do Obreiro ACP); a VM1 e o GitHub estão em `f9d0000`, o local
+21 commits à frente. Esses 21 commits não mexem em `Caddyfile.backend` nem em `docker-compose.backend.yml`
+(editados à mão na VM1), então o `git pull` não dá conflito. Também entram `emaus-web/app/_lib/catalogo.ts` e
+`emaus-web/public/grade-obreiro-acp.html` (commits anteriores do Obreiro ACP).
+**Banco:** o start cria sozinho as colunas `topicos.revisao_status` (padrão `pendente`) e `topico_comments.resposta_ia`
+(`_ensure_colunas_extras`) e as tabelas novas `topico_revisao_eventos` e `topico_anotacao_tratada` (`create_all`). Só acrescenta.
+
+```bash
+# 0. na sua máquina (pasta NIA)
+git push originNIA master
+scp -i ssh-key-2026-09-07now.key backend/static/audio/curso15/t218-s3-b4.mp3 backend/static/audio/curso15/t219-s2-b2.mp3 \
+    backend/static/audio/curso15/t219-s4-b2.mp3 backend/static/audio/curso15/t219-s5-b2.mp3 \
+    ubuntu@163.176.70.148:~/NIA/backend/static/audio/curso15/        # áudios da NIA-T-027
+
+# 1. VM 1 (backend) — ssh -i ssh-key-2026-09-07now.key ubuntu@163.176.70.148
+cd ~/NIA
+sudo docker compose -f docker-compose.backend.yml exec -T db pg_dump -U niauser -d niadb -Fc > ~/backups/antes_revisao_topico_2026-11-13.dump
+git pull
+sudo docker compose -f docker-compose.backend.yml up -d --build
+sudo docker compose -f docker-compose.backend.yml logs backend | grep -c "Application startup complete"   # tem que dar 2
+#   deu 1? (corrida do create_all com tabela nova) → sudo docker restart nia-backend-backend-1 e conferir de novo
+sudo docker compose -f docker-compose.backend.yml exec -T db psql -U niauser -d niadb -c "SELECT revisao_status, count(*) FROM topicos GROUP BY 1"
+
+# 2. VM 2 (Emaús) — ssh -i ssh-key-2026-09-07now.key ubuntu@137.131.152.20
+cd ~/NIA && git pull && sudo docker compose -f docker-compose.emaus.yml up -d --build && sudo docker image prune -f
+```
+
+**Conferir depois:** API 200; `GET /topicos/219/revisao` sem login → 401; site 200; entrar como master num tópico do
+curso 15 → botão 📌 na barra e caixa "Revisão deste tópico" no slide Resultado; como aluno, nada disso aparece.
+Ouvir T219 slide 4 (tem que dizer "Salmo 23", não "capítulo 23").
+**Depois do deploy (Claude):** marcar como tratadas as 2 anotações já corrigidas (T217 s7, T219 s4) com
+`_revisoes_pendentes.py --marcar`, rodar a fila e registrar este deploy aqui.
+
 ## 🚀 Último deploy — 2026-10-05 (caderno da aula + regra Gemini → Groq)
 
 Commit `d444c17`. **VM 1:** backup em **`~/backups/antes_caderno_2026-10-05.dump`**, `git pull` +
