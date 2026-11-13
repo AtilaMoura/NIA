@@ -80,6 +80,15 @@ def _ensure_colunas_extras(bind):
         "ALTER TABLE courses ADD CONSTRAINT valid_visibilidade "
         "CHECK (visibilidade IN ('publico', 'privado')); "
         "END IF; END $$;",
+        # Revisão no tópico (NIA-T-026): colunas novas em tabela existente. Mesmas
+        # instruções de _adicionar_revisao_topico.py (idempotentes); as tabelas novas o create_all cria.
+        "ALTER TABLE topicos ADD COLUMN IF NOT EXISTS revisao_status VARCHAR(20) NOT NULL DEFAULT 'pendente'",
+        "DO $$ BEGIN "
+        "IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'valid_topico_revisao_status') THEN "
+        "ALTER TABLE topicos ADD CONSTRAINT valid_topico_revisao_status "
+        "CHECK (revisao_status IN ('pendente', 'enviado_ia', 'aprovado')); "
+        "END IF; END $$;",
+        "ALTER TABLE topico_comments ADD COLUMN IF NOT EXISTS resposta_ia TEXT",
     ]
     with bind.begin() as conn:
         for s in stmts:

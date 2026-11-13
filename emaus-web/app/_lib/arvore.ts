@@ -13,6 +13,7 @@ import {
   listProgress,
   type Course,
   type VeredictoTutor,
+  type StatusRevisao,
 } from "./api";
 
 export type TopicoNo = {
@@ -31,6 +32,8 @@ export type TopicoNo = {
   // Situação da prova pro aluno (2026-10-07): "feita" = aprovado; "refazer" = fez e
   // não passou (o backend abre rodada nova); null = ainda não fez ou não tem prova.
   prova: "feita" | "refazer" | null;
+  // Situação da revisão de conteúdo (NIA-T-026) — só é mostrada a quem revisa
+  revisaoStatus: StatusRevisao;
   // preenchidos só na linhaDoTempo (contexto pra exibir fora da árvore)
   moduloTitulo?: string;
   aulaTitulo?: string;
@@ -145,6 +148,7 @@ export async function montarArvore(
             concluido_em: prog?.concluido_em ?? null,
             tutor_veredito: prog?.tutor_veredito ?? null,
             avaliacaoId: t.avaliacao_id,
+            revisaoStatus: t.revisao_status ?? "pendente",
             // "reforco" vem antes: mesma leitura do /progresso ("Prova: revisar")
             prova:
               provaProg?.tutor_veredito === "reforco"

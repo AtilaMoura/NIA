@@ -37,6 +37,7 @@ class ComentarioOut(BaseModel):
     sobre_imagem: bool
     texto: str | None
     resolvido: bool
+    resposta_ia: str | None = None
     created_at: datetime
 
     class Config:
@@ -64,3 +65,71 @@ class ChecklistOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ---- Revisão no tópico (NIA-T-026) ----
+StatusRevisao = Literal["pendente", "enviado_ia", "aprovado"]
+AcaoRevisao = Literal["aprovar", "enviar_ia", "ia_revisou", "reabrir"]
+
+
+class AprovarTopicoIn(BaseModel):
+    observacao: str | None = None
+
+
+class PontoTratado(BaseModel):
+    comment_id: int
+    resposta_ia: str
+
+
+class AnotacaoTratada(BaseModel):
+    anotacao_id: int
+    resposta_ia: str
+
+
+class IaRevisouIn(BaseModel):
+    pontos: list[PontoTratado] = []
+    anotacoes: list[AnotacaoTratada] = []
+
+
+class PontoRevisaoOut(BaseModel):
+    id: int
+    user_id: int
+    autor: str | None
+    slide_index: int | None
+    texto: str | None
+    reacao: Reacao | None
+    resolvido: bool
+    resposta_ia: str | None
+    created_at: datetime | None
+
+
+class AnotacaoRevisaoOut(BaseModel):
+    id: int
+    user_id: int
+    autor: str | None
+    slide_index: int
+    texto: str
+    tratada: bool           # False = ainda conta como ponto aberto
+    resposta_ia: str | None
+    updated_at: datetime | None
+
+
+class EventoRevisaoOut(BaseModel):
+    id: int
+    user_id: int
+    autor: str | None
+    acao: AcaoRevisao
+    observacao: str | None
+    created_at: datetime | None
+
+
+class RevisaoTopicoOut(BaseModel):
+    topico_id: int
+    status: StatusRevisao
+    pode_revisar: bool
+    aprovado_por: str | None   # só quando status == 'aprovado'
+    aprovado_em: datetime | None
+    abertos: int               # pontos não resolvidos + anotações de revisor pendentes
+    pontos: list[PontoRevisaoOut]
+    anotacoes: list[AnotacaoRevisaoOut]
+    eventos: list[EventoRevisaoOut]

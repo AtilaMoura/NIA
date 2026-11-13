@@ -596,6 +596,28 @@
     content: ''; position: absolute; top: 2px; right: 2px; width: 10px; height: 10px;
     border-radius: 50%; background: var(--bad); border: 1.5px solid var(--surface);
   }
+  /* Modo revisor (NIA-T-026): só aparece quando o Emaús manda 'emaus:modo-revisor'.
+     Cor âmbar = ponto de revisão, diferente da anotação pessoal (cor de destaque do tema). */
+  .pontos-rev { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .ponto-rev {
+    border: 1px solid var(--amber); border-left-width: 4px; border-radius: var(--radius);
+    background: var(--warn-soft); padding: 8px 12px; font-size: 13px; color: var(--text);
+  }
+  .ponto-rev-cab { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; font-weight: 700; color: var(--warn-text); font-family: var(--font-label); }
+  .ponto-rev-texto { margin-top: 3px; white-space: pre-wrap; }
+  .ponto-rev.resolvido { border-color: var(--good); background: var(--good-soft); }
+  .ponto-rev.resolvido .ponto-rev-cab { color: var(--good-text); }
+  .ponto-rev-resposta { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border-soft); font-size: 12.5px; color: var(--text-muted); white-space: pre-wrap; }
+  .pontuar-fab-ativo { border-color: var(--amber); }
+  .revisao-box { border-left: 3px solid var(--amber); }
+  .revisao-box .box-label { color: var(--warn-text); }
+  .revisao-linha { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; padding: 3px 0; }
+  .revisao-status { font-weight: 700; }
+  .revisao-status[data-status="aprovado"] { color: var(--good-text); }
+  .revisao-status[data-status="enviado_ia"] { color: var(--warn-text); }
+  .revisao-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .revisao-acoes button:disabled { opacity: .5; cursor: not-allowed; }
+  .revisao-msg { margin-top: 8px; font-size: 12.5px; color: var(--text-dim); }
   .anotacao-painel {
     position: fixed; right: 16px; bottom: 70px; z-index: 70; width: min(340px, calc(100vw - 32px));
     max-height: min(420px, calc(100vh - 220px)); display: flex; flex-direction: column;
@@ -828,7 +850,7 @@
 
     /* fora: interação e navegação */
     .topbar, .navbar, .progress-track, .section-label,
-    .gate-hint, .confidence, .badge-row, .anotacao-fab, .anotacao-painel,
+    .gate-hint, .confidence, .badge-row, .anotacao-fab, .anotacao-painel, .pontos-rev, .revisao-box,
     .vocab-listen, .vocab-listen-exemplo, .vocab-listen-secao,
     #pdfBtn, .modo-btn, .fullscreen-btn, .nav-audio, .topbar-menu, .dialogo-fundo,
     .slide[data-tipo="checkpoint"],
@@ -1018,6 +1040,18 @@
             <div id="avaliacaoAcoes"></div>
           </div>
         </div>
+        {# Revisão do conteúdo (NIA-T-026): só aparece quando o pai manda 'emaus:modo-revisor' #}
+        <div class="box revisao-box" id="rvtBox" hidden>
+          <div class="box-label">🔎 Revisão deste tópico</div>
+          <div class="revisao-linha"><span>Situação</span><span class="revisao-status" id="rvtStatus"></span></div>
+          <div class="revisao-linha"><span>Pontos abertos</span><span id="rvtAbertos">0</span></div>
+          <div class="revisao-linha" id="rvtAprovadoLinha" hidden><span id="rvtAprovadoTexto"></span></div>
+          <div class="revisao-acoes">
+            <button type="button" class="register-btn" id="rvtAprovarBtn">Aprovar tópico</button>
+            <button type="button" class="anotacao-toggle" id="rvtEnviarIaBtn">Mandar a IA revisar</button>
+          </div>
+          <div class="revisao-msg" id="rvtMsg"></div>
+        </div>
       {% endif %}
 
     </div>
@@ -1066,6 +1100,15 @@
   </div>
 </div>
 
+<div class="anotacao-painel" id="pontuarPainel" hidden>
+  <div class="duvida-cabecalho">📌 Pontuar para a revisão</div>
+  <div class="anotacao-aba">
+    <textarea class="anotacao-texto" id="pontuarTexto" maxlength="2000" placeholder="O que precisa mudar neste slide?"></textarea>
+    <button type="button" class="anotacao-salvar register-btn" id="pontuarEnviarBtn">Enviar ponto</button>
+    <span class="anotacao-status" id="pontuarStatus"></span>
+  </div>
+</div>
+
 <div class="anotacao-painel duvida-painel" id="duvidaPainel" hidden>
   <div class="duvida-cabecalho">Tire sua dúvida com a IA</div>
   <div class="duvida-mensagens" id="duvidaMensagens">
@@ -1105,6 +1148,7 @@
   <button class="nav-speed" id="speedBtn" title="Velocidade do áudio (leitura do slide e 🔊 de vocabulário)">1x</button>
   <button type="button" class="nav-tool anotacao-fab duvida-fab" id="duvidaFab" title="Tirar dúvida com a IA" aria-label="Tirar dúvida com a IA">❓</button>
   <button type="button" class="nav-tool anotacao-fab" id="anotacaoFab" title="Anotações" aria-label="Anotações">✍️</button>
+  <button type="button" class="nav-tool anotacao-fab pontuar-fab-ativo" id="pontuarFab" title="Pontuar este slide para a revisão" aria-label="Pontuar este slide para a revisão" hidden>📌</button>
   <span class="nav-count" id="slideCount">1 de {{ content.slides|length }}</span>
   <button class="nav-btn nav-next" id="nextBtn">Próximo ▶</button>
 </div>
@@ -1685,6 +1729,7 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO === 'avaliacao') {
     // Um painel por vez — os dois ocupam o mesmo canto da tela.
     var painelDuvida = document.getElementById('duvidaPainel');
     if (!anotacaoPainel.hidden && painelDuvida) painelDuvida.hidden = true;
+    if (!anotacaoPainel.hidden && window.pontuarPainel) pontuarPainel.hidden = true;
     if (!anotacaoPainel.hidden) trocarAbaAnotacao('anotar');
   });
 
@@ -1840,6 +1885,7 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
     duvidaPainel.hidden = !duvidaPainel.hidden;
     if (!duvidaPainel.hidden) {
       anotacaoPainel.hidden = true; // um painel por vez (mesmo canto da tela)
+      if (window.pontuarPainel) pontuarPainel.hidden = true;
       carregarConversa();
       rolarChatProFim();
       duvidaTexto.focus();
@@ -2071,6 +2117,148 @@ function dispararCorrecaoIA(qid, respostaDada) {
     });
 }
 
+// ---- Modo revisor (NIA-T-026) ----
+// Só liga quando o Emaús (pai) manda 'emaus:modo-revisor' — nunca para aluno, nunca em
+// ?contexto=revisao (a tela antiga de revisão tem o próprio comentário). Quem fala com a API
+// é o pai (só ele tem a sessão real); aqui só se desenha e se manda postMessage.
+var modoRevisor = false;
+var pontosRevisor = [];
+var revisaoTopico = null;
+var pontuarFab = document.getElementById('pontuarFab');
+var pontuarPainel = document.getElementById('pontuarPainel');
+var pontuarTexto = document.getElementById('pontuarTexto');
+var pontuarStatus = document.getElementById('pontuarStatus');
+
+function avisarPai(msg) {
+  try { window.parent.postMessage(msg, '*'); } catch (e) {}
+}
+
+function elRev(tag, classe, texto) {
+  var el = document.createElement(tag);
+  if (classe) el.className = classe;
+  if (texto) el.textContent = texto;
+  return el;
+}
+
+function desenharPontosRevisor() {
+  document.querySelectorAll('.pontos-rev').forEach(function (el) { el.remove(); });
+  if (!modoRevisor) return;
+  slides.forEach(function (slideEl, i) {
+    if (slideEl.dataset.extra === '1') return; // "Relembrando" não existe no conteúdo
+    var idx = paraConteudo(i);
+    var doSlide = pontosRevisor.filter(function (p) { return p.slide_index === idx && (p.texto || p.resposta_ia); });
+    if (!doSlide.length) return;
+    var inner = slideEl.querySelector('.slide-inner');
+    if (!inner) return;
+    var caixa = elRev('div', 'pontos-rev');
+    doSlide.forEach(function (p) {
+      var item = elRev('div', 'ponto-rev' + (p.resolvido ? ' resolvido' : ''));
+      item.appendChild(elRev('div', 'ponto-rev-cab', (p.resolvido ? '✔ Ponto tratado' : '📌 Ponto de revisão') + (p.autor ? ' · ' + p.autor : '')));
+      item.appendChild(elRev('div', 'ponto-rev-texto', p.texto || ''));
+      if (p.resolvido && p.resposta_ia) item.appendChild(elRev('div', 'ponto-rev-resposta', 'IA: ' + p.resposta_ia));
+      caixa.appendChild(item);
+    });
+    inner.appendChild(caixa);
+  });
+}
+
+function formatarDataCurta(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2);
+}
+
+function desenharCaixaRevisao() {
+  var caixa = document.getElementById('rvtBox');
+  if (!caixa) return;
+  caixa.hidden = !(modoRevisor && revisaoTopico);
+  if (caixa.hidden) return;
+  var r = revisaoTopico;
+  var rotulos = { pendente: 'Pendente', enviado_ia: 'Com a IA revisando', aprovado: 'Aprovado' };
+  var st = document.getElementById('rvtStatus');
+  st.textContent = rotulos[r.status] || r.status;
+  st.dataset.status = r.status;
+  var abertos = typeof r.abertos === 'number' ? r.abertos : 0;
+  document.getElementById('rvtAbertos').textContent = String(abertos);
+  var linha = document.getElementById('rvtAprovadoLinha');
+  linha.hidden = r.status !== 'aprovado';
+  if (r.status === 'aprovado') {
+    var quando = formatarDataCurta(r.aprovado_em);
+    document.getElementById('rvtAprovadoTexto').textContent = '✓ Aprovado' + (r.aprovado_por ? ' por ' + r.aprovado_por : '') + (quando ? ' em ' + quando : '');
+  }
+  var btnAprovar = document.getElementById('rvtAprovarBtn');
+  var btnIa = document.getElementById('rvtEnviarIaBtn');
+  btnAprovar.hidden = r.status === 'aprovado';
+  btnAprovar.disabled = false;
+  btnIa.disabled = abertos === 0 || r.status === 'enviado_ia';
+  btnIa.textContent = 'Mandar a IA revisar (' + abertos + ' ponto' + (abertos === 1 ? '' : 's') + ')';
+  document.getElementById('rvtMsg').textContent = '';
+}
+
+if (pontuarFab) {
+  pontuarFab.addEventListener('click', function () {
+    pontuarPainel.hidden = !pontuarPainel.hidden;
+    if (!pontuarPainel.hidden) {
+      anotacaoPainel.hidden = true; // um painel por vez (mesmo canto da tela)
+      var pd = document.getElementById('duvidaPainel');
+      if (pd) pd.hidden = true;
+      pontuarStatus.textContent = '';
+      pontuarTexto.focus();
+    }
+  });
+  document.getElementById('pontuarEnviarBtn').addEventListener('click', function () {
+    var texto = pontuarTexto.value.trim();
+    if (!texto) { pontuarStatus.textContent = 'Escreva o ponto antes de enviar.'; return; }
+    pontuarStatus.textContent = 'Enviando…';
+    this.disabled = true;
+    avisarPai({ tipo: 'emaus:ponto', slideIndex: paraConteudo(current), texto: texto });
+  });
+  document.getElementById('rvtAprovarBtn').addEventListener('click', function () {
+    this.disabled = true;
+    document.getElementById('rvtMsg').textContent = 'Aprovando…';
+    avisarPai({ tipo: 'emaus:revisao-aprovar' });
+  });
+  document.getElementById('rvtEnviarIaBtn').addEventListener('click', function () {
+    this.disabled = true;
+    document.getElementById('rvtMsg').textContent = 'Enviando pra IA…';
+    avisarPai({ tipo: 'emaus:revisao-enviar-ia' });
+  });
+}
+
+function ligarModoRevisor(d) {
+  if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico' || !pontuarFab) return;
+  modoRevisor = true;
+  pontuarFab.hidden = false;
+  atualizarRevisor(d);
+}
+
+function atualizarRevisor(d) {
+  if (!modoRevisor) return;
+  if (Array.isArray(d.pontos)) pontosRevisor = d.pontos;
+  if (d.revisao) revisaoTopico = d.revisao;
+  desenharPontosRevisor();
+  desenharCaixaRevisao();
+  var enviar = document.getElementById('pontuarEnviarBtn');
+  if (enviar && enviar.disabled) {
+    enviar.disabled = false;
+    pontuarTexto.value = '';
+    pontuarStatus.textContent = 'Ponto enviado ✔';
+    setTimeout(function () { pontuarStatus.textContent = ''; pontuarPainel.hidden = true; }, 1200);
+  }
+}
+
+// Avisa o pai que o render está pronto (ele responde com 'emaus:modo-revisor' se a pessoa revisa).
+if (EMBUTIDO && !RESPOSTAS_CONTEXTO_REVISAO && RESPOSTAS_PREFIXO === 'topico') setTimeout(function () { avisarPai({ tipo: 'emaus:pronto' }); }, 0);
+
+function erroRevisor(mensagem) {
+  var enviar = document.getElementById('pontuarEnviarBtn');
+  if (enviar && enviar.disabled) { enviar.disabled = false; pontuarStatus.textContent = mensagem; }
+  desenharCaixaRevisao(); // reabilita os botões conforme o estado
+  var msg = document.getElementById('rvtMsg');
+  if (msg) msg.textContent = mensagem;
+}
+
 // Fila de revisão do professor manda ir pra um slide específico ao clicar
 // num comentário existente — reaproveitado aqui pro painel "Minhas
 // anotações" também. Além disso, é aqui que o pai (Emaús) devolve o
@@ -2091,6 +2279,12 @@ window.addEventListener('message', function (e) {
     carregarResultado(!!d.temProximo, !!d.temAvaliacao, false, function () {
       renderizarResultadoAvaliacao(d.veredito, d.resumo_diagnostico, !!d.temProximo, !!d.temAvaliacao);
     });
+  } else if (d.tipo === 'emaus:modo-revisor') {
+    ligarModoRevisor(d);
+  } else if (d.tipo === 'emaus:revisao-atualizada') {
+    atualizarRevisor(d);
+  } else if (d.tipo === 'emaus:revisao-erro') {
+    erroRevisor(d.mensagem || 'Não foi possível concluir. Tente de novo.');
   } else if (d.tipo === 'emaus:avaliacao-erro') {
     document.getElementById('avaliacaoErroMsg').textContent = d.mensagem || 'Não deu pra falar com o tutor agora.';
     mostrarEstadoAvaliacao('avaliacaoErro');

@@ -11,6 +11,20 @@ import { contarModulo, type ModuloNo } from "../../_lib/arvore";
 
 type Estado = ModuloNo["aulas"][number]["topicos"][number]["estado"];
 type Prova = ModuloNo["aulas"][number]["topicos"][number]["prova"];
+type RevisaoStatus = ModuloNo["aulas"][number]["topicos"][number]["revisaoStatus"];
+
+// Selo da revisão de conteúdo (NIA-T-026) — só aparece para quem revisa.
+const SELO_REVISAO: Record<RevisaoStatus, { texto: string; classe: string }> = {
+  pendente: { texto: "Pendente", classe: "border-[var(--tm-border)] text-[var(--tm-ink-muted)]" },
+  enviado_ia: {
+    texto: "Com a IA",
+    classe: "border-[color-mix(in_srgb,var(--tm-warn)_55%,transparent)] text-[var(--tm-warn)]",
+  },
+  aprovado: {
+    texto: "✓ Aprovado",
+    classe: "border-[color-mix(in_srgb,var(--tm-good)_55%,transparent)] text-[var(--tm-good)]",
+  },
+};
 
 // Chip da prova liberada: aprovado (verde), precisa refazer (laranja) ou ainda não feita.
 const CHIP_PROVA: Record<NonNullable<Prova> | "nao_feita", { texto: string; classe: string }> = {
@@ -55,6 +69,8 @@ function LinhaTopico({
   estado,
   avaliacaoId,
   prova,
+  revisaoStatus,
+  mostrarRevisao,
 }: {
   id: number;
   titulo: string;
@@ -62,6 +78,8 @@ function LinhaTopico({
   estado: Estado;
   avaliacaoId: number | null;
   prova: Prova;
+  revisaoStatus: RevisaoStatus;
+  mostrarRevisao: boolean;
 }) {
   if (estado === "em_preparacao") {
     return (
@@ -122,12 +140,30 @@ function LinhaTopico({
           </span>
         )}
       </Link>
+      {mostrarRevisao && (
+        <span
+          className={`${CHIP} ${SELO_REVISAO[revisaoStatus].classe}`}
+          title="Situação da revisão do conteúdo (só você, que revisa, vê isto)"
+        >
+          {SELO_REVISAO[revisaoStatus].texto}
+        </span>
+      )}
       {chipProva}
     </div>
   );
 }
 
-function Modulo({ modulo, aberto, aoAlternar }: { modulo: ModuloNo; aberto: boolean; aoAlternar: () => void }) {
+function Modulo({
+  modulo,
+  aberto,
+  aoAlternar,
+  mostrarRevisao,
+}: {
+  modulo: ModuloNo;
+  aberto: boolean;
+  aoAlternar: () => void;
+  mostrarRevisao: boolean;
+}) {
   const { concluidos, total } = contarModulo(modulo);
   const feito = total > 0 && concluidos === total;
   const emPreparacao = total === 0;
@@ -219,6 +255,8 @@ function Modulo({ modulo, aberto, aoAlternar }: { modulo: ModuloNo; aberto: bool
                     estado={t.estado}
                     avaliacaoId={t.avaliacaoId}
                     prova={t.prova}
+                    revisaoStatus={t.revisaoStatus}
+                    mostrarRevisao={mostrarRevisao}
                   />
                 ))
               )}
@@ -233,9 +271,11 @@ function Modulo({ modulo, aberto, aoAlternar }: { modulo: ModuloNo; aberto: bool
 export function ArvoreCursoUI({
   modulos,
   moduloAbertoId,
+  mostrarRevisao = false,
 }: {
   modulos: ModuloNo[];
   moduloAbertoId: number | null;
+  mostrarRevisao?: boolean;
 }) {
   const [abertos, setAbertos] = useState<Set<number>>(
     () => new Set(moduloAbertoId != null ? [moduloAbertoId] : []),
@@ -268,7 +308,13 @@ export function ArvoreCursoUI({
       </div>
       <div className="flex flex-col gap-2.5">
         {modulos.map((m) => (
-          <Modulo key={m.id} modulo={m} aberto={abertos.has(m.id)} aoAlternar={() => alternar(m.id)} />
+          <Modulo
+            key={m.id}
+            modulo={m}
+            aberto={abertos.has(m.id)}
+            aoAlternar={() => alternar(m.id)}
+            mostrarRevisao={mostrarRevisao}
+          />
         ))}
       </div>
     </section>

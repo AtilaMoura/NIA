@@ -8,6 +8,7 @@ import { CATALOGO, tituloCurto } from "../../_lib/catalogo";
 import { TelaAviso } from "../../_ui/TelaAviso";
 import { preferenciasDosSlides } from "../../_lib/preferencias-slides";
 import {
+  getRevisaoTopico,
   getTopico,
   getTopicoToken,
   listLessons,
@@ -84,6 +85,12 @@ export default async function TopicoPage({
     respostasToken = await getTopicoToken(tokenSessao, topico.id).catch(() => null);
   }
 
+  // Revisão no próprio tópico (NIA-T-026): só busca se o papel revisa; quem decide se pode
+  // neste curso é o backend (403 -> null, e a tela fica igual à do aluno).
+  const revisaoInicial = papelPodeRevisar(sessao.role)
+    ? await getRevisaoTopico(topico.id, tokenSessao)
+    : null;
+
   const aula = lessons.find((l) => l.id === topico.lesson_id) ?? null;
   const modulo = aula ? modules.find((m) => m.id === aula.module_id) ?? null : null;
   if (!modulo) notFound();
@@ -159,6 +166,7 @@ export default async function TopicoPage({
         estadoInicial={estadoInicial}
         proximoTopicoId={proximo?.id ?? null}
         avaliacaoId={topico.avaliacao_id}
+        revisaoInicial={revisaoInicial?.pode_revisar ? revisaoInicial : null}
       />
     </div>
   );

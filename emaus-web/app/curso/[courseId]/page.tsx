@@ -179,7 +179,7 @@ export default async function CursoPage({
           )}
         </section>
 
-        <ArvoreCursoUI modulos={modulos} moduloAbertoId={moduloAbertoId} />
+        <ArvoreCursoUI modulos={modulos} moduloAbertoId={moduloAbertoId} mostrarRevisao={podeRevisar} />
       </main>
 
       <Rodape papel={sessao.role} />

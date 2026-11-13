@@ -297,8 +297,13 @@ class Topico(Base):
     generated_by = Column(String(100))
     reviewed_by = Column(String(100))
     review_feedback = Column(JSONB)
+    # is_approved = VISIBILIDADE do tópico (scripts de publicação gravam True). A aprovação
+    # de CONTEÚDO pelo revisor é o campo revisao_status abaixo (NIA-T-026).
     is_approved = Column(Boolean, default=False)
     estimated_read_time_minutes = Column(Integer)
+
+    # Revisão de conteúdo na própria tela de estudo: pendente -> enviado_ia -> pendente -> aprovado
+    revisao_status = Column(String(20), nullable=False, default='pendente', server_default='pendente')
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -310,6 +315,7 @@ class Topico(Base):
     # Constraints
     __table_args__ = (
         CheckConstraint('topico_index > 0', name='valid_topico_index'),
+        CheckConstraint("revisao_status IN ('pendente', 'enviado_ia', 'aprovado')", name='valid_topico_revisao_status'),
     )
 
     def __repr__(self):
@@ -487,6 +493,7 @@ class TopicoComment(Base):
     sobre_imagem = Column(Boolean, default=False)  # comentário é sobre a imagem já presente no slide
     texto = Column(Text)                       # pode ser só reação, sem texto
     resolvido = Column(Boolean, default=False)
+    resposta_ia = Column(Text)                 # o que a IA mudou ao tratar este ponto (pro revisor conferir)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -637,6 +644,44 @@ class TopicoAnotacao(Base):
 
     def __repr__(self):
         return f"<TopicoAnotacao(topico_id={self.topico_id}, user_id={self.user_id}, slide_index={self.slide_index})>"
+
+
+# ------------------------------------------------------------
+# 11c. MODELS: revisão no tópico (NIA-T-026 — 2026-11-13)
+# ------------------------------------------------------------
+# TopicoRevisaoEvento: histórico (só insere) das ações de revisão do tópico.
+# TopicoAnotacaoTratada: marca que a IA já tratou uma anotação PESSOAL de revisor
+# (a anotação em si nunca é alterada); se for editada depois (updated_at maior que
+# updated_at_visto), volta a contar como pendente.
+
+class TopicoRevisaoEvento(Base):
+    __tablename__ = "topico_revisao_eventos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    topico_id = Column(Integer, ForeignKey('topicos.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    acao = Column(String(20), nullable=False)  # aprovar | enviar_ia | ia_revisou | reabrir
+    observacao = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    topico = relationship("Topico", backref="eventos_revisao")
+    user = relationship("User", backref="eventos_revisao")
+
+    __table_args__ = (
+        CheckConstraint("acao IN ('aprovar', 'enviar_ia', 'ia_revisou', 'reabrir')", name='valid_revisao_evento_acao'),
+    )
+
+
+class TopicoAnotacaoTratada(Base):
+    __tablename__ = "topico_anotacao_tratada"
+
+    id = Column(Integer, primary_key=True, index=True)
+    anotacao_id = Column(Integer, ForeignKey('topico_anotacoes.id', ondelete='CASCADE'), nullable=False, unique=True)
+    updated_at_visto = Column(DateTime(timezone=True))  # updated_at (ou created_at) da anotação quando a IA tratou
+    resposta_ia = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    anotacao = relationship("TopicoAnotacao", backref="tratamento")
 
 
 # ------------------------------------------------------------

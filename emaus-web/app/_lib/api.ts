@@ -49,6 +49,8 @@ export type Topico = {
   generated_by: string | null;
   reviewed_by: string | null;
   estimated_read_time_minutes: number | null;
+  // Situação da revisão de conteúdo (NIA-T-026) — diferente de is_approved (visibilidade)
+  revisao_status?: StatusRevisao;
   // id da Avaliacao (prova) vinculada, só quando existe E está aprovada
   // (2026-09-19 — backend anexa isso em GET /topicos, não é coluna real do Topico).
   avaliacao_id: number | null;
@@ -157,6 +159,53 @@ export function listAnotacoes(token: string | null | undefined, topicoId: number
 }
 
 // ---- Revisão (FASE 5a) ----
+// ---- Revisão no próprio tópico (NIA-T-026) ----
+export type StatusRevisao = "pendente" | "enviado_ia" | "aprovado";
+
+export type PontoRevisao = {
+  id: number;
+  user_id: number;
+  autor: string | null;
+  slide_index: number | null;
+  texto: string | null;
+  reacao: "positivo" | "negativo" | null;
+  resolvido: boolean;
+  resposta_ia: string | null;
+  created_at: string | null;
+};
+
+export type AnotacaoRevisao = {
+  id: number;
+  user_id: number;
+  autor: string | null;
+  slide_index: number;
+  texto: string;
+  tratada: boolean;
+  resposta_ia: string | null;
+  updated_at: string | null;
+};
+
+export type EventoRevisao = {
+  id: number;
+  user_id: number;
+  autor: string | null;
+  acao: "aprovar" | "enviar_ia" | "ia_revisou" | "reabrir";
+  observacao: string | null;
+  created_at: string | null;
+};
+
+export type RevisaoTopico = {
+  topico_id: number;
+  status: StatusRevisao;
+  pode_revisar: boolean;
+  aprovado_por: string | null;
+  aprovado_em: string | null;
+  abertos: number;
+  pontos: PontoRevisao[];
+  anotacoes: AnotacaoRevisao[];
+  eventos: EventoRevisao[];
+};
+
 export type Reacao = "positivo" | "negativo";
 export type ImagemSugerida = "antes" | "depois";
 
@@ -437,6 +486,13 @@ export function listChecklistsTopico(topicoId: number, token?: string | null) {
   return fetchJson<ChecklistTopico[]>(`/topico-checklists/?topico_id=${topicoId}`, comAuth(token));
 }
 
+// Revisão do tópico (server component). 403/404 = sem permissão neste curso: devolve null
+// e a tela fica exatamente como a do aluno.
+export function getRevisaoTopico(topicoId: number, token: string | null | undefined) {
+  if (!token) return Promise.resolve<RevisaoTopico | null>(null);
+  return fetchJson<RevisaoTopico>(`/topicos/${topicoId}/revisao`, comAuth(token)).catch(() => null);
+}
+
 export function getGovernancaCurso(courseId: number, token: string | null | undefined) {
   if (!token) return Promise.resolve<GovernancaCurso | null>(null);
   return fetchJson<GovernancaCurso>(`/cursos/${courseId}/governanca`, comAuth(token));
@@ -523,6 +579,20 @@ export function criarComentarioSlide(data: NovoComentario) {
 
 export function resolverComentario(id: number, resolvido: boolean) {
   return chamarMesmaOrigem<TopicoComment>("/api/revisao/comentario", "PUT", { id, resolvido });
+}
+
+// Ações de revisão feitas na própria tela do tópico (NIA-T-026). Todas devolvem a revisão
+// já atualizada (status, pontos, contagem de abertos).
+export function pontuarSlide(topicoId: number, slideIndex: number, texto: string) {
+  return chamarMesmaOrigem<RevisaoTopico>("/api/revisao", "POST", { acao: "ponto", topicoId, slideIndex, texto });
+}
+
+export function aprovarTopicoRevisao(topicoId: number, observacao?: string) {
+  return chamarMesmaOrigem<RevisaoTopico>("/api/revisao", "POST", { acao: "aprovar", topicoId, observacao });
+}
+
+export function enviarTopicoParaIA(topicoId: number) {
+  return chamarMesmaOrigem<RevisaoTopico>("/api/revisao", "POST", { acao: "enviar-ia", topicoId });
 }
 
 export type NovoChecklist = {
