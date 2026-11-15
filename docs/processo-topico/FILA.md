@@ -43,6 +43,30 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 34 | 214 | Inglês (9) | M2 · Dias, semanas, meses e datas | Dias da semana e meses do ano | pendente | |
 | 35 | 215 | Inglês (9) | M2 · Dias, semanas, meses e datas | Números ordinais e datas (first… thirty-first) | pendente | |
 | 36 | 216 | Inglês (9) | M2 · Dias, semanas, meses e datas | Preposições de tempo: at, in, on | pendente | |
+| 37 | 304 | Eng. IA (16, privado) | F1 · Git por dentro | O que o Git guarda: repositório, commit e a pasta .git | em andamento | NÃO publicado; pronto local (dossiê, conteúdo, auditoria 0 pendências, 5 imagens em `backend/static/course-images/curso16`); falta: deploy do NIA-T-029 → scp das imagens → `python _criar_topico304_eng_ia.py prod` → PUT → áudio |
+| 38 | 305 | Eng. IA (16, privado) | F1 · Git por dentro | As três áreas: pasta de trabalho, preparação e histórico | pendente | depende do deploy do bloco `codigo` (NIA-T-029) |
+| 39 | 306 | Eng. IA (16, privado) | F1 · Git por dentro | Prática: o repositório de treino e o histórico do NIA | pendente |  |
+| 40 | 307 | Eng. IA (16, privado) | F2 · Branch, merge e worktree | Branch é uma etiqueta: switch, fast-forward e merge commit | pendente |  |
+| 41 | 308 | Eng. IA (16, privado) | F2 · Branch, merge e worktree | Conflito: por que acontece e como resolver | pendente |  |
+| 42 | 309 | Eng. IA (16, privado) | F2 · Branch, merge e worktree | Worktree: duas pastas, um repositório | pendente |  |
+| 43 | 310 | Eng. IA (16, privado) | F3 · Remoto e GitHub | Remoto: origin, clone, fetch, pull e push | pendente |  |
+| 44 | 311 | Eng. IA (16, privado) | F3 · Remoto e GitHub | Dois remotes e fork: o caso do PinkBella e da Vercel | pendente |  |
+| 45 | 312 | Eng. IA (16, privado) | F3 · Remoto e GitHub | Prática: o que está só no seu computador | pendente |  |
+| 46 | 313 | Eng. IA (16, privado) | F4 · Pull Request e revisão | Pull Request: o pedido para juntar uma branch | pendente |  |
+| 47 | 314 | Eng. IA (16, privado) | F4 · Pull Request e revisão | Revisão: comentário, aprovação, squash e merge | pendente |  |
+| 48 | 315 | Eng. IA (16, privado) | F4 · Pull Request e revisão | Prática: lendo o PR #265 do CMPort com gh | pendente |  |
+| 49 | 316 | Eng. IA (16, privado) | F5 · Como ler um diff | Anatomia de um diff: hunk, + e - e contexto | pendente |  |
+| 50 | 317 | Eng. IA (16, privado) | F5 · Como ler um diff | A lista de revisão: transação, corrida, segredo e efeito colateral | pendente |  |
+| 51 | 318 | Eng. IA (16, privado) | F5 · Como ler um diff | Prática: revisar um diff real feito pela IA | pendente |  |
+| 52 | 319 | Eng. IA (16, privado) | F6 · Testes | Por que testar: unitário, integração e a pirâmide | pendente |  |
+| 53 | 320 | Eng. IA (16, privado) | F6 · Testes | pytest e vitest: ler e rodar uma suíte | pendente |  |
+| 54 | 321 | Eng. IA (16, privado) | F6 · Testes | TDD do bug: o teste que falha primeiro | pendente |  |
+| 55 | 322 | Eng. IA (16, privado) | F7 · CI/CD | Integração contínua: o que roda a cada PR | pendente |  |
+| 56 | 323 | Eng. IA (16, privado) | F7 · CI/CD | Entrega contínua: homologação, produção e runner próprio | pendente |  |
+| 57 | 324 | Eng. IA (16, privado) | F7 · CI/CD | Quando o CI quebra: ler o log e decidir | pendente |  |
+| 58 | 325 | Eng. IA (16, privado) | F8 · Configuração, terminal e ágil | Arquivos de configuração: JSON, YAML, .env e os três níveis de settings | pendente |  |
+| 59 | 326 | Eng. IA (16, privado) | F8 · Configuração, terminal e ágil | Terminal no Windows: PowerShell × Git Bash, PATH e venv | pendente |  |
+| 60 | 327 | Eng. IA (16, privado) | F8 · Configuração, terminal e ágil | Ágil na prática: kanban, WIP e definição de pronto | pendente |  |
 
 ## Já feitos (processo novo)
 | topico_id | curso | título | data |

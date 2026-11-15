@@ -11,6 +11,7 @@ diz o que ACRESCENTA ou SUBSTITUI aqui:
 | Redes e Câmeras | 11 | [redes.md](redes.md) |
 | Engenharia de Agentes LLM (IA) | 5 | [ia.md](ia.md) |
 | Vendas na Internet (privado) | 13 (local 12) | [vendas.md](vendas.md) |
+| Engenharia de Software com IA (privado) | 16 (local 132) | [eng-ia.md](eng-ia.md) |
 
 Comum a todos: [FONTES_GUIA.md](FONTES_GUIA.md) (o que buscar de fonte e o dossiê).
 
