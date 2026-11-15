@@ -11,6 +11,10 @@ from .render import montar_question_order
 
 _HEX_RE = re.compile(r"^#[0-9a-fA-F]{3,8}$")
 
+# Bloco "codigo" (NIA-T-029): linguagens aceitas (só viram rótulo) e limite do texto
+_LINGUAGENS_CODIGO = {"powershell", "bash", "python", "json", "yaml", "diff", "texto"}
+_MAX_TEXTO_CODIGO = 5000
+
 
 def validar_topico(content: dict) -> list[str]:
     """Retorna uma lista de problemas encontrados (vazia = sem problemas)."""
@@ -85,6 +89,28 @@ def validar_topico(content: dict) -> list[str]:
                             f"Timeline item '{item.get('titulo')}' tem cor '{cor}' que "
                             f"não é hex válido (ex: '#2c7fb8') — vai renderizar sem cor."
                         )
+
+    # 5c. Bloco "codigo" (NIA-T-029): texto obrigatório (até 5000) e linguagem da lista.
+    for slide in content.get("slides", []):
+        if slide["tipo"] != "conteudo":
+            continue
+        for bloco in slide.get("blocos", []):
+            if bloco["tipo"] != "codigo":
+                continue
+            rotulo = bloco.get("titulo") or bloco.get("id") or "sem título"
+            texto = bloco.get("texto")
+            if not isinstance(texto, str) or not texto.strip():
+                problemas.append(f"Bloco 'codigo' ({rotulo}): sem 'texto'.")
+            elif len(texto) > _MAX_TEXTO_CODIGO:
+                problemas.append(
+                    f"Bloco 'codigo' ({rotulo}): texto com {len(texto)} caracteres (máximo {_MAX_TEXTO_CODIGO})."
+                )
+            ling = bloco.get("linguagem")
+            if ling is not None and ling not in _LINGUAGENS_CODIGO:
+                problemas.append(
+                    f"Bloco 'codigo' ({rotulo}): linguagem '{ling}' inválida "
+                    f"(use: {', '.join(sorted(_LINGUAGENS_CODIGO))})."
+                )
 
     # 5. Todo checkpoint/avaliação precisa ter pelo menos 1 pergunta
     for slide in content.get("slides", []):

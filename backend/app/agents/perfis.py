@@ -196,6 +196,9 @@ inegociáveis:
   "diagrama" com svg_raw pra isso: SVG cru escrito por IA sai sem setas/conectores reais
   e reprova na revisão estrutural (achado real, mesmo problema já visto nos cursos de
   obreiro e inglês). "fluxo" desenha em HTML/CSS e nunca quebra.
+- Comando de terminal e trecho de código vão no bloco "codigo" (campos: texto — obrigatório,
+  até 5000 caracteres, com quebras de linha —, linguagem: powershell|bash|python|json|yaml|diff|texto,
+  titulo e nota opcionais), nunca dentro de "box" nem de "paragrafo". Sem narracao: o áudio não lê comando.
 """.strip()
 
 EXEMPLO_CALIBRACAO_REDES = """

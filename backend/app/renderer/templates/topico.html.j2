@@ -70,6 +70,23 @@
   </div>
 {%- endmacro %}
 
+{# Bloco "codigo" (NIA-T-029): comando/trecho de código em fonte monoespaçada, com botão Copiar.
+   O texto é sempre escapado pelo Jinja (nunca |safe); a linguagem é só um rótulo. #}
+{% macro render_codigo(bloco) -%}
+  <div class="codigo-bloco">
+    {% if bloco.titulo or bloco.linguagem %}
+    <div class="codigo-cab">
+      {% if bloco.titulo %}<span class="codigo-titulo">{{ bloco.titulo }}</span>{% endif %}
+      {% if bloco.linguagem %}<span class="codigo-lang">{{ bloco.linguagem }}</span>{% endif %}
+    </div>
+    {% endif %}
+    <pre class="codigo-pre"><code>{{ bloco.texto }}</code></pre>
+    <button type="button" class="copy-btn codigo-copy-btn">📋 Copiar</button>
+    <span class="codigo-aviso" role="status" aria-live="polite"></span>
+    {% if bloco.nota %}<p class="codigo-nota">{{ bloco.nota }}</p>{% endif %}
+  </div>
+{%- endmacro %}
+
 {% macro render_bloco(bloco) -%}
   {% if bloco.tipo == 'paragrafo' %}
     <p>{{ bloco.texto }}</p>
@@ -114,6 +131,8 @@
     {{ render_fluxo(bloco) }}
   {% elif bloco.tipo == 'prompt_externo' %}
     {{ render_prompt_externo(bloco) }}
+  {% elif bloco.tipo == 'codigo' %}
+    {{ render_codigo(bloco) }}
   {% elif bloco.tipo == 'diagrama' %}
     {{ render_diagrama(bloco) }}
   {% elif bloco.tipo == 'imagem_sugerida' %}
@@ -381,6 +400,15 @@
   .relembrando-sub { color: var(--text-muted); font-size: 14px; margin: 0 0 6px; }
   .box-instr { border-left: 2px solid var(--blue); font-size: 13.5px; } .box-instr .box-label { color: var(--blue); }
   .prompt-texto { white-space: pre-line; font-family: var(--font-label); font-size: 12.5px; background: rgba(0,0,0,.12); padding: 10px 12px; border-radius: 6px; margin: 8px 0; }
+  /* Bloco "codigo" (NIA-T-029): usa só variáveis do tema (claro/escuro); rolagem horizontal fica dentro do <pre> */
+  .codigo-bloco { margin: 12px 0; max-width: 100%; min-width: 0; }
+  .codigo-cab { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .codigo-titulo { font-weight: 700; font-size: 13.5px; color: var(--text); overflow-wrap: anywhere; }
+  .codigo-lang { font-family: var(--font-label); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+  .codigo-pre { margin: 0; padding: 10px 12px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; overflow-x: auto; max-width: 100%; white-space: pre; tab-size: 4; -webkit-overflow-scrolling: touch; }
+  .codigo-pre code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12.5px; line-height: 1.5; background: none; padding: 0; white-space: pre; }
+  .codigo-aviso { font-size: 12px; color: var(--text-muted); margin-left: 8px; }
+  .codigo-nota { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
   .prompt-nota { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
   .capa-imagem { width: 100%; max-height: 320px; object-fit: cover; border-radius: var(--radius-lg); border: 1px solid var(--border-soft); margin: 14px 0 18px; display: block; }
 
@@ -3088,6 +3116,34 @@ document.querySelectorAll('.prompt-copy-btn').forEach(function (btn) {
       btn.classList.add('copied');
       setTimeout(function () { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
     });
+  });
+});
+
+// Bloco "codigo" (NIA-T-029): mesmo padrão do prompt-copy-btn; se a área de transferência for negada,
+// seleciona o texto e avisa pra usar Ctrl+C.
+document.querySelectorAll('.codigo-copy-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const bloco = btn.closest('.codigo-bloco');
+    const code = bloco.querySelector('code');
+    const aviso = bloco.querySelector('.codigo-aviso');
+    function selecionar() {
+      try {
+        const r = document.createRange();
+        r.selectNodeContents(code);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(r);
+      } catch (e) {}
+      if (aviso) { aviso.textContent = 'Não consegui copiar sozinho: use Ctrl+C.'; }
+    }
+    if (!navigator.clipboard || !navigator.clipboard.writeText) { selecionar(); return; }
+    navigator.clipboard.writeText(code.textContent).then(function () {
+      const original = btn.textContent;
+      btn.textContent = 'Copiado! ✔';
+      btn.classList.add('copied');
+      if (aviso) { aviso.textContent = ''; }
+      setTimeout(function () { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
+    }).catch(selecionar);
   });
 });
 
