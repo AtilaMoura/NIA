@@ -8,7 +8,17 @@ capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://
 (backend) e `https://caminho-emaus.duckdns.org` (Emaús) em produção com HTTPS. O `A1.Flex`
 (VM maior) segue em retry automático via cron na VM 2, não bloqueia nada.
 
-## 🚀 Último deploy — 2026-11-13 (revisão no tópico, NIA-T-026) · FEITO
+## 🚀 Último deploy — 2026-11-15 (bloco `codigo` NIA-T-029 + tema do curso 16) · FEITO
+
+Feito pelo Claude a pedido do Atila, commits `4f6d4b1`, `e063a29`, `4de08b9` (push para `originNIA/master`). **VM 1:** backup em
+**`~/backups/antes_bloco_codigo_2026-11-15.dump`** (583 KB), `git pull` + `up -d --build` do backend; 2× "startup complete";
+sem mudança de banco. `Caddyfile.backend` e `docker-compose.backend.yml` seguem editados à mão (NIA-T-018), o pull não conflitou.
+**VM 2:** `git pull` + `up -d --build` do Emaús (`TEMA_POR_CURSO[16] = "menta-grafite"`), sem travar.
+Mídia nova: pastas `static/course-images/curso16/` e `static/audio/curso16/` criadas por `scp -r` (sem 401).
+Conferido: API 200, Emaús 200; T304 publicado (PUT 200), render com 9 blocos `codigo` e 0 `None`, áudio 30/30,
+35 mídias com 200. Falta: o Atila liberar o curso 16 para si em Pessoas e olhar o tópico na tela.
+
+## (anterior) Deploy 2026-11-13 (revisão no tópico, NIA-T-026) · FEITO
 
 Feito pelo Claude a pedido do Atila, commit `a4c4ac6`. **VM 1:** backup em **`~/backups/antes_revisao_topico_2026-11-13.dump`**
 (585 KB), `git pull` + `up -d --build`; os 2 workers subiram ("startup complete" 2×), colunas e tabelas novas criadas

@@ -43,8 +43,8 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 34 | 214 | Inglês (9) | M2 · Dias, semanas, meses e datas | Dias da semana e meses do ano | pendente | |
 | 35 | 215 | Inglês (9) | M2 · Dias, semanas, meses e datas | Números ordinais e datas (first… thirty-first) | pendente | |
 | 36 | 216 | Inglês (9) | M2 · Dias, semanas, meses e datas | Preposições de tempo: at, in, on | pendente | |
-| 37 | 304 | Eng. IA (16, privado) | F1 · Git por dentro | O que o Git guarda: repositório, commit e a pasta .git | em andamento | NÃO publicado; pronto local (dossiê, conteúdo, auditoria 0 pendências, 5 imagens em `backend/static/course-images/curso16`); falta: deploy do NIA-T-029 → scp das imagens → `python _criar_topico304_eng_ia.py prod` → PUT → áudio |
-| 38 | 305 | Eng. IA (16, privado) | F1 · Git por dentro | As três áreas: pasta de trabalho, preparação e histórico | pendente | depende do deploy do bloco `codigo` (NIA-T-029) |
+| 37 | 304 | Eng. IA (16, privado) | F1 · Git por dentro | O que o Git guarda: repositório, commit e a pasta .git | feito | publicado em 2026-11-15 (15 slides, 5 imagens, 30 áudios) |
+| 38 | 305 | Eng. IA (16, privado) | F1 · Git por dentro | As três áreas: pasta de trabalho, preparação e histórico | pendente | |
 | 39 | 306 | Eng. IA (16, privado) | F1 · Git por dentro | Prática: o repositório de treino e o histórico do NIA | pendente |  |
 | 40 | 307 | Eng. IA (16, privado) | F2 · Branch, merge e worktree | Branch é uma etiqueta: switch, fast-forward e merge commit | pendente |  |
 | 41 | 308 | Eng. IA (16, privado) | F2 · Branch, merge e worktree | Conflito: por que acontece e como resolver | pendente |  |
