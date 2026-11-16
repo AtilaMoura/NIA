@@ -45,7 +45,7 @@ Code. Reordene as linhas pra mudar a prioridade. Status: `pendente`, `em andamen
 | 36 | 216 | Inglês (9) | M2 · Dias, semanas, meses e datas | Preposições de tempo: at, in, on | pendente | |
 | 37 | 304 | Eng. IA (16, privado) | F1 · Git por dentro | O que o Git guarda: repositório, commit e a pasta .git | feito | publicado em 2026-11-15 (15 slides, 5 imagens, 30 áudios) |
 | 38 | 305 | Eng. IA (16, privado) | F1 · Git por dentro | As três áreas: pasta de trabalho, preparação e histórico | feito | publicado em 2026-11-16 (15 slides, 5 imagens, 26 áudios) |
-| 39 | 306 | Eng. IA (16, privado) | F1 · Git por dentro | Prática: o repositório de treino e o histórico do NIA | pendente |  |
+| 39 | 306 | Eng. IA (16, privado) | F1 · Git por dentro | Prática: o repositório de treino e o histórico do NIA | feito | publicado em 2026-11-16 (15 slides, 5 imagens, 19 áudios); Aula F1 completa |
 | 40 | 307 | Eng. IA (16, privado) | F2 · Branch, merge e worktree | Branch é uma etiqueta: switch, fast-forward e merge commit | pendente |  |
 | 41 | 308 | Eng. IA (16, privado) | F2 · Branch, merge e worktree | Conflito: por que acontece e como resolver | pendente |  |
 | 42 | 309 | Eng. IA (16, privado) | F2 · Branch, merge e worktree | Worktree: duas pastas, um repositório | pendente |  |
