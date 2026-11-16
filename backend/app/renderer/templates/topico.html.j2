@@ -1232,15 +1232,79 @@ const RESPOSTAS_ROTA = (function () {
 })();
 const RESPOSTAS_TOPICO_ID_DB = RESPOSTAS_ROTA.id;
 const RESPOSTAS_PREFIXO = RESPOSTAS_ROTA.prefixo;
-const RESPOSTAS_TOKEN = new URLSearchParams(window.location.search).get('token');
+var RESPOSTAS_TOKEN = new URLSearchParams(window.location.search).get('token');
+var SESSAO_EXPIRADA = false;
+var RENOVACAO_PENDENTE = null;
+var MSG_SESSAO_EXPIRADA = 'Sua sessão expirou — recarregue a página (F5) para continuar.';
+
+// Faixa discreta (uma vez só) quando a sessão expirou de vez; não usa alert().
+function avisarSessaoExpirada() {
+  SESSAO_EXPIRADA = true;
+  if (document.getElementById('faixaSessaoExpirada')) return;
+  var f = document.createElement('div');
+  f.id = 'faixaSessaoExpirada';
+  f.setAttribute('role', 'status');
+  f.textContent = MSG_SESSAO_EXPIRADA;
+  f.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;padding:8px 14px;text-align:center;font-size:14px;background:#b45309;color:#fff;';
+  document.body.appendChild(f);
+}
+
+// Pede token novo ao pai (Next.js) por postMessage. Pedidos simultâneos
+// compartilham a mesma Promise; espera no máximo ~8 s e resolve true/false.
+function renovarToken() {
+  if (RENOVACAO_PENDENTE) return RENOVACAO_PENDENTE;
+  if (!window.parent || window.parent === window) return Promise.resolve(false);
+  RENOVACAO_PENDENTE = new Promise(function (resolve) {
+    var fim = function (ok) {
+      window.removeEventListener('message', ouvir);
+      clearTimeout(timer);
+      RENOVACAO_PENDENTE = null;
+      resolve(ok);
+    };
+    var ouvir = function (e) {
+      if (e.source !== window.parent || !e.data) return;
+      if (e.data.tipo === 'emaus:token-novo' && typeof e.data.token === 'string' && e.data.token) {
+        RESPOSTAS_TOKEN = e.data.token;
+        fim(true);
+      } else if (e.data.tipo === 'emaus:token-falhou') {
+        fim(false);
+      }
+    };
+    var timer = setTimeout(function () { fim(false); }, 8000);
+    window.addEventListener('message', ouvir);
+    window.parent.postMessage({ tipo: 'emaus:token-renovar' }, '*');
+  });
+  return RENOVACAO_PENDENTE;
+}
+
+// fetch com o token ATUAL; em 401 renova o token uma vez e repete a chamada.
+// Se a renovação falhar, marca "sessão expirada" e devolve a resposta 401.
+function fetchComToken(url, opts) {
+  function chamar() {
+    var o = Object.assign({}, opts || {});
+    o.headers = Object.assign({}, o.headers || {}, { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN });
+    return fetch(url, o);
+  }
+  if (SESSAO_EXPIRADA) return chamar();
+  return chamar().then(function (r) {
+    if (r.status !== 401) return r;
+    return renovarToken().then(function (ok) {
+      if (!ok) { avisarSessaoExpirada(); return r; }
+      return chamar().then(function (r2) {
+        if (r2.status === 401) avisarSessaoExpirada();
+        return r2;
+      });
+    });
+  });
+}
 const RESPOSTAS_CONTEXTO_REVISAO = new URLSearchParams(window.location.search).get('contexto') === 'revisao';
 const RESPOSTAS_ATIVO = !!(RESPOSTAS_TOPICO_ID_DB && RESPOSTAS_TOKEN) && !RESPOSTAS_CONTEXTO_REVISAO;
 
 function salvarRespostaRemota(qid, gateId, tipo, respostaDada, correta) {
   if (!RESPOSTAS_ATIVO) return;
-  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-respostas/' + RESPOSTAS_TOPICO_ID_DB + '/' + encodeURIComponent(qid), {
+  fetchComToken(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-respostas/' + RESPOSTAS_TOPICO_ID_DB + '/' + encodeURIComponent(qid), {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ gate_id: gateId, tipo: tipo, resposta_dada: respostaDada, correta: correta }),
   }).catch(function (e) { console.error('falha ao salvar resposta', qid, e); });
 
@@ -1257,9 +1321,9 @@ function salvarRespostaRemota(qid, gateId, tipo, respostaDada, correta) {
 // só não restaura o lugar certo na próxima abertura, nada quebra na hora.
 function salvarSlideRemoto(idx) {
   if (!RESPOSTAS_ATIVO) return;
-  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
+  fetchComToken(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ indice: paraConteudo(idx) }),
   }).catch(function (e) { console.error('falha ao salvar slide atual', e); });
 }
@@ -1277,9 +1341,9 @@ function salvarSlideRemoto(idx) {
   setInterval(function () {
     if (document.visibilityState !== 'visible') return;
     if (Date.now() - ultimaInteracao > 10 * 60 * 1000) return;
-    fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/tempo', {
+    fetchComToken(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/tempo', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+      headers: {},
     }).catch(function () { /* sem rede: só perde este minuto */ });
   }, 60 * 1000);
 })();
@@ -1633,8 +1697,8 @@ function renderizarRevisao(a, temProximo, temAvaliacao) {
 // (prova reprovada já foi reiniciada — abre limpa pra refazer).
 function carregarResultado(temProximo, temAvaliacao, soSeConcluido, seNaoTiver) {
   if (!RESPOSTAS_ATIVO) { if (seNaoTiver) seNaoTiver(); return; }
-  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/resultado', {
-    headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+  fetchComToken(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/resultado', {
+    headers: {},
   })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
@@ -1770,9 +1834,9 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO === 'avaliacao') {
     var texto = anotacaoTextoAtual.value.trim();
     if (!RESPOSTAS_ATIVO) { anotacaoStatus.textContent = 'Faça login pra salvar.'; return; }
     anotacaoStatus.textContent = 'Salvando…';
-    fetch(window.location.origin + '/topico-anotacoes/' + RESPOSTAS_TOPICO_ID_DB + '/' + idx, {
+    fetchComToken(window.location.origin + '/topico-anotacoes/' + RESPOSTAS_TOPICO_ID_DB + '/' + idx, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ texto: texto }),
     })
       .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
@@ -1786,8 +1850,8 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO === 'avaliacao') {
   });
 
   if (RESPOSTAS_ATIVO) {
-    fetch(window.location.origin + '/topico-anotacoes/' + RESPOSTAS_TOPICO_ID_DB, {
-      headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    fetchComToken(window.location.origin + '/topico-anotacoes/' + RESPOSTAS_TOPICO_ID_DB, {
+      headers: {},
     })
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (lista) {
@@ -1839,9 +1903,9 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
     var novo = atual ? atual + '\n\n' + trecho : trecho;
     btn.disabled = true;
     btn.textContent = 'Salvando…';
-    fetch(window.location.origin + '/topico-anotacoes/' + RESPOSTAS_TOPICO_ID_DB + '/' + slideIdx, {
+    fetchComToken(window.location.origin + '/topico-anotacoes/' + RESPOSTAS_TOPICO_ID_DB + '/' + slideIdx, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ texto: novo }),
     })
       .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
@@ -1889,8 +1953,8 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
   function carregarConversa() {
     if (conversaCarregada || !RESPOSTAS_ATIVO) return;
     conversaCarregada = true;
-    fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/duvidas', {
-      headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    fetchComToken(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/duvidas', {
+      headers: {},
     })
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (lista) {
@@ -1945,9 +2009,9 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
     duvidaContador.textContent = '0/' + DUVIDA_MAX;
     duvidaPerguntarBtn.disabled = true;
     var pensando = adicionarMensagem('ia', 'Pensando…');
-    fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/duvida', {
+    fetchComToken(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/duvida', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slide_index: slideIdx, pergunta_aluno: pergunta, tamanho: duvidaTamanho.value }),
     })
       .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
@@ -1956,9 +2020,12 @@ if (RESPOSTAS_CONTEXTO_REVISAO || RESPOSTAS_PREFIXO !== 'topico') {
         adicionarMensagem('ia', tirarMarkdown(data.resposta_ia), slideIdx, pergunta);
       })
       .catch(function (e) {
-        pensando.textContent = String(e.message).indexOf('503') >= 0
+        var msgErro = String(e.message);
+        pensando.textContent = msgErro.indexOf('503') >= 0
           ? 'O tutor está sobrecarregado agora — tenta de novo em alguns minutos.'
-          : 'Não deu pra responder agora — tenta de novo.';
+          : (msgErro.indexOf('401') >= 0
+            ? MSG_SESSAO_EXPIRADA
+            : 'Não deu pra responder agora — tenta de novo.');
         duvidaTexto.value = pergunta;
         duvidaContador.textContent = pergunta.length + '/' + DUVIDA_MAX;
         console.error('falha ao tirar dúvida', e);
@@ -2023,9 +2090,9 @@ function montarPerguntaReforcoHTML(p) {
 
 function enviarRespostaReforco(reforcoId, respostaDada, correta) {
   if (!RESPOSTAS_ATIVO) return;
-  fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/reforco/' + reforcoId, {
+  fetchComToken(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/reforco/' + reforcoId, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ resposta_dada: respostaDada, correta: correta }),
   }).catch(function (e) { console.error('falha ao salvar resposta de reforço', e); });
 }
@@ -2118,9 +2185,9 @@ function dispararCorrecaoIA(qid, respostaDada) {
   wrapper.appendChild(loading);
   questionEl.insertAdjacentElement('afterend', wrapper);
 
-  fetch(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/corrigir', {
+  fetchComToken(window.location.origin + '/topico-tutor/' + RESPOSTAS_TOPICO_ID_DB + '/corrigir', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question_id: qid, resposta_dada: respostaDada }),
   })
     .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
@@ -2754,8 +2821,8 @@ function restaurarOpen(qid, textoSalvo) {
 }
 
 if (RESPOSTAS_ATIVO) {
-  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-respostas/' + RESPOSTAS_TOPICO_ID_DB, {
-    headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+  fetchComToken(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-respostas/' + RESPOSTAS_TOPICO_ID_DB, {
+    headers: {},
   })
     .then(function (r) { return r.ok ? r.json() : []; })
     .then(function (respostas) {
@@ -3181,8 +3248,8 @@ function abrirSlideInicial() {
   var slidePedido = parseInt(new URLSearchParams(window.location.search).get('slide'), 10);
   if (slidePedido >= 1 && slidePedido <= slides.length) { showSlide(paraTela(slidePedido - 1)); return; }
   if (!RESPOSTAS_ATIVO) { showSlide(0); return; }
-  fetch(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
-    headers: { 'Authorization': 'Bearer ' + RESPOSTAS_TOKEN },
+  fetchComToken(window.location.origin + '/' + RESPOSTAS_PREFIXO + '-progress/' + RESPOSTAS_TOPICO_ID_DB + '/slide', {
+    headers: {},
   })
     .then(function (r) { return r.ok ? r.json() : {}; })
     .then(function (d) {

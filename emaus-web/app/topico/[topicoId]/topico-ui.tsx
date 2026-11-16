@@ -147,6 +147,21 @@ export function AcoesTopico({
       if (!d || typeof d !== "object") return;
       if (d.tipo === "emaus:concluir" && typeof d.texto === "string") {
         enviarResumo(d.texto);
+      } else if (d.tipo === "emaus:token-renovar") {
+        // O token curto do render (2h) venceu: pega um novo com o cookie de sessão e
+        // devolve ao iframe por postMessage, sem mexer no src (recarregaria a página).
+        fetch("/api/topico-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topicoId }),
+          cache: "no-store",
+        })
+          .then(async (r) => {
+            const j = await r.json().catch(() => ({}));
+            if (!r.ok || typeof j.token !== "string") throw new Error("status " + r.status);
+            postParaIframe({ tipo: "emaus:token-novo", token: j.token });
+          })
+          .catch(() => postParaIframe({ tipo: "emaus:token-falhou" }));
       } else if (d.tipo === "emaus:pronto") {
         enviarModoRevisor();
       } else if (d.tipo === "emaus:ponto" && revisaoRef.current) {
@@ -221,6 +236,7 @@ export function AcoesTopico({
     enviarModoRevisor,
     aplicarRevisao,
     falhaRevisao,
+    postParaIframe,
     proximoTopicoId,
     avaliacaoId,
     router,
