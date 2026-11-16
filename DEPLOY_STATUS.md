@@ -8,7 +8,11 @@ capas de curso, conteúdo de tópico (texto+imagem+áudio), progresso. `https://
 (backend) e `https://caminho-emaus.duckdns.org` (Emaús) em produção com HTTPS. O `A1.Flex`
 (VM maior) segue em retry automático via cron na VM 2, não bloqueia nada.
 
-## 🚀 Último deploy — 2026-11-16 (NIA-T-030: renovação automática do token curto do tópico) · FEITO
+## 🚀 Último deploy — 2026-11-16 (NIA-T-031: correção de resposta aberta + perfil da IA por curso) · FEITO
+
+Feito pelo Claude a pedido do Atila, commit `ec094cb`, **só VM 1** (o Emaús não mudou). Backup em **`~/backups/antes_nia_t031_2026-11-16.dump`** (625 KB), `git pull`, `up -d --build`; 2× "startup complete", 0 traceback. No start criou `courses.perfil_ia`. Depois rodado `backend/_definir_perfil_ia_cursos.py aplicar` (local): 2, 4, 5 → tech; 6 → teologia; 7, 8, 12 → obreiro; 9, 14 → ingles; 11 → redes; 15 → obreiro_acp; 16 → eng_ia; 13 fica NULL (perfil geral do título). Conferido: API 200, tutor de dúvida do T304 respondeu 200.
+
+## 🚀 Deploy — 2026-11-16 (NIA-T-030: renovação automática do token curto do tópico) · FEITO
 
 Feito pelo Claude a pedido do Atila, commit `9b3881a` (push para `originNIA/master`; subiram junto os commits do curso 16 T305/T306). **VM 1:** backup em **`~/backups/antes_nia_t030_2026-11-16.dump`** (620 KB), `git pull` sem conflito (`Caddyfile.backend` e `docker-compose.backend.yml` seguem editados à mão, NIA-T-018, não tocados pelo pull; sem stash), `up -d --build`; 2× "startup complete". **VM 2:** árvore limpa (o stash de 2026-11-13 segue guardado), `git pull` + `up -d --build` do Emaús; build lento (~12 min, VM de 1 GB com swap), sem queda de SSH.
 Conferido: API 200, Emaús 200; template no container da VM 1 com `fetchComToken` (14) e `emaus:token-renovar` (1); `POST /api/topico-token` sem cookie → 401 (rota nova existe); commit das 2 VMs = `9b3881a`.
