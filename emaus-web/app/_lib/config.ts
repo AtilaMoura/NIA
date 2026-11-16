@@ -19,6 +19,7 @@ export const TEMA_POR_CURSO: Record<number, string> = {
   9: "caderno-escolar", // Inglês (antes: papel-latao)
   5: "azul-petroleo", // Engenharia de Agentes LLM (catálogo 2026-10-03; antes vinho-ouro, vidro-fume)
   11: "alto-contraste", // Redes e Câmeras (antes: default trigo-maduro)
+  16: "menta-grafite", // Engenharia de Software com IA (privado, 2026-11-14)
 };
 
 // FASE 1 (auth) trocou isto pela sessão de verdade (`_lib/sessao.ts`, getSessao().id) em
