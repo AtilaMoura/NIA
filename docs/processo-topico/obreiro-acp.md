@@ -4,7 +4,7 @@ Segue a [BASE](BASE.md) e herda do [obreiro.md](obreiro.md) (passos de fonte, es
 **exceto** o que está abaixo, que substitui. Grade: [GRADE_OBREIRO_ACP.md](GRADE_OBREIRO_ACP.md).
 Estatuto: [estatuto-resumo.md](../../fontes/obreiro-acp/estatuto-resumo.md).
 
-- **Tema:** `trigo-maduro` · **Perfil:** `PERFIL_OBREIRO` · **Identidade visual:** logo/cores da ACP (pendente).
+- **Tema:** `trigo-maduro` · **Perfil:** `obreiro_acp` (`PERFIL_OBREIRO_ACP`, confessional; definir em `courses.perfil_ia`) · **Identidade visual:** logo/cores da ACP (pendente).
 
 ## Regras específicas
 

@@ -13,6 +13,19 @@ diz o que ACRESCENTA ou SUBSTITUI aqui:
 | Vendas na Internet (privado) | 13 (local 12) | [vendas.md](vendas.md) |
 | Engenharia de Software com IA (privado) | 16 (local 132) | [eng-ia.md](eng-ia.md) |
 
+## Perfil da IA do curso (NIA-T-031) — obrigatório em curso novo
+
+Todo curso novo **deve ter `courses.perfil_ia` definido** (PUT `/courses/{id}` com `{"perfil_ia": "<id>"}`).
+É ele que diz à IA do tutor/correção/prova em que área está (contexto, regras de citação, fatos só do
+material). Não existe mais id de curso fixo no código nem queda no "Garden Center".
+
+- Ids válidos: `tech`, `teologia`, `obreiro`, `ingles`, `redes`, `obreiro_acp` (confessional, sem
+  neutralidade, ACF), `eng_ia` (Git, conferir o que a IA fez). Lista em `backend/app/agents/perfis.py`.
+- Sem `perfil_ia` (NULL) a IA usa o **perfil geral**, montado do título e da descrição do curso: serve,
+  mas é genérico. Se o curso tem regras próprias, crie o perfil em `perfis.py` e registre em `PERFIS`.
+- Cursos de produção já mapeados: `backend/_definir_perfil_ia_cursos.py` (`previa` / `aplicar`).
+- Não há tela de criação de curso nos fronts: o campo é definido pela API (ou pelo script acima).
+
 Comum a todos: [FONTES_GUIA.md](FONTES_GUIA.md) (o que buscar de fonte e o dossiê).
 
 Regra de leitura: **ler a BASE + a especificação do curso antes de começar qualquer

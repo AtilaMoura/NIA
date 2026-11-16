@@ -31,7 +31,7 @@ from app.agents.pipeline import gerar_estrutura_curso, gerar_e_revisar_topico
 from app.agents.tutor_agent import TutorAgent
 from app.agents.contexto_topico import carregar_content, montar_contexto_duvida
 from app.agents.revisao_avaliacao import NOTA_MINIMA_PROVA, corrigir_e_revisar, dificuldades_do_resultado
-from app.agents.perfis import resolver_perfil
+from app.agents.perfis import PerfilDominio, perfil_do_curso_obj, perfil_geral, resolver_perfil
 from app.schemas.topico_progress import AvaliarTopicoRequest, TopicoProgressOut
 from app.schemas.avaliacao_progress import AvaliacaoProgressOut
 from app.services.modelos import servico
@@ -519,18 +519,14 @@ async def avaliar_resumo(lesson_id: int, data: AvaliarResumoRequest, db: Session
 # ALUNO — Tutor por TÓPICO (FASE 4 do front Emaús)
 # ============================================================
 
-# Enquanto não existe Tenant/domain_profile no banco, o perfil de domínio do
-# Tutor é resolvido pelo curso. Curso 8 = Formação do Novo Obreiro (teologia);
-# curso 9 = estudo pessoal de Inglês; o resto cai no perfil "tech" (default de
-# resolver_perfil).
-_PERFIL_POR_CURSO: dict[int, str] = {8: "obreiro", 9: "ingles", 11: "redes"}
-
-
-def _perfil_do_curso(db: Session, topico: Topico) -> str:
+# O perfil de domínio do Tutor vem do próprio curso (courses.perfil_ia, NIA-T-031):
+# nada de id fixo no código. Sem perfil_ia, usa o perfil GERAL montado do título/descrição
+# do curso (nunca mais cai no Garden Center por padrão).
+def _perfil_do_curso(db: Session, topico: Topico) -> PerfilDominio:
     lesson = db.query(Lesson).filter(Lesson.id == topico.lesson_id).first()
     module = db.query(Module).filter(Module.id == lesson.module_id).first() if lesson else None
-    course_id = module.course_id if module else None
-    return _PERFIL_POR_CURSO.get(course_id, "tech")
+    curso = db.query(Course).filter(Course.id == module.course_id).first() if module else None
+    return perfil_do_curso_obj(curso)
 
 
 def _rate_limited(err: Exception) -> bool:
@@ -664,7 +660,7 @@ async def avaliar_resumo_topico(
     )
     rodada = registro.rodada_atual if registro else 1
     content_topico = carregar_content(topico)
-    perfil = resolver_perfil(_perfil_do_curso(db, topico))
+    perfil = _perfil_do_curso(db, topico)
     # Correção/nota do aluno: sempre a cadeia "correcao" (Gemini primeiro), ignorando
     # data.modelo — o padrão "groq" mandava pra qwen/gpt-oss, que erram fato (2026-10-01)
     agente = TutorAgent(servico("correcao"))
@@ -767,7 +763,7 @@ async def avaliar_resumo_avaliacao(
     rodada = registro.rodada_atual if registro else 1
     topico = avaliacao.topico
     content_topico = carregar_content(topico) if topico and topico.content else {"slides": []}
-    perfil = resolver_perfil(_perfil_do_curso(db, topico) if topico else "tech")
+    perfil = _perfil_do_curso(db, topico) if topico else perfil_geral(None)
     # Correção/nota do aluno: sempre a cadeia "correcao" (Gemini primeiro), ignorando
     # data.modelo — o padrão "groq" mandava pra qwen/gpt-oss, que erram fato (2026-10-01)
     agente = TutorAgent(servico("correcao"))

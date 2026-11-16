@@ -32,7 +32,6 @@ from app.schemas.topico_tutor import (
     ResponderReforcoRequest,
 )
 from app.agents.tutor_agent import TutorAgent
-from app.agents.perfis import resolver_perfil
 from app.agents.contexto_topico import carregar_content, montar_contexto_duvida
 from app.services.modelos import servico
 from app.routers.pipeline import _perfil_do_curso, _rate_limited
@@ -84,8 +83,7 @@ async def corrigir_exercicio(
     if not pergunta:
         raise HTTPException(404, "Pergunta não encontrada neste tópico")
 
-    perfil_id = _perfil_do_curso(db, topico)
-    perfil = resolver_perfil(perfil_id)
+    perfil = _perfil_do_curso(db, topico)
     try:
         resultado = await TutorAgent(servico("tutor")).corrigir_exercicio(
             pergunta, data.resposta_dada, contexto_topico=topico.titulo, perfil=perfil,
@@ -177,8 +175,7 @@ async def tirar_duvida(
     )
     historico = [(d.pergunta_aluno, d.resposta_ia) for d in reversed(anteriores)]
 
-    perfil_id = _perfil_do_curso(db, topico)
-    perfil = resolver_perfil(perfil_id)
+    perfil = _perfil_do_curso(db, topico)
     try:
         resposta_texto = await TutorAgent(servico("tutor")).responder_duvida(
             data.pergunta_aluno,

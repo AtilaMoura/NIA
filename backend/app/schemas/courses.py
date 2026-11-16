@@ -1,6 +1,6 @@
 # backend/app/schemas/courses.py
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, field_validator
 from typing import List, Optional
 from datetime import datetime
 
@@ -36,3 +36,29 @@ class ModuleGenerateResponse(BaseModel):
     message: str
     module_id: int
     title: str
+
+def _validar_perfil_ia(v):
+    """Vazio vira None (= perfil geral do curso); id desconhecido vira erro 422."""
+    from app.agents.perfis import PERFIS_VALIDOS
+    if v is None or (isinstance(v, str) and not v.strip()):
+        return None
+    v = v.strip()
+    if v not in PERFIS_VALIDOS:
+        raise ValueError(f"perfil_ia inválido: '{v}'. Use um destes: {', '.join(PERFIS_VALIDOS)} (ou vazio = geral).")
+    return v
+
+
+class CourseUpdate(BaseModel):
+    """Atualização/criação de curso: os campos antigos seguem livres (extra=allow, como
+    era com dict); só perfil_ia é validado (NIA-T-031)."""
+    model_config = ConfigDict(extra="allow")
+    perfil_ia: Optional[str] = None
+
+    @field_validator("perfil_ia")
+    @classmethod
+    def _perfil_valido(cls, v):
+        return _validar_perfil_ia(v)
+
+
+class CourseCreate(CourseUpdate):
+    pass

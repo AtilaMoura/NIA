@@ -231,14 +231,117 @@ PERFIL_REDES = PerfilDominio(
 )
 
 
+# ---------------------------------------------------------------------------
+# Obreiro ACP (curso CONFESSIONAL) — NIA-T-031. Parte do PERFIL_OBREIRO, mas sem a
+# neutralidade denominacional: o curso ensina o que a ACP crê, com base bíblica.
+# Regras vindas de docs/processo-topico/obreiro-acp.md.
+# ---------------------------------------------------------------------------
+FIO_CONDUTOR_OBREIRO_ACP = """
+Fio condutor pedagógico obrigatório desta área (nunca contradizer):
+Este é um curso CONFESSIONAL da igreja (ACP — Casa da Palavra): ensina o que a igreja crê,
+sempre com base no texto bíblico. O texto bíblico é a fonte central e final; orientação da
+igreja, comentário e aplicação são APOIO e ficam claramente separados do texto. NÃO use nota
+de neutralidade nem apresente "o que as tradições cristãs dizem": ensine a posição da igreja.
+Se houver divergência com outras igrejas, no máximo 1 frase, uma vez, e volte à posição da
+igreja. Texto bíblico sempre na versão ACF (Almeida Corrigida Fiel).
+Linguagem de iniciante: todo termo (diácono, altar, voto, prebenda, ata, repreender...) é
+explicado na mesma frase em que aparece; nada de "como vimos em outro curso".
+
+REGRA DE CITAÇÃO (a fonte de verdade é o texto fornecido, não a sua memória):
+- Se um TEXTO BÍBLICO DE REFERÊNCIA for fornecido nesta chamada: toda citação entre aspas
+  apresentada como literal TEM que vir exatamente desse texto — não complete, corrija ou
+  invente uma palavra de memória.
+- Se NENHUM texto de referência for fornecido: é PROIBIDO colocar qualquer coisa entre aspas
+  como citação literal. Parafraseie em prosa normal (sem aspas) e cite a referência exata
+  (livro capítulo:versículo).
+- Regras do dia a dia da igreja entram numa caixa "Orientação da ACP", ao lado da base bíblica
+  e nunca no lugar dela; regra não confirmada pelo pastor: marcar "a confirmar".
+- Nunca invente fato, número, nome ou artigo do estatuto: só o que está no material.
+""".strip()
+
+PERFIL_OBREIRO_ACP = PerfilDominio(
+    id="obreiro_acp",
+    contexto_curso='curso confessional "Obreiro ACP — Servir na Casa da Palavra" (formação de obreiros, linguagem de iniciante)',
+    fio_condutor=FIO_CONDUTOR_OBREIRO_ACP,
+    exemplo_calibracao=EXEMPLO_CALIBRACAO_TEOLOGIA,
+    exemplo_diagrama=EXEMPLO_DIAGRAMA_TEOLOGIA,
+)
+
+
+# ---------------------------------------------------------------------------
+# Engenharia de Software com IA (curso 16: Git, conferir o que a IA fez, repositório real)
+# ---------------------------------------------------------------------------
+FIO_CONDUTOR_ENG_IA = """
+Fio condutor pedagógico obrigatório desta área (nunca contradizer):
+Curso prático de engenharia de software com IA: usar Git e conferir o que a IA fez em um
+repositório REAL. Regras inegociáveis:
+- Fatos técnicos (comando, opção/flag, saída esperada, comportamento do Git, datas e nomes
+  históricos) e comandos vêm SEMPRE do material fornecido; nunca invente comando, opção ou
+  resultado de memória. Na dúvida, diga que não está no material.
+- Ensine a CONFERIR: o que a IA fez, o que mudou no repositório e como verificar (diff,
+  histórico, testes), em vez de confiar no relatório da IA.
+- Comando de terminal e trecho de código vão no bloco "codigo" (campos: texto — obrigatório,
+  até 5000 caracteres, com quebras de linha —, linguagem: powershell|bash|python|json|yaml|diff|texto,
+  titulo e nota opcionais), nunca dentro de "box" nem de "paragrafo". Sem narracao: o áudio
+  não lê comando.
+- Pra fluxo/processo use o bloco "fluxo" (campos: passos: [{texto, decisao: bool}]), nunca
+  um "diagrama" com svg_raw escrito por IA.
+- Ancore em situações reais de trabalho com o repositório e contraste armadilhas comuns de
+  quem está começando.
+""".strip()
+
+PERFIL_ENG_IA = PerfilDominio(
+    id="eng_ia",
+    contexto_curso='curso "Engenharia de Software com IA" (Git, conferir o que a IA fez, repositório real)',
+    fio_condutor=FIO_CONDUTOR_ENG_IA,
+    exemplo_calibracao="",
+)
+
+
+# ---------------------------------------------------------------------------
+# Perfil GERAL — montado do próprio curso (título + descrição). Substitui o antigo
+# "cai no tech/Garden Center por padrão": curso sem perfil_ia nunca herda o contexto
+# de outro curso.
+# ---------------------------------------------------------------------------
+FIO_CONDUTOR_GERAL = """
+Fio condutor pedagógico obrigatório (nunca contradizer):
+Todo fato, número, nome, comando ou citação usado vem do MATERIAL fornecido — nunca invente
+nem complete de memória; na dúvida, diga que não está no material. Use a linguagem do aluno
+(simples, sem jargão não explicado) e exemplos do próprio material ou do dia a dia.
+""".strip()
+
+
+def perfil_geral(titulo: str | None, descricao: str | None = None) -> PerfilDominio:
+    """Perfil genérico montado do próprio curso."""
+    contexto = f'curso "{(titulo or "").strip()}"' if titulo else "curso"
+    desc = " ".join((descricao or "").split())
+    if desc:
+        contexto += f" ({desc[:200].rstrip()})"
+    return PerfilDominio(id="geral", contexto_curso=contexto, fio_condutor=FIO_CONDUTOR_GERAL, exemplo_calibracao="")
+
+
 PERFIS: dict[str, PerfilDominio] = {
     PERFIL_TECH.id: PERFIL_TECH,
     PERFIL_TEOLOGIA.id: PERFIL_TEOLOGIA,
     PERFIL_OBREIRO.id: PERFIL_OBREIRO,
     PERFIL_INGLES.id: PERFIL_INGLES,
     PERFIL_REDES.id: PERFIL_REDES,
+    PERFIL_OBREIRO_ACP.id: PERFIL_OBREIRO_ACP,
+    PERFIL_ENG_IA.id: PERFIL_ENG_IA,
 }
+
+# Ids válidos pra courses.perfil_ia ("geral" não é gravado: é o NULL)
+PERFIS_VALIDOS = tuple(PERFIS)
 
 
 def resolver_perfil(perfil_id: str) -> PerfilDominio:
     return PERFIS.get(perfil_id, PERFIL_TECH)
+
+
+def perfil_do_curso_obj(curso) -> PerfilDominio:
+    """perfil_ia do curso se preenchido e válido; senão o perfil GERAL do próprio curso
+    (nunca cai no Garden Center)."""
+    pid = getattr(curso, "perfil_ia", None) if curso is not None else None
+    if pid and pid in PERFIS:
+        return PERFIS[pid]
+    return perfil_geral(getattr(curso, "title", None), getattr(curso, "description", None))

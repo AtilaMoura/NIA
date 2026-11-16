@@ -10,6 +10,8 @@ from app.models.models import Course, Module, Progress, Lesson, User  # ← ADIC
 from app.schemas.courses import (
     CourseGenerateRequest,
     CourseStructureResponse,
+    CourseCreate,
+    CourseUpdate,
     ModuleGenerateResponse
 )
 from app.agents.orchestrator import Orchestrator
@@ -34,8 +36,9 @@ def _exigir_admin(user: User):
 # ============================================
 
 @router.post("/")
-def create_course(data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def create_course(body: CourseCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     _exigir_admin(current_user)
+    data = body.model_dump(exclude_unset=True)
     course = Course(**data)
     db.add(course)
     db.commit()
@@ -56,11 +59,12 @@ def get_course(course_id: int, db: Session = Depends(get_db), user: User | None 
     return course
 
 @router.put("/{course_id}")
-def update_course(course_id: int, data: dict, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def update_course(course_id: int, body: CourseUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     _exigir_admin(current_user)
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(404, "Course not found")
+    data = body.model_dump(exclude_unset=True)
     for key, value in data.items():
         setattr(course, key, value)
     db.commit()

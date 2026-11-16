@@ -119,6 +119,10 @@ class Course(Base):
     identidade_visual = Column(JSONB)
     cover_image_url = Column(String(500))
 
+    # Perfil de domínio da IA (NIA-T-031): id de app/agents/perfis.py; NULL = perfil geral
+    # montado do título/descrição do curso.
+    perfil_ia = Column(String(40), nullable=True)
+
     # Status
     status = Column(String(50), default='draft')
     is_public = Column(Boolean, default=False)

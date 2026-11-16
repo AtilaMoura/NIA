@@ -116,6 +116,10 @@ com a resposta esperada acima — nunca com a sua opinião. Resposta que diz a m
 o material (mesmo com outras palavras, ou menos completa) NÃO é lacuna "real"; no máximo
 "superficial" se faltar algo que a pergunta pediu explicitamente (ex: citar os exemplos).
 Só é lacuna "real" o que CONTRADIZ o material.
+Erro só de digitação/grafia (inclusive em nome de comando ou termo técnico) NÃO é lacuna: no
+máximo cite "Atenção à grafia: X". Informação correta segundo o material nunca é erro, mesmo
+indo além da resposta esperada: antes de apontar que o aluno confundiu algo, confira no material.
+Parte certa da resposta com outra parte pedida faltando é no máximo lacuna "superficial".
 
 {"REFORÇOS DE RODADAS DE ESTUDO ANTERIORES (o aluno recomeçou o tópico depois deles). Só conta como erro que voltou se a resposta ATUAL repetir o mesmo erro, conferido contra o material: " + historico_reforcos if historico_reforcos else ""}
 
@@ -170,6 +174,19 @@ CLASSIFICAÇÃO (compare com o gabarito/material de cada pergunta, nunca com a s
   (não basta faltar um detalhe da resposta esperada), ou mistura um conceito de forma imprecisa.
 - "errada": contradiz o material, ou não responde o que foi pedido.
 
+REGRAS DE JULGAMENTO PARA "ABERTA" (valem sempre, em qualquer curso):
+- GRAFIA: erro de digitação/grafia (1-2 letras trocadas, acento, maiúscula), inclusive em
+  nome de comando ou termo técnico (ex.: "cat-fale" no lugar de "cat-file"), NÃO torna a
+  resposta errada: julgue a IDEIA e aponte em "o_que_faltou" no formato "Atenção à grafia: X"
+  (ex.: "Atenção à grafia: cat-file").
+- MATERIAL É A FONTE: informação correta segundo o MATERIAL nunca é erro, mesmo que vá além da
+  resposta esperada. Antes de dizer que o aluno "confundiu" ou errou algo, confira no MATERIAL
+  (slide por slide); se o material diz o mesmo que o aluno, ele está certo (no máximo uma
+  nota curta de contexto). Informação além do material que não o contradiz não reduz a nota.
+- PARTE CERTA: se o aluno respondeu certo uma parte do que a pergunta pede e faltou outra
+  parte pedida, é "parcial", NUNCA "errada". "errada" só quando contradiz o material ou não
+  responde o que foi pedido.
+
 Pra perguntas do tipo FRASE, julgue a FRASE INTEIRA (não só um trecho):
 - "certa": frase correta com o mesmo sentido do gabarito — variações válidas contam. Erro SÓ
   de grafia/maiúscula/pontuação/apóstrofo também é "certa": aponte em "o_que_faltou" no
@@ -213,6 +230,10 @@ REVISÃO curta e clara das dificuldades DELE, agrupada por ASSUNTO (não questã
 fiel ao material. A resposta certa de cada questão já está definida — não questione.
 
 {perfil.fio_condutor}
+
+ATENÇÃO: se a dificuldade de uma questão foi só de grafia/digitação (letra trocada, acento,
+maiúscula, inclusive em nome de comando ou termo técnico), diga isso ("Atenção à grafia: X") e
+não trate como erro de conceito. Nunca diga que o aluno errou algo que o MATERIAL confirma.
 
 FIDELIDADE: regras e exemplos usam só o que está no MATERIAL — nunca acrescente fato, citação,
 nome, número ou detalhe (bíblico, técnico ou histórico) que não esteja nele. Exemplos são
@@ -280,6 +301,12 @@ dentro do próprio material de estudo (não é avaliação final, é feedback na
 {perfil.fio_condutor}
 
 {"CONTEXTO (tópico/aula em que isso está inserido): " + contexto_topico if contexto_topico else ""}
+
+REGRAS DA CORREÇÃO: se o erro do aluno foi só de digitação/grafia (letra trocada, acento,
+maiúscula, inclusive em nome de comando ou termo técnico), diga isso em "correcao_personalizada"
+("Atenção à grafia: X") em vez de tratar como erro de conceito. Nunca diga que o aluno
+confundiu algo que a própria pergunta/explicação confirma; se acertou uma parte, reconheça
+essa parte e foque no que faltou.
 
 PERGUNTA ORIGINAL (JSON):
 {json.dumps(pergunta, ensure_ascii=False, indent=2)}

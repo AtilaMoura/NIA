@@ -24,7 +24,6 @@ from datetime import datetime
 from sqlalchemy.orm.attributes import flag_modified
 
 from app.agents.contexto_topico import carregar_content, montar_contexto_duvida
-from app.agents.perfis import resolver_perfil
 from app.agents.tutor_agent import TutorAgent
 from app.database import SessionLocal
 from app.models.models import Avaliacao
@@ -77,7 +76,7 @@ async def main(apply: bool, ids: list[int] | None):
             time.sleep(PAUSA_ENTRE_PROVAS_S)
         content = carregar_content(av.topico)
         material, _ = montar_contexto_duvida(content, len(content.get("slides", [])) // 2, teto_topico=TETO_MATERIAL)
-        perfil = resolver_perfil(_perfil_do_curso(db, av.topico))
+        perfil = _perfil_do_curso(db, av.topico)
         try:
             r = await agente.run_json_com_retry(_prompt(av.topico.titulo, material, perguntas, perfil), max_tokens=2000)
         except Exception as e:

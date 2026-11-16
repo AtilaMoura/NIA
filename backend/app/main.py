@@ -51,6 +51,8 @@ def _ensure_colunas_extras(bind):
         "ALTER TABLE courses ADD COLUMN IF NOT EXISTS identidade_visual JSONB",
         "ALTER TABLE courses ADD COLUMN IF NOT EXISTS cover_image_url VARCHAR(500)",
         "ALTER TABLE modules ADD COLUMN IF NOT EXISTS cover_image_url VARCHAR(500)",
+        # Perfil de domínio da IA por curso (NIA-T-031).
+        "ALTER TABLE courses ADD COLUMN IF NOT EXISTS perfil_ia VARCHAR(40)",
         # Slide exato onde o aluno parou + "rodada" de exercícios pra separar
         # teste/preview de avaliação real (2026-09-15, ver POST
         # /topico-progress/{id}/reiniciar).
